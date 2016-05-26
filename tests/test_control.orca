@@ -1,0 +1,175 @@
+using io.print;
+
+print('simple if');
+if 10 > 20: {
+	throw test.control, 'if statement fail';
+}
+
+
+print('if else');
+a = 0;
+
+if 10 > 30: 
+	throw test.control, 'if else statement fail';
+else: 
+	a = 10;
+
+if a != 10: throw test.control, 'if else statement fail';
+
+
+
+print('simple while');
+while false: 
+	throw test.control, 'simple while statement fail';
+
+
+a = 0;
+while a < 100: 
+	a = a+1;
+
+
+if a != 100: throw test.control, 'while statement fail';
+
+print('simple do while');
+
+a = 0;
+do {
+	a = a+1;
+} while a < 100;
+
+print(a);
+if a != 100: throw test.control, 'simple do while statement fail';
+
+print('simple times do');
+
+a = 0;
+100 times do {
+	a = a+1;
+}
+
+print(a);
+if a != 100: throw test.control, 'simple times do statement fail';
+
+print('nested');
+
+a=0;
+c=0;
+do {
+	b = 0;
+	while b<10: {
+		10 times do {
+			c = c+1;
+		}
+		b = b+1;
+	}
+
+	a = a+1;
+} while a < 10;
+
+print(c);
+if c != 1000: {
+	throw test.control, 'nested control statement fail';
+}
+
+print('simple for');
+a = [1,2,3,4,5,6,7,8,9,10];
+c = 0;
+for b in a: {
+  print(b);
+  c = c+b;
+}
+
+print(c);
+if c != 55: throw test.control, 'simple for statement fail';
+
+print('simple for');
+l = [1,2,3,4,5,6,7,8,9,10];
+d = 0;
+for a in l: {
+  for b in l: {
+  	for c in l: {
+    		d = d+1;
+	}
+  }
+}
+
+print(d);
+if (d != 1000): throw test.control, 'nested for statement fail';
+
+print('simple tuple for');
+a = (1,2,3,4,5,6,7,8,9,10);
+c = 0;
+for b in a: {
+  print(b);
+  c = c+b;
+}
+
+print(c);
+if c != 55: throw test.control, 'tuple for statement fail';
+
+
+
+# test break, continue
+
+a = 0;
+do {
+ if a == 5: {
+    a += 10;
+    continue;
+ }
+
+ a += 1;
+} while a<10;
+print: a;
+if a != 16: throw test.control, 'continue fail';
+
+a = 0;
+
+do {
+  if a==5: {
+    print: 'a==5';
+    break;
+  }
+
+  a += 1;
+  print: a;
+} while a<10;
+
+print: a;
+if a != 5: throw test.control, 'break fail';
+
+
+a = 0;
+
+while a > -1: {
+
+  if a == 10:
+    break;
+
+  a += 1;
+}
+
+print: a;
+if a != 10: throw test.control, 'while, break fail';
+
+
+for a in [1..30]: {
+
+  if a == 9: {
+    print: 'break';
+    break;
+  }
+
+  if a > 5:
+    continue;
+
+  print: 'for: ', a;
+}
+
+print: a;
+if a != 9 : throw test.control, 'for, break fail';
+
+
+
+
+

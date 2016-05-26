@@ -1,0 +1,82 @@
+try {
+	a = 10;
+	throw aaa;
+}
+catch aaa {
+	print: 'ok, aaa catched';
+}
+catch bbb {
+	print: 'bbb catched';
+	throw test.ex, 'invalid catch';
+}
+
+def foo(a)
+{
+	b = a;
+	throw a.b.c;
+}
+
+
+try {
+	a = 10;
+	my.foo(10);
+}
+catch {
+	print: 'my.foo catched';
+	a = 0;
+}
+finally {
+	print: 'fainally catched';
+	a += 1;
+}
+
+
+if a != 1: {
+	throw test.ex, 'invalid catch';
+}
+
+
+
+try {
+	try {
+		try {
+			a = 10;
+			throw ccc;
+		} catch aaa {
+			print: 'aaa catched';
+			throw test.ex, 'invalid catch';
+		}
+	}
+	catch bbb {
+		print: 'bbb catched';
+		throw test.ex, 'invalid catch';
+	}
+}
+catch ccc {
+	print: 'ccc catched';
+
+}
+finally {
+	print: 'fainally catched';
+}
+
+
+# exception argument
+
+try {
+	throw aaa, 10, 20.0, 'str';
+}
+catch aaa: a, b, c {
+	if a != 10:
+		throw test.ex, 'exception param fail';
+
+	if b != 20.0:
+		throw test.ex, 'exception param fail';
+
+	if c != 'str':
+		throw test.ex, 'exception param fail';
+}
+
+print: 'OK';
+
+

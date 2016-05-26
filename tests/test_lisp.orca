@@ -1,0 +1,349 @@
+
+using lisp;
+using pack;
+using math;
+
+
+
+str = """
+(* 4 2)
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 4 * 2:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+str = """
+(+ 3 (* 4 2 3))
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 4*2*3+3:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+str = """
+( defun (sum x y) (+ x y) )(sum 4 4)
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 4+4:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+str = """
+( defun pi 3.141592 )(* pi pi)
+""";
+
+
+str = """
+( defun (pow x) (* x x) )(pow 3)
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 3 * 3:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+
+str = """
+( defun pi 3.141592)
+( defun (pow x) (* x x) )
+( defun (fun x y) (x y) )
+(fun pow pi)
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 3.141592 * 3.141592:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+
+str = """
+( defun (avg x y z) (/ (+ x y z) 3) )
+( defun (pow x) (* x x) )
+(avg 10 (pow 20) 30)
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != (10 + 20*20 + 30) / 3:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+str = """
+( list 1 2 3 4)
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != [1,2,3,4]:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+str = """
+(car [1 2 3])
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 1:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+str = """
+( cdr (list 1 2 3 4))
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != [2,3,4]:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+str = """
+(car (cdr ( list 1 2 3 4)))
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 2:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+str = """
+( if (>= 3 2) (* 3 10) 4)
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 3 * 10:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+str = """
+(do (* 3 3) (+ 4 4))
+""";
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 8:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+
+
+str = """
+( defun (sum x y) (+ x y) )(do (sum 4 4)(sum 3 4))
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 3+4:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+
+
+str = """
+( cond 
+	((>= -3 20) (* 3 10))
+	((< 20 10) 3)
+	(T "hello")
+)
+""";
+
+print: str;
+print: code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 'hello':
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+str = """
+( using math ) (math.sin 1)
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != math.sin(1):
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+str = """
+( using math.sin ) (sin 1)
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != math.sin(1):
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+def mul(...)
+{
+	print: argv;
+	return 3*4;
+}
+
+str = """
+(my.mul 3 4)
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 3*4:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+
+str = """
+((lambda (x y) (* x y)) 3 4)
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 3*4:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+
+str = """
+(defun (pow x) (* x x))
+(pow ((lambda (x y) (* x y)) 3 4))
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != (3*4)*(3*4):
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+str = """
+(quote 1 (* 2 3) 4)
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r[0] != 1 || r[1][1] != 2 || r[1][2] != 3 || r[2] != 4:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+str = """
+'(1 (* 2 3) 4)
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r[0] != 1 || r[1][1] != 2 || r[1][2] != 3 || r[2] != 4:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+
+str = """
+`(1 ,(* 2 3) 4)
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != [1, 6, 4]:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+
+str = """
+( defmacro (pow x) (list * x x) )(do (pow 3) (pow 4) (pow 5))
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 25:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+
+str = """
+(let ((x 10)(y 20)) (* x y))
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 200:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+
+str = """
+( defmacro (addy x) `(+ ,x y))
+(let ((y 20)) (addy 10))
+""";
+
+print: str;
+code = lisp.compile(str);
+print: 'result: ', r = lisp.execute(code);
+
+if r != 30:
+	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+
+
+
+def foo := %lisp{
+ (+ argv0 argv1)
+};
+
+print: .foo;
+print: r = .foo(3, 4);
+
+if r != 3+4:
+	throw test.lisp, 'lisp result for context failed';
+
+print: 'OK';
+

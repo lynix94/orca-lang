@@ -1,0 +1,3231 @@
+<html>
+<head>
+<link type="text/css" rel="StyleSheet" media="all" href="main.css"/>
+
+</head>
+<body>
+
+<h1> Orca Programming Language Module Reference</h1>
+<h2> version 0.5</h2>
+written by Lee, Ki-Yeul (kiyeul.lee@gmail.com)<br>
+visit http://orca-lang.or.kr for more information.
+
+<h1> Table of Contents </h1>
+<ul>
+<li><a href="#io">io</a>
+<li><a href="#file">file</a>
+<li><a href="#thread">thread</a>
+<li><a href="#ipc">ipc</a>
+<li><a href="#socket">socket</a>
+<li><a href="#select">select</a>
+<li><a href="#alg">alg</a>
+<li><a href="#type">type</a>
+<li><a href="#xml">xml</a>
+<li><a href="#json">json</a>
+<li><a href="#os">os</a>
+<li><a href="#system">system</a>
+<li><a href="#math">math</a>
+<li><a href="#operator">operator</a>
+<li><a href="#sort">sort</a>
+<li><a href="#fun">fun</a>
+<li><a href="#gui">gui</a>
+<li><a href="#datetime">datetime, date, time</a>
+<li><a href="#gnuplot">gnuplot</a>
+<li><a href="#remotec">remotec, remoted, dist</a>
+<li><a href="#fs">fs, dfsd, cached</a>
+<li><a href="#lisp">lisp</a>
+<li><a href="#cpp">cpp</a>
+<li><a href="#sh">sh</a>
+<li><a href="#httpd">httpd</a>
+<li><a href="#base64">base64</a>
+<li><a href="#stopwatch">stopwatch</a>
+<li><a href="#orca">orca</a>
+<li><a href="#util">util</a>
+<li><a href="#run">run</a>
+<li><a href="#cgi">cgi</a>
+<li><a href="#mysql">mysql</a>
+</ul>
+
+
+
+<h1>
+<a name="io">io</a>
+</h1>
+
+
+This module handle Input and Output.<br>
+
+<h3>
+print(...)
+</h3>
+
+Prints out arguments.<br>
+It's absolute module path is root.io.print but for conveniance, It's already in using space.<br>
+
+<h3>
+put(...)
+</h3>
+This interface is similar with io.print. But, this interface don't change line.
+
+
+<h3>
+open(filename, mode)
+</h3>
+
+First argument is file name and Second argument is open mode (like fopen in C)
+It open file and return file object. (in next chapter)
+
+
+<h3>
+input()
+</h3>
+
+Read from console.<br>
+
+<div class="shell"><pre>
+$ name=io.input();
+KY Lee
+$ print: 'hello, ', name;
+hello, KY Lee
+</pre></div>
+
+<h1>
+<a name="file">file</a>
+</h1>
+
+Manage file by using read, write and close interface.<br>
+Here is simple example.<br>
+
+
+<div class="code"><pre>
+input = 'hello, file';
+fh = open('test.txt', 'w');
+fh.write(input);
+fh.close();
+
+
+fh = open('test.txt', 'r');
+output = fh.read();
+fh.close();
+</pre></div>
+
+
+<p>seek(offset, base) change file pointer. offset is size to move.<br>
+base is string like 'SEEK_SET', 'SEEK_CUR', 'SEEK_END' which means first, current, end of file.<br>
+
+tell() returns current file pointer position.<br>
+
+
+
+<h1>
+<a name="thread">thread</a>
+</h1>
+
+This supports thread.<br>
+run interface launch thread and return thread handle.<br>
+You can join thread by using thread.join interface.<br>
+
+<div class="code"><pre>
+using thread;
+
+def foo(param) {
+  print: param;
+}
+
+hd = thread.run(my.foo, ‘hello, thread’);
+hd.join();
+</pre></div>
+
+<p> First argument is object which be a new thread. others are paremeter to passing.<br>
+
+
+
+
+<h1>
+<a name="ipc">ipc</a>
+</h1>
+
+This supports IPC. 
+currently mutex, cond and semaphore is made up.<br>
+
+<h2>
+mutex
+</h2>
+
+It supports lock and unlock interface.<br>
+If you run below code,
+
+
+<div class="code"><pre>
+using ipc;
+using thread;
+using time;
+
+def sample_thread(num, mtx) {
+    print: 'thread: ${num} start';    
+    mtx.lock();
+    print: 'thread: ${num} accuire mutex';    
+    time.msleep(3000);
+    mtx.unlock();
+    print: 'thread: ${num} release mutex';    
+    print: 'thread: ${num} end';    
+}
+
+m = clone ipc.mutex;
+
+th1 = thread.run(my.sample_thread, 1, m);
+th2 = thread.run(my.sample_thread, 2, m);
+th1.join();
+th2.join();
+</pre></div>
+
+<p> It's result is 
+
+<pre>
+thread: 1 start
+thread: 2 start
+thread: 1 accuire mutex
+thread: 1 release mutex
+thread: 2 accuire mutex
+thread: 1 end
+thread: 2 release mutex
+thread: 2 end
+</pre>
+
+<p>mutex is scope object, so it could be used like below.<br>
+
+<div class="code"><pre>
+a = mutex.clone();
+
+a {
+  fh.write('exclusive write'); 
+}
+</pre></div>
+
+
+<h2>
+cond
+</h2>
+
+<h3>
+signal()
+</h3>
+
+<h3>
+wait(mutex, [msec])
+wait([msec])
+</h3>
+
+It's conditional variable and provides wait and signal interface.<br>
+
+<p>wait can get relative mutex which handle critical section.
+and it can get msec to determine waittime. If it's omitted, wait infinitely.<br>
+
+If you run below example, wait_thread wake up after 1 sec.<br>
+
+<div class="code"><pre>
+using time;
+
+def wait_thread(cond) {
+    print: 'thread: wait';
+    cond.wait(3000);
+    print: 'thread: wakeup';
+}
+
+def signal_thread(cond) {
+    time.msleep(1000);
+    cond.signal();
+}
+
+c = clone ipc.cond;
+
+th1 = thread.run(my.wait_thread, c);
+th2 = thread.run(my.signal_thread, c);
+th1.join();
+th2.join();
+</pre></div>
+
+
+<h2>
+semaphore
+</h2>
+
+This module is semaphore and provides set, inc and dec interface.<br>
+By using set, set up key and semaphore max value. And using semaphore by inc and dec.<br>
+If you run below code,
+
+<div class="code"><pre>
+using ipc;
+using thread;
+using time;
+
+def inc_thread(key) {
+    sem = clone ipc.semaphore;
+    sem.set(key, 10);
+    for a in [1..10]: {
+        print: 'produced...';
+        sem.inc();
+        time.msleep(1000);
+    }
+}
+
+def dec_thread(key) {
+    sem = clone ipc.semaphore;
+    sem.set(key, 10);
+    for a in [1..10]: {
+        sem.dec();
+        print: 'consumed...';
+    }
+}
+
+th1 = thread.run(my.inc_thread, 1000);
+time.msleep(3000);
+th2 = thread.run(my.dec_thread, 1000);
+th1.join();
+th2.join();
+</pre></div>
+
+<p> It's result is
+
+
+<pre>
+produced...
+produced...
+produced...
+produced...
+consumed...
+consumed...
+consumed...
+consumed...
+produced...
+consumed...
+produced...
+consumed...
+produced...
+consumed...
+produced...
+consumed...
+produced...
+consumed...
+produced...
+consumed...
+</pre>
+
+
+It shows that consumed... occurs after produced...<br>
+
+
+<h1>
+<a name="socket">socket</a>
+</h1>
+
+This module supports socket.  but socket option is not developed yet.<br>
+
+<h3>create()</h3>
+<p>create socket and return.
+<p>$ sock = socket.create();
+
+<h3>send(data)</h3>
+
+<p>send data by socket.
+<p>$ sock.send('hello, world');
+
+<h3>recv([len, [timeout]])</h3>
+
+<p>receive data from socket.
+<p>$ msg = sock.recv();
+
+<h3>close()</h3>
+
+<p>close socket
+<p>$ sock.close();
+
+
+<h3>connect(ip, port)</h3>
+
+<p>connect to ip, port.
+<p>$ sock = socket.create();<br>
+$ sock.connect('127.0.0.1', 8080);
+
+
+<h3>bind(port)</h3>
+
+<p>socket bind.
+<p>$ sock.bind(80);
+
+
+<h3>listen()</h3>
+
+<p>socket listen
+<p>$ sock.listen();
+
+<h3>accept()</h3>
+
+<p>accept client and return client socket.
+<p>$ client = sock.accept();
+
+Here is echo example.<br>
+
+<div class="code"><pre>
+svr = socket.create();
+svr.bind(80);
+svr.listen();
+
+do {
+    try {
+        client = svr.accept();
+        msg = client.recv();
+        client.send(msg);
+    }
+    catch {
+
+    }
+} while(true);
+</pre></div>
+
+<p>If you run above code and try below in another console,
+
+<div class="shell"><pre>
+$ using socket;
+$ sock = socket.create();
+$ msg = io.input();
+Hello, socket
+$ sock.send(msg);
+$ print: sock.recv();
+Hello, socket
+</pre></div>
+
+<p> Like above, echo server is worked.<br>
+
+You can build multiplexing, multithread server by using select, thread module.<br>
+
+IOCP, async socket and epoll server will be added soon.<br>
+
+
+<h1>
+<a name="select">select</a>
+</h1>
+
+select have select object in it. because It have epoll object in it later.<br>
+
+select interface is like below.<br>
+select (read_list, write_list, exception_list, sleep)
+
+It's simillar like posix sleep API
+
+
+<div class="code"><pre>
+def server {
+    sock = socket.create();
+
+    sock.bind(8080);
+    sock.listen();
+
+    while true: {
+        fd = select.select([sock.get()], [], [], 1000);
+
+        if fd[0] == [sock.get()]: {
+            new_cl = sock.accept();
+
+            str = new_cl.recv();
+            new_cl.send(str);
+
+            sock.close();
+            new_cl.close();
+            return;
+        }
+    }
+}
+</pre></div>
+
+
+
+
+
+
+<h1>
+<a name="alg">alg</a>
+</h1>
+
+alg module is set of general algorithms about container.<br>
+It's inspired from STL algorithm.<br>
+
+
+<h3>
+traverse(obj, fun)
+</h3>
+
+traverse obj and run fun to each items.<br>
+
+<div class="shell"><pre>
+$ using alg;
+$ a = [1,2,3, {4:5, 6:7}, (8,0)];
+$ alg.traverse(a, %c{print: argv[0];});
+[ 1,2,3,{ 4:5,6:7 },( 8,0 ) ]
+1
+2
+3
+{ 4:5,6:7 }
+( 4,5 )
+4
+5
+( 6,7 )
+6
+7
+( 8,0 )
+8
+0
+$
+</pre></div>
+
+
+<h3>
+for_each (begin, end, function)
+</h3>
+
+Run function(item) to every items  between begin to end.<br>
+
+It's simillar to,
+
+<div class="code"><pre>
+for a in a.begin():
+{
+	function(a());
+}
+</pre></div>
+
+<p> But, you can set end iterator.<br>
+
+<div class="shell"><pre>
+$ using alg;
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ alg.for_each(a.begin(), a.end(), %c{ print: argv[0]; });
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+$ 
+</pre></div>
+
+
+
+<h3>
+for_each_iterator(begin, end, function)
+</h3>
+
+for_each interface call function by value. So, if you want change values, It's not suitable.<br>
+In this case, use for_each_iterator instead. It calls function by iterator as parameter.<br>
+
+<div class="shell"><pre>
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ alg.for_each_iterator(a.begin(), a.end(), %c{ argv[0](argv[0]()*2); });
+$ print: a;
+[ 2,4,6,8,10,12,14,16,18,20 ]
+$ 
+</pre></div>
+
+
+<h3>
+find (begin, end, value)
+</h3>
+
+find interface find value at range of  begin to end. If value is exists in that range, return it's iterator.<br>
+If not, return end iterator.<br>
+
+<div class="shell"><pre>
+$ using alg;
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ b = alg.find(a.begin(), a.end(), 5);
+listiter <0x98acc38>
+$ print: b();
+5
+$ b = alg.find(a.begin(), a.end(), 20);
+listiter <0x98ad2e8>
+$ print: b();
+uncaugted exception: orca.iter out of range
+recent call-stack trace
+>> root (/usr/local/lib/orca/alg.orca 237)              return true;
+</pre></div>
+
+
+
+<h3>
+find_if (begin, end, function)
+</h3>
+
+find_if simillar to find but, It determinds match if function(item) return true.<br>
+As an example, change above example to find 7's multiplier.<br>
+
+<div class="shell"><pre>
+$ a = [11..20];
+[ 11,12,13,14,15,16,17,18,19,20 ]
+$ b = alg.find_if(a.begin(), a.end(), %c{ return argv[0] % 7 == 0; });
+listiter <0x98ae668>
+$ print: b();
+14
+</pre></div>
+
+<p> find_if calls function to every item from begin to end. If function return true, return that item's iterator.<br>
+
+
+<h3>
+erase (begin, end)
+</h3>
+
+erase interface erase all items from begin to end.<br>
+
+<div class="shell"><pre>
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ s = a.begin().next(3);
+listiter <0x98afc60>
+$ e = a.end().prev(2);
+listiter <0x98af870>
+$ print: s(), ':', e();
+4:9
+$ alg.erase(s, e);
+$ print: a;
+[ 1,2,3,9,10 ]
+</pre></div>
+
+
+<h3>
+remove (begin, end, val)
+</h3>
+
+remove interface remove all items which is same with val from begin to end.<br>
+
+<div class="shell"><pre>
+$ a = [1,2,3,2,7,2];
+[ 1,2,3,2,7,2 ]
+$ alg.remove(a.begin(), a.end(), 2);
+$ print: a;
+[ 1,3,7 ]
+</pre></div>
+
+
+<h3>
+remove_if (begin, end, function)
+</h3>
+
+remove_if interface remove all items if function(item) return true from begin to end.<br>
+
+If you want remove all items which are less than 10,
+
+<div class="shell"><pre>
+$ a = [10, 3, 2, 20, 32];
+[ 10,3,2,20,32 ]
+$ alg.remove_if(a.begin(), a.end(), %c{ argv[0] < 10; } );
+$ print: a;
+[ 10,3,2,20,32 ]
+</pre></div>
+
+
+
+<h3>
+copy(begin, end, target)
+</h3>
+
+copy interface copy all items between begin and end to target iterator.<br>
+
+<div class="shell"><pre>
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ b = [];
+[  ]
+$ alg.copy(a.begin(), a.end(), b.begin());
+$ print: b;
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ alg.copy(a.begin(), a.end(), alg.find(b.begin(), b.end(), 5));
+$ print: b;
+[ 1,2,3,4,1,2,3,4,5,6,7,8,9,10,5,6,7,8,9,10 ]
+$ 
+</pre></div>
+
+
+
+<h3>
+copy_n(begin, n, target)
+</h3>
+
+copy_n interface is similar with copy, but it copy n items from begin to target iterator.<br>
+
+<div class="shell"><pre>
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ b = [];
+[  ]
+$ alg.copy_n(alg.find(a.begin(), a.end(), 5), 3, b.begin());
+$ print: b;
+[ 5,6,7 ]
+</pre></div>
+
+
+
+
+<h3>
+count(begin, end, val)
+</h3>
+
+count interface count items from begin to end whose value is val.<br>
+
+<div class="shell"><pre>
+$ a = [2, 3, 3, 3, 2, 7, 4];
+[ 2,3,3,3,2,7,4 ]
+$ alg.count(a.begin(), a.end(), 3);
+3
+</pre></div>
+
+
+
+<h3>
+count_if(begin, end, function)
+</h3>
+
+count_if is similar with count, but it count items if return value of function(item) is true.<br>
+
+So, if you want to count even number, do it like below.<br>
+
+<div class="shell"><pre>
+$ a = [2,3,3,3,2,7,4];
+[ 2,3,3,3,2,7,4 ]
+$ alg.count_if(a.begin(), a.end(), %c{ return argv[0] % 2 == 0; });
+3
+</pre></div>
+
+
+
+
+<h3>
+equal(begin, end, begin2, function)
+</h3>
+
+equal interface calls function(a, b) whose parameter a comes from each eletement of begin ~ end and b comes from
+each element of begin2 ~
+If all return values are true, equal return truel.<br>
+Otherwise, It returns false.<br>
+
+As an example, below two lists a and b have different type of items.<br>
+So if you evaluate a == b, it's result is false.<br>
+But you can do type-free compare like below,
+
+<div class="shell"><pre>
+$ a = [1, 2, 3, 2, 2];
+[ 1,2,3,2,2 ]
+$ b = ['1', '2', '3', '2', '2'];
+[ '1','2','3','2','2' ]
+$ alg.equal(a.begin(), a.end(), b.begin(), %c{ return argv[0] == argv[1].integer(); });
+true
+</pre></div>
+
+
+<h3>
+equal_range(begin, end, val)
+</h3>
+
+equal_range check all items between begin and end are same value val.<br>
+
+<div class="shell"><pre>
+$ a = [1,1,2,2,3,3,4,4];
+[ 1,1,2,2,3,3,4,4 ]
+$ alg.equal_range(a.begin(), a.end(), 1);
+false
+$ alg.equal_range(a.begin().next(2), a.begin().next(4), 2);
+true
+</pre></div>
+
+
+<h3>
+replace(begin, end, from, to)
+</h3>
+
+replace interface change items whose value is 'from' to 'to' at the range of begin ~ end.<br>
+Below example show replace 0 to 3.<br>
+
+<div class="shell"><pre>
+$ a = %[x%3|x<-1~10];
+[ 1,2,0,1,2,0,1,2,0,1 ]
+$ alg.replace(a.begin(), a.end(), 0, 3);
+$ print: a;
+[ 1,2,3,1,2,3,1,2,3,1 ]
+</pre></div>
+
+
+
+<h3>
+replace_if(begin, end, function, to)
+</h3>
+
+replace_if interface is similar with replace, but it change item if function(item)'s result is true.<br>
+Below example show that replace_if change 3's multiplier to X
+
+<div class="shell"><pre>
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ alg.replace_if(a.begin(), a.end(), %c{ return argv[0]%3 == 0; }, 'x');
+$ print: a;
+[ 1,2,'x',4,5,'x',7,8,'x',10 ]
+</pre></div>
+
+
+<h3>
+transfrom(begin, end, dest, function)
+</h3>
+<h3>
+transfrom(begin, end, begin2, des, function)
+</h3>
+
+transform interface has two types.<br>
+First, transform(begin, end, dest, function) method calls function(item) to all items from begin to end and insert it's result to dest iterator.<br>
+
+<div class="shell"><pre>
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ b = [];
+[  ]
+$ alg.transform(a.begin(), a.end(), b.begin(), %c{ return argv[0]*10; });
+$ print: b;
+[ 10,20,30,40,50,60,70,80,90,100 ]
+</pre></div>
+
+<p> Above example is multiply 10 to all items and insert them to b;
+transform(begin, end, begin2, des, function) is similar with above but it has two sources.  begin~end and begin2~.<br>
+It inserts the results of function(item1, item2) to dest iterator.<br>
+
+<div class="shell"><pre>
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ b = %[x|x<- 100~ ];
+[ 100,101,102,103,104,105,106,107,108,109, ... ]
+$ using alg;
+$ c = [];
+[  ]
+$ alg.transform(a.begin(), a.end(), b.begin(), c.begin(), %c{ return argv[0] + argv[1]; });
+$ print: c;
+[ 101,103,105,107,109,111,113,115,117,119 ]
+</pre></div>
+
+<p> Above example sum up each item from a and b, then insert it to c.<br>
+List b is set-builder form list and it's length is infinite. But range is just a.begin() ~ a.end() because source one has finite range.<br>
+
+
+
+<h1>
+<a name="type">type</a>
+</h1>
+
+This is module for type traits and make type dynamically.
+
+first, make data type at runtime like below,
+
+$ print: type.list(1,2,3);
+[ 1,2,3 ]
+$ print: type.tuple();
+(  )
+$ print: type.map(1,2,3,4);
+{ 1:2,3:4 }
+$ str = '[0-9]+';
+$ print: a = type.regex(str);
+r'[0-9]+'
+$ print: a == '12345';
+true
+
+<p>without type.regex() programmer can make regular expression from constatant string only.
+(like r'[0-9]+'). but type.regex(str) allow to make dynamically.
+
+<p> And, members of type is type type of each data type.
+So, you can use those for type check.
+
+<div class="shell"><pre>
+$ 1.type == type.int;
+true
+$ 'string'.type == type.string;
+true
+$ 1.34.type == type.int;
+false
+$ 
+</pre></div>
+
+
+
+
+<h1>
+<a name="xml">xml</a>
+</h1>
+
+
+xml module can endode & decode xml string.<br>
+It's made by decode statements. and It's purpose is demonstration of decode statement.<br>
+
+so if you use cxml module (which may be out at later release) that use libxml, It'll be more faster than this.<br>
+
+<h3>
+xml.decoding(string)
+</h3>
+decode xml string to orca data structure,
+
+<h3>
+xml.encoding(obj)
+</h3>
+encode orca data structure to xml stringl.<br>
+
+<h3>
+xml.beutify(obj)
+</h3>
+is similar with encoding but, It prints out more readable format.<br>
+
+string to orca data structure encoding/ decoding rule is like below example.<br>
+
+If input string is like this,
+
+
+<div class="code"><pre>
+str = '''
+&lt?xml version="1.0"?&gt
+&lttag_a&gt
+&lttag_b attr1="value1" attr2="value2"&gttext of tag b&lt/tag_b&gt
+&lt/tag_a&gt
+''';
+</pre></div>
+
+<p>this xml string is convered to 
+
+<div class="code"><pre>
+{ '$info':'xml version="1.0"',
+   'tag_a':{ 
+		    'tag_b':{ '$attrs':{ 'attr1':'value1','attr2':'value2'  },'$text':'text of tag b' } 
+                }
+}
+</pre></div>
+
+<p> It is based on xml path structure, one node (tag_a) has it's name key and It's value is child nodes.<br>
+
+<p> And there is special nodes whose name is $attrs, $text, $info,
+$attrs is attributes in node, $text is tag value and $info is document information.<br>
+
+<p> basic rule is like above, but orca map doesn't allow multiple key values. but xml node could be repeated. so if there is same key value in xml string, orca xml decode it as tuple.<br>
+Let's see below example,
+
+<div class="code"><pre>
+str = '''
+&lt?xml version="1.0"?&gt
+&lttag_a&gt
+&lttag_b attr1="value1" attr2="value2"&gttext of tag b&lt/tag_b&gt
+&lttag_b&gttext of tag b 2nd&lt/tag_b&gt
+&lt/tag_a&gt
+''';
+</pre></div>
+
+In this case xml module change it as below,
+
+<div class="code"><pre>
+{ '$info':'xml version="1.0"',
+  'tag_a':{ 'tag_b':( { '$text':'text of tag b 2nd' },
+			        { '$attrs':{ 'attr1':'value1','attr2':'value2' },'$text':'text of tag b' } )
+	       } 
+}
+</pre></div>
+
+<p> like above, multiple tag_b nodes are represented as tuple.<br>
+
+after decoding, You can find node lists in tag_a like this,
+
+<p>ret = xml.decoding(str);
+
+<p>ret['tag_a'].keys();
+
+and you can access child nodes like this,
+ret['tag_a']['tag_b'][1]['$text'] 
+
+search in xml data structure may be provided at later release.<br>
+
+
+
+and You can encoding from orca structure to xml string by xml.encoding
+
+<div class="code"><pre>
+xml.encoding(ret)
+
+&lt? xml version="1.0" ?&gt&lttag_a&gt&lttag_b &gttext of tag b 2nd&lt/tag_b&gt&lttag_b attr1=value1 attr2=value2 &gttext of tag b&lt/tag_b&gt&lt/tag_a&gt
+</pre></div>
+
+
+<p> but, this result is not easily readable.<br>
+
+so, use xml.beutify,
+
+<div class="code"><pre>
+&lt? xml version="1.0" ?&gt
+&lttag_a&gt
+        &lttag_b &gt
+                        text of tag b 2nd
+        &lt/tag_b&gt
+        &lttag_b attr1=value1 attr2=value2 &gt
+                        text of tag b
+        &lt/tag_b&gt
+
+&lt/tag_a&gt
+</pre></div>
+
+<p> than you can get indented result string.<br>
+
+
+
+<h1>
+<a name="json">json</a>
+</h1>
+
+
+json module can encoding & decoding of json like xml module.<br>
+
+<h3>
+json.decoding(str)
+</h3>
+decoding json string to orca data structures.<br>
+
+<h3>
+json.encoding(obj)
+</h3>
+encoding orca data structure to json string.<br>
+
+<h3>
+json.beutify(obj)
+</h3>
+This also encode to json string but this make more readable string.<br>
+
+conversion rules are like below,
+
+json dectionanry is converted to orca map,
+json array is converted to orca list,
+and like xml, json dictionary can have multiple key value so like xml module, orca json module converts it as orca tuple.<br>
+
+
+for an example if json string is like this,
+<pre>
+  str = "{ 'a':3, 'b':6, 'c':[1,2,3, { 'a':{'b':'c'}, 'd':[1,2,3], 'd':3 },   4,5,6] }";
+
+ret = json.decoding(str);
+</pre>
+
+this result is 
+<pre>
+{ 'a':3,'b':6,'c':[ 1,2,3,{ 'a':{ 'b':'c' },'d':( [ 1,2,3 ],3 ) },4,5,6 ] }
+</pre>
+
+It's almost same shape but 'd' had been repeated so it's value is tuple like ([1,2,3], 3)
+
+and now, if you want to see value of 'c'
+you can access it like 
+print: ret['c']; 
+
+and like xml module, search in json structure will be provided at later release.<br>
+
+And  you can encdoing to json string from orca data structure by this,
+
+str = json.encoding(ret);
+
+and result is 
+<pre>
+{'a':3,'b':6,'c':[1,2,3,{'a':{'b':'c'},'d':[1,2,3],'d':3},4,5,6]}
+</pre>
+
+and threre is another encoding function beutify which make more readable result.<br>
+
+print: str = json.beutify(ret) 
+this prints out below,
+
+<div class="code"><pre>
+        {'a':3,
+        'b':6,
+        'c':    [1,
+                2,
+                3,
+                        {'a':   {'b':'c'},
+                        'd':    [1,
+                                2,
+                                3],
+                        'd':3},
+                4,
+                5,
+                6]}
+</pre></div>
+
+
+
+
+<h1>
+<a name="os">os</a>
+</h1>
+
+
+<h3>
+run(cmd)
+</h3>
+run excutes argument. It's seem like popen.<br>
+
+<div class="shell"><pre>
+$ using os;
+$ os.run(‘ls’);
+</pre></div>
+
+<p> This prints out file lists.<br>
+
+And for convenience, It could be like below.<br>
+
+<div class="shell"><pre>
+$ ; ls -al
+</pre></div>
+
+<p> If semi-colon is in front of string. It is same as or.run(string)
+;ls -al is equal to os.run('ls -al');
+
+And It supports call-back reference by using caller.<br>
+
+
+<div class="code"><pre>
+
+$ def __cout__;
+$ ; ls -al    
+total 2924
+drwxrwxrwx+ 10 MYHOME 없음       0 Dec  1 14:56 .
+drwxrwxrwx+ 24 MYHOME 없음       0 Nov 27 11:01 ..
+drwxrwxrwx+  6 MYHOME 없음       0 Dec  1 02:11 .svn
+-rw-rw-rw-   1 MYHOME 없음       8 Nov  8 17:26 BUILD_NUMBER
+-rw-rw-rw-   1 MYHOME 없음   18007 Nov  8 17:26 COPYING
+….
+$ print: my.__cout__;
+[ 'total 2924
+','drwxrwxrwx+ 10 MYHOME 없음       0 Dec  1 14:56 .
+','drwxrwxrwx+ 24 MYHOME 없음       0 Nov 27 11:01 ..
+','drwxrwxrwx+  6 MYHOME 없음       0 Dec  1 02:11 .svn
+','-rw-rw-rw-   1 MYHOME 없음       8 Nov  8 17:26 BUILD_NUMBER
+
+','-rw-rw-rw-   1 MYHOME 없음   18007 Nov  8 17:26 COPYING
+…
+</pre></div>
+
+<p> like above, If there is __cout__ object in caller object,
+print results are appended in it.<br>
+
+
+<h3>
+getenv(name)
+</h3>
+
+It inquries environment variable.<br>
+
+<div class="shell"><pre>
+$ print: os.getenv(‘PATH’);
+</pre></div>
+
+<p> This return the PATH of current shell.<br>
+
+
+<h3>
+cwd()
+</h3>
+
+Return current working directory.<br>
+
+<div class="shell"><pre>
+$ print: os.cwd();
+/root/curr
+</pre></div>
+
+<h3>mkdir(path)</h3>
+Make new directory
+
+
+<div class="shell"><pre>
+$ 
+$ os.mkdir('newdir');
+$ 
+$ os.cd('newdir');
+$ print: os.ls('.');
+[ ]
+$ 
+</pre></div>
+
+
+<h3>
+rename(src, dest)
+</h3>
+Rename file.<br>
+
+
+<div class="shell"><pre>
+$ print: os.ls('.');
+[ ]
+$ os.mkdir('newdir');
+$ print: os.ls('.');
+[ './newdir' ]
+$ os.rename('newdir', 'renamed_dir');
+$ print: os.ls('.');
+[ './renamed_dir' ]
+$ 
+</pre></div>
+
+<h3>
+copy(src, dest)
+</h3>
+copy file
+
+<div class="shell"><pre>
+$ print: os.ls('.');
+[ './file_a' ]
+$ os.copy('file_a', 'file_b');
+$ print: os.ls('.');
+[ './file_b','./file_a' ]
+$ 
+</pre></div>
+
+<h3>
+remove(name)
+</h3>
+
+remove file
+
+<div class="shell"><pre>
+$ print: os.ls('.');
+[ './file_a' ]
+$ os.remove('file_a');
+$ print: os.ls('.');
+[ ]
+$ 
+</pre></div>
+
+<h3>
+ls()
+</h3>
+return file lists.<br>
+return type is list.<br>
+
+<div class="shell"><pre>
+$ os.cd('/usr');
+$ print: os.ls('.');
+[ './tmp','./include','./kerberos','./local','./bin','./games','./sbin','./share','./lib','./src','./etc','./libexec' ]
+$ 
+</pre></div>
+
+<h3>
+cd(path)
+</h3>
+change directory
+
+<div class="shell"><pre>
+$ os.cd('/usr');
+$ print: os.ls('.');
+[ './tmp','./include','./kerberos','./local','./bin','./games','./sbin','./share','./lib','./src','./etc','./libexec' ]
+$ 
+</pre></div>
+
+<h3>
+isexists(path)
+</h3>
+If file or directory exists, return true
+
+<div class="shell"><pre>
+$ print: os.isexists('/etc');
+True
+$ print: os.isexists('/etc/passwd');
+True
+$ print: os.isexists('/if_not_exist');
+False
+$ 
+</pre></div>
+
+<h3>
+isfile(path)
+</h3>
+
+If argument path is file, return true.<br>
+
+<div class="shell"><pre>
+$ print: os.isfile('/etc/passwd');
+True
+$ 
+$ print: os.isfile('/etc');
+False
+$ 
+$ print: os.isfile('/if_not_exist');
+False
+$ 
+</pre></div>
+
+<h3>
+isdir(path)
+</h3>
+
+If argument path is directory, return true.<br>
+
+<div class="shell"><pre>
+$ print: os.isdir('/etc');
+True
+$ print: os.isdir('/etc/passwd');
+False
+$ print: os.isdir('/if_not_exist');
+False
+$ 
+</pre></div>
+
+<h3>
+dir_iterator(path)
+</h3>
+
+This return iterator object which iterates all files in directory.<br>
+
+<div class="shell"><pre>
+$ os.cd('/etc');
+$ for a in os.dir_iterator('.'):
+* print: a;
+* 
+./printcap
+./terminfo
+./rc2.d
+./bash_completion.d
+...
+</pre></div>
+
+<h3>
+dir_traverser(path)
+</h3>
+
+dir_iterator iterates only current directory's file.<br>
+dir_traverser traverse tree.<br>
+
+<div class="shell"><pre>
+$ for a in os.dir_traverser('/etc/yum'):
+* print: a;
+* 
+/etc/yum/pluginconf.d
+/etc/yum/pluginconf.d/blacklist.conf
+/etc/yum/pluginconf.d/whiteout.conf
+/etc/yum/pluginconf.d/refresh-packagekit.conf
+$
+</pre></div>
+
+<h3>
+read(filepath, size, offset)
+</h3>
+read file contents of filepath and return as string.<br>
+If there is size as parameter, read only size from file.<br>
+If there is offset as parameter, read from offset of file.<br>
+
+<h3>
+write(filepath, data, offset)
+</h3>
+writes data to file.<br>
+If there is offset as paremeter, write from offset of file.<br>
+
+<h3>
+file_size(filepath)
+</h3>
+return size of file
+
+<h3>
+last_write_time(filepath)
+</h3>
+return last write time as datetime
+
+<div class="shell"><pre>
+$ os.write('foo.txt', 'hello, file');
+$ print: os.read('foo.txt');
+hello, file
+$ print: os.file_size('foo.txt');
+11
+$ print: os.last_write_time('foo.txt');
+2010-11-14T15:16:51
+</pre></div>
+
+
+
+<h1> 
+<a name="system">system</a>
+</h1>
+
+<p>system module is for checking system info.<br>
+It provides below interfaces.<br>
+
+<h3>
+cpu_n()
+</h3>
+This interface return the number of cpu core in the system.<br>
+You can use this at parallel foy by or other parallel adaptive work.<br>
+
+<h3>
+free()
+</h3>
+This interface returns available memory.<br>
+
+<h3>
+memory()
+</h3>
+This interface returns physical memory.<br>
+
+<h3>
+os()
+</h3>
+This interface returns Operating System info as a string.<br>
+
+<h3>
+version()
+</h3>
+This interface returns orca version as a string.<br>
+
+<div class="shell"><pre>
+$ system.cpu_n();
+4
+$ system.free();
+1422434304
+$ system.memory();
+2002993152
+$ system.os();
+Linux version 2.6.35-22-generic (buildd@rothera) (gcc version 4.4.5 (Ubuntu/Linaro 4.4.4-14ubuntu4) ) #33-Ubuntu SMP Sun Sep 19 20:34:50 UTC 2010
+
+$ system.version();
+0.5
+</pre></div>
+ 
+
+<h1>
+<a name="math">math</a>
+</h1>
+
+<p>math module is wrapper of c math library.<br>
+It provides below interfaces.<br>
+
+<p>acos, asin, atan, atan2, ceil, cos, cosh, exp, fabs, floor, fmod, frexp, ldexp, log, log10, modf, pow, sin, sinh, sqrt, tan, tanh
+
+<p>Interface and spec of each member is same as libm.<br>
+But, some of above function in c has two output (one by return and the other by parameter pointer) but, orca has no pointer.<br>
+so, in that case return values are returned as one tuple.<br>
+You can see each example at tests/test_math.orca.<br>
+
+
+<h1>
+<a name="operator">operator</a>
+</h1>
+
+<p>operator module is used for lisp module and other functional programming.<br>
+
+<p>It has +, -, *, /, %, <, <=, >, >=, ==, !=, ||, &&  members.<br>
+These members are composed by special characters. So, you should refer them with ' ' like below,
+
+<div class="shell"><pre>
+$ operator.'+'(3, 4);
+7
+$ operator.'-'(3, 4);
+-1
+$ operator.'*'(3, 4);
+12
+$ operator.'%'(3, 4);
+3
+$ operator.'<='(3, 4);
+true
+</pre></div>
+
+<p> These function is infix operator. So, if you want to apply them to more parameters at once,
+use fun.reduce or fun.apply.<br>
+
+
+<h1>
+<a name="sort">sort</a>
+</h1>
+
+<p>sort module is interface for sort container (list or tuple)
+It make sorted container from input a and return it.<br>
+original container is not changed.<br>
+
+
+
+
+
+<h1>
+<a name="fun">fun</a>
+</h1>
+
+This moule is made for high-order functional programming.<br>
+This provides below interfaces.<br>
+
+<h3>
+map(iteratable, f)
+</h3>
+run f to each member of iteratable.<br>
+and make list from each results of that.<br>
+
+<div class="shell"><pre>
+$ using fun;
+$ ret = fun.map([1,2,3], %c{ return argv[0] * 2; } );
+$ print: ret;
+[ 2,4,6 ]
+</pre></div>
+
+<p> above code works like  [ 1 * 2, 2 * 2, 3 * 2]
+
+<h3>
+reduce(iteratable, fun, initial)
+</h3>
+make accumulative result of fun to each item of iteratable.<br>
+use initial as initila value if it is exists or set first item as initial value.<br>
+
+belows are sum up example.<br>
+
+<div class="shell"><pre>
+$ using fun;
+$ print: fun.reduce([1,2,3,4,5], %c{ return argv[0] + argv[1]; });
+15
+</pre></div>
+
+<p> argv[0] are accumulative result and argv[1] is each member of list
+so, above code works like  ((((1 + 2) + 3) + 4) + 5)
+
+<h3>
+bind_1st(fun, arg)
+</h3>
+bind first paramter of fun as arg
+
+
+<div class="code"><pre>
+def mul(a, b) 
+{
+	return a * b;
+}
+
+mul10 = fun.bind_1st(..mul, 10);
+</pre></div>
+
+In above case,
+
+<div class="shell"><pre>
+$ print: mul10(2);
+20
+$ print: mul10(2.4);
+4.8
+</pre></div>
+
+<p> new mul10 function which binds 10 to mul is created.<br>
+
+
+
+bind_2nd, bind_3rd are similar with bind_1st but bind arg to 2nd and 3rd paremeter
+and fun.bind_nth(fun, arg, n) 
+bind arg to n 'th paremter of fun.<br>
+
+
+<h3>
+apply(f, list)
+</h3>
+call f with list elements as paremeters
+as an example,
+fun.apply(foo, [1,2,3]) call foo(1,2,3)
+
+
+
+
+
+<h1>
+<a name="gui">gui</a>
+</h1>
+gui module support GUI interface. 
+gui module use flexible relationship of orca object. 
+
+<div class="code"><pre>
+  def main : window
+   {
+       my.attr['wh'] = (800, 600);
+   
+       def box : vbox
+       {
+           def menu : menubar
+           {
+               file = [ 'open', %c{
+                                   name = dialog.fileopen(upper('main'));
+                                   str= os.read(name);
+                                   upper('box').hs.edit.attr['text'] = str;
+                               },
+                       'save', %c{
+                                   str= upper('box').hs.edit.attr['text'];
+                                   name = dialog.filesave(upper('main'));
+                                   os.write(name, str);
+                               },
+                       'exit', %c{
+                                   upper('main').quit();
+                               }
+                       ];
+   
+               my.push_back('file', file);
+           }
+   
+           def hs : scroll
+           {
+               def edit : text
+               {
+               }
+           }
+       }
+   }
+</pre></div>
+
+<p> Above example is simple notepad application. 
+If you do this with Win32 api or GTK API, It should be more complex and bothering. If you use RAD tools for it,
+Additional representation layer and real code has some gap so it lose intuition.<br>
+
+<p>But, orca gui module is different. All things in window has it's own object in code. and That objects have same relation. 
+Real object in gui has same logical object in code.<br>
+
+<p>Lets imagine main window has only one 'ok' button.<br>
+That button is included in window.<br>
+
+<div class="code"><pre>
+   def main : window
+   {
+       def box : vbox
+       {
+           def ok : button
+           {
+               my.attr['text'] = 'ok';
+           }
+       }
+   }
+</pre></div>
+
+<p> This window is written like above. ok : button is included in main : window (actually, there should be additional container object in window. GTK aspects)
+<p>If you launch above main window like this,
+
+<div class="code"><pre>
+my.main.make();
+my.main.show();
+</pre></div>
+
+<img src='image/gui_first.jpg'/>
+
+<p> main window with ok button appears.<br>
+make interface makes window with it's sub objects.<br>
+show interface show result window. result window is like below.<br>
+
+
+
+
+
+In this time, We don't define action of ok button. So, Nothing is happened when you click ok button.<br>
+Let's see another example which have click event action.<br>
+
+<div class="code"><pre>
+  def main : window
+   {
+       my.attr['xy'] = (50, 20);
+       my.attr['wh'] = (300, 200);
+   
+       def box : fixed
+       {
+           def counter : label
+           {
+               my.attr['xy'] = (40, 50);
+               my.attr['text'] = 0;
+           }
+   
+           def plus : button
+           {
+               my.attr['xy'] = (150, 30);
+               my.attr['wh'] = (100, 50);
+               my.attr['text'] = '+';
+               my.event['clicked'] = %c{
+                   upper('box').counter.attr['text'] += 1;
+               };
+           }
+   
+           def minus : button
+           {
+               my.attr['xy'] = (150, 130);
+               my.attr['wh'] = (100, 50);
+               my.attr['text'] = '-';
+               my.event['clicked'] = %c{
+                   upper('box').counter.attr['text'] -= 1;
+               };
+           }
+       }
+   }
+</pre></div>
+   
+<p> Above example, Window have counter label, plus button which increase counter and minus button which decrease counter. We use box : fixed contaiter. So, we define position attribute my.attr['xy']. 
+And then, GUI event could be defined by set my.event attribute.<br>
+
+<p>On above code, my.event['clicked'] has assigned by lambda code. And then, If you click plus button, GUI make clicked event and it invokes assigned lambda code %c{ upper('box').counter.attr['text'] += 1; }.
+
+<p>upper is util.upper interface which traverse owner link and find name is euqal. So, upper.('box').counter means main.box.counter. And lambda code increase counter  text by 1. so label text of counter is changed.<br>
+
+<p> Result window is like this,<br>
+<img src='image/button.jpg'/>
+
+<p>This simple but impressive exmaple shows that all the object in the window and there relation and events can move to code exactly.<br>
+
+Below gui objects are supported in current version.<br>
+
+<ul>
+<li>window : top level window widget.<br>
+<li>button : button
+<li>check : check button
+<li>combo : combo button
+<li>radio : radio button
+<li>entry : input entry field
+<li>fixed : fixed container
+<li>vbox : vertical container
+<li>hbox : horizontal container
+<li>dialog : default system dialog (file open, save)
+<li>hsep : horizontal seperator
+<li>image : image
+<li>label : text label
+<li>list : list widght
+<li>menubar : menu
+<li>scroll : scroll bar
+<li>statusbar : status bar
+<li>table : table
+<li>text : text
+<li>tree : tree widght
+</ul>
+
+Each object represent different GTK widget. You can inherit above object and set your own attributes and events.<br>
+You can see many example and codes by run tests/test_gui.orca.<br>
+
+
+
+<h1>
+<a name="datetime">datatime, date, time</a>
+</h1>
+
+<p>These modules maintain time duration & time point.<br>
+
+<p>datetime is timepoint which has years, months, days, hours, minutes, seconds and microseconds. It points out exact time point.<br>
+Internally, datetime is made up by module date + module time
+module date is time point(date point).<br>
+
+<p>module time is time duration "from 00:00:00 AM"
+dateduration is the interval of two date. (like 2 moth ago, 2 years later)
+time point is exact time so time points couldn't be added to other time point.<br>
+
+<p>but It could be substracted from another time points and result is integer which means interval of two timepoints.<br>
+If time points is datetime, interval scale is microsecond.<br>
+and if time points is date, interval scale is day.<br>
+
+<p>Time duration is  amount of time. so it could be added or be substracted to another time duration.<br>
+and It could be multiplied or divided by integer.<br>
+
+<p>If you add (or sub) time point and time duration, It make new time point which is moved from original time point to amount of time duration.<br>
+
+<p>Let's see detail interface of each module.<br>
+
+<h1>
+time
+</h1>
+
+<p>time means time durtiaon from 00:00:00 AM. Time of day.<br>
+value is composed by hour, minute, second, microsecond.<br>
+
+
+<h3>
+time.clone(format)
+</h3>
+create new time object from format.<br>
+
+<div class="shell"><pre>
+$ print: a = time.clone('01:02:03.4');
+01:02:03.400000
+$ print: a.hour;
+1
+$ print: a.minute;
+2
+$ print: a.second;
+3
+</pre></div>
+
+<h3>
+time.time_of_day() 
+</h3>
+return current time of day
+
+$ print: time.time_of_day();
+23:01:33.990408
+ 
+
+<h3>
+time.hours(h)
+</h3>
+make duration of h hours
+
+<h3>
+time.minutes(m) 
+</h3>
+make duration of m minutes
+
+<h3>
+time.seconds(s)
+</h3>
+make duration of s seconds
+
+<h3>
+time.microseconds(us)
+</h3>
+make duration of us microseconds
+
+<div class="shell"><pre>
+$ print: time.clone('01:02:03') + time.hours(3) + time.microseconds(1000);
+04:02:03.001000
+</pre></div>
+
+<p> It's a duration, so each field has no limit.<br>
+(That means, minutes could be more 60)
+
+And time could be added or substracted wich integer.<br>
+In this case, integer value means microseconds.<br>
+
+<div class="shell"><pre>
+$ print: a;
+01:02:03
+$ print: a + 1234;
+01:02:03.001234
+$ 
+</pre></div>
+
+<p> time object could be compared to each other.<br>
+
+
+<div class="shell"><pre>
+$ using time;
+$ a = time.clone('01:02:03');
+$ b = time.clone('01:02:04');
+$ print: a > b;
+false
+$ print: a == b;
+false
+$ print: a < b;
+true
+</pre></div>
+
+<h1>
+date
+</h1>
+
+date is date point and It is composed by year, month and day
+
+<div class="shell"><pre>
+$ using date;
+$ print: a = date.clone('2000-01-02');
+2000-01-02
+$ print: a.year, ' ', a.month, ' ', a.day;
+2000 1 2
+</pre></div>
+
+date.today()
+return current date.<br>
+
+<div class="shell"><pre>
+$ print: date.today();
+2010-11-02
+</pre></div>
+
+<p> And dateduration is date duration (no date point).<br>
+this dateduration object could be added or substacted to each other.<br>
+and It could be multiplied or diveded with integer.<br>
+but devide means devide each value of attributes (years, monthes, days, weeks) and
+remainder is lost.<br>
+
+And add, sub by integer is possible. In this case integer means days.<br>
+
+
+<div class="shell"><pre>
+$ using date;
+$ print: date.years(1);
+1 years 
+$ print: date.months(2);
+2 months 
+$ print: date.days(3);
+3 days 
+$ print: date.weeks(4);
+4 weeks 
+$ print: a = date.years(3) - date.months(4) + date.weeks(2) - date.days(7);
+3 years -4 months 2 weeks -7 days 
+$ print: a *= 2;
+6 years -8 months 4 weeks -14 days 
+$ print: a /= 3;
+2 years -2 months 1 weeks -4 days 
+$ print: a += 1;
+2 years -2 months 1 weeks -3 days 
+$ print: a -= 2;
+2 years -2 months 1 weeks -5 days 
+</pre></div>
+
+<p> and now, you can add (or sub) date and dateduration then make new date.<br>
+
+<div class="shell"><pre>
+$ print: date.clone('2000-01-01') + date.months(2);
+2000-03-01
+</pre></div>
+
+<p> substraction between two dates means intervals in days scale.<br>
+
+<div class="shell"><pre>
+$ using date;
+$ print: date.clone('2000-01-01');
+2000-01-01
+$ print: date.today() - date.clone('2000-01-01');
+3958
+$ print: date.clone('2000-01-01') + 100;
+2000-04-10
+</pre></div>
+
+
+<h1>
+datetime
+</h1>
+
+
+date + time make datetime object. this means exact time point from date with time duration.<br>
+
+<div class="shell"><pre>
+$ print: date.today() + time.time_of_day();
+2010-11-02T23:26:12.827502
+</pre></div>
+
+<p>datetime could be made up by initial string like below, and datetime have internal interface date() and time() which return
+date or time value of datetime.<br>
+now() means current datetime.<br>
+
+<div class="shell"><pre>
+$ print: datetime.clone('2000-01-02 03:04:05');
+2000-01-02T03:04:05
+$ print: a = datetime.now();
+2010-11-02T23:21:56.685685
+$ print: a.date(), ' ', a.time();
+2010-11-02 23:21:56.685685
+</pre></div>
+
+<p> date, time duration could be added or substarcted to datetime.<br>
+
+<div class="shell"><pre>
+$ print: a = datetime.clone('2000-01-01 03:04:05');
+2000-01-01T03:04:05
+$ print: a + date.years(10) - date.months(30) + time.hours(100) - time.minutes(2000);
+2007-07-03T21:44:05
+</pre></div>
+
+
+
+<p> substraction between two datetime means interval of them with microseconds scale.<br>
+and add (or sub) of integer to datetime means increase(or decrease) of microsecond value.<br>
+
+
+<div class="shell"><pre>
+$ print: a = datetime.clone('2000-01-01 03:04:05');
+2000-01-01T03:04:05
+$ print: a + 1000000 * 3600 * 24 * 10;
+2000-01-11T03:04:05
+$ print: a - 10;
+2000-01-01T03:04:04.999990
+$ print: datetime.clone('2010-01-01 03:04:05') - a;
+87672:00:00
+</pre></div>
+
+
+<p> And aditionally,
+time.msleep(msec) 
+is another static function which sleep in msec milliseconds.<br>
+
+
+
+
+<h1>
+<a name="gnuplot">gnuplot</a>
+</h1>
+
+gnuplot module is the wrapper of gnuplot.<br>
+You can use lists as the plot data of gnuplot. Especially, set builder form lists are more useful with gnuplot module.<br>
+
+<h3>
+gnuplot.run(cmd)
+</h3>
+This interface call gnuplot application as 'cat cmd | gnuplot'. It's most simple wrapper interface.<br>
+
+<h3>
+gnuplot.add(title, list)
+</h3>
+This interface add 2D plot data to gnuplot's internal data.<br>
+list is 2D format like [(x1, y1), (x2, y2), ...]
+
+<h3>
+gnuplot.plot(cmd);
+</h3>
+This interface plot added 2D data plots to screen.<br>
+Before plot graph executes cmd. So, you can pass cmd like 'pause 1'.<br>
+
+<h3>
+gnuplot.clear();
+</h3>
+This interface clear added graph data in object.<br>
+
+
+
+
+Below example show x^2 and 2*x^2 graph on the screen.<br>
+plots are connected by line, grid lines are setted. graph appears about 1 sec.<br>
+
+<div class="code"><pre>
+   a = gnuplot.clone();
+   a.clear();
+   a.add('x^2', %[(x, x*x)|x<-1~1000]);
+   a.add('2*x^2', %[(x, x*x*2)|x<-1~1000]);
+   a.set('line');
+   a.plot('pause 1');
+</pre></div>
+
+<p> Result graph image is like below,<br>
+
+<img src='image/gnuplot2d.jpg'/>
+
+
+<p>3D graph plot needs 3 data at one point. So, It's differ from 2D plot interface.<br>
+
+<h3>
+gnuplot.sadd(title, list, group)
+</h3>
+This interface add 3D data to gnuplot object.<br>
+title and list is same as gnuplot.add. And group means line grouping in 3D images for conveniance.<br>
+You can add this parameter as true if (x, y, z) lists are sorted by x, y.<br>
+
+
+
+<h3>
+gnuplot.splot(cmd)
+</h3>
+This interface plot 3D graph using plot data added by sadd.<br>
+
+s means space.<br>
+
+
+
+<div class="code"><pre>
+   sbf= %[(x, y, 40*(x*x + y*y)*math.exp(-(x*x) - (y*y)))|x<--2~2:0.1, y<- -2~2:0.1];  
+   sbf2= %[(x, y, 4*y-1)|x<- -2~2:0.1, y<- 0~1:0.1];
+  
+   gnuplot.sadd('40*(x^2 + y^2) * exp(-x^2 -y^2)', sbf, true);
+   gnuplot.sadd('4*y-1', sbf2, true);
+   gnuplot.set('grid');
+   gnuplot.set('line');
+   gnuplot.splot('pause 1');
+</pre></div>
+
+<p> Above example show z = 40*(x^2 + y^2)*exp(-x^2-y^2) and z = 4*y-1
+Result graph images are like below,<br>
+
+<img src='image/gnuplot3d.jpg'/>
+
+
+In these example, only SBF lists are used as source data. But, you can use norman lists which are setup by your algorithm or your own module.<br>
+
+
+
+
+<h1>
+<a name="remotec">remotec, remoted, dist</a>
+</h1>
+
+This modules supports orca remote and distribute processing.<br>
+
+first, remoted runs remote server.<br>
+
+<h3>
+remoted(port) 
+</h3>
+remote server stated using port.<br>
+
+<div class="shell"><pre>
+orca remoted 8080
+## dist server start
+</pre></div>
+
+
+You can run it from shell prompt like above or run it from script file like remoted(8080)
+And second, connect to remote server from other machine like below,
+
+<div class="shell"><pre>
+$ using remotec;
+$ c = remotec.clone('127.0.0.1', 8080);
+$ print: c.ping();
+true
+$
+</pre></div>
+
+<p> from now on, If you get or set member of c, It works from remote machine !!
+(It made by .attr, .attr_last, .attr=)
+
+let's see detail example.<br>
+
+<div class="shell"><pre>
+$ c.hello = 'hello, remote';
+$ print: c.hello;
+hello, remote
+</pre></div>
+
+<p> It's very simple but It doesn't work from local machine. 
+c.hello = 'hello, remote' make root.hello object to remote server.<br>
+print: c.hello read root.hello from remote server and print it.<br>
+
+cascaded path could be possible.<br>
+
+<div class="shell"><pre>
+$ c.foo.bar = 10;
+$ print: c.foo.bar;
+10
+$
+</pre></div>
+
+In this case, roo.foo.bar object is created and assigned to 10 of remote node. 
+print: c.foo.bar reads root.foo.bar of remote node.<br>
+and if you referr c.foo.bar only root.foo.bar is read from remote node by socket (not all contents of root.foo)
+
+and then, let's call remote function.<br>
+You can set object to remote node like below,
+(wait, current version doesn't support it from shell inerpreter. you shoud do that from script file)
+
+<div class="code"><pre>
+using remotec;
+
+def sum(...)
+{
+	return argv[0] + argv[1];
+}
+
+c = remotec.clone('127.0.0.1', 8080);
+c.sum = my.sum;
+print: c.sum(10, 20);
+</pre></div>
+
+<p> If you run this script file, It returns 30. 
+You set root.sum from remote node and call it and get result from that.<br>
+
+But, in this code, client is blocked while result is calculated by remote.<br>
+so If you want non-block working, Do it like below
+
+<div class="code"><pre>
+using remotec;
+
+def sum(...)
+{
+	return argv[0] + argv[1];
+}
+
+c = remotec.clone('127.0.0.1', 8080);
+c.sum = my.sum;
+c.sum.__nowait__(10, 20);
+print: c.is_done(100);
+print: c.pop_obj();
+</pre></div>
+
+<p> If you add virtual member __nowait__ after function sum, remotec call sum and non-blocking returned.<br>
+and you can check if remote call is done by call is_done(msec).<br>
+
+isdon(msec)
+check if remote call is done. In case of void parameter, It return true/false immidiatly.<br>
+if msec is provied as parameter, It wait remote call to msec millisecond.<br>
+
+After remote call is done, you can get result by calling pop_obj()
+
+
+Above usages are different to other languages because It access remote object like same way of local object.<br>
+and It can move object to remote node with compiled byte codes and call it directly.<br>
+
+so you can use it like below with remote_do()
+
+<div class="code"><pre>
+using remotec;
+
+c = remotec.clone('127.0.0.1', 8080);
+c.remote_do: 10, 20, %c{ 
+	return argv[0] + argv[1]; 
+};
+
+print: c.is_done(100);
+print: c.pop_obj();
+</pre></div>
+
+<p> this codes return 30.<br>
+
+remoted(...) call last argv item with other argv items as paremeters.<br>
+In this example, last argv item is lambda function. It's remote call but very similar with local procedure call.<br>
+
+In nowdays, Only orca supports above easy and flexible way of remote call processing.<br>
+
+dist module supports distribute processing environment with remoted lists.<br>
+
+<h3>
+dist.add(ip, port)
+</h3>
+
+connect to remoted server and add it to internal list.<br>
+
+<h3>
+dist.dist_do(...)
+</h3>
+
+works like remote_do but it select remote node automatically.<br>
+
+<h3>
+dist.dist_for(list, fun)
+</h3>
+
+this do disribute processessing with internal remoted lists. main procedure is blocked to all result is calculated.<br>
+It returns result lists.<br>
+
+Let's see from example.<br>
+below is test_dist.orca whithc is in tests directory of orca as test vector.<br>
+
+It launches remote node from port, port+1 and port+2 and call dist_do and dist_for.<br>
+dist_do call simple sum function to remote node.<br>
+dist_for do distribute processing to list (calculating square of each item)
+
+<div class="code"><pre>
+using remoted;
+using remotec;
+using dist;
+using random;
+using time;
+
+random.seed();
+port = random.integer(1000) + 8000;
+
+print: '# port: ', port;
+
+
+parallel do {
+	server = remoted.clone();
+	server(port);
+}
+
+parallel do {
+	server = remoted.clone();
+	server(port+1);
+}
+
+parallel do {
+	server = remoted.clone();
+	server(port+2);
+}
+
+time.msleep(200);
+
+dist.add('127.0.0.1', port);
+dist.add('127.0.0.1', port+1);
+dist.add('127.0.0.1', port+2);
+
+
+r = dist.dist_do(10, 20, %c{ return argv[0] + argv[1]; });
+print: r.is_done(100);
+print: ret = r.pop_obj();
+
+if ret != 30:
+	throw test.dist, 'dist_do failed';
+
+list = [1..100];
+rs = dist.dist_for(list, %c{ return argv[0] * argv[0]; } );
+print: rs;
+
+if rs != %[ x*x | x<-1~100 ]:
+	throw test.dist, 'dist_for failed';
+
+print: '## now quit: ', dist.shutdown();
+return 'OK', my;
+</pre></div>
+
+<p> belows are result of above. 
+30 is return as result of dist_do,
+And you can see square value of each item of [1..100] is returnend.<br>
+
+<div class="shell"><pre>
+# port: 8985
+## dist server start
+## dist server start
+## dist server start
+true
+30
+[ 1,4,9,16,25,36,49,64,81,100,121,144,169,196,225,256,289,324,361,400,441,484,52
+9,576,625,676,729,784,841,900,961,1024,1089,1156,1225,1296,1369,1444,1521,1600,1
+681,1764,1849,1936,2025,2116,2209,2304,2401,2500,2601,2704,2809,2916,3025,3136,3
+249,3364,3481,3600,3721,3844,3969,4096,4225,4356,4489,4624,4761,4900,5041,5184,5
+329,5476,5625,5776,5929,6084,6241,6400,6561,6724,6889,7056,7225,7396,7569,7744,7
+921,8100,8281,8464,8649,8836,9025,9216,9409,9604,9801,10000 ]
+</pre></div>
+
+
+
+<h1>
+<a name="fs">fs, dfsd, cached</a>
+</h1>
+
+This modules are made for distribute file system and distribute cache.<br>
+
+dfsd is distribute file server node and cached is distribute cache node.<br>
+fs mounts this node to it's file system path.<br>
+
+but, mount means that it works in orca vm only. It doesn't mean mount file system in OS level.<br>
+
+
+dfsd starts with file path which it serve and port num which it listen.<br>
+
+<div class="shell"><pre>
+[Machine 192.168.0.2]
+$ orca dfsd /home/lynix 8080
+
+[Machine 192.168.0.3]
+$ orca dfsd /home/orca 8080
+</pre></div>
+
+<p> You can launche file system node like above.<br>
+and now, mount them by fs.mount(path, ip, port)  like below,
+
+<pre>
+fs.mount('/mnt/node_a', '192.168.0.2', 8080); 
+fs.mount('/mnt/node_b', '192.168.0.3', 8080); 
+</pre>
+
+after that,
+
+data = fs.read('/mnt/node_a/foo/bar.txt');<br>
+above statement read /home/lynix/foo/bar.txt from machine 192.168.0.2 and save to data.<br>
+
+data = fs.copy('/mnt/node_a/foo/bar.txt', '/mnt/node_b/')<br>
+this statement copy /home/lynix/foo/bar.txt of machine 192.168.0.2 to /home/orca of 192.168.0.3.<br>
+
+but, fs.read('/etc/passwd') reads from local file because it's path is no in mounted list.<br>
+
+other members of fs is belows.<br>
+mkdir, ls, remove, file_size, isexist, isfile, isdir, read, write, copy, rename
+
+this member works like those of os module except if path is mounted It works from file server.<br>
+
+So if you make program by using fs module (rather than os module), your program is flexible for extenstion to distribute file system or cache.<br>
+
+<h3>
+fs.mount_dist_dir(path, ...)
+</h3>
+mound_dist_dir mounts several file server nodes to path. 
+
+You can mount servers like this,
+<h3>
+fs.mount_dist_dir('/mnt/dir', ('192.168.0.1', 8080),   ('192,168.0.2', 8081));
+</h3>
+
+and If you call like below,
+<pre>
+fs.write('/mnt/dir/file1', 'hello, file'); 
+fs.write('/mnt/dir/file2', 'hello, file'); 
+fs.write('/mnt/dir/file3', 'hello, file'); 
+...
+</pre>
+
+fs hashing path and distributes it to some file server node.<br>
+
+after that, If you call fs.read('/mnt/dir/file1'); 
+fs read it from server node which had wrotten.<br>
+
+cached is key-value memory cache server.<br>
+But it has same interface with dfsd and just save contents in memories.<br>
+
+So, you can mount cached by using fs.mount or fs.mount_dist_dir
+
+but in this release cached has no function for LRU-reflacement. maybe later release should support that.<br>
+
+
+
+
+
+<h1>
+<a name="lisp">lisp</a>
+</h1>
+
+The lisp module is common lisp compiler which is made by parse statement of orca. Because it's made by orca, it's possible and easy to use orca object and module in lisp statement.<br>
+
+lisp.compile(str) compiles lisp code and make compiled code as tuple.<br>
+If you save this compiled code and use it later, use pack.save() interface and save it as file.<br>
+You can get execution result by call lisp.execute(code).<br>
+
+Let's see real examples.<br>
+
+Below example is copmile & excute 3 + (4 * 2) by lisp.<br>
+You can see compiled code in interpreter shell.<br>
+
+<div class="shell"><pre>
+$ ret = lisp.compile('(+ 3 (* 4 2))');
+( [ [ +,3,[ *,4,2 ] ] ],{ 'F':false,'T':true,'car':car <0x9d82350>,'cdr':cdr <0x9d823d8>,'do':do_list <0x9d82460>,'list':list <0x9d824e8> } )
+$ lisp.execute(ret);
+11
+</pre></div>
+
+<p> lisp module supports defun, macro, let, if, cond and etc...<br>
+
+<div class="shell"><pre>
+$ lisp.execute(lisp.compile('(defun (sum x y) (+ x y) )(sum 4 4)'));
+8
+$ lisp.execute(lisp.compile('(defmacro (addy x) `(+ ,x y))  (let ((y 20)) (addy 10))'));
+30
+$ lisp.execute(lisp.compile('( cond ((>= -3 20) (* 3 10))  ((< 20 10) 3)   (T "error") )'));
+error
+</pre></div>
+
+<p> And, lisp code can access orca object. But default namespaces are io and io.print. So, before you use it, register namespace by (using path) statement.<br>
+
+<div class="shell"><pre>
+$ lisp.execute(lisp.compile('(print "hello\n")'));
+hello
+lisp.execute(lisp.compile('(using math) (math.sin (/ 30.0 90.0))'));
+0.327195
+</pre></div>
+
+<p> And lisp module supports UDS (user define statement)
+So, You can use lisp codes in orca source code.<br>
+
+<div class="code"><pre>
+   def foo := %lisp{
+    (+ argv0 argv1)
+   };
+   
+   print: r = .foo(3, 4);
+</pre></div>
+
+<p> Above example prints 7. Paremeters that pass to lisu UDS are named as argvN.<br>
+You can see more test examples at test/test_lisp.orca and can see lib/lisp.orca as lisp module source code made by parse statement.<br>
+
+
+<h1>
+<a name="cpp">cpp</a>
+</h1>
+
+cpp is user define statement(UDS) module. It helps user to make dynamic extension library easily.<br>
+Orca supports dynamic library which is made by native C++ language. But, this methods are disturbing and have to do a lot of things to make.<br>
+
+<div class="code"><pre>
+   using cpp;
+   
+   def sum := %cpp{
+	// this is cpp code
+       return argv[0] + argv[1];
+   };
+   
+   
+   print: my.sum(10, 20);
+</pre></div>
+
+<p> If you make above code and run by orca, At first module loading (with compile) native codes in %cpp{ } are compiled by native compiler (gcc or VC++) 
+Then output library is loaded in orca.<br>
+
+<div class="shell"><pre>
+$ ./orca tt
+cpp external module compile: g++ -shared -o /tmp/lib__tt_1_context.so /tmp/__tt_1_context.cpp -I${ORCA_HOME}/include/orca -L${ORCA_HOME}/lib -lorca
+/usr/bin/ld: cannot find -lorca
+30
+</pre></div>
+
+<p> Then it prints 30. 
+look at the above compile messages.<br>
+orca made /tmp/__tt_1_context.cpp file from the cpp UDS of tt.orca. Then invoked native compiler (gcc) to build shared library /tmp/lib__tt_1_context.so.<br>
+
+<p>Result dynamic modules are saved in /tmp/ so you have to add that path to LD_LIBRARY_PATH
+
+<p>There are somethings to do before use cpp UDS. But if you set up one time, making native object will be very easy after that.<br>
+
+<p>The parameters passed to cpp UDS object are vector<orcaData> argv; so, in above example, argv[0] and argv[1] is struct orcaData (in cpp struct)
+You can see that struct in src/vm/orcaData.h. And implicit type casting of CPP struct make it easy to use orcaData as orca object.<br>
+
+<p>Below code is __tt_1_context.cpp. It's generated by orca cpp module from tt.orca.<br>
+You can find native code in udf which is defined at %cpp{ }
+
+<div class="code"><pre>
+ #include "orcaObject.h"
+   
+       class __tt_1_context : public orcaObject
+       {
+       public:
+           orcaData udf(orcaVM* vm, vector<orcaData>& argv)
+           {
+	       // this is cpp code
+               return argv[0] + argv[1];   
+           }
+   
+           orcaData operator()(orcaVM* vm, int param_n)
+           {
+               vector<orcaData> argv;
+               for (int i=0; i<param_n; i++)
+                   argv.push_back(vm->get_param(i));
+   
+               return udf(vm, argv);
+           }
+       };
+   
+       #ifdef WINDOWS
+       #define EXPORT __declspec(dllexport)
+       #else
+       #define EXPORT
+       #endif
+   
+       extern "C" EXPORT void* get___tt_1_context()
+       {
+           __tt_1_context* sp = new __tt_1_context();
+           return sp;
+       }
+</pre></div>
+
+
+<p> When you make your own cpp code, Sometimes you have to include header or setup library path.<br>
+At that case, 
+
+<div class="code"><pre>
+   def sum := %cpp{
+       #include <math.h>
+       #cflags -I/usr/local
+       #ldflags -ltest
+   
+       return argv[0] + argv[1];
+   };
+</pre></div>
+   
+<p> Like above, define #include, #cflags and #ldflags in UDS statement. cpp module copy #include line to top of generated file. 
+And use clfags and ldflags as compile time option.<br>
+
+<p>In windows envrionment, cpp UDS objects are compiled by vscompile.bat.<br>
+That batch file is made up for Visual c++ express edition 2008. If you use another compiler or there are some problem to build, change that batch file.<br>
+
+
+<h1> 
+<a name="sh">sh</a>
+</h1>
+
+<p>sh module is the wrapper of shell script for using at orca's UDS.<br>
+It use os.run interface and pass parameters as argv[N]
+
+Below example is making sh UDS object tgzip which make tar ball of input directory.<br>
+
+<div class="code"><pre>
+def tgzip = %sh{ tar -xcvf argv[0] argv[1] };
+my.tgzip('out.tar.gz', '/home/lynix/out');
+</pre></div>
+
+
+
+
+
+<h1>
+<a name="httpd">httpd</a>
+</h1>
+
+This is simple http server.<br>
+
+<h3>
+httpd(path, port)
+</h3>
+This call launch http server with path as http root and port as http listen port.<br>
+
+This module use fs module for file management so dfsd and cached could be used for hosting.<br>
+
+current it supports get, post and multipart post request.<br>
+and if URI is *.orca file, It launch thread and execute it.<br>
+and if URI is *.osp (orca server page), It call osp module to parsing it and launce thread and execute that.<br>
+
+currently, sample test page is http://orca-lang.or.kr:8080/hello.osp
+
+
+
+
+<h1>
+<a name="base64">base64</a>
+</h1>
+
+This is base64 encoding & decoding module.<br>
+
+<h3>
+base64.enc(str)
+</h3>
+do base64 encoding of str.<br>
+
+<h3>
+base64.dec(str)
+</h3>
+do base64 decoding of str
+
+<div class="shell"><pre>
+$ using base64;
+$ print: a = base64.enc('12345678');
+MTIzNDU2Nzg=
+$ print: b = base64.dec(a);
+12345678
+</pre></div>
+
+
+
+<h1>
+<a name="stopwatch">stopwatch</a>
+</h1>
+
+It's simple stopwatch object.<br>
+
+<h2>
+start()
+</h2>
+Init timer.<br>
+
+<h2>
+elapse()
+</h2>
+
+return elapsed time as microsecond.<br>
+
+<div class="shell"><pre>
+$ using stopwatch;
+$ 
+$ stopwatch.start();
+$ print: stopwatch.elapse();
+15007541
+$ 
+$ print: stopwatch.elapse();
+24143768
+$ 
+</pre></div>
+
+<h2>
+lap(msg)
+</h2>
+
+Prints out elapsed time in console.<br>
+
+<div class="shell"><pre>
+$ sw = stopwatch;
+$ sw.start();
+$ sw.lap('lap 1: ');
+lap 1: 17 sec, 71 ms, 530 us
+$ sw.lap();
+20 sec, 287 ms, 624 us
+$ 
+</pre></div>
+
+<h2>
+title(msg)
+</h2>
+
+Set up header message of timer.<br>
+After setup, this message is printed when lap() is called.<br>
+title returns stopwatch object.<br>
+
+
+<div class="shell"><pre>
+$ using stopwatch;
+$ sw1 = stopwatch.clone();
+$ sw1.title('[sw1]');
+$ sw2 = stopwatch.clone();
+$ sw2.title('[sw2]');
+$ 
+$ sw1.start();
+$ sw2.start();
+$ sw1.lap();
+[sw1]5 sec, 792 ms, 273 us
+$ sw2.lap();
+[sw2]5 sec, 855 ms, 888 us
+$ sw1.lap('lap1');
+[sw1]lap122 sec, 128 ms, 36 us
+$ sw2.lap('lap2: ');
+[sw2]lap2: 32 sec, 976 ms, 62 us
+$ 
+</pre></div>
+
+<h2>
+scope_start, scope_end
+</h2>
+
+It supports scope statement
+
+scope_start is same as start, scope_end is same as lap.<br>
+
+<div class="shell"><pre>
+$ sw1.title('scope statement test:') { 
+* root.time.msleep(1000);
+* }
+* 
+scope statement test:999 ms, 425 us
+$
+</pre></div>
+
+
+<h1>
+<a name="orca">orca</a>
+</h1>
+
+This module is for access low-level aspects of orca.<br>
+current version provides load() and unload() interface.<br>
+
+<h3>
+load(name)
+</h3>
+loads module in runtime.<br>
+
+str = argv[0];
+orca.load(str);
+
+<h3>
+unload(name)
+</h3>
+unload module in runtime. It's purpose is reload dynamic pages from http, osp module.<br>
+
+
+
+<h1>
+<a name="util">util</a>
+</h1>
+
+This module provides simple utilities.<br>
+
+<h3>
+lock(obj)
+</h3>
+
+It make lock by lang.id() of obj. 
+
+below example lock to obj and make critical section.<br>
+
+util.lock(obj) {
+    obj.push_back(1);
+    ...<br>
+}
+
+<h2>
+lru
+</h2>
+
+<p>lru interface manage lru list.
+It manage lru by (key, value) pair.
+
+<h3>
+lru.insert(k, v)
+</h3>
+
+<p>Inserts k, v pair into lru list.
+v is dest. object which is maintained by lru list
+k is key which to find v is in or not in.
+
+<h3>
+lru.victimize()
+</h3>
+
+<p>victimize interface remove oldest one from lru list.
+
+<h3>
+lru.touch(k)
+</h3>
+
+<p> If k is exist in lru list, return v and move it to first of lru list.
+If not, return nil.
+
+<h3>
+lru.size()
+</h3>
+
+<p> size interface return current lru list size.
+
+<div class="shell"><pre>
+$ using util.lru;
+lru <0x858c230>
+$ a = 'string a';
+string a
+$ lru.insert(a.id(), a);
+$ b = 'string b';
+string b
+$ lru.insert(b.id(), b);
+$ c = 'string c';     
+string c               
+$ lru.insert(c.id(), c);
+$ lru.dump();  
+string: string c
+string: string b
+string: string a
+$ lru.victimize(); 
+$ lru.dump();          
+string: string c      
+string: string b 
+</pre></div>
+
+<h1>
+<a name="run">run</a>
+</h1>
+
+You can run orca module in shell promt. but you can't run member of module directly in shell prompt.<br>
+
+That means
+$ orca foo # possible
+$ orca foo.bar # impossible
+
+But if you use run module,
+argv[0] is path of object which will be called and argv[1:] is paremeters
+
+so you can use like below, 
+nil of last line is return value.<br>
+
+<div class="shell"><pre>
+$ orca run io.print hello, orca
+hello,orca
+nil
+</pre></div>
+
+
+
+<h1>
+<a name="cgi">cgi</a>
+</h1>
+
+cgi module is made by libcgi and supports basic CGI programming.<br>
+This module is beta phase so It will have many changes in interface.<br>
+
+First, describe interface and show basic example.<br>
+
+<h2>
+get_param(name)
+</h2>
+
+return request parameter.<br>
+
+<div class="shell"><pre>
+$ var = cgi.get_param('key');
+$ print: var;
+value
+</pre></div>
+
+<h2>
+urlenc(src)
+</h2>
+
+Encoding input string as URL format.<br>
+
+<div class="shell"><pre>
+$ print: cgi.urlenc("if a+3 > 4: print('overflow');");
+if+a%2B3+%3E+4%3A+print%28%27overflow%27%29%3B
+</pre></div>
+
+<h2>
+urldec(src)
+</h2>
+
+Decoding URL format as original string.<br>
+
+<div class="shell"><pre>
+$ print: cgi.urlenc("if a+3 > 4: print('overflow');");
+if+a%2B3+%3E+4%3A+print%28%27overflow%27%29%3B
+$ print: cgi.urldec('if+a%2B3+%3E+4%3A+print%28%27overflow%27%29%3B');
+if a+3 > 4: print('overflow');
+</pre></div>
+
+<h2>
+htmlenc(src)
+</h2>
+
+encoding symbol as html escape character.<br>
+
+<h2>
+redirect(url)
+</h2>
+
+redirect document.<br>
+
+<div class="shell"><pre>
+header {
+  cgi.redirect('another.orca');
+}
+</pre></div>
+
+<h2>
+header
+</h2>
+
+cgi.header has session and cookie object.<br>
+cgi.header object is used as scope statement.<br>
+In it's scope, session and cookie setting is possible.<br>
+
+
+<div class="code"><pre>
+cgi.header {
+  cgi.header.session('session_name_a');
+     ...
+  cgi.redirect('doc.orca');
+}
+</pre></div>
+
+<h2>
+header.session
+</h2>
+
+session manager object
+
+<h2>
+header.session.add(name, value)
+</h2>
+
+add new variable in session.<br>
+
+session.add('new_key', 'new_value');
+
+<h2>
+header.session.set(name, value)
+</h2>
+
+change session variable value.<br>
+
+session.set('new_key', 'changed_value');
+
+<h2>
+header.session.get(name)
+</h2>
+
+return session variable value.<br>
+
+session.get('new_key');
+
+<h2>
+header.session.remove(name)
+</h2>
+
+remove session variable.<br>
+
+session.remove('new_key');
+
+<h2>
+header.session.exist(name)
+</h2>
+
+check whether session variable is exist.<br>
+
+session.exist('new_key');
+
+<h2>
+header.session.destroy()
+</h2>
+
+destroy the session
+
+session.destroy();
+
+<h2>
+cgi.header.cookie
+</h2>
+
+cookie manager object.<br>
+
+<h2>
+header.cookie.get(name)
+</h2>
+
+get cookie value
+
+cookie.get('cookie');
+
+<h2>
+header.cookie.set(name, value)
+</h2>
+
+set cookie value
+
+cookie.set('cookie', 'value');
+
+<h2>
+html
+</h2>
+
+html text generation object.<br>
+
+<h2>
+html.puts(msg)
+</h2>
+
+prints text in html document.<br>
+
+html.puts('text in html');
+
+<h2>
+html.tag
+</h2>
+
+make new tag in html document.<br>
+first parameter is tag name and others are attributes.<br>
+
+<div class="code"><pre>
+using cgi.html.tag;
+
+tag('html') {
+  tag('head') { }
+  tag('body') {
+    ...<br>
+  }
+}
+</pre></div>
+
+<h2>
+html.ctag
+</h2>
+
+Like <img .../>, make closed tag
+
+<div class="code"><pre>
+using cgi.html.tag;
+using cgi.html.ctag;
+
+tag('html') {
+  tag('head') { }
+  tag('body') {
+    ctag('img', 'src=img.jpg');
+  }
+}
+</pre></div>
+
+<h2>
+html.br
+</h2>
+
+print <br> in html docuemnt.<br>
+
+<div class="code"><pre>
+using cgi.html.tag;
+using cgi.html.ctag;
+using cgi.html.br;
+
+tag('html') {
+  tag('head') { }
+  tag('body') {
+    ctag('img', 'src=img.jpg');
+    br();
+  }
+}
+</pre></div>
+
+<h2>
+html.text(msg)
+</h2>
+
+make new font tag.<br>
+First parameter is text which be printed.<br>
+Second parameter is font name.<br>
+Third parameter is size.<br>
+
+<div class="code"><pre>
+using cgi.html.tag;
+using cgi.html.ctag;
+using cgi.html.br;
+
+tag('html') {
+  tag('head') { }
+  tag('body') {
+    ctag('img', 'src=img.jpg');
+    br();
+    text('simple text', 'gulim', 10);
+  }
+}
+</pre></div>
+
+<h1>
+Simple login example
+</h1>
+
+Here is simple login example.<br>
+
+Below file is login.orca.<br>
+It reads name from user and process login.<br>
+ 
+For more detail on source,
+If form is submitted, It called again and makes new session session_test and sets session variable
+logged as 1.<br>
+Then redirect to result.orca.<br>
+
+<div class="code"><pre>
+#!/bin/orca
+
+using cgi;
+using cgi.header;
+using cgi.header.session;
+using cgi.header.cookie;
+
+using cgi.html.tag;
+using cgi.html.ctag;
+using cgi.html.br;
+using cgi.html.puts;
+using cgi.html.text;
+
+cgi.header {
+	session('session_test');
+	if (cgi.get_param('logout')): {
+		session.destroy();
+	}
+	if (cgi.get_param('login')): {
+		session.add('logged', '1');
+		session.add('name', cgi.get_param('username'));
+		cookie.set('key', 'value');
+		cgi.redirect('result.orca?option=false');
+		return;
+	}
+}
+
+cgi.html {
+	tag('html') {
+		tag('head') { 
+			tag('title') { 
+				puts('cgi session example');
+			}
+		}
+
+		tag('body') {
+			tag('form', ["action='login.orca'", "method='get'"]) {
+				puts: 'username'; 
+				ctag('input', "type='text' name='username'");
+				ctag('input', "type='submit' name='login' value='Click to 
+
+login'");
+			}
+		}
+	}
+}
+</pre></div>
+
+
+<p> Belows are result.orca
+It sets up session_test and check logged.<br>
+If logged is 1, prints more detail informations.<br>
+If not logged, prints "not logged in"
+
+
+<div class="code"><pre>
+#!/bin/orcash
+
+using cgi;
+using cgi.header;
+using cgi.header.session;
+using cgi.header.cookie;
+
+using cgi.html.tag;
+using cgi.html.ctag;
+using cgi.html.br;
+using cgi.html.puts;
+using cgi.html.text;
+
+cgi.header {
+	session('session_test');
+}
+
+cgi.html {
+	tag('html') {
+		tag('head') { 
+			tag('title') { 
+				puts('cgi session example');
+			}
+		}
+
+		tag('body') {
+			if (session.exist('logged')): {
+				puts: 'logged'; 
+				br();
+				puts: 'session.name =', session.get('name'); 
+				br();
+				puts: 'cookie.key =', cookie.get('key');
+				br();
+				puts: 'param.option =', cgi.get_param('option');
+				br();
+				tag('form', ["action='login.orca'", "method='get'"]) {
+					ctag('input', "type='submit' name='logout' 
+
+value='Click to logout'");
+				}
+			}
+			else: {
+				puts: 'not logged in'; 
+			}
+		}
+	}
+}
+</pre></div>
+
+
+<p> This example is available in
+
+http://orca-lang.or.kr/cgi-bin/login.orca
+http://orca-lang.or.kr/cgi-bin/result.orca
+
+
+
+
+<h1>
+<a name="mysql">mysql</a>
+</h1>
+
+
+mysql is external module so you have to build it from extlib.<br>
+It requires mysql to be installed before build.<br>
+
+After build it, move libmysql.so to LD_LIBRARY_PATH and 
+load module by using statement.<br>
+
+using mysql;
+
+<h3>
+mysql.connect(ip, id, pw, db)
+</h3>
+connect to mysql server
+
+<h3>
+mysql.update(query)
+</h3>
+execute update Qeury
+
+<h3>
+mysql.execute(query)
+</h3>
+execute select Query
+return value is mysql result iterator.<br>
+so you can access result value by call it.<br>
+
+Here is simple example.<br>
+<div class="code"><pre>
+using mysql;
+  
+  m = mysql.clone();
+  m.connect('127.0.0.1', argv[0], argv[1], 'test');
+  
+  print: m.update('drop table t1');
+  print: m.update('create table t1 (code int)');
+  
+  for i in [1..5]:
+      print: m.update('insert into t1 values(${i})');
+  
+  
+  print: ret = m.execute('select * from t1');
+  
+  for a in ret:
+      print: a();
+
+$ orca tt root passwd
+0
+0
+0
+0
+0
+0
+0
+mysqlresult <0x8766028>
+( '1' )
+( '2' )
+( '3' )
+( '4' )
+( '5' )
+</pre></div>
+
+
+</body>
+</html>
+

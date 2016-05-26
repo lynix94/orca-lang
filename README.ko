@@ -1,0 +1,122 @@
+
+이번 0.4버전에서는
+
+* decode 구문에 사용자 정의함수를 쓸 수 있고
+ (튜토리얼을 보시고 그 예로 xml.orca를 보시면 얼마나 유용한지 아실수..)
+* 이터레이터를 개선했으며,
+* 원격, 분산처리 모듈이 추가 되었습니다.
+ (이부분도 모듈 레퍼런스를 보시면 재미있으실 겁니다)
+* xml, json 인코딩, 디코딩 모듈이 추가되었고
+* httpd, osp(서버 페이지 처리) 모듈이 작성되었고
+  (http://orca-lang.or.kr:8080/hello.osp 로 테스트 가능)
+* base64, fun(functional), datetime, date, time 모듈이 추가되었고
+* operator_get, operator_set, operator_get_last 연산자를 재정의할 수 있게 되었으며,
+
+* 분산파일 시스템, 분산 캐쉬의 프로토타입 모듈이 추가되었습니다.
+* DB driver로서 mysql module 이 extlib에 추가되었고 곧 cubrid 모듈도 추가될 예정입니다. extlib는 커뮤니티 게시판을 참조하세요.
+
+상세한 변경내역은 커뮤니티 게시판의 알림판을 보시면 [0.4 추가] 들로
+나열되어 있습니다.
+또한 튜토리얼과 모듈 레퍼런스도 갱신되었으니 참조할 수 있습니다.
+
+커뮤니티 사이트 : http://orca-lang.or.kr/
+
+2010. 11. 16 일의 늦은 밤..
+Lee, Ki-Yeul (kiyeul.lee@gmail.com)
+
+----------------------------
+
+0.2 에 이어 이번 릴리즈까지는 텀이 매우 길었습니다.
+
+개인적으로 겨울에는 보딩을 하느라 짬이 안 났고,
+
+지난달에서 예쁜 아가씨와 결혼을 하느라 ^^;; 
+결혼 준비 및 신혼 살림 장만에 정말 여유가 없었습니다.
+
+그래도, 지난 두 번의 릴리즈가 언어의 기본 코어를 만드는데 급급했다면,
+이제는 오르카만의 독특한 색깔을 내기 시작했습니다.
+업그레이드된 항목은 적지만 개인적으로는 나름 뿌듯한 릴리즈였습니다.
+
+이런 릴리즈에서는 
+
+* 역시나 수 많은 버그가 수정되었으며 ^^;;
+* decode statement
+* 조건제시법 (set builder form) 과 지연연산을 지원하고,
+* parallel do statement,
+* parallel for statement 를 지원하여 손쉬운 병렬처리 구현을 가능하게 했습니다.
+
+그 외에 추가한 모듈로는
+* os module 이 filesystem 관련하여 개선되었고,
+* cgi module 이 첫발을 떼었으며,
+* 간단한 bmt용으로 stopwatch 모듈을 제공합니다.
+
+및 이런저런 많은 수정이 있었습니다.
+그럼 많은 관심 및 참여 부탁드리겠습니다.
+
+
+2009. 6. 20
+Lee, Ki-Yeul (kiyeul.lee@gmail.com)
+
+---------------------------
+
+0.1 에 이어 이번 릴리즈에서는
+
+* 수 많은 버그가 수정되고 -_-;;
+* big number 를 지원하고,
+* real number 지원
+* scope statement 생성
+* lambda 함수 지원
+* thread, ipc 지원
+* 기본적인 socket 지원
+
+및 이런저런 많은 수정이 있었습니다.
+
+그리고 커뮤니티 사이트를 열었습니다.
+혹시 패키지만 받으셨다면,
+
+http://orca-lang.or.kr/phpBB3 를 방문해 주시기 바랍니다.
+
+2009. 12. 2
+Lee, Ki-Yeul (kiyeul.lee@gmail.com)
+
+-------------------------------
+
+오르카는 새로운 스크립트 인터프리터로서 객체지향 개발이 가능 하며 몇몇 재미있고 독특한 구조로 이루어져 있다.
+이건 C++/STL/BOOST로 구현되어 있어서 코어가 극단적으로 작고, 효율적으로 구성되었고 향후 C++ 객체외 쉽게 연동될 수 있는 특징이 있다.
+
+현재 0.1 베타를 릴리즈 하지만,
+기본적인 코어는 구현되어 있는 상태이다.
+산술연산, 제어문(if, do, while, for), 스트링 연산, 정규표현식 연산,  함수 및 객체의 정의와 상속,
+가비지 컬렉션, 연산자 재정의, exception handling 같은...
+
+orca는 
+http://orca-lang.sourceforge.net
+에서 개발되고 있으며
+
+svn path 는 https://orca-lang.svn.sourceforge.net/svnroot/orca-lang 이다.
+
+2009. 10. 07
+Lee, Ki-Yeul (kiyeul.lee@gmail.com)
+
+
+
+# 소스로부터 빌드하는법 
+
+unix-like 환경에서는
+./autogen.sh
+./configure
+make
+make install
+
+를 차례대로 치면 되고,
+윈도우에서는 win.sln을 열고 빌드하면 된다.
+
+
+# TEST
+
+설치한 후 orca tests/test 를 치면 실행되는 내역이 보일 것이다.
+이것은 tests 폴더 밑의 test.orca를 실행하는 예제이다.
+
+아니면 단순히 orca만 입력하여 인터프리터를 열수도 있다.
+
+

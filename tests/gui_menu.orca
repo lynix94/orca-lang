@@ -1,0 +1,45 @@
+using gui;
+using gui.window;
+using gui.vbox;
+using gui.label;
+using gui.menubar;
+using gui.text;
+using gui.scroll;
+using gui.dialog;
+using util.upper;
+
+def main : window
+{
+	my.attr['wh'] = (800, 600);
+
+	def box : vbox
+	{
+		def menu : menubar
+		{
+			file = [ 'open', %c{ 
+								name = dialog.fileopen(upper('main'));
+								str= os.read(name);
+								upper('box').hs.edit.attr['text'] = str;
+							},
+					'save', %c{ 
+								str= upper('box').hs.edit.attr['text'];
+								name = dialog.filesave(upper('main'));
+								os.write(name, str);
+							},
+					'exit', %c{ 
+								upper('main').quit(); 
+							}
+					];
+
+			my.push_back('file', file);
+		}
+
+		def hs : scroll
+		{
+			def edit : text
+			{
+			}
+		}
+	}
+}
+

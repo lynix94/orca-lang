@@ -1,0 +1,49 @@
+
+parse def foo(str)
+{
+	stmt : expr
+		;
+
+	expr : add 
+		| assign_expr
+		;
+
+	assign_expr: name '=' expr
+		;
+
+	name : r'[a-z]+'
+		;
+
+	add : add '+' mul
+		| mul
+		;
+
+
+	mul : mul '*' primary
+		| primary
+		;
+
+	primary : number
+		| '(' expr ')'
+		;
+
+	number : r'[0-9]+'
+		;
+
+	~ : r'[ \t\r\n]+'
+		;
+}
+
+print: 'start';
+print: my.foo('1');
+print: my.foo('1*2*3');
+print: my.foo('10+2*3');
+print: my.foo('10+2*3+20*30');
+print: my.foo('(3+20)');
+
+print: my.foo('10+2*(3+20)*30');
+print: my.foo('a = 10 * 3');
+
+print: 'done';
+
+

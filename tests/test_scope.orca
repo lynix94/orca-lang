@@ -1,0 +1,61 @@
+
+def scope 
+{
+	def flag_start;
+	def flag_end;
+
+	.flag_start = false;
+	.flag_end = false;
+
+
+	def scope_start() {
+		print: 'scope start';
+		..flag_start = true;
+	}
+
+	def scope_end() {
+		print: 'scope end';
+		..flag_end = true;
+	}
+}
+
+.scope();
+
+
+.scope {
+	print: .scope.flag_start;
+	if !.scope.flag_start:
+		throw test.scope, 'scope_start not called';
+
+	print: 'scope mid';
+}
+
+if !.scope.flag_end:
+	throw test.scope, 'scope_end not called';
+
+
+.scope();
+
+try {
+	.scope {
+		if !.scope.flag_start:
+			throw test.scope, 'scope_start not called';
+
+		print: 'scope mid';
+		throw scope, 'test';
+
+		print: 'this printing will be ignored by throw, but scope end will be preinted';
+		throw test.scope, 'abnormal scope termination';
+	}
+}
+catch scope: msg {
+	print: 'catched', msg;
+}
+
+
+if !.scope.flag_end:
+	throw test.scope, 'scope_end not called';
+
+print: my, ' OK';
+
+

@@ -1,0 +1,23 @@
+
+parse def foo(str)
+{
+	Ed	: E
+		;
+
+	E	: E '+' T
+		| T
+		;
+
+	T	: T '*' F
+		| F
+		;
+
+	F	: '(' E ')' 
+		| 'id'
+		;
+}
+
+
+print: 'done';
+
+

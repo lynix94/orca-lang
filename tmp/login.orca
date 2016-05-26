@@ -1,0 +1,45 @@
+#!/bin/orcash
+
+using cgi;
+using cgi.header;
+using cgi.header.session;
+using cgi.header.cookie;
+
+using cgi.html.tag;
+using cgi.html.ctag;
+using cgi.html.br;
+using cgi.html.puts;
+using cgi.html.text;
+
+cgi.header {
+	session('session_test');
+	if (cgi.get_param('action')): {
+		session.add('logged', '1');
+		session.add('name', 'orca session');
+		cookie.set('key', 'value');
+		cgi.redirect('result.orca?option=true');
+		return;
+	}
+}
+
+cgi.html {
+	tag('html') {
+		tag('head') { 
+			tag('title') { 
+				puts('cgi session example');
+			}
+		}
+
+		tag('body') {
+			tag('form', ["action='login.orca'", "method='get'"]) {
+				puts: 'username'; 
+				ctag('input', "type='text' name='username'");
+				ctag('input', "type='submit' name='action' value='Click to login'");
+			}
+		}
+	}
+}
+
+
+
+

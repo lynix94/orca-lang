@@ -1,0 +1,156 @@
+using os;
+using fun;
+using alg;
+
+def name := [];
+def data := [];
+def sdata := [];
+
+def cmd := '';
+def with_line;
+
+def run(cmd)
+{
+	name = 'plot_' + owner.id() + '.tmp';
+	os.write(name, cmd);
+	os.run('gnuplot ' + name);
+	os.remove(name);
+}
+
+def set(cmd)
+{
+	if cmd == 'line': {
+		..with_line = true;
+		return;
+	}
+
+	..cmd += 'set ' + cmd + '\n';
+}
+
+def add(name, data)
+{
+	..name.push_back(name);
+	..data.push_back(data);
+}
+
+def sadd(name, data, grouping)
+{
+	..name.push_back(name);
+
+	if grouping == nil:
+		..sdata.push_back(data);
+	elif grouping == true: {
+		new_data = [];
+		alg.copy(data.begin(), data.end(), new_data.begin());
+
+		it = new_data.begin();
+		while true: {
+			b = it()[1];
+			if it.next() == nil: break;
+
+			if b > it()[1]: {
+				it.insert(('', '', ''));
+			}
+		}
+
+		..sdata.push_back(new_data);
+	}
+}
+
+def clear()
+{
+	..name = [];
+	..data = [];
+	..sdata = [];
+	..with_line = false;
+}
+
+def splot(cmd_end)
+{
+	file_name = 'data_' + owner.id() + '.tmp.';
+	order = 1;
+
+	# set command
+
+	cmd = ..cmd;
+	cmd += 'splot ';
+	for name in ..name.begin(): {
+		cmd += '"${file_name + order}" title \'${name()}\'';
+		if ..with_line:
+			cmd += ' with line';
+
+		if name != ..name.last():
+			cmd += ', \\\n';
+
+		order += 1;
+	}
+
+	cmd += '\n' + cmd_end;
+
+	for j in [0..owner.sdata.size()-1]: {
+		f = io.open(file_name + (j+1),'w');
+
+		for i in %[x|x<-0~]: {
+			if i >= ..sdata[j].size(): break;
+
+			str = '';
+			str += ..sdata[j][i][0] + '\t'
+				+ ..sdata[j][i][1] + '\t'
+				+ ..sdata[j][i][2] + '\t';
+			str += '\n';
+			f.write(str);
+		}
+
+		f.close();
+	}
+
+	..run(cmd);
+
+	for i in [1..order]:
+		os.remove(file_name + i);
+}
+
+
+def plot(cmd_end)
+{
+	file_name = 'data_' + owner.id() + '.tmp';
+
+	# set command
+	idx = 1;
+
+	cmd = ..cmd;
+	cmd += 'plot ';
+	for name in ..name.begin(): {
+		cmd += '"${file_name}" using ${idx}:${idx+1} title \'${name()}\'';
+		idx += 2;
+		if ..with_line:
+			cmd += ' with line';
+
+		if name != ..name.last():
+			cmd += ', \\\n';
+	}
+
+	cmd += '\n' + cmd_end;
+
+	f = io.open(file_name,'w');
+
+	for i in %[x|x<-0~]: {
+		if i >= ..data[0].size(): break;
+		str = '';
+		for j in [0..owner.data.size()-1]: {
+			str += ..data[j][i][0] + '\t' + ..data[j][i][1] + '\t';
+		}
+		str += '\n';
+		f.write(str);
+	}
+
+	f.close();
+	..run(cmd);
+	os.remove(file_name);
+}
+
+
+return;
+
+
+

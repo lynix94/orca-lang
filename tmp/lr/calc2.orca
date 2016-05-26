@@ -1,0 +1,54 @@
+
+parse def foo(str)
+{
+	stmt_done : stmt
+				%c{
+					return argv[0];
+				}
+		;
+
+	stmt : stmt '+' mul
+				%c{
+					return argv[0] + argv[2];
+				}
+		| stmt '-' mul
+				%c{
+					return argv[0] - argv[2];
+				}
+		| mul
+				%c{
+					return argv[0];
+				}
+		;
+
+	mul : mul '*' number
+				%c{
+					return argv[0] * argv[2];
+				}
+		|  mul '/' number
+				%c{
+					return argv[0] / argv[2];
+				}
+		| number
+				%c{
+					return argv[0];
+				}
+		;
+
+	number : r'[0-9]+'
+				%c{
+					return argv[0].integer();
+				}
+		;
+
+	~ : r'[ \t\r\n]+'
+		;
+}
+
+do {
+	io.put: '>>> ';
+	str = io.input();
+	print: my.foo(str);
+} while true;
+		
+

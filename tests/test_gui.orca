@@ -1,0 +1,119 @@
+using test_gui;
+
+using gui;
+using gui.window;
+using gui.vbox;
+using gui.hbox;
+using gui.button;
+using gui.scroll;
+using gui.text;
+
+using util.upper;
+using fun.bind_1st;
+
+using gui_button;
+using gui_combo;
+using gui_check;
+using gui_radio;
+using gui_entry;
+using gui_image;
+using gui_status;
+using gui_menu;
+using gui_list;
+using gui_tree;
+
+
+def test_list := [
+	['button', gui_button.main, 'button source', 'gui_button.orca'],
+	['combo button', gui_combo.main, 'combo source', 'gui_combo.orca'],
+	['check button', gui_check.main, 'check source', 'gui_check.orca'],
+	['radio button', gui_radio.main, 'radio source', 'gui_radio.orca'],
+	['entry', gui_entry.main, 'entry source', 'gui_entry.orca'],
+	['image', gui_image.main, 'image source', 'gui_image.orca'],
+	['status bar', gui_status.main, 'status bar source', 'gui_status.orca'],
+	['menu', gui_menu.main, 'menu source', 'gui_menu.orca'],
+	['list', gui_list.main, 'list source', 'gui_list.orca'],
+	['tree', gui_tree.main, 'tree source', 'gui_tree.orca']
+];
+
+def source : window
+{
+	my.attr['xy'] = (250, 120);
+	my.attr['wh'] = (800, 600);
+
+	def box : vbox
+	{
+		def scr : scroll
+		{
+			def source : text
+			{
+				# filled by below button
+			}
+		}
+	}
+}
+
+
+def template : hbox
+{
+	def launch : button 
+	{ 
+		my.attr['wh'] = (100, 40);
+	}
+	def source : button 
+	{ 
+		my.attr['wh'] = (100, 40);
+	}
+}
+
+
+def main : window
+{
+	my.attr['xy'] = (50, 20);
+	my.attr['wh'] = (300, 300);
+
+	def pop_window(win)
+	{
+		w = win.clone();
+		w.make();
+		w.show();
+	}
+
+	def src_window(file)
+	{
+		w = test_gui.source.clone();
+		w.make();
+		w.box.scr.source.attr['text'] = os.read(file);
+		w.show();
+	}
+
+	def box : vbox
+	{
+		count = 0;
+		for i in test_gui.test_list: {
+			a = test_gui.template.clone();
+			a.make();
+
+			a.launch.attr['text'] = i[0];
+			a.launch.event['clicked'] = bind_1st(upper('main').pop_window, i[1]);
+
+			a.source.attr['text'] = i[2];
+			a.source.event['clicked'] = bind_1st(upper('main').src_window, i[3]);
+			my.members['tmp' +  count] = a;
+			count += 1;
+
+			sep = gui.hsep.clone();
+			sep.make();
+			my.members['sep' + i] = sep;
+		}
+	}
+}
+
+my.main.make();
+my.main.show();
+
+return;
+
+
+
+

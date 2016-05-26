@@ -1,0 +1,56 @@
+
+print: 'quick sort 10~-10';
+
+decode def qsort(a)
+{
+	[] -> 
+	{
+		return [];
+	}
+	%x:%xs -> 
+	{
+		return qsort(%[a|a<-xs, a<=x]) + [x] +  qsort(%[b|b<-xs, b>x]);
+	}
+}
+
+print: result = .qsort([10..-10]);
+
+if result != [-10..10]:
+  throw test.sbf, 'quick sort failed';
+
+print: 'generate prime number between 1~100';
+
+def factor(n)
+{
+  return  %[ x | x <- [1..n], n%x == 0 ];
+}
+
+print: pnum =  %[x|x<-1~100, .factor(x) == [1, x]];
+
+if pnum != [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97]:
+  throw test.sbf, 'prime number failed';
+
+print: a = %[x|x<-0.1~4];
+if a != [0.1, 1.1, 2.1, 3.1]:
+  throw test.sbf, 'generator failed';
+
+print: a = %[x|x<-0.1~3.01:0.1]; # precision problem
+if a != [0.1..3.01:0.1]:
+  throw test.sbf, 'generator failed';
+
+
+# big number case
+
+a = %[x|x<- ~100000000000];
+print: b = [a[0], a[1], a[2]];
+if b != [100000000000, 100000000000-1, 100000000000-2]:
+	throw test.sbf, 'big number case failed';
+
+a = %[x|x<- 100000000000~ ];
+print: b = [a[0], a[1], a[2]];
+if b != [100000000000, 100000000001, 100000000002]:
+	throw test.sbf, 'big number case failed';
+
+
+print: 'OK';
+

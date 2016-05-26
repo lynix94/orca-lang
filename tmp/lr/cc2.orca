@@ -1,0 +1,50 @@
+
+parse def foo(str)
+{
+	stmt : add
+			%c{
+				print: '1: ', argv;
+				return argv[0];
+			}
+		;
+
+	add : add '+' mul
+			%c{
+				print: '2: ', argv;
+				return argv[0] + argv[2];
+			}
+		| mul
+			%c{
+				print: '3: ', argv;
+				return argv[0];
+			}
+		;
+
+
+	mul : mul '*' number
+			%c{
+				print: '2: ', argv;
+				return argv[0] * argv[2];
+			}
+		| number
+			%c{
+				print: '3: ', argv;
+				return argv[0];
+			}
+		;
+
+	number : r'[0-9]+'
+			%c{
+				print: '4: ', argv;
+				return argv[0].integer();
+			}
+		;
+}
+
+print: 'start';
+#print: my.foo('1');
+#print: my.foo('1*2*3');
+print: my.foo('10+2*3');
+print: 'done';
+
+

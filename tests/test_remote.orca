@@ -1,0 +1,60 @@
+using remoted;
+using remotec;
+using random;
+using time;
+
+random.seed();
+port = random.integer(1000) + 8000;
+
+print: '# port: ', port;
+
+
+parallel do {
+	server = remoted.clone();
+	server(port);
+}
+
+time.msleep(200);
+print: '# client start';
+c = remotec.clone('127.0.0.1', port);
+
+c.var_a = 'variable a';
+print: c.var_a;
+if c.var_a != 'variable a':
+	throw test.remote, 'remote variable set fail';
+
+def foo
+{
+	def bar()
+	{
+		return 'bar of foo';
+	}
+}
+
+f = my.foo.clone();
+
+c.f = f;
+print: c.f.bar();
+if c.f.bar() != 'bar of foo':
+	throw test.remote, 'remote object set fail';
+
+
+print: '## remote_do test';
+c.remote_do: 10, 20, %c{
+    return argv[0] + argv[1];
+};
+
+do {
+    print: ret = c.is_done(1000);
+} while (ret == false);
+
+print: ret = c.pop_obj();
+if ret != 30:
+	throw test.remote, 'remote do fail';
+	
+
+print: '## now quit: ', c.shutdown();
+
+return 'OK', my;
+
+

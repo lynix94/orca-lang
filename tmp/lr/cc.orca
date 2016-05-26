@@ -1,0 +1,17 @@
+
+parse def foo(str)
+{
+	stmt : mul
+		;
+
+	mul : mul '*' r'[0-9]+'
+		| r'[0-9]+'
+		;
+}
+
+print: 'start';
+#print: my.foo('1');
+print: my.foo('1*2');
+print: 'done';
+
+

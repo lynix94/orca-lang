@@ -1,0 +1,240 @@
+
+def traverse(obj, fun)
+{
+	fun(obj);
+	if obj.members.has_key('begin'): {
+		for a in obj.begin(): {
+			traverse(a(), fun);
+		}
+	}
+}
+
+def for_each(begin, end, fun)
+{
+	iter = begin;
+
+	while iter != end: {
+		fun(iter()):
+		iter.next();
+	}
+}
+
+def for_each_iterator(begin, end, fun)
+{
+	iter = begin;
+
+	while iter != end: {
+		fun(iter):
+		iter.next();
+	}
+}
+
+
+def find(begin, end, val)
+{
+	iter = begin;
+
+	while iter != end: {
+		if iter() == val:
+			return iter;
+		iter.next();
+	}
+
+	return end;
+}
+
+
+def find_if(begin, end, fun)
+{
+	iter = begin;
+
+	while iter != end: {
+		if fun(iter()):
+			return iter;
+
+		iter.next();
+	}
+
+	return end;
+}
+
+
+def remove(begin, end, val)
+{
+	iter = begin;
+
+	while iter != end: {
+		if iter() == val: {
+			iter.erase();
+		}
+		else: {
+			iter.next();
+		}
+	}
+}
+
+
+def remove_if(begin, end, fun)
+{
+	iter = begin;
+
+	while iter != end: {
+		if fun(iter()):
+			iter.erase();
+		else:
+			iter.next();
+	}
+}
+
+
+def replace(begin, end, old, new)
+{
+	iter = begin;
+
+	while iter != end: {
+		if iter() == old: 
+			iter(new);
+
+		iter.next();
+	}
+}
+
+
+def replace_if(begin, end, fun, new)
+{
+	iter = begin;
+
+	while iter != end: {
+		if fun(iter()):
+			iter(new);
+
+		iter.next();
+	}
+}
+
+
+def erase(begin, end)
+{
+	iter = begin;
+
+	while iter != end: {
+		iter.erase();
+	}
+}
+
+
+def copy(begin, end, dest)
+{
+	iter = begin;
+
+	while iter != end: {
+		dest.insert(iter());
+		iter.next();
+	}
+}
+
+
+def copy_n(begin, n, dest)
+{
+	iter = begin;
+
+	n times do {
+		dest.insert(iter());
+		iter.next();
+	}
+}
+
+
+def count(begin, end, val)
+{
+	iter = begin;
+	i = 0;
+
+	while iter != end: {
+		if iter() == val:
+			i+=1;
+
+		iter.next();
+	}
+
+	return i;
+}
+
+
+def count_if(begin, end, fun)
+{
+	iter = begin;
+	i = 0;
+
+	while iter != end: {
+		if fun(iter()):
+			i+=1;
+
+		iter.next();
+	}
+
+	return i;
+}
+
+
+def transform(begin, end, p1, p2, p3)
+{
+	iter = begin;
+
+	if p3 == nil: {
+		# transform(begin, end, out, fun)
+		out = p1;
+		fun = p2;
+
+		while iter != end: {
+			out.insert(fun(iter()));
+			iter.next();
+		}
+	}
+	else: {
+		# transform(begin, end, begin2, out, fun)
+		begin2 = p1;
+		out = p2;
+		fun = p3;
+
+		while iter != end: {
+			out.insert(fun(iter(), begin2()));
+			iter.next();
+			begin2.next();
+		}
+	}
+}
+
+def equal(begin, end, begin2, fun)
+{
+	while begin != end: {
+		if fun == nil: {
+			if begin() != begin2():
+				return false;
+		}
+		else: {
+			if fun(begin(), begin2()) == false:
+				return false;
+		}
+		
+		begin.next();
+		begin2.next();
+	}
+
+	return true;
+}
+
+
+def equal_range(begin, end, val)
+{
+	while begin != end: {
+		if begin() != val:
+			return false;
+		
+		begin.next();
+	}
+
+	return true;
+}
+
+

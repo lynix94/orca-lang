@@ -1,0 +1,85 @@
+CC = gcc
+CXX = g++
+LEX = flex
+YACC = bison
+
+PARSER = ./src/parser
+VM = ./src/vm
+CORELIB = ./src/corelib
+PRIMITIVE = ./src/primitive
+COMMON	= ./src/include
+KYLIB	= ./src/kylib
+
+CFLAGS = -g -I$(PARSER) -Isrc/include -I$(VM) -I$(PRIMITIVE) -I$(CORELIB) -I$(KYLIB) -I/usr/include/boost-1_33_1  -MMD -DLINUX `pkg-config --cflags gtk+-2.0`
+#LDFLAGS = 
+LDFLAGS = -L/usr/lib -lboost_regex -lboost_filesystem -lboost_date_time -lreadline -lcurses -lgmp `pkg-config --libs gtk+-2.0`
+
+
+ORCA_OBJ = $(PARSER_OBJ) $(VM_OBJ) $(LIB_OBJ) $(PRIMITIVE_OBJ) $(CORE_OBJ) $(KY_OBJ)
+ORCA_DEPS = $(PARSER_DEPS) $(VM_DEPS) $(LIB_DEPS) $(PRIMITIVE_DEPS) $(CORE_DEPS)
+
+PARSER_OBJ = parser_common.o lexer.o parser.o parserCode.o parserControl.o parserOP.o parserException.o parserParse.o
+VM_OBJ = orcaData.o orcaLocal.o orcaObject.o orcaObjectMembers.o orcaObjectMembersIter.o orcaObjectParents.o orcaObjectParentsIter.o orcaRoot.o orcaStack.o orcaVM.o orcaTrace.o orcaForStack.o orcaDecodeStack.o porting.o main.o orcaGlobal.o orcaPure.o orcaOnce.o orcaParserObject.o
+PRIMITIVE_OBJ = orcaBoolean.o orcaInteger.o orcaFloat.o orcaList.o orcaVirtList.o orcaListIter.o orcaListIterator.o orcaSbf.o orcaString.o orcaTuple.o orcaTupleIter.o orcaMap.o orcaMapIter.o
+CORE_OBJ = base64.o orcaDatetime.o orcaPack.o orcaGtk.o
+KY_OBJ = kyString.o
+
+PARSER_DEPS = parser_common.d lexer.d parser.d parserCode.d parserControl.d parserOP.d parserException.d parserParse.d
+VM_DEPS = orcaData.d orcaLocal.d orcaObject.d orcaRoot.d orcaStack.d orcaVM.d orcaTrace.d orcaForStack.d orcaDecodeStack.d main.d orcaGlobal.d orcaPure.d orcaOnce.d orcaParserObject.d
+PRIMITIVE_DEPS = orcaBoolean.d orcaInteger.d orcaFloat.d orcaList.d orcaVirtList.d orcaListIter.d orcaListIterator.d orcaSbf.d orcaString.d orcaTuple.d orcaTupleIter.d orcaMap.d orcaMapIter.d
+CORE_DEPS = base64.d orcaDatetime.d orcaPack.d orcaGtk.d
+KY_DEPS = kyString.d
+
+TARGET_ORCA = orca
+
+
+all	: $(TARGET_ORCA) 
+
+$(TARGET_ORCA) : $(ORCA_OBJ) Makefile
+	$(CXX) -o $(TARGET_ORCA) $(ORCA_OBJ) $(LDFLAGS)
+	#ar rc liborca.a *.o
+	#$(CXX) -shared -o liborca.so *.o
+
+
+$(PARSER)/parser.cpp: $(PARSER)/parser.y 
+	$(YACC) -d -r all -o $(PARSER)/parser.cpp $(PARSER)/parser.y
+
+$(PARSER)/lexer.cpp: $(PARSER)/lexer.l $(PARSER)/parser.cpp
+	$(LEX) -+ -o$(PARSER)/lexer.cpp $(PARSER)/lexer.l
+
+%o : $(PARSER)/%cpp
+	$(CXX) $(CFLAGS) -c $<
+	
+%o : $(VM)/%cpp
+	$(CXX) $(CFLAGS) -c $<
+	
+%o : $(CORELIB)/%cpp
+	$(CXX) $(CFLAGS) -c $<
+	
+%o : $(PRIMITIVE)/%cpp
+	$(CXX) $(CFLAGS) -c $<
+	
+%o : $(COMMON)/%cpp
+	$(CXX) $(CFLAGS) -c $<
+	
+%o : $(KYLIB)/%cpp
+	$(CXX) $(CFLAGS) -c $<
+	
+
+install:
+	cp orca /usr/local/bin
+	rm -rf /usr/local/lib/orca
+	cp -r lib /usr/local/lib/orca
+
+clean : 
+	rm -rf $(OBJECTS) $(TARGET_ORCA) core $(PARSER)/parser.cpp $(PARSER)/lexer.cpp $(PARSER)/parser.hpp $(PARSER)/parser.output
+	rm -rf *.o *.bak *.*~ *~ *.stackdump *.a *.so $(ORCA_DEPS)
+	find . -name '*.*~' -exec rm '-rf' '{}' \;
+
+test :
+	rm -rf tests/*.kw
+	./$(TARGET_ORCA) tests/test
+
+-include $(ORCA_DEPS)
+
+

@@ -1,0 +1,27 @@
+using io.open;
+
+input = 'hello, file';
+print: 'aaaaaaaa';
+fh = open('test.txt', 'w');
+print: 'aaaaaaaa';
+fh.write(input);
+print: 'aaaaaaaa';
+fh.close();
+print: 'aaaaaaaa';
+
+
+fh = open('test.txt', 'r');
+output = fh.read();
+fh.close();
+
+print('[', input, ' ', input.length(),']');
+print('[', output, ' ', output.length(),']');
+
+if input != output: {
+	print('ne');
+	throw test.file, 'file operation fail';
+}
+
+
+return true;
+

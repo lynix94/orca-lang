@@ -1,0 +1,61 @@
+
+using time;
+
+def foo
+{
+	for a in [1..2]: {
+		//time.msleep(1);
+		print: a;
+	}
+}
+
+def bar
+{
+	for a in [100000..100001]: {
+		//time.msleep(1);
+		print: a;
+	}
+}
+
+print: 'parallel start';
+
+parallel do {
+  print: 'parallel do 1';
+  .foo();
+  print: 'parallel do 1 done';
+}
+
+.bar();
+print: 'well done 1';
+
+parallel do {
+  print: 'parallel do 2';
+  .foo();
+  print: 'parallel do 2 done';
+}
+
+.bar();
+print: 'well done 2';
+
+parallel do {
+  print: 'parallel do 3';
+  .foo();
+  print: 'parallel do 3 done';
+}
+
+.bar();
+print: 'well done 3';
+
+parallel do {
+  print: 'parallel do 4';
+  .foo();
+  print: 'parallel do 4 done';
+}
+
+.bar();
+print: 'well done 4';
+
+
+print: '###well done';
+
+

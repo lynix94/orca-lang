@@ -1,0 +1,85 @@
+<%
+	using datetime;
+	using util;
+	using fs;
+%>
+
+<html>
+<body>
+<h2>hello, <%= 'orca server page' %></h2>
+<% body.push_back('1st OSP page'); %>
+<br>
+
+<%
+	try {
+		util.lock(my) {
+			try {
+				counter = fs.read('counter.txt', 10);
+				counter = counter.integer();
+			}
+			catch {
+				counter = 0;
+			}
+
+			counter += 1;
+			fs.write('counter.txt', counter.string('%010d'));
+		}
+
+		body.push_back("You're ${counter}'th visitor");
+	}
+	catch {
+		// do nothing
+	}
+%>
+
+<h2>post test..</h2>
+<FORM action="/hello.osp" method="POST">
+   <INPUT type="text" name="name" />
+   <INPUT type="text" name="etc" />
+ <INPUT type="submit" value="Submit"/>
+</FORM>
+
+
+<h2>multipart test...</h2>
+  <FORM action="/hello.osp"
+         enctype="multipart/form-data"
+         method="post">
+     <P>
+     What is your name? <INPUT type="text" name="submit-name"><BR>
+     What files are you sending? <INPUT type="file" name="files"><BR>
+     <INPUT type="submit" value="Send"> <INPUT type="reset">
+   </FORM>
+  
+<br>
+<br>
+<h2> Session & Cookie variables </h2>
+<%
+	session = my.get_session(true);
+	if !session.has_key('count'):
+		session['count'] = 0;
+
+	session['count'] += 1;
+
+	session['time'] = datetime.now(); 
+	body.push_back("session.count: ${session['count']}");
+	body.push_back("<br><br>session parameters<br>");
+	body.push_back(session);
+	body.push_back("<br><br>cookie/http parameters<br>");
+	body.push_back(param);
+%>
+
+<br>
+<h2>hello.osp (source code of this page)</h2>
+
+<textarea rows=100 cols=80>
+<%
+	str = fs.read('hello.osp');
+	body.push_back(str);
+%>
+</textarea>
+
+
+</body>
+</html>
+
+

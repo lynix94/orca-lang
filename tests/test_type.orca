@@ -1,0 +1,57 @@
+
+
+print: '# type traits';
+
+print: ret = type.list(1,2,3);
+if ret != [1,2,3]:
+	throw test.type, 'type testing is failed';
+	
+print: ret = type.tuple(1,2,3);
+if ret != (1,2,3):
+	throw test.type, 'type testing is failed';
+	
+print: ret = type.map(1,2,3,4);
+if ret != { 1:2, 3:4 }:
+	throw test.type, 'type testing is failed';
+	
+str = '[0-9]+';
+print: ret = type.regex(str);
+if ret != '0123456789':
+	throw test.type, 'type testing is failed';
+	
+if ret == '0123456789a':
+	throw test.type, 'type testing is failed';
+
+print: '# typename test';
+	
+if [1,2,3].typename != 'list':
+	throw test.type, 'type testing is failed';
+
+if (1,2,3).typename != 'tuple':
+	throw test.type, 'type testing is failed';
+
+if {1:2}.typename != 'map':
+	throw test.type, 'type testing is failed';
+
+if 1.typename != 'int':
+	throw test.type, 'type testing is failed';
+
+if 10000000000000000000000000000000000000.typename != 'int':
+	throw test.type, 'type testing is failed';
+
+if 0.1.typename != 'float':
+	throw test.type, 'type testing is failed';
+
+if 'str'.typename != 'string':
+	throw test.type, 'type testing is failed';
+
+if true.typename != 'bool':
+	throw test.type, 'type testing is failed';
+
+if !my.typename.starts_with('object'):
+	throw test.type, 'type testing is failed';
+
+print: 'OK: ', my;
+
+
+

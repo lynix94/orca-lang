@@ -1,0 +1,94 @@
+using gui;
+using gui.window;
+using gui.vbox;
+using gui.hbox;
+using gui.entry;
+using gui.label;
+using gui.list;
+using gui.button;
+using gui.statusbar;
+using util.upper;
+
+def main : window
+{
+	my.attr['wh'] = (400, 100);
+
+	def box : vbox
+	{
+		def print : label
+		{
+			my.attr['text'] = 'choose your hobbies';
+		}
+
+		def items : list
+		{
+			def handle_toggle(...)
+			{
+				def selected := type.map();
+
+				# argv[1] : list iterator
+				# argv[1]() : list item. like this -> [ true, 'name' ]
+				name = argv[1]()[1];
+
+				if argv[0]: {	# select
+					.selected[name] = true;
+				}
+				else: {			# deselect
+					.selected.erase_key(name);
+				}
+
+				print: .selected.string();
+				print: upper('box').result;
+
+
+				result = '[ Your selections ]\n';
+				for a in .selected.begin(): {
+					result += '%s\n' % a.first();
+				}
+	
+				upper('box').result.attr['text'] = result;
+			}
+
+			my.attr['column'] = [('choose', 'toggle', .handle_toggle), 'name'];
+
+			my.push_back([false, 'moutain biking']);
+			my.push_back([false, 'snow boarding']);
+			my.push_back([false, 'inline skating']);
+			my.push_back([false, 'classic guiar']);
+			my.push_back([false, 'programming']);
+
+			my.event['changed'] = %c{
+				upper('box').change.attr['text'] = argv[0].string() + argv[0]();
+			};
+		}
+
+		def input : hbox
+		{
+			def new : entry
+			{
+				my.attr['text'] = 'input other hobby (not in the above lists)';
+			}
+
+			def ok : button
+			{
+				my.attr['wh'] = (100, 20);
+				my.attr['text'] = 'submit';
+				my.event['clicked'] = %c{
+					new = upper('input').new.attr['text'];
+					upper('box').items.push_back([false, new]);
+				};
+			}
+		}
+
+		def result : label { }
+
+		def change : statusbar
+		{
+			my.attr['wh'] = (800, 60);
+		}
+	}
+}
+
+my.main.make();
+my.main.show();
+

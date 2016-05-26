@@ -1,0 +1,15 @@
+
+using fibonacci;
+
+if argv[0].type != type.int:
+	argv[0] = argv[0].integer();
+
+if argv[0] == 0:
+	return 0;
+
+if argv[0] == 1: 
+	return 1;
+
+return fibonacci(argv[0]-1) + fibonacci(argv[0]-2);
+
+

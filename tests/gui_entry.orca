@@ -1,0 +1,35 @@
+using gui;
+using gui.window;
+using gui.vbox;
+using gui.label;
+using gui.entry;
+using gui.button;
+using util.upper;
+
+def main : window
+{
+	my.attr['wh'] = (200, 100);
+	
+	def box : vbox
+	{
+		def print : label
+		{
+			my.attr['text'] = 'your input is...';
+		}
+
+		def input : entry
+		{
+			my.attr['text'] = 'input text here';
+		}
+
+		def ok : button
+		{
+			my.attr['text'] = 'ok';
+			my.event['clicked'] = 
+				%c{ 
+					upper('box').print.attr['text'] = upper('box').input.attr['text'];
+				};
+		}
+	}
+}
+

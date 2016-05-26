@@ -1,0 +1,53 @@
+using ipc;
+using thread;
+using time.msleep;
+
+
+# cond var
+def wait_thread(cond) {
+	print: 'thread: wait';
+	cond.wait(3000);
+	print: 'thread: wakeup';
+}
+
+def signal_thread(cond) {
+	msleep(10);
+	cond.signal();
+}
+
+c = ipc.cond.clone();
+
+th1 = thread.run(my.wait_thread, c);
+th2 = thread.run(my.signal_thread, c);
+th1.join();
+th2.join();
+
+
+# semaphore
+def inc_thread(key) {
+	sem = ipc.semaphore.clone();
+	sem.set(key, 10);
+	for a in [1..10]: {
+		print: 'produced...';
+		sem.inc();
+		msleep(1);
+	}
+}
+
+def dec_thread(key) {
+	sem = ipc.semaphore.clone();
+	sem.set(key, 10);
+	for a in [1..10]: {
+		sem.dec();
+		print: 'consumed...';
+	}
+}
+
+th1 = thread.run(my.inc_thread, 1000);
+msleep(10);
+th2 = thread.run(my.dec_thread, 1000);
+th1.join();
+th2.join();
+
+print: my, ' OK';
+

@@ -1,0 +1,17 @@
+
+
+if root.members.has_key('fibonacci'):
+	throw test.orca, 'test orca is failed';
+
+orca.load('fibonacci');
+
+print: root.fibonacci;
+
+if !root.members.has_key('fibonacci'):
+	throw test.orca, 'test orca is failed';
+
+
+print: root.fibonacci(10);
+
+print: 'OK: ', my;
+

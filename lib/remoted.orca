@@ -1,0 +1,277 @@
+using socket;
+using thread;
+using time;
+using pack;
+using fun;
+using remoted;
+
+print: '## dist server start';
+
+def sock;
+def shut_down;
+def port;
+static def magic;
+
+.magic = 'orca.dist_0.1:';
+.sock = socket.create();
+.port = argv[0];
+.sock.bind(argv[0]);
+.sock.listen();
+.shut_down = false;
+
+do {
+	sock = .sock.accept();
+	if .shut_down: break;
+	
+	cl = .client.clone(sock);
+	thread.run(cl.runs);
+} while(true);
+
+.sock.close();
+return;
+
+def log(...)
+{
+	#print(argv);
+}
+
+def client
+{
+	def sock;
+	def obj_stack;
+
+	def init(s)
+	{
+		..sock = s;
+		..obj_stack = [];
+	}
+
+	def header(msg)
+	{
+		len = msg.length();
+		head = remoted.magic + len.string('%5d');
+
+		return head + msg;
+	}
+
+	def send(msg)
+	{
+		msg = ..header(msg);
+		remoted.log: ' >> ', msg;
+		..sock.send(msg);
+	}
+
+	def recv()
+	{
+		header = ..sock.recv(remoted.magic.length() + 5);
+		if header.starts_with(remoted.magic): {
+			len = header[-5:-1).integer();
+		}
+		else: {
+			..sock.recv(0, 0);
+		}
+		
+		msg = ..sock.recv_all(len, 2000);
+		remoted.log: '<<', header, msg;
+		return msg;
+	}
+
+	def runs()
+	{
+		remoted.log: 'thread ${my.id} launced';
+
+		do {
+			try {
+				remoted.log:'## wait...';
+
+				cmd = ..recv();
+				if ..do_what(cmd) == '<shutdown>': {
+					..sock.close();
+					owner.owner.shut_down = true;
+					sock = socket.create();
+					sock.connect('127.0.0.1', owner.owner.port);
+					sock.close();
+					break;
+				}
+			}
+			catch io.socket {
+				remoted.log: 'socket disconnected';
+				..sock.close();
+				break;
+			}
+		} while(true);
+
+		remoted.log: 'thread ${my.id} done';
+	}
+
+	def assign_obj(name, new_obj)
+	{
+		obj = ..pop_obj();
+
+		if obj == nil:
+			return false;
+
+		obj.members[name] = new_obj;
+		return true;
+	}
+
+
+	def find_obj(path)
+	{
+		def obj;
+
+		decode(path)
+		{
+		%head, '.', %tail -> 
+			{ 
+				if head == 'root':
+					.obj = root;
+				else:
+					.obj = .obj.members[head];
+
+				return find_obj(tail);
+			}
+		%head -> 
+			{ 
+				if head == 'root':
+					.obj = root;
+				else: {
+					.obj = .obj.members[head];
+				}
+			}
+		}
+
+		return .obj;
+
+		if path == 'root':
+			.obj = root;
+		else:
+			.obj = .obj.members[head];
+
+		return .obj;
+	}
+
+
+	def push_obj(obj)
+	{
+		..obj_stack.push_back(obj);
+	}
+
+	def pop_obj()
+	{
+		ret = ..obj_stack[-1];
+		..obj_stack.pop_back();
+		return ret;
+	}
+
+	def get_obj(idx)
+	{
+		ret = ..obj_stack[-idx - 1];
+		..obj_stack[-idx - 1] = '___DUMMY___';
+		return ret;
+	}
+
+	def clean_obj()
+	{
+		while ..obj_stack.size() > 0 && ..obj_stack[-1] == '___DUMMY___': {
+			..obj_stack.pop_back();
+		}
+		
+		return nil;
+	}
+
+	def do_what(msg)
+	{
+		decode(msg)
+		{
+			'<push>', %tail  -> 
+				{ 
+					cl = pack.check_code(tail);
+					for a in cl: {
+						..send('<req_code>'+a);
+						rcv = ..recv();
+						do_what(rcv);
+					}
+
+					obj = pack.load(tail);
+					..push_obj(obj);
+					..send: '<ok:push>';
+				}
+			'<pop>' -> 
+				{ 
+					obj = ..pop_obj();
+					str = pack.save(obj);
+					..send('<ok:pop>'+str);
+				}
+			'<get>', %idx -> 
+				{ 
+					obj = ..get_obj(idx.integer());
+					str = pack.save(obj);
+					..send('<ok:get>'+str);
+				}
+			'<clean>' -> 
+				{ 
+					..clean_obj();
+					..send('<ok:clean>');
+				}
+			'<assign>', %name  ->
+				{
+					obj = ..pop_obj();
+					..assign_obj(name, obj);
+					..send: '<ok:assign>';
+				}
+			'<find>', %name -> 
+				{ 
+					try {
+						obj = ..find_obj(name);
+						if obj.id != root.id:
+							..pop_obj();
+		
+						..push_obj(obj);
+						..send: '<ok:find>';
+					}
+					catch {
+						..send: '<nok:1>${name} not found';
+					}
+				}
+			'<code>', %name, ',', %tail -> 
+				{
+					try {
+						pack.load_code(name, tail);
+					}
+					catch orca.lang {
+						remoted.log: name, ' already exists';
+					}
+				}
+			'<call>', %tail ->
+				{
+					n = tail.integer();
+					param = [];
+					if (n>0): {
+						for i in [1..n]: {
+							param .push_front(..pop_obj());
+						}
+					}
+
+					obj = ..pop_obj();
+					..send: '<ok:call start>';
+					obj = fun.apply(obj, param);
+					..push_obj(obj);
+					..send: '<ok:call done>';
+				}
+			'<ping>' ->
+				{
+					..send: '<ack>';
+				}
+			'<shutdown>' ->
+				{
+					..send: '<ack>';
+					time.msleep(200);
+					return '<shutdown>';
+				}
+		}
+	}
+}
+
+
+

@@ -1,0 +1,202 @@
+
+using match;
+using alg;
+
+
+def match_array(str)
+{
+	return match.tag('[', ']', str);
+}
+
+def match_brace(str)
+{
+	return match.tag('{', '}', str);
+}
+
+def dummy_list
+{ 
+	def list;
+}
+
+def pure_str(str)
+{
+	ret = '';
+	decode str
+	{
+	'"', %value = match.dq_string, '"' -> ret = value;
+	"'", %value = match.sq_string, "'" -> ret = value;
+	%etc -> ret = str;
+	}
+
+	return match.string_unescaping(ret);
+}
+
+def decoding(str)
+{
+	#print: '# ', str;
+	decode str.strip()
+	{
+	'"', %value = match.dq_string, '"' -> 
+		{
+			return match.string_unescaping(value);
+		}
+
+	"'", %value = match.sq_string, "'" -> 
+		{
+			return match.string_unescaping(value);
+		}
+
+	%value = r'[0-9]+' -> return value.integer();
+
+	'[', %value = ..match_array, ']' ->
+		{
+			if value == '': return [];
+
+			tp = decoding(value);
+			if tp.type == ..dummy_list: {
+				return tp.list;
+			}
+			return [tp];
+		}
+	'{', %value = ..match_brace, '}' ->
+		{
+			if value == '': return type.map();
+
+			tp = decoding(value);
+			if tp.type == ..dummy_list: {
+				map = type.map();
+				for a in tp.list: {
+					if map.has_key(a[0]): {
+						if map[a[0]].type == type.tuple: 
+							map[a[0]].push_back(a[1]);
+						else: {
+							map[a[0]] = (map[a[0]], a[1]);
+						}
+					}
+					else: {
+						map[a[0]] = a[1];
+					}
+				}
+
+				return map;
+			}
+
+			return { tp[0]:tp[1] };
+		}
+
+	%head = match.comma, ',', %tail -> 
+		{
+			item  = decoding(head);
+			remain = decoding(tail);
+
+			if remain.type == ..dummy_list: {
+				remain.list.push_front(item);
+				return remain;
+			}
+				
+			dl = ..dummy_list.clone();
+			dl.list = [item, remain];
+			return dl;
+		}
+
+	%key, ':', %value ->
+		{
+			 return (..pure_str(key), decoding(value));
+		}
+	}
+}
+
+def encoding(obj)
+{
+	ret = '';
+	if obj.type == type.map: {
+		ret += '{';
+		for a in obj.begin(): {
+			if a.second().type == type.tuple: {
+				for b in a.second().begin(): {
+					ret += encoding(a.first());
+					ret += ':';
+					ret += encoding(b());
+					if b != a.second().last():
+						ret += ',';
+				}
+			}
+			else : {
+				ret += encoding(a.first());
+				ret += ':';
+				ret += encoding(a.second());
+			}
+
+			if a != obj.last():
+				ret += ',';
+		}
+		ret += '}';
+	}
+	elif obj.type == type.list: {
+		ret += '[';
+		for a in obj.begin(): {
+			ret += encoding(a());
+			if a != obj.last():
+				ret += ',';
+		}
+		ret += ']';
+	}
+	elif obj.type == type.string: {
+		ret += "'" + match.string_escaping(obj) + "'";
+	}
+	else: {
+		ret += obj;
+	}
+
+	return ret;
+}
+
+
+def beutify(obj, tab)
+{
+	if tab == nil: tab = 1;
+	else:		   tab += 1;
+
+	ret = '';
+	if obj.type == type.map: {
+		ret += '\t{';
+		for a in obj.begin(): {
+			if a.second().type == type.tuple: {
+				for b in a.second().begin(): {
+					ret += beutify(a.first(), tab);
+					ret += ':';
+					ret += beutify(b(), tab);
+					if b != a.second().last():
+						ret += ',\n' + '\t'*tab;
+				}
+			}
+			else : {
+				ret += beutify(a.first(), tab);
+				ret += ':';
+				ret += beutify(a.second(), tab);
+			}
+
+			if a != obj.last():
+				ret += ',\n' + '\t'*tab;
+		}
+		ret += '}';
+	}
+	elif obj.type == type.list: {
+		ret += '\t[';
+		for a in obj.begin(): {
+			ret += beutify(a(), tab);
+			if a != obj.last():
+				ret += ',\n' + '\t'*tab;
+		}
+		ret += ']';
+	}
+	elif obj.type == type.string: {
+		ret += "'" + match.string_escaping(obj) + "'";
+	}
+	else: {
+		ret += obj;
+	}
+
+	return ret;
+}
+

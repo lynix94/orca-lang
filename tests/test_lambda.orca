@@ -1,0 +1,19 @@
+
+
+def for_each(list, functor) {
+  for a in list: {
+    functor(a);
+  }
+}
+
+my.for_each([1..10], %c{ print(argv[0]); });
+
+# below is same with above statement
+
+my.for_each: [1..10], %c{
+  print: argv[0];
+};
+
+print: 'OK';
+
+

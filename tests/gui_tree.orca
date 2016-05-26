@@ -1,0 +1,126 @@
+using gui;
+using gui.window;
+using gui.vbox;
+using gui.hbox;
+using gui.entry;
+using gui.label;
+using gui.tree;
+using gui.button;
+using gui.statusbar;
+using util.upper;
+
+def main : window
+{
+	my.attr['wh'] = (800, 100);
+
+	def box : vbox
+	{
+		def print : label
+		{
+			my.attr['text'] = 'programming lanuages';
+		}
+
+		def items : tree
+		{
+			def current := nil;
+
+			def handle_toggle(...)
+			{
+				# argv: ( toggled, tree_iterator )
+				# argv[1]: tree_iterator 
+				# argv[1](): tree item value  [ bool, name ]
+				upper('box').result.attr['text'] = argv[1]()[1] + ' toggled';
+
+				my.toggle_child(argv[1], argv[0]);
+
+				def toggle_child(it, toggle)
+				{
+					if it.child_size() > 0: {
+						for a in it.child_begin(): 
+							toggle_child(a, toggle);
+					}
+
+					cur = it();
+					cur[0] = toggle;
+					it(cur);
+				}
+			}
+
+			my.attr['column'] = [('', 'toggle', .handle_toggle), 'name'];
+			my.push_back([false, 'compiler']);
+			my.push_back([false, 'interpreter']);
+
+			b = my.branch(0);
+			b.push_child([false, 'c/c++']);
+			b.push_child([false, 'd']);
+			b.push_child([false, 'java']);
+			b.push_child([false, 'fortran']);
+
+			b = my.branch(1);
+			b.push_child([false, 'basic']);
+			b.push_child([false, 'orca']);
+			b.push_child([false, 'python']);
+			b.push_child([false, 'ruby']);
+			b.push_child([false, 'lisp']);
+
+			my.event['changed'] = %c{
+				upper('box').change.attr['text'] = argv[0].string() + argv[0]();
+				..current = argv[0];
+			};
+		}
+
+		def input_sibling : hbox
+		{
+			def new : entry { }
+
+			def ok : button
+			{
+				my.attr['wh'] = (100, 20);
+				my.attr['text'] = 'submit sibling';
+
+				my.event['clicked'] = %c{
+					it = upper('box').items.current;
+					new = upper('input_sibling').new.attr['text'];
+					if new.length() <= 0: return;
+
+					if it == nil: 
+						upper('box').items.push_back([false, new]);
+					else: {
+						it.insert([false, new]);
+					}
+				};
+			}
+		}
+
+		def input_child : hbox
+		{
+			def new : entry { }
+
+			def ok : button
+			{
+				my.attr['wh'] = (100, 20);
+				my.attr['text'] = 'submit child';
+
+				my.event['clicked'] = %c{
+					it = upper('box').items.current;
+					new = upper('input_child').new.attr['text'];
+					if new.length() <= 0: return;
+
+					if it == nil: 
+						upper('box').items.push_back([false, new]);
+					else: 
+						it.push_child([false, new]);
+				};
+			}
+		}
+
+		def result : label { }
+
+		def change : statusbar
+		{
+			my.attr['wh'] = (800, 60);
+		}
+	}
+}
+
+

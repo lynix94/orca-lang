@@ -1,0 +1,42 @@
+using gui;
+using gui.window;
+using gui.fixed;
+using gui.button;
+using gui.label;
+using util.upper;
+
+def main : window
+{
+	my.attr['xy'] = (50, 20);
+	my.attr['wh'] = (300, 200);
+
+	def box : fixed
+	{
+		def counter : label
+		{
+			my.attr['xy'] = (40, 50);
+			my.attr['text'] = 0;
+		}
+
+		def plus : button
+		{
+			my.attr['xy'] = (150, 30);
+			my.attr['wh'] = (100, 50);
+			my.attr['text'] = '+';
+			my.event['clicked'] = %c{ 
+				upper('box').counter.attr['text'] += 1;
+			};
+		}
+
+		def minus : button
+		{
+			my.attr['xy'] = (150, 130);
+			my.attr['wh'] = (100, 50);
+			my.attr['text'] = '-';
+			my.event['clicked'] = %c{ 
+				upper('box').counter.attr['text'] -= 1;
+			};
+		}
+	}
+}
+

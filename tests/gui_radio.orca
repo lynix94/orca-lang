@@ -1,0 +1,53 @@
+using gui;
+using gui.window;
+using gui.vbox;
+using gui.label;
+using gui.radio;
+using util.upper;
+
+def main : window
+{
+	my.attr['wh'] = (200, 100);
+	
+	def box : vbox
+	{
+		def print : label
+		{
+			my.attr['text'] = 'choose your favorite OS';
+		}
+
+		def linux : radio
+		{
+			my.attr['text'] = 'linux';
+			my.event['toggled'] = 
+				%c{ 
+					if argv[0]: 
+						upper('box').print.attr['text'] = ..attr['text'];
+				};
+		}
+
+		def windows : radio
+		{
+			my.attr['text'] = 'windows';
+			my.attr['group'] = ..linux;
+			my.event['toggled'] = 
+				%c{ 
+					if argv[0]: 
+						upper('box').print.attr['text'] = ..attr['text'];
+				};
+		}
+
+		def solaris : radio
+		{
+			my.attr['text'] = 'solaris';
+			my.attr['group'] = ..linux;
+			my.event['toggled'] = 
+				%c{ 
+					if argv[0]: 
+						upper('box').print.attr['text'] = ..attr['text'];
+				};
+		}
+
+	}
+}
+

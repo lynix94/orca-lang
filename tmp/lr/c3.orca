@@ -1,0 +1,39 @@
+
+parse def foo(str)
+{
+	stmt : add 
+		;
+
+	add : add '+' mul
+		| mul
+		;
+
+
+	mul : mul '*' prim
+		| prim
+		;
+
+	prim: number
+		| '(' add ')'
+		;
+
+	number : r'[0-9]+'
+		;
+}
+
+print: 'start';
+print: my.foo('1');
+print: my.foo('1+2');
+print: my.foo('1*2*3');
+print: my.foo('10+2*3');
+print: my.foo('10+2*3+20*30');
+print: my.foo('(3)');
+print: my.foo('(3*20)');
+print: my.foo('(3+20)');
+
+print: my.foo('10+2*(3+20)*30');
+print: my.foo('10+2*(a+20)*30');
+
+print: 'done';
+
+

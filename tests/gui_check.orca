@@ -1,0 +1,28 @@
+using gui;
+using gui.window;
+using gui.vbox;
+using gui.label;
+using gui.check;
+using util.upper;
+
+def main : window
+{
+	my.attr['wh'] = (200, 100);
+	
+	def box : vbox
+	{
+		def print : label
+		{
+			my.attr['text'] = 'check result: false';
+		}
+
+		def toggle : check
+		{
+			my.attr['text'] = 'check me';
+			my.event['toggled'] = %c{ 
+					upper('box').print.attr['text'] = 'check result: %s' % argv[0];
+				};
+		}
+	}
+}
+

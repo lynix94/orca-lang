@@ -1,0 +1,19 @@
+
+using json;
+
+
+str = "{ 'a':3, 'b':6, 'c':[1,2,3, { 'a':{'b':'c'}, 'd':[1,2,3], 'd':3 }, 4,5,6] }";
+print: ret = json.decoding(str);
+print: str = json.encoding(ret);
+print: str = json.beutify(ret);
+
+str = io.open('lru-file.json').read();
+
+print: '# json decoding';
+print: ret = json.decoding(str);
+
+print: '# json encoding';
+print: str = json.encoding(ret);
+
+print: str = json.beutify(ret);
+

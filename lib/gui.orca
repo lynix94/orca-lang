@@ -1,0 +1,370 @@
+
+using gtk;
+using fun;
+using alg;
+
+using gui;
+using gui.window;
+
+def dialog := gtk.dialog.clone();
+
+
+def window
+{
+	def handle := nil;
+
+	static def s_order := 0;
+	def order;
+
+	def inc_order
+	{
+		..s_order += 1;
+		..order = ..s_order;
+	}
+
+	def init
+	{
+		..inc_order();
+	}
+
+	def init_gtk
+	{
+		..handle = gtk.clone('window');
+	}
+
+	def make
+	{
+		if owner.handle != nil: {
+			return;
+		}
+
+		owner.init_gtk();
+		owner();
+
+		if owner.type < gui.table: {
+			return;
+		}
+
+		members = owner.members.values();
+
+		alg.remove_if: members.begin(), members.end(), %c{
+			return !(argv[0].type < window);
+		};
+
+		members.sort(%c{ return argv[0].order < argv[1].order; });
+
+		alg.for_each: members.begin(), members.end(), %c{
+			argv[0].make();
+			..owner.handle.put(argv[0].handle);
+		};
+	}
+
+	def table_put(...)
+	{
+		argv[0].make();
+		argv[0] = argv[0].handle;
+		fun.apply(..handle.put, argv);
+	}
+
+	def show
+	{
+		..handle.show();
+	}
+
+	def quit
+	{
+		..handle.quit();
+	}
+
+	def attr
+	{
+		def '[]='(k, v)
+		{
+			decode k
+			{
+			'text' ->  ..owner.handle.set_text(v);
+			%default ->  ..owner.handle.set_attr(k, v);
+			}
+
+			..attr[k] = v;
+		}
+
+		def '[]'(k)
+		{
+			return ..attr[k];
+		}
+
+		def attr := type.map();
+	}
+
+	def event
+	{
+		def '[]='(k, v)
+		{
+			..owner.handle.set_event(k, v);
+			..attr[k] = v;
+		}
+
+		def '[]'(k)
+		{
+			return ..attr[k];
+		}
+
+		def attr := type.map();
+	}
+}
+
+def vbox : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('vbox');
+	}
+}
+
+def fixed : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('fixed');
+	}
+}
+
+def hbox : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('hbox');
+	}
+}
+
+def scroll : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('scroll');
+	}
+}
+
+def table : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('table');
+	}
+}
+
+def hsep : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('hsep');
+	}
+}
+
+def button : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('button');
+	}
+}
+
+def check : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('check');
+	}
+}
+
+def combo : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('combo');
+	}
+
+	def push_back(item)
+	{
+		..handle.push_back(item);
+	}
+}
+
+def radio : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('radio');
+	}
+
+	def push_back(item)
+	{
+		..handle.push_back(item);
+	}
+}
+
+def label : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('label');
+	}
+}
+
+def entry : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('entry');
+	}
+
+	def attr
+	{
+		def '[]='(k, v)
+		{
+			decode k
+			{
+			'text' ->  ..owner.handle.set_text(v);
+			%default ->  ..owner.handle.set_attr(k, v);
+			}
+
+			..attr[k] = v;
+		}
+
+		def '[]'(k)
+		{
+			if k == 'text': {
+				return ..owner.handle.get_data('text');
+			}
+
+			return ..attr[k];
+		}
+
+		def attr := type.map();
+	}
+}
+
+def text : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('text');
+	}
+}
+
+def menubar : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('menubar');
+	}
+
+	def push_back(k, v)
+	{
+		..handle.push_back(k, v);
+	}
+}
+
+def image : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('image');
+	}
+}
+
+def statusbar : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('statusbar');
+	}
+
+}
+
+def list : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('list');
+	}
+
+
+	def '[]='(k, v)
+	{
+		if k.type != type.int:
+			return;
+
+		owner.handle.set_data(k, v);
+	}
+
+	def '[]'(k)
+	{
+		if k.type!= type.int:
+			return nil;
+
+		return owner.handle.get_data(k);
+	}
+
+	def push_back(item)
+	{
+		..handle.push_back(item);
+	}
+
+	def begin
+	{
+		return ..handle.get_data('begin');
+	}
+
+	def end
+	{
+		return ..handle.get_data('end');
+	}
+}
+
+
+def tree : window
+{
+	def init_gtk
+	{
+		..handle = gtk.clone('tree');
+	}
+
+	def '[]='(k, v)
+	{
+		if k.type != type.int:
+			return;
+
+		owner.handle.set_data(k, v);
+	}
+
+	def '[]'(k)
+	{
+		if k.type != type.int:
+			return nil;
+
+		return owner.handle.get_data(k);
+	}
+
+	def branch(...)
+	{
+		return owner.handle.get_data('branch', argv);
+	}
+
+	def push_back(item)
+	{
+		..handle.push_back(item);
+	}
+
+	def begin
+	{
+		return ..handle.get_data('begin');
+	}
+
+	def end
+	{
+		return ..handle.get_data('end');
+	}
+}
+

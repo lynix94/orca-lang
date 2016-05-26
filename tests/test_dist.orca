@@ -1,0 +1,52 @@
+using remoted;
+using remotec;
+using dist;
+using random;
+using time;
+
+random.seed();
+port = random.integer(1000) + 11000;
+
+print: '# port: ', port;
+
+
+parallel do {
+	server = remoted.clone();
+	server(port);
+}
+
+parallel do {
+	server = remoted.clone();
+	server(port+1);
+}
+
+parallel do {
+	server = remoted.clone();
+	server(port+2);
+}
+
+time.msleep(400);
+
+dist.add('127.0.0.1', port);
+dist.add('127.0.0.1', port+1);
+dist.add('127.0.0.1', port+2);
+
+
+r = dist.dist_do(10, 20, %c{ return argv[0] + argv[1]; });
+print: r.is_done(100);
+print: ret = r.pop_obj();
+
+if ret != 30:
+	throw test.dist, 'dist_do failed';
+
+list = [1..100];
+rs = dist.dist_for(list, %c{ return argv[0] * argv[0]; } );
+print: rs;
+
+if rs != %[ x*x | x<-1~100 ]:
+	throw test.dist, 'dist_do failed';
+
+print: '## now quit: ', dist.shutdown();
+return 'OK', my;
+
+

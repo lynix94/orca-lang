@@ -1,0 +1,33 @@
+<categories>
+	<category a="Miscellaneous" icon="/usr/share/pixmaps/evolution-data-server/category_miscellaneous_16.png" searchable="1"/>
+	<category a="날씨: 소나기" icon="/usr/share/icons/gnome/16x16/status/weather-showers.png" searchable="0"/>
+	<category a="개인" icon="/usr/share/pixmaps/evolution-data-server/category_personal_16.png" searchable="1"/>
+	<category a="Strategies" icon="/usr/share/pixmaps/evolution-data-server/category_strategies_16.png" searchable="1"/>
+	<category a="Time &amp; Expenses" icon="/usr/share/pixmaps/evolution-data-server/category_time-and-expenses_16.png" searchable="1"/>
+	<category a="Competition" searchable="1"/>
+	<category a="Key Customer" icon="/usr/share/pixmaps/evolution-data-server/category_key-customer_16.png" searchable="1"/>
+	<category a="생일" icon="/usr/share/pixmaps/evolution-data-server/category_birthday_16.png" searchable="1"/>
+	<category a="Gifts" icon="/usr/share/pixmaps/evolution-data-server/category_gifts_16.png" searchable="1"/>
+	<category a="Holiday" icon="/usr/share/pixmaps/evolution-data-server/category_holiday_16.png" searchable="1"/>
+	<category a="Suppliers" icon="/usr/share/pixmaps/evolution-data-server/category_suppliers_16.png" searchable="1"/>
+	<category a="VIP" searchable="1"/>
+	<category a="Ideas" icon="/usr/share/pixmaps/evolution-data-server/category_ideas_16.png" searchable="1"/>
+	<category a="기념일" searchable="1"/>
+	<category a="날씨: 안개" icon="/usr/share/icons/gnome/16x16/status/weather-fog.png" searchable="0"/>
+	<category a="International" icon="/usr/share/pixmaps/evolution-data-server/category_international_16.png" searchable="1"/>
+	<category a="날씨: 맑음" icon="/usr/share/icons/gnome/16x16/status/weather-clear.png" searchable="0"/>
+	<category a="날씨: 흐림" icon="/usr/share/icons/gnome/16x16/status/weather-overcast.png" searchable="0"/>
+	<category a="날씨: 밤하늘 맑음" icon="/usr/share/icons/gnome/16x16/status/weather-clear-night.png" searchable="0"/>
+	<category a="Favorites" icon="/usr/share/pixmaps/evolution-data-server/category_favorites_16.png" searchable="1"/>
+	<category a="Goals/Objectives" icon="/usr/share/pixmaps/evolution-data-server/category_goals_16.png" searchable="1"/>
+	<category a="상태" icon="/usr/share/pixmaps/evolution-data-server/category_status_16.png" searchable="1"/>
+	<category a="날씨: 구름" icon="/usr/share/icons/gnome/16x16/status/weather-few-clouds.png" searchable="0"/>
+	<category a="날씨: 밤하늘 구름" icon="/usr/share/icons/gnome/16x16/status/weather-few-clouds-night.png" searchable="0"/>
+	<category a="날씨: 태풍" icon="/usr/share/icons/gnome/16x16/status/weather-storm.png" searchable="0"/>
+	<category a="Hot Contacts" icon="/usr/share/pixmaps/evolution-data-server/category_hot-contacts_16.png" searchable="1"/>
+	<category a="Phone Calls" icon="/usr/share/pixmaps/evolution-data-server/category_phonecalls_16.png" searchable="1"/>
+	<category a="Waiting" searchable="1"/>
+	<category a="날씨: 눈" icon="/usr/share/icons/gnome/16x16/status/weather-snow.png" searchable="0"/>
+	<category a="Holiday Cards" icon="/usr/share/pixmaps/evolution-data-server/category_holiday-cards_16.png" searchable="1"/>
+	<category a="Business" icon="/usr/share/pixmaps/evolution-data-server/category_business_16.png" searchable="1"/>
+</categories>

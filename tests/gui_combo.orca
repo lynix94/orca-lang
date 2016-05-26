@@ -1,0 +1,30 @@
+using gui;
+using gui.window;
+using gui.vbox;
+using gui.label;
+using gui.combo;
+using util.upper;
+
+def main : window
+{
+	my.attr['wh'] = (200, 100);
+	
+	def box : vbox
+	{
+		def print : label
+		{
+			my.attr['text'] = 'choose your favorite OS';
+		}
+
+		def test_combo : combo
+		{
+			my.attr['wh'] = (100, 30);
+			my.push_back: 'linux';
+			my.push_back: 'windows';
+			my.push_back: 'solaris';
+
+			my.event['changed'] = %c{ upper('box').print.attr['text'] = argv[0]; };
+		}
+	}
+}
+

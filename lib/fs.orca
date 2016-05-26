@@ -1,0 +1,271 @@
+using socket;
+using pack;
+using select;
+using time;
+using os;
+using fs;
+
+
+def mtable;
+static def magic;
+
+def init_once()
+{
+	..magic = 'orca.ds_0.4:';
+	..init();
+}
+
+def init()
+{
+	..mtable = type.map();
+}
+
+
+def server
+{
+	def sock;
+	def send(msg)
+	{
+		msg = ..header(msg);
+		#print: ' >> ', msg;
+		..sock.send(msg);
+	}
+
+	def recv()
+	{
+		header = ..sock.recv(fs.magic.length() + 5);
+		if header.starts_with(fs.magic): {
+			len = header[-5:-1).integer();
+		}
+		else: {
+			..sock.recv(0, 0);
+		}
+		
+		msg = ..sock.recv_all(len, 2000);
+		#print: '<<', header, msg;
+		return msg;
+	}
+
+	def close()
+	{
+		..sock.close();
+	}
+
+	def header(msg)
+	{
+		len = msg.length();
+		head = fs.magic + len.string('%5d');
+		return head + msg;
+	}
+}
+
+def mount(path, ip, port)
+{
+	if path[-1] == '/':
+		p = path[:-1];
+	else: 
+		p = path;
+
+	sock = ..server.clone();
+	sock.sock = socket.create();
+	sock.sock.connect(ip, port);
+	..mtable[p] = sock;
+}
+
+def unmount(path, flag)
+{
+	mi = ..mtable.upper_bound(path);
+	try {
+		mi.prev();
+		if path.starts_with(mi.first()): {
+			if mi.second().type == type.tuple: {
+				for a in mi.second(): {
+					if flag == true: {
+						a.send('<fs1>shutdown,/');
+						msg = a.recv();
+					}
+					a.close();
+				}
+			}
+			else: {
+				if flag == true: {
+					mi.second().send('<fs1>shutdown,/');
+					msg = mi.secon().recv();
+				}
+				mi.second().close();
+			}
+		}
+
+		mi.erase();
+	}
+	catch {
+		// nil..
+	}
+}
+
+def shutdown(path)
+{
+	..unmount(path, true);
+}
+
+def mount_dist_dir(path, ...)
+{
+	if path[-1] == '/':
+		p = path[:-1];
+	else: 
+		p = path;
+
+	p = path;
+		
+	for a in argv: {
+		sock = ..server.clone();
+		sock.sock = socket.create();
+		sock.sock.connect(a[0], a[1]);
+
+		if !..mtable.has_key(p):
+			..mtable[p] = type.tuple();
+
+		..mtable[p].push_back(sock);
+	}
+}
+
+def check_in_table(path)
+{ 
+	mi = ..mtable.upper_bound(path);
+	try {
+		mi.prev();
+		if path.starts_with(mi.first() + '/'): {
+			if mi.second().type == type.tuple: {
+				tp = mi.second();
+				len = tp.size();
+				nth = path.hash(len);
+				return (tp[nth], path[mi.first().length():]);
+			}
+			else: {
+				return (mi.second(), path[mi.first().length():]);
+			}
+		}
+	}
+	catch {
+		// nil..
+	}
+	
+	return nil;
+}
+
+def fs1(cmd, path)
+{
+	ret =  ..check_in_table(path);
+	if ret == nil: {
+		return os.members[cmd](path);
+	}
+
+	ret[0].send('<fs1>${cmd},${ret[1]}');
+	msg = ret[0].recv();
+	ret = pack.load(msg);
+	return ret;
+}
+
+def mkdir(path)
+{
+	return ..fs1('mkdir', path);
+}
+
+def ls(path)
+{
+	return ..fs1('ls', path);
+}
+
+def remove(path)
+{
+	return ..fs1('remove', path);
+}
+
+def file_size(path)
+{
+	return ..fs1('file_size', path);
+}
+
+def isexists(path)
+{
+	return ..fs1('isexists', path);
+}
+
+def isfile(path)
+{
+	return ..fs1('isfile', path);
+}
+
+def isdir(path)
+{
+	return ..fs1('isdir', path);
+}
+
+def ping(path)
+{
+	return ..fs1('ping', path);
+}
+
+def read(path, size, offset)
+{
+	ret =  ..check_in_table(path);
+	if ret == nil: {
+		return os.read(path, size, offset);
+	}
+
+	ret[0].send('<read>${ret[1]},${size},${offset}');
+	msg = ret[0].recv();
+	ret = pack.load(msg);
+	return ret;
+}
+
+def write(path, data, offset)
+{
+	ret =  ..check_in_table(path);
+	if ret == nil: {
+		return os.write(path, data, offset);
+	}
+
+	ret[0].send('<write>${ret[1]},${offset},${data}');
+	msg = ret[0].recv();
+	ret = pack.load(msg);
+	return ret;
+}
+
+def copy(src, dest)
+{
+	rs =  ..check_in_table(src);
+	rd =  ..check_in_table(dest);
+
+	if rs == nil && rd == nil: {
+		return os.copy(src, dest);
+	}
+
+	data = ..read(src);
+	..remove(dest);
+	..write(dest, data);
+}
+
+def rename(src, dest)
+{
+	rs =  ..check_in_table(src);
+	rd =  ..check_in_table(dest);
+
+	if rs == nil && rd == nil: {
+		return os.rename(src, dest);
+	}
+
+	if rs[0] == rd[0]: { # same machine
+		rs[0].send('<rename>${rs[1]},${rd[1]}');
+		msg = rs[0].recv();
+		ret = pack.load(msg);
+		return ret;
+	}
+
+	data = ..read(src);
+	..write(dest, data);
+	..remove(src);
+}
+
+
+

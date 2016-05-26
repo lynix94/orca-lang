@@ -1,0 +1,69 @@
+
+using operator;
+using fun;
+
+#str = "( * 3 4 5)";
+#str = "( * 3 (+ 4 5))";
+str = "( * 3 (+ 4 5) (- 12 10))";
+
+
+parse def foo(src)
+{
+	stmt:	expr
+			%c{
+				print: 'rule: ', 0, argv;
+				return argv[0];
+			}
+		;
+
+	expr:	'(' func items ')'
+			%c{
+				print: 'rule: ', 1, argv;
+				return fun.reduce(argv[2], argv[1]);
+			}
+		;
+
+	items: items item
+			%c{
+				print: 'rule: ', 2, argv;
+				return argv[0].push_back(argv[1]);
+			}
+		| item
+			%c{
+				print: 'rule: ', 3, argv;
+				return [argv[0]];
+			}
+		;
+
+	item: number
+			%c{
+				print: 'rule: ', 4;
+				return argv[0];
+			}
+		| expr
+			%c{
+				print: 'rule: ', 5;
+				return argv[0];
+			}
+		;
+	
+	func:	'+' %c{ return operator.'+'; }
+		|	'-' %c{ return operator.'-'; }
+		|	'*' %c{ return operator.'*'; }
+		|	'/' %c{ return operator.'/'; }
+		;
+
+	number: r'[0-9]+' 
+			%c{ 
+				return argv[0].integer(); 
+			}
+		;
+
+	~ : r'[ \t\r\n]+'
+		;
+}
+
+print: my.foo(str);
+		
+
+

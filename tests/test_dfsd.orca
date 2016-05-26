@@ -1,0 +1,91 @@
+using fs;
+using dfsd;
+using random;
+using time;
+using os;
+
+random.seed();
+port = random.integer(1000) + 15000;
+
+print: '# port: ', port;
+
+
+def f1;
+def f2;
+
+my.f1 = false;
+my.f2 = false;
+
+
+parallel do {
+	os.mkdir('dir1');
+	server1 = dfsd.clone();
+	server1('dir1', port);
+}
+
+parallel do {
+	os.mkdir('dir2');
+	server2 = dfsd.clone();
+	server2('dir2', port+1);
+}
+
+time.msleep(100);
+
+try {
+	fs.mount('/mnt/dfs1', '127.0.0.1', port);
+}
+catch {
+	time.msleep(1000);
+	fs.mount('/mnt/dfs1', '127.0.0.1', port);
+}
+
+try {
+	fs.mount('/mnt/dfs2', '127.0.0.1', port+1);
+}
+catch {
+	time.msleep(1000);
+	fs.mount('/mnt/dfs2', '127.0.0.1', port+1);
+}
+
+fs.write('/mnt/dfs1/file1', 'file1');
+print: ret1 = fs.read('/mnt/dfs1/file1');
+print: ret2 = fs.read('dir1/file1');
+if ret1 != ret2:
+	throw test.dfsd, 'dfsd read/write fail';
+
+fs.write('/mnt/dfs2/file2', 'file2');
+print: ret1 = fs.read('/mnt/dfs2/file2');
+print: ret2 = fs.read('dir2/file2');
+if ret1 != ret2:
+	throw test.dfsd, 'dfsd read/write fail';
+
+
+print: '## unmount: ';
+fs.unmount('/mnt/dfs1/');
+fs.unmount('/mnt/dfs2/');
+
+print: '## mount_dist_dir: ';
+fs.mount_dist_dir('/mnt/dfs', ('127.0.0.1', port), ('127.0.0.1', port+1));
+
+fs.write('/mnt/dfs/file1', 'file1');
+print: ret1 = fs.read('/mnt/dfs/file1');
+print: ret2 = fs.read('dir1/file1');
+if ret1 != ret2:
+	throw test.dfsd, 'dfsd read/write fail';
+
+fs.write('/mnt/dfs/file2', 'file2');
+print: ret1 = fs.read('/mnt/dfs/file2');
+print: ret2 = fs.read('dir2/file2');
+if ret1 != ret2:
+	throw test.dfsd, 'dfsd read/write fail';
+
+
+print: '## now shutdown: ';
+;rm -rf dir1
+;rm -rf dir2
+
+fs.shutdown('/mnt/dfs/');
+
+return 'OK', my;
+
+

@@ -1,0 +1,25 @@
+
+def obj
+{
+  def m;
+}
+
+.obj.m = '111111111111111111111111111111111111111111111111111111111';
+
+
+def func
+{
+  a = ..obj.clone();
+}
+
+
+
+count = 0;
+do {
+  .func();
+  count = count + 1;
+} while (count < 1000);
+
+
+print('OK');
+

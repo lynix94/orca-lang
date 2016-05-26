@@ -1,0 +1,19 @@
+
+parse def foo(str)
+{
+	Sd	: S
+		;
+
+	S	: '(' L ')'
+		| 'x'
+		;
+
+	L	: S
+		| L ',' S
+		;
+}
+
+
+print: 'done';
+
+

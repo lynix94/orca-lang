@@ -1,0 +1,44 @@
+#!/bin/orcash
+
+using cgi;
+using cgi.header;
+using cgi.header.session;
+using cgi.header.cookie;
+
+using cgi.html.tag;
+using cgi.html.ctag;
+using cgi.html.puts;
+using cgi.html.text;
+
+cgi.header {
+	session('session_a');
+	cookie.set('key_a', 'value_a');
+	session.set('key_b', 'value_b');
+}
+
+cgi.html {
+	tag('html') {
+		tag('head') { }
+
+		tag('body') {
+			tag('img', 'src=http://orca-lang.or.kr/phpBB3/styles/prosilver/imageset/site_logo.gif') {}
+			tag('test', ['a':'b', 'c':'d', 'e':'3'], ['a=30', 'b=40']) { };
+
+			cookie.set('key_c', 'value_c');
+			puts: cgi.get_param('param');
+			puts: cookie.get('key_a');
+			puts: session.get('key_a');
+			puts: session.get('key_b');
+			puts: ret = cgi.urlenc('a > 3+4');
+			puts: cgi.htmlenc(cgi.urldec(ret));
+
+			ctag('br');
+			puts('hello, cgi');
+			text('hello, cgi', 'gulim', 30);
+		}
+	}
+}
+
+
+
+

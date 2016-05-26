@@ -1,0 +1,18 @@
+using test_using;
+using foo_bar;
+using foo_bar.foo;
+using foo_bar.foo.bar;
+
+
+#root.print('print');
+
+root.foo_bar();
+foo_bar();
+
+foo();
+
+bar();
+
+io.print('test');
+
+

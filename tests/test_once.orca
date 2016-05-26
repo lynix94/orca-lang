@@ -1,0 +1,51 @@
+
+using stopwatch;
+using fun;
+using alg;
+
+def fibo(n) 
+{
+	if n == 0:
+		return 0;
+	
+	if n == 1: 
+		return 1;
+
+	return fibo(n-1) + fibo(n-2);
+}
+
+stopwatch {
+	r0 = my.fibo(20); 
+}
+
+t0 = stopwatch.elapse();
+
+t = [1..10];
+r = [1..10];
+
+for i in [0..9]: {
+	stopwatch {
+		r[i] = %1{ my.fibo(20); };
+	}
+	t[i] = stopwatch.elapse();
+}
+
+print: t;
+it = alg.find_if(t.begin().next(), t.end(), 
+				fun.bind_1st(%c{ return argv[0] <= argv[1]; }, 1000));
+
+if it != t.end():
+	throw test.test_once, 'once result fail';
+
+print: r;
+it = alg.find_if(r.begin(), r.end(), 
+				fun.bind_1st(%c{ return argv[0] != argv[1]; }, r[0]));
+if it != r.end():
+	throw test.test_once, 'once result fail';
+
+print: 'OK';
+
+
+
+
+

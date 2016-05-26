@@ -1,0 +1,118 @@
+
+using datetime;
+using date;
+using time;
+
+
+print: '# basic operation';
+print: date.today();
+
+print: d1 = date.clone('2000-01-02');
+if d1.year != 2000 || d1.month != 1 || d1.day != 2:
+	throw test.date, 'date value is invalid';
+
+if d1.day_of_week != 0 || d1.day_of_year != 2:
+	throw test.date, 'date value is invalid';
+
+
+
+print: '# add operation with : int, time, duration';
+print: d2 = d1+1;
+if d2 != date.clone('2000-01-03'):
+	throw test.date, 'date operation failed';
+
+print: d2 = d1+31;
+if d2 != date.clone('2000-02-02'):
+	throw test.date, 'date operation failed';
+
+print: ret = d1 + time.clone('01:02:03');
+if ret != datetime.clone('2000-01-02 01:02:03'):
+	throw test.date, 'date operation failed';
+
+print: ret = d1 + date.years(10) + date.months(24) + date.days(365);
+if ret != date.clone('2013-01-01'):
+	throw test.date, 'date operation failed';
+
+print: ret = d1 + time.hours(10) + time.seconds(20);
+if ret != datetime.clone('2000-01-02 10:00:20'):
+	throw test.date, 'date operation failed';
+
+
+
+
+print: '# sub operation with : int, time, duration, date';
+print: d2 = d1-1;
+if d2 != date.clone('2000-01-01'):
+	throw test.date, 'date operation failed';
+
+print: d2 = d1-31;
+if d2 != date.clone('1999-12-02'):
+	throw test.date, 'date operation failed';
+
+print: ret = d1 - time.clone('01:02:03');
+if ret != datetime.clone('2000-01-01 22:57:57'):
+	throw test.date, 'date operation failed';
+
+print: ret = d1 - date.years(10) - date.months(24) - date.days(365);
+if ret != date.clone('1987-01-02'):
+	throw test.date, 'date operation failed';
+
+print: ret = d1 - time.hours(10) - time.seconds(20);
+if ret != datetime.clone('2000-01-01 13:59:40'):
+	throw test.date, 'date operation failed';
+
+print: ret = d1 - date.clone('2000-01-01');
+if ret != 1:
+	throw test.date, 'date operation failed';
+
+
+print: '# compare';
+print: d1 = date.clone('2000-01-01');
+print: d2 = date.clone('2000-01-02');
+if d1 >= d2:
+	throw test.date, 'date comparison fail';
+	
+if d1 == d2:
+	throw test.date, 'date comparison fail';
+
+print: dt1 = datetime.clone('2000-01-01 01:00:00');
+if d1 == dt1:
+	throw test.date, 'date comparison fail';
+	
+if d1 >= dt1:
+	throw test.date, 'date comparison fail';
+	
+
+print: '# date duration arithmetic';
+print: dd1 = date.years(10);
+print: dd2 = date.months(3);
+print: dd3 = date.weeks(2);
+print: dd4 = date.days(30);
+
+print: dd5 = dd1 + dd2 + dd3 + dd4;
+print: ret = dd5 + date.clone('2000-01-01');
+if ret != date.clone('2010-05-15'):
+	throw test.date, 'date duration op fail';
+
+print: dd5 = dd1 + dd2 + dd3 + dd4;
+print: ret = (dd5*2) + date.clone('2000-01-01');
+if ret != date.clone('2020-09-27'):
+	throw test.date, 'date duration op fail';
+
+print: ret = -dd5;
+print: ret = -dd5 + date.clone('2000-01-01');
+if ret != date.clone('1989-08-18'):
+	throw test.date, 'date duration op fail';
+
+print: ret = dd1 == dd2;
+if ret == true:
+	throw test.date, 'date duration op fail';
+
+print: ret = dd1 == dd1;
+if ret == false:
+	throw test.date, 'date duration op fail';
+
+print: 'OK: ', my;
+
+
+

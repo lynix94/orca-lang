@@ -1,0 +1,19 @@
+using gui;
+using gui.window;
+using gui.vbox;
+using gui.label;
+using gui.image;
+using util.upper;
+
+def main : window
+{
+	def box : vbox
+	{
+		def orca : image
+		{
+			my.attr['wh'] = (224, 300);
+			my.attr['file'] = '448px-Type_C_Orcas.jpg';
+		}
+	}
+}
+

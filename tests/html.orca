@@ -1,0 +1,114 @@
+
+# test code
+address_list = [ ['KYLee', '012-345-6789', 'Seoul,Korea' ], ['foo', '000-111-2222', 'bar'] ];
+name_size = 100;
+phone_size = 200;
+address_size = 800;
+line_size = 20;
+
+
+doc = my.new();
+doc.tag('html') {
+	doc.tag('head') { }
+	doc.tag('body') { 
+		doc.txt('address book');
+		doc.br();
+		doc.tag('table', 'style="table-layout: fixed;"'); {
+
+			# title row
+			doc.tag('tr') {
+				doc.tag('td', 'width=${name_size}, height=${line_size}', 'name');
+				doc.tag('td', 'width=${phone_size},  height=${line_size}', 'phone');
+				doc.tag('td', 'width=${address_size},  height=${line_size}', 'address');
+			}
+
+			# members...
+			for row in address_list: {
+				doc.tag('tr') {
+					doc.tag('td', 'width=${name_size},  height=${line_size}', row[0]);
+					doc.tag('td', 'width=${phone_size},  height=${line_size}', row[1]);
+					doc.tag('td', 'width=${address_size},  height=${line_size}', row[2]);
+				}
+			}
+
+		}
+	}
+}
+
+print: doc;
+
+
+
+# real class code
+
+def result;
+def depth;
+
+def new 
+{
+	ret = clone owner;
+	ret.result = '';
+	ret.depth = 0;
+	return ret;
+}
+
+def string {
+	return ..result;
+}
+
+def txt(str)
+{
+	..result += '    ' * ..depth;
+	..result += str;
+	..result += '\n';
+}
+
+def br()
+{
+	..result += '    ' * ..depth;
+	..result += '<br>\n';
+}
+
+
+
+def tag(name, attr, txt)
+{
+	if txt.typename == 'string': {
+		..result += '    ' * ..depth;
+		..result += '<${name} ${attr}>';
+		..result += txt;
+		..result += '</${name}>\n';
+	}
+	else: {
+		new_tag = clone my;
+		new_tag.m_name = name;
+		new_tag.m_attr = attr;
+		new_tag.m_doc = owner;
+
+		return new_tag;
+	}
+
+
+	def scope_start {
+		..m_doc.result += '    ' * ..m_doc.depth;
+
+		if ..m_attr == nil:
+			..m_doc.result += '<${..m_name}>\n';
+		else: 
+			..m_doc.result += '<${..m_name} ${..m_attr}>\n';
+
+		..m_doc.depth += 1;
+	}
+
+
+	def scope_end {
+		..m_doc.depth -= 1;
+		..m_doc.result += '    ' * ..m_doc.depth;
+		..m_doc.result += '</${..m_name}>\n';
+	}
+
+	def m_name;
+	def m_attr;
+	def m_doc;
+}
+

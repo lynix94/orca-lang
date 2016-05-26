@@ -1,0 +1,86 @@
+
+using stopwatch;
+
+test_vectors = [
+  'test_arith',
+  'test_control',
+  'test_list',
+  'test_tuple',
+  'test_map',
+  'test_exception',
+  'test_string',
+  'test_format',
+  'test_oo',
+  'test_gc',
+  'test_operator',
+# 'test_shell',
+  'test_iter',
+  'test_lambda',
+  'test_thread',
+  'test_pure',
+  'test_once',
+  'test_scope',
+  'test_decode',
+  'test_sbf',
+  'test_para',
+  'test_para_for',
+  'test_type',
+  'test_orca',
+  'test_lang',
+  'test_parse'
+];
+
+test_modules = [
+  'test_file',
+  'test_ipc',
+  'test_socket',
+  'test_select',
+#  'test_os',
+#  'test_pack',
+  'test_fun',
+  'test_date',
+  'test_time',
+  'test_datetime',
+  'test_remote',
+  'test_dist',
+  'test_dfsd',
+  'test_system',
+  'test_math',
+#  'test_sh',
+#  'test_awk',
+#  'test_cpp',
+  'test_alg',
+#  'test_run',
+#  'test_util',
+  'test_lisp',
+  'test_xml',
+  'test_json',
+  'test_gnuplot'
+];
+	
+stopwatch.title('elapsed time: ') {
+	try{
+		for t in test_vectors: {
+			print: '### Test: %s start' % t;
+			orca.load(t);
+			root.members[t]();
+			print: '### Test: %s end' % t;
+		}
+
+		for t in test_modules: {
+			print: '### Test: %s start' % t;
+			orca.load(t);
+			root.members[t]();
+			print: '### Test: %s end' % t;
+		}
+	}
+	catch test: msg {
+		print: '!!! Fail !!!';
+		print: msg;
+		return;
+	}
+}
+
+print: '### All cases Success ###';
+
+

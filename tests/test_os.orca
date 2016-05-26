@@ -1,0 +1,17 @@
+using os;
+
+print: 1;
+print: os.cwd();
+
+os.mkdir('newdir');
+#os.mkdir('/root/newdir');
+
+os.rename('newdir', 'newdir2');
+os.copy('orca', 'orca2');
+
+#os.remove('/root/newdir');
+os.remove('newdir2');
+os.remove('orca2');
+
+print: os.ls('.');
+
