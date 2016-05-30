@@ -17,7 +17,7 @@ def main : window
 			def count := 0;
 
 			my.attr['text'] = 'click';
-			my.event['clicked'] = %c{ 
+			my.event['clicked'] = def(){ 
 				..count += 1;
 				upper('box').info.attr['text'] = ..count.string() + ' times';
 			};

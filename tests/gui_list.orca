@@ -57,8 +57,8 @@ def main : window
 			my.push_back([false, 'classic guiar']);
 			my.push_back([false, 'programming']);
 
-			my.event['changed'] = %c{
-				upper('box').change.attr['text'] = argv[0].string() + argv[0]();
+			my.event['changed'] = def(a){
+				upper('box').change.attr['text'] = argv[0].string() + a();
 			};
 		}
 
@@ -73,7 +73,7 @@ def main : window
 			{
 				my.attr['wh'] = (100, 20);
 				my.attr['text'] = 'submit';
-				my.event['clicked'] = %c{
+				my.event['clicked'] = def(){
 					new = upper('input').new.attr['text'];
 					upper('box').items.push_back([false, new]);
 				};

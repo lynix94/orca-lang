@@ -1,10 +1,8 @@
+/* A Bison parser, made by GNU Bison 2.7.  */
 
-/* A Bison parser, made by GNU Bison 2.4.1.  */
-
-/* Skeleton interface for Bison's Yacc-like parsers in C
+/* Bison interface for Yacc-like parsers in C
    
-      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
+      Copyright (C) 1984, 1989-1990, 2000-2012 Free Software Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,6 +30,15 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
+#ifndef YY_YY_SRC_PARSER_PARSER_HPP_INCLUDED
+# define YY_YY_SRC_PARSER_PARSER_HPP_INCLUDED
+/* Enabling traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -87,40 +94,37 @@
      SUB_ASSIGN = 303,
      MUL_ASSIGN = 304,
      DIV_ASSIGN = 305,
-     LAMBDA = 306,
-     PURE = 307,
-     NIL_ = 308,
-     RIGHT_ARROW = 309,
-     LEFT_ARROW = 310,
-     PARALLEL = 311,
-     ASSIGNMENT = 312,
-     ONCE = 313,
-     NAME = 314,
-     STRING = 315,
-     FORMAT_STRING_HEAD = 316,
-     FORMAT_STRING_TAIL = 317,
-     RE_STRING = 318,
-     RE_FORMAT_STRING_HEAD = 319,
-     HEX_STRING = 320,
-     SHELL_STRING_HEAD = 321,
-     CONTEXT = 322,
-     NUMBER = 323,
-     MINUS_NUMBER = 324,
-     BIG_NUMBER = 325,
-     MINUS_BIG_NUMBER = 326,
-     REAL = 327,
-     MINUS_REAL = 328
+     PURE = 306,
+     NIL_ = 307,
+     RIGHT_ARROW = 308,
+     LEFT_ARROW = 309,
+     PARALLEL = 310,
+     ASSIGNMENT = 311,
+     ONCE = 312,
+     NAME = 313,
+     STRING = 314,
+     FORMAT_STRING_HEAD = 315,
+     FORMAT_STRING_TAIL = 316,
+     RE_STRING = 317,
+     RE_FORMAT_STRING_HEAD = 318,
+     HEX_STRING = 319,
+     SHELL_STRING_HEAD = 320,
+     CONTEXT = 321,
+     NUMBER = 322,
+     MINUS_NUMBER = 323,
+     BIG_NUMBER = 324,
+     MINUS_BIG_NUMBER = 325,
+     REAL = 326,
+     MINUS_REAL = 327
    };
 #endif
-
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
 {
-
-/* Line 1676 of yacc.c  */
-#line 46 "./src/parser/parser.y"
+/* Line 2058 of yacc.c  */
+#line 46 "../src/parser/parser.y"
 
 	const char* cp;
 	int integer;
@@ -131,9 +135,8 @@ typedef union YYSTYPE
 	struct int2_t int2;
 
 
-
-/* Line 1676 of yacc.c  */
-#line 137 "./src/parser/parser.hpp"
+/* Line 2058 of yacc.c  */
+#line 140 "../src/parser/parser.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -142,4 +145,18 @@ typedef union YYSTYPE
 
 extern YYSTYPE yylval;
 
+#ifdef YYPARSE_PARAM
+#if defined __STDC__ || defined __cplusplus
+int yyparse (void *YYPARSE_PARAM);
+#else
+int yyparse ();
+#endif
+#else /* ! YYPARSE_PARAM */
+#if defined __STDC__ || defined __cplusplus
+int yyparse (void);
+#else
+int yyparse ();
+#endif
+#endif /* ! YYPARSE_PARAM */
 
+#endif /* !YY_YY_SRC_PARSER_PARSER_HPP_INCLUDED  */

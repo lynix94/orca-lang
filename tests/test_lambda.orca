@@ -6,12 +6,12 @@ def for_each(list, functor) {
   }
 }
 
-my.for_each([1..10], %c{ print(argv[0]); });
+my.for_each([1..10], def(a){ print(a); });
 
 # below is same with above statement
 
-my.for_each: [1..10], %c{
-  print: argv[0];
+my.for_each: [1..10], def(a){
+  print: a;
 };
 
 print: 'OK';

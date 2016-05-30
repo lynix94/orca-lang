@@ -38,17 +38,17 @@ if fun.bind_1st(.foo, 10)(2,3) != fun.bind_nth(.foo, 10, 1)(2,3):
 	throw test.fun, 'bind_nth fail';
 
 
-print: 'map: ', ret = fun.map( [1,2,3,4,5], %c{ return argv[0]*2; } );
+print: 'map: ', ret = fun.map( [1,2,3,4,5], def(...){ return argv[0]*2; } );
 if ret != [2,4,6,8,10]:
 	throw test.fun, 'map fail';
 	
-print: 'reduce: ', ret = fun.reduce( [1,2,3,4,5], %c{ return argv[0]+argv[1]; } );
+print: 'reduce: ', ret = fun.reduce( [1,2,3,4,5], def(...){ return argv[0]+argv[1]; } );
 
 if ret != 1+2+3+4+5:
 	throw test.fun, 'reduce fail';
 	
 
-print: 'reduce: ', ret = fun.reduce( 0, [1,2,3,4,5], %c{ return argv[0]+argv[1]; });
+print: 'reduce: ', ret = fun.reduce( 0, [1,2,3,4,5], def(...){ return argv[0]+argv[1]; });
 
 if ret != 0+1+2+3+4+5:
 	throw test.fun, 'reduce fail';

@@ -63,9 +63,9 @@ def main : window
 			b.push_child([false, 'ruby']);
 			b.push_child([false, 'lisp']);
 
-			my.event['changed'] = %c{
+			my.event['changed'] = def(a){
 				upper('box').change.attr['text'] = argv[0].string() + argv[0]();
-				..current = argv[0];
+				..current = a;
 			};
 		}
 
@@ -78,7 +78,7 @@ def main : window
 				my.attr['wh'] = (100, 20);
 				my.attr['text'] = 'submit sibling';
 
-				my.event['clicked'] = %c{
+				my.event['clicked'] = def(){
 					it = upper('box').items.current;
 					new = upper('input_sibling').new.attr['text'];
 					if new.length() <= 0: return;
@@ -101,7 +101,7 @@ def main : window
 				my.attr['wh'] = (100, 20);
 				my.attr['text'] = 'submit child';
 
-				my.event['clicked'] = %c{
+				my.event['clicked'] = def(){
 					it = upper('box').items.current;
 					new = upper('input_child').new.attr['text'];
 					if new.length() <= 0: return;

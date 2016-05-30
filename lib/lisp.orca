@@ -178,7 +178,7 @@ parse def parse_code(src)
 		;
 
 	expr:	'(' expr_list ')'
-			%c{ 
+			def(...){ 
 				code = argv[1];
 				if code[0].type == type.tuple && code[0][0] == 'path': {
 					name = code[0][1][0];
@@ -210,7 +210,7 @@ parse def parse_code(src)
 		;
 
 	comma_expr: ',' expr
-				%c{
+				def(...){
 					return ('comma', argv[1]);
 				}
 			;
@@ -223,41 +223,41 @@ parse def parse_code(src)
 				;
 
 	defun_stmt: '(' 'defun' name expr ')'
-				%c{
+				def(...){
 					..owner.defun(argv[2], argv[3]);
 					return nil;
 				}
 			| '(' 'defun' fun_define expr ')'
-					%c{
+					def(...){
 						..owner.defun(argv[2], argv[3]);
 						return nil;
 					} 
 			| '(' 'lambda' fun_define expr ')'
-					%c{
+					def(...){
 						return  ..owner.defun(argv[2].push_front('lambda'), argv[3]);
 					} 
 			;
 
 	defmacro_stmt: '(' 'defmacro' name expr ')'
-				%c{
+				def(...){
 					..owner.defmacro(argv[2], argv[3]);
 					return nil;
 				}
 			| '(' 'defmacro' fun_define expr ')'
-					%c{
+					def(...){
 						..owner.defmacro(argv[2], argv[3]);
 						return nil;
 					} 
 			;
 
 	fun_define:	'(' name_list ')'
-				%c{ return argv[1]; }
+				def(...){ return argv[1]; }
 			;
 
 	name_list: name_list name
-				%c{ return argv[0].push_back(argv[1]); }
+				def(...){ return argv[0].push_back(argv[1]); }
 			| name
-				%c{ return [argv[0]]; }
+				def(...){ return [argv[0]]; }
 			;
 
 	function: internal 
@@ -265,33 +265,33 @@ parse def parse_code(src)
 			;
 
 	if_stmt : '(' 'if' expr expr expr  ')'
-				%c{
+				def(...){
 					return [('if', argv[2], argv[3], argv[4])];
 				}
 			;
 
 	cond_stmt : '(' 'cond' expr_pair_list  ')'
-				%c{
+				def(...) {
 					return [('cond', argv[2])];
 				}
 			;
 
 	let_stmt : '(' 'let' expr expr  ')'
-				%c{
+				def(...) {
 					return [('let', argv[2], argv[3])];
 				}
 			;
 
 	quote_stmt : '(' 'quote' expr_list ')'
-					%c{ return [('quote', argv[2])]; }
+					def(...) { return [('quote', argv[2])]; }
 				| "'(" expr_list ')'
-					%c{ return [('quote', argv[1])]; }
+					def(...) { return [('quote', argv[1])]; }
 				| "`(" expr_list ')'
-					%c{ return [('backquote', argv[1])]; }
+					def(...) { return [('backquote', argv[1])]; }
 				;
 
 	using_stmt : '(' 'using' path_expr  ')'
-				%c{
+				def(...) {
 					mod = root;
 
 					try {
@@ -308,27 +308,27 @@ parse def parse_code(src)
 			;
 
 	expr_pair_list: expr_pair_list expr_pair
-				%c{
+				def(...) {
 					return argv[0].push_back(argv[1]);
 				}
 			| expr_pair
-				%c{
+				def(...) {
 					return [argv[0]];
 				}
 			;
 
 	expr_pair : '(' expr expr ')'
-			%c{
+			def(...) {
 				return (argv[1], argv[2]);
 			}
 			;
 
 	internal: r'[*/+-]|<=|>=|==|!=|<|>'
-				%c{ return operator.members[argv[0]]; }
+				def(...) { return operator.members[argv[0]]; }
 			;
 
 	external: path_expr
-				%c{ 
+				def(...) { 
 					# do macro
 					if argv[0].size() == 1: {
 						if ..owner.mmap.has_key(argv[0][0]): {
@@ -345,9 +345,9 @@ parse def parse_code(src)
 			;
 
 	path_expr:	path_expr '.' base_name
-					%c{ return argv[0].push_back(argv[2]); }
+					def(...) { return argv[0].push_back(argv[2]); }
 			|	base_name
-					%c{ return type.tuple(argv[0]); }
+					def(...) { return type.tuple(argv[0]); }
 			;
 
 	base_name:	name
@@ -360,33 +360,33 @@ parse def parse_code(src)
 		;
 
 	list: '[' expr_list ']'
-				%c{ 
+				def(...) { 
 					return argv[1].push_front(('path', type.tuple('list')));
 				}
 		;
 
 	expr_list: expr_list expr
-				%c{ 
+				def(...) { 
 					if argv[1] != nil: 
 						argv[0].push_back(argv[1]); 
 
 					return argv[0];
 				}
 			| expr
-				%c{
+				def(...) {
 					if argv[0] != nil: return [argv[0]]; 
 					else: return [];
 				}
 		;
 
 	number: r'-?[0-9]+'	
-			%c{ return argv[0].integer(); }
+			def(...) { return argv[0].integer(); }
 		 | r'(-?[0-9]+[Ee][\+\-]?[0-9]+)|(-?[0-9]*\\.[0-9]+([Ee][\+\-]?[0-9]+)?)'
-			%c{ return argv[0].float(); }
+			def(...) { return argv[0].float(); }
 		;
 
 	string: r'"[^"]*"'
-			%c{ return argv[0].strip('"'); }
+			def(...) { return argv[0].strip('"'); }
 		;
 
 	~ : r'[ \r\n\t]+'

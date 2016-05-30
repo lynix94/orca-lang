@@ -20,7 +20,7 @@ def main : window
 		{
 			my.attr['text'] = 'linux';
 			my.event['toggled'] = 
-				%c{ 
+				def(){ 
 					if argv[0]: 
 						upper('box').print.attr['text'] = ..attr['text'];
 				};
@@ -31,7 +31,7 @@ def main : window
 			my.attr['text'] = 'windows';
 			my.attr['group'] = ..linux;
 			my.event['toggled'] = 
-				%c{ 
+				def(){ 
 					if argv[0]: 
 						upper('box').print.attr['text'] = ..attr['text'];
 				};
@@ -42,7 +42,7 @@ def main : window
 			my.attr['text'] = 'solaris';
 			my.attr['group'] = ..linux;
 			my.event['toggled'] = 
-				%c{ 
+				def(){ 
 					if argv[0]: 
 						upper('box').print.attr['text'] = ..attr['text'];
 				};

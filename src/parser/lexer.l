@@ -379,8 +379,6 @@ b\"					{
 						return '}';
 					}
 
-"%c{"				{ return LAMBDA; }
-
 "%1{"				{ return ONCE; }
 
 %[a-zA-Z_][a-zA-Z0-9_]*\{	{ 

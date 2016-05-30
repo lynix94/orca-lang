@@ -1,7 +1,0 @@
-
-using sample "cpp";
-
-print: sample(1, 2);
-
-print: 'done';
-

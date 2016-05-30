@@ -47,15 +47,15 @@ def window
 
 		members = owner.members.values();
 
-		alg.remove_if: members.begin(), members.end(), %c{
-			return !(argv[0].type < window);
+		alg.remove_if: members.begin(), members.end(), def(a){
+			return !(a.type < window);
 		};
 
-		members.sort(%c{ return argv[0].order < argv[1].order; });
+		members.sort(def(a, b){ return a.order < b.order; });
 
-		alg.for_each: members.begin(), members.end(), %c{
-			argv[0].make();
-			..owner.handle.put(argv[0].handle);
+		alg.for_each: members.begin(), members.end(), def(a){
+			a.make();
+			..owner.handle.put(a.handle);
 		};
 	}
 

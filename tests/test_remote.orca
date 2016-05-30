@@ -40,8 +40,8 @@ if c.f.bar() != 'bar of foo':
 
 
 print: '## remote_do test';
-c.remote_do: 10, 20, %c{
-    return argv[0] + argv[1];
+c.remote_do: 10, 20, def(a, b){
+    return a + b;
 };
 
 do {

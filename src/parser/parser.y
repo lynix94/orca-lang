@@ -62,7 +62,7 @@ using namespace std;
 %type <cp> lvar
 %type <cp> p_var
 %type <cp> object_path
-%type <cp> lambda
+%type <cp> lambda_define_start
 %type <cp> big_number
 %type <cp> minus_big_number
 
@@ -80,7 +80,6 @@ using namespace std;
 %type <integer> pair_list				// num of expr
 %type <integer> opt_expr_list			// num of expr
 %type <integer> opt_superclass			// num of superclass
-%type <integer> elif_stmt				// num of elif stmt
 %type <integer> elif_stmt_list			// num of elif stmt
 %type <integer> reserved_object			// reserved object enum value
 %type <integer> calling_body			// num of arguemnts
@@ -148,7 +147,6 @@ using namespace std;
 %token SUB_ASSIGN
 %token MUL_ASSIGN
 %token DIV_ASSIGN
-%token LAMBDA
 %token PURE
 %token NIL_
 %token RIGHT_ARROW
@@ -623,7 +621,7 @@ non_terminal:/*{{{*/
 /*}}}*/
 
 action_code:/*{{{*/
-	lambda_expr
+	lambda_object
 		{
 			$$ = g_parse->get_action_bnf(g_bnf_right_num);
 		}
@@ -810,29 +808,12 @@ once_expr:/*{{{*/
 	;
 /*}}}*/
 
-lambda_expr:/*{{{*/
-	lambda open_statement_block
+lambda_object:/*{{{*/
+	lambda_define_start statement_block
 		{
 			parserCode::pop_code_stack();
 			g_op->push_reserved(OP_PUSH_MY);
 			g_op->find_member($1);
-		}
-	;
-/*}}}*/
-
-lambda:/*{{{*/
-	LAMBDA
-		{
-			static int count = 1;
-			char buff[256];
-			sprintf(buff, "#%d_lambda", count++);
-			const char* name = parser_strdup(buff);
-			
-			parserCode::push_code_stack(name);
-			code_top->find_lvar("argv");
-			code_top->set_argv_on();
-
-			$$ = name;
 		}
 	;
 /*}}}*/
@@ -868,6 +849,37 @@ define_start:/*{{{*/
 				code_top->find_lvar("argv");
 				code_top->set_argv_on();
 			}
+		}
+	;
+
+lambda_define_start:
+	define_prefix opt_argument_list
+		{
+			name_list_t* vp = (name_list_t*)$2;
+
+			// check argv
+			bool flag_argv = false;
+			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
+				vp->pop_back();
+				flag_argv = true;
+
+				if (vp->empty()) {	// if argv only, make vp as NULL
+					vp = NULL;
+				}
+			}
+
+			static int count = 1;
+			char buff[256];
+			sprintf(buff, "#%d_lambda", count++);
+			const char* name = parser_strdup(buff);
+			parserCode::push_code_stack(name, vp, $1);
+
+			if (flag_argv == true) {
+				code_top->find_lvar("argv");
+				code_top->set_argv_on();
+			}
+
+			$$ = name;
 		}
 	;
 /*}}}*/
@@ -1081,7 +1093,6 @@ tuple_expression_list:/*{{{*/
 
 expression:/*{{{*/
 	  assign_expr
-	| lambda_expr
 	| context_expr
 	| once_expr
 	;
@@ -1539,13 +1550,14 @@ in_expr:/*{{{*/
 	;
 /*}}}*/
 
-range_expr:
+range_expr:/*{{{*/
 	range_expr_sub ':' expression
 	| range_expr_sub
 		{
 			g_op->push_integer(1);
 		}
 	;
+/*}}}*/
 
 range_expr_sub:/*{{{*/
 	expression '~' expression
@@ -1582,6 +1594,7 @@ primary_object:/*{{{*/
 	  list
 	| tuple
 	| map
+	| lambda_object
 	| lvar
 		{
 			if (g_op->check_lvar($1) == false) {

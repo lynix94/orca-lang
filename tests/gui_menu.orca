@@ -16,17 +16,17 @@ def main : window
 	{
 		def menu : menubar
 		{
-			file = [ 'open', %c{ 
+			file = [ 'open', def(){ 
 								name = dialog.fileopen(upper('main'));
 								str= os.read(name);
 								upper('box').hs.edit.attr['text'] = str;
 							},
-					'save', %c{ 
+					'save', def(){ 
 								str= upper('box').hs.edit.attr['text'];
 								name = dialog.filesave(upper('main'));
 								os.write(name, str);
 							},
-					'exit', %c{ 
+					'exit', def(){ 
 								upper('main').quit(); 
 							}
 					];

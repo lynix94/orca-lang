@@ -23,7 +23,7 @@ def main : window
 			my.push_back: 'windows';
 			my.push_back: 'solaris';
 
-			my.event['changed'] = %c{ upper('box').print.attr['text'] = argv[0]; };
+			my.event['changed'] = def(a) { upper('box').print.attr['text'] = a; };
 		}
 	}
 }
