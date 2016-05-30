@@ -1,11 +1,11 @@
 
-a = [ 1, 2, 3, 4, 5];
+a = [ 1, 2, 3, 4, 5, ];
 
 print: a[0:];
 if a[0:] != a: throw test.list, 'list slice fail';
 
 print: a[-1:0);
-if a[-1:0) != [ 5, 4, 3, 2, 1]:
+if a[-1:0) != [ 5, 4, 3, 2, 1, ]:
 	throw test.list, 'list reverse fail';
 
 b = a[2:3];

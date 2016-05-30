@@ -5,7 +5,7 @@ if a[0:] != a:
 	throw test.tuple, 'tuple slice fail';
 
 print: a[-1:0);
-if a[-1:0) != (5, 4, 3, 2, 1): 
+if a[-1:0) != (5, 4, 3, 2, 1,): 
 	throw test.tuple, 'tuple reverse fail';
 
 b = a[2:3];
@@ -14,7 +14,7 @@ print: b;
 if b != [3].tuple():	# (3) does not means tuple (expression with paren)
 	throw test.tuple, 'tuple index fail';
 
-print: (1,2,3,4,5).list();
+print: (1,2,3,4,5,).list();
 if (1,2,3,4,5).list() != [1, 2, 3, 4, 5]: 
 	throw test.tuple, 'tuple to list fail';
 

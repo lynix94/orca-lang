@@ -1,5 +1,8 @@
 *.o
 *.la
 *.lo
+tests/*.kw
+Makefile
+.*
 
 

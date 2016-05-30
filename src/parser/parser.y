@@ -1088,6 +1088,10 @@ tuple_expression_list:/*{{{*/
 		{
 			$$ = 2;
 		}
+	| expression ','
+		{
+			$$ = 1;
+		}
 	;
 /*}}}*/
 
@@ -1461,6 +1465,10 @@ list:/*{{{*/
 		{
 			g_op->make_list($2);
 		}
+	| '[' expression_list ','']'
+		{
+			g_op->make_list($2);
+		}
 	| '[' expression DOUBLE_DOT expression ']'
 		{
 			g_op->make_list(-2);
@@ -1475,6 +1483,10 @@ list:/*{{{*/
 
 tuple:/*{{{*/
 	'(' tuple_expression_list ')'
+		{
+			g_op->make_tuple($2);
+		}
+	| '(' expression_list ',' ')'
 		{
 			g_op->make_tuple($2);
 		}
@@ -1654,7 +1666,7 @@ primary_object:/*{{{*/
 		{
 			g_op->push_nil();
 		}
-	| '(' expression ')'		// remind: conflict with tuple	
+	| '(' expression ')'
 	;
 /*}}}*/
 
