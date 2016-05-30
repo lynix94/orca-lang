@@ -42,7 +42,8 @@ static int g_format_string = 0;
 static bool g_comment = false;
 static const char* get_string(char end);
 static const char* get_comment(char end);
-static const char* get_context();
+//static const char* get_context();
+const char* get_context();
 static const char* get_hex_string(char end);
 static const char* get_bin_string(char end);
 %}
@@ -381,16 +382,6 @@ b\"					{
 
 "%1{"				{ return ONCE; }
 
-%[a-zA-Z_][a-zA-Z0-9_]*\{	{ 
-						cp2_t cp2;
-						char* cp = (char*)parser_strdup(&yytext[1]);
-						cp[strlen(cp)-1] = 0;
-						cp2.c1 = cp;
-						cp2.c2 = get_context();
-						yylval.cp2 = cp2;
-						return CONTEXT;
-					}
-
 .					{ g_shell_start = false; return yytext[0]; }
 
 %%
@@ -606,7 +597,7 @@ static const char* get_comment(char end)/*{{{*/
 }
 /*}}}*/
 
-static const char* get_context()/*{{{*/
+const char* get_context()/*{{{*/
 {
 	char c;
 	char open = '{';
@@ -614,10 +605,10 @@ static const char* get_context()/*{{{*/
 	int depth = 0;
 
 	string str;
-
-
-	c = lexer->yyinput();
 	depth++;
+
+	
+	c = lexer->yyinput();
 
 	while ((c = lexer->yyinput()) != 0 && c != -1) {
 		if (c == open) depth++;

@@ -40,6 +40,9 @@ int g_bnf_right_num = 0;
 
 using namespace std;
 
+
+const char* get_context();
+
 %}
 
 %union 
@@ -793,6 +796,13 @@ define_stmt:/*{{{*/
 			g_ctl->decode_end();
 			parserCode::pop_code_stack();
 		}
+	| DEF '.' name name '{'
+		{
+			const char* cp = get_context();
+			print("get_context(): '%s'\n", cp);
+			code_top->do_context($3, $4, cp);
+			//TODO: fail check
+		}
 	; 
 /*}}}*/
 
@@ -815,14 +825,25 @@ lambda_object:/*{{{*/
 			g_op->push_reserved(OP_PUSH_MY);
 			g_op->find_member($1);
 		}
+	| context_lambda_obj
 	;
 /*}}}*/
 
-context_expr:/*{{{*/
-	CONTEXT
+context_lambda_obj:/*{{{*/
+	DEF '.' name  '{'
 		{
-			cp2_t cp2 = $1;
-			code_top->do_context(cp2.c1, cp2.c2);
+			// for serial tagging
+			static int count = 1;
+			char name[256];
+			sprintf(name, "__%s_%d_context", g_parse_module_name.c_str(), count++);
+
+			const char* cp = get_context();
+			//print("get_context(): '%s'\n", cp);
+			code_top->do_context($3, name, cp);
+			//TODO: fail check
+
+			g_op->push_reserved(OP_PUSH_MY);
+			g_op->find_member(name);
 		}
 	;
 /*}}}*/
@@ -1097,7 +1118,6 @@ tuple_expression_list:/*{{{*/
 
 expression:/*{{{*/
 	  assign_expr
-	| context_expr
 	| once_expr
 	;
 /*}}}*/

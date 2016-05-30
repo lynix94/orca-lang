@@ -335,7 +335,7 @@ if r != 30:
 
 
 
-def foo := %lisp{
+def foo := def.lisp {
  (+ argv0 argv1)
 };
 

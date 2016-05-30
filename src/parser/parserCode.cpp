@@ -319,11 +319,8 @@ void parserCode::reg_object(const char* s, int flag_define) /*{{{*/
 }
 /*}}}*/
 
-void parserCode::do_context(const char* mod, const char* code)
+void parserCode::do_context(const char* mod, const char* name, const char* code)
 {
-	static int count = 1;
-	char name[256];
-	sprintf(name, "__%s_%d_context", g_parse_module_name.c_str(), count++);
 	int len;
 
 	m_def.push_back(OP_CONTEXT);
@@ -342,9 +339,6 @@ void parserCode::do_context(const char* mod, const char* code)
 	char* cp = i2l(len);
 	copy(cp, cp+sizeof(int), back_inserter(m_def));
 	copy(code, code + len, back_inserter(m_def));
-
-	g_op->push_reserved(OP_PUSH_MY);
-	g_op->find_member(name);
 }
 
 void parserCode::init_object_start(const char* s) /*{{{*/

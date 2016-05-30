@@ -124,7 +124,7 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 2058 of yacc.c  */
-#line 46 "../src/parser/parser.y"
+#line 49 "../src/parser/parser.y"
 
 	const char* cp;
 	int integer;
