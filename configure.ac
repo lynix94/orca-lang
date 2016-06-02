@@ -3,8 +3,8 @@
 
 AC_PREREQ([2.65])
 AC_INIT(orca, 0.5, kiyeul.lee@gmail.com)
-AM_INIT_AUTOMAKE(orca, 0.5)
-AC_CONFIG_SRCDIR([external/include/gmpxx.h])
+AM_INIT_AUTOMAKE
+AC_CONFIG_SRCDIR([src/vm/main.cpp])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
