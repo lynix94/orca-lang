@@ -56,7 +56,6 @@ const char* get_context();
 	struct int2_t int2;
 };
 
-%glr-parser
 %error-verbose
 
 
@@ -303,7 +302,7 @@ parallel_option: /* empty *//*{{{*/
 /*}}}*/
 
 simple_call_stmt:/*{{{*/
-	object ':' expression_list  ';'
+	postfix_object ':' expression_list  ';'
 		{
 			g_op->call($3);
 		}
@@ -1503,9 +1502,9 @@ list:/*{{{*/
 /*}}}*/
 
 tuple:/*{{{*/
-	'(' tuple_expression_list ')'
+	'(' expression_list ',' expression ')'
 		{
-			g_op->make_tuple($2);
+			g_op->make_tuple($2 + 1);
 		}
 	| '(' expression_list ',' ')'
 		{
