@@ -56,6 +56,7 @@ const char* get_context();
 	struct int2_t int2;
 };
 
+%glr-parser
 %error-verbose
 
 
@@ -1523,6 +1524,10 @@ tuple:/*{{{*/
 
 map:/*{{{*/
 	'{' pair_list '}'
+		{
+			g_op->make_map($2);
+		}
+	| '{' pair_list ',' '}'
 		{
 			g_op->make_map($2);
 		}
