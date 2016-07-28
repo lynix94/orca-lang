@@ -65,9 +65,11 @@ const char* get_context();
 %type <cp> lvar
 %type <cp> p_var
 %type <cp> object_path
-%type <cp> lambda_define_start
 %type <cp> big_number
 %type <cp> minus_big_number
+%type <cp> lambda_define_header
+%type <cp> lambda_decode_header
+%type <cp> lambda_parse_header
 
 %type <bp> terminal
 %type <bp> non_terminal
@@ -79,16 +81,13 @@ const char* get_context();
 %type <integer> minus_number					// integer
 %type <integer> expression_stmt			// num of expr
 %type <integer> expression_list			// num of expr
-%type <integer> tuple_expression_list	// num of expr
 %type <integer> pair_list				// num of expr
 %type <integer> opt_expr_list			// num of expr
 %type <integer> opt_superclass			// num of superclass
 %type <integer> elif_stmt_list			// num of elif stmt
 %type <integer> reserved_object			// reserved object enum value
 %type <integer> calling_body			// num of arguemnts
-%type <integer> define_option_list		// flag
-%type <integer> define_option			// flag
-%type <integer> define_prefix			// flag
+%type <integer> def						// flag
 %type <integer> assign_type				// '=', '+'...
 %type <integer> pattern_list			// num of pattern
 
@@ -150,7 +149,6 @@ const char* get_context();
 %token SUB_ASSIGN
 %token MUL_ASSIGN
 %token DIV_ASSIGN
-%token PURE
 %token NIL_
 %token RIGHT_ARROW
 %token LEFT_ARROW
@@ -231,7 +229,6 @@ statement:/*{{{*/
 		}
 	| scope_stmt
 	| parallel_stmt
-	| parse_stmt
 	| debug_stmt 
 	| ';'
 	;
@@ -501,37 +498,6 @@ decode_stmt:/*{{{*/
 	;
 /*}}}*/
 
-parse_stmt:/*{{{*/
-	PARSE DEF name_or_string opt_argument_list
-		{
-			name_list_t* vp = (name_list_t*)$4;
-
-			// check argv
-			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
-				yyerror("argv not allowed in parse object");
-			}
-
-			if (vp == NULL) {
-				yyerror("at least 1 argument needed in parse object");
-			}
-
-			parserCode::push_code_stack($3, vp);
-			g_parse->do_parse_init();
-		}
-	'{' bnf_stmt_list '}'
-		{
-			vector<char>& def = parserCode::get_def();
-
-			g_parse->make_table();
-			//g_parse->dump();
-			g_parse->do_parse(def);
-			g_parse->cleanup();
-
-			parserCode::pop_code_stack();
-		}
-	;
-/*}}}*/
-
 bnf_stmt_list:/*{{{*/
 	bnf_stmt_list bnf_stmt
 	| bnf_stmt
@@ -710,41 +676,17 @@ loop_stmt:/*{{{*/
 	;
 /*}}}*/
 
-define_option_list:/*{{{*/
-	define_option_list define_option
-		{
-			$$ = $1 | $2;
-		}
-	| define_option
-		{
-			$$ = $1;
-		}
-	;
-/*}}}*/
-
-define_option:/*{{{*/
-	STATIC
+def:
+	STATIC DEF
 		{
 			$$ = BIT_DEFINE_STATIC;
-		}
-	| PURE
-		{
-			$$ = BIT_DEFINE_PURE;
-		}
-	;
-/*}}}*/
-
-define_prefix:/*{{{*/
-	define_option_list DEF
-		{
-			$$ = $1;
 		}
 	| DEF
 		{
 			$$ = 0;
 		}
-	;		   
-/*}}}*/
+	;
+
 
 name_or_string:/*{{{*/
 	name
@@ -759,11 +701,11 @@ name_or_string:/*{{{*/
 /*}}}*/
 
 define_stmt:/*{{{*/
-	define_prefix name_or_string ';'
+	def name_or_string ';'
 		{
 			code_top->reg_object($2, $1);
 		}
-	| define_prefix name_or_string ASSIGNMENT 
+	| def name_or_string ASSIGNMENT 
 		{
 			code_top->reg_object($2, $1);
 			code_top->init_object_start($2);
@@ -776,7 +718,7 @@ define_stmt:/*{{{*/
 			g_op->pop_stack();
 			code_top->init_object_done();
 		}
-	| define_start opt_superclass 
+	| define_header opt_superclass
 		{
 			if ($2) {
 				code_top->make_super($2);
@@ -786,8 +728,61 @@ define_stmt:/*{{{*/
 		{
 			parserCode::pop_code_stack();
 		}
-	| DECODE define_start 
+	| def '.' name_or_string name_or_string '{'
 		{
+			const char* cp = get_context();
+			print("get_context(): '%s'\n", cp);
+			code_top->do_context($3, $4, cp);
+			//TODO: fail check
+		}
+	| def '.' PARSE name_or_string opt_argument_list
+		{
+			name_list_t* vp = (name_list_t*)$5;
+
+			// check argv
+			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
+				yyerror("argv not allowed in parse object");
+			}
+
+			if (vp == NULL) {
+				yyerror("at least 1 argument needed in parse object");
+			}
+
+			parserCode::push_code_stack($4, vp);
+			g_parse->do_parse_init();
+		}
+	'{' bnf_stmt_list '}'
+		{
+			vector<char>& def = parserCode::get_def();
+
+			g_parse->make_table();
+			//g_parse->dump();
+			g_parse->do_parse(def);
+			g_parse->cleanup();
+
+			parserCode::pop_code_stack();
+		}
+	| def '.' DECODE name_or_string opt_argument_list
+		{
+			name_list_t* vp = (name_list_t*)$5;
+
+			// check argv
+			bool flag_argv = false;
+			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
+				vp->pop_back();
+				flag_argv = true;
+
+				if (vp->empty()) {	// if argv only, make vp as NULL
+					vp = NULL;
+				}
+			}
+
+			parserCode::push_code_stack($4, vp, $1);
+
+			if (flag_argv == true) {
+				code_top->find_lvar("argv");
+				code_top->set_argv_on();
+			}
 			
 			g_ctl->decode_func_start();
 		}
@@ -796,60 +791,11 @@ define_stmt:/*{{{*/
 			g_ctl->decode_end();
 			parserCode::pop_code_stack();
 		}
-	| DEF '.' name name '{'
-		{
-			const char* cp = get_context();
-			print("get_context(): '%s'\n", cp);
-			code_top->do_context($3, $4, cp);
-			//TODO: fail check
-		}
-	; 
-/*}}}*/
-
-once_expr:/*{{{*/
-	ONCE
-		{
-			g_ctl->once_start();
-		}
-	open_statement_block
-		{
-			g_ctl->once_end();
-		}
 	;
 /*}}}*/
 
-lambda_object:/*{{{*/
-	lambda_define_start statement_block
-		{
-			parserCode::pop_code_stack();
-			g_op->push_reserved(OP_PUSH_MY);
-			g_op->find_member($1);
-		}
-	| context_lambda_obj
-	;
-/*}}}*/
-
-context_lambda_obj:/*{{{*/
-	DEF '.' name  '{'
-		{
-			// for serial tagging
-			static int count = 1;
-			char name[256];
-			sprintf(name, "__%s_%d_context", g_parse_module_name.c_str(), count++);
-
-			const char* cp = get_context();
-			//print("get_context(): '%s'\n", cp);
-			code_top->do_context($3, name, cp);
-			//TODO: fail check
-
-			g_op->push_reserved(OP_PUSH_MY);
-			g_op->find_member(name);
-		}
-	;
-/*}}}*/
-
-define_start:/*{{{*/
-	define_prefix name_or_string opt_argument_list
+define_header:/*{{{*/
+	def name_or_string opt_argument_list
 		{
 			name_list_t* vp = (name_list_t*)$3;
 
@@ -872,9 +818,75 @@ define_start:/*{{{*/
 			}
 		}
 	;
+/*}}}*/
 
-lambda_define_start:
-	define_prefix opt_argument_list
+once_expr:/*{{{*/
+	ONCE
+		{
+			g_ctl->once_start();
+		}
+	open_statement_block
+		{
+			g_ctl->once_end();
+		}
+	;
+/*}}}*/
+
+lambda_object:/*{{{*/
+	lambda_define_header opt_superclass
+		{
+			if ($2) {
+				code_top->make_super($2);
+			}
+		}
+	statement_block
+		{
+			parserCode::pop_code_stack();
+			g_op->push_reserved(OP_PUSH_MY);
+			g_op->find_member($1);
+		}
+	| def '.' name  '{'
+		{
+			// for serial tagging
+			static int count = 1;
+			char name[256];
+			sprintf(name, "__%s_%d_context", g_parse_module_name.c_str(), count++);
+
+			const char* cp = get_context();
+			//print("get_context(): '%s'\n", cp);
+			code_top->do_context($3, name, cp);
+			//TODO: fail check
+
+			g_op->push_reserved(OP_PUSH_MY);
+			g_op->find_member(name);
+		}
+	| lambda_decode_header '{' decode_pattern_stmt_list '}'
+		{
+			g_ctl->decode_end();
+			parserCode::pop_code_stack();
+
+			g_op->push_reserved(OP_PUSH_MY);
+			g_op->find_member($1);
+		}
+	| lambda_parse_header '{' bnf_stmt_list '}'
+		{
+			vector<char>& def = parserCode::get_def();
+
+			g_parse->make_table();
+			//g_parse->dump();
+			g_parse->do_parse(def);
+			g_parse->cleanup();
+
+			parserCode::pop_code_stack();
+
+			g_op->push_reserved(OP_PUSH_MY);
+			g_op->find_member($1);
+		}
+	;
+/*}}}*/
+
+lambda_define_header:
+	def opt_argument_list
 		{
 			name_list_t* vp = (name_list_t*)$2;
 
@@ -903,7 +915,67 @@ lambda_define_start:
 			$$ = name;
 		}
 	;
-/*}}}*/
+
+
+lambda_decode_header:
+	def '.' DECODE opt_argument_list
+		{
+			name_list_t* vp = (name_list_t*)$4;
+
+			// check argv
+			bool flag_argv = false;
+			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
+				vp->pop_back();
+				flag_argv = true;
+
+				if (vp->empty()) {	// if argv only, make vp as NULL
+					vp = NULL;
+				}
+			}
+
+			static int count = 1;
+			char buff[256];
+			sprintf(buff, "#%d_decode_lambda", count++);
+			const char* name = parser_strdup(buff);
+			parserCode::push_code_stack(name, vp, $1);
+
+			if (flag_argv == true) {
+				code_top->find_lvar("argv");
+				code_top->set_argv_on();
+			}
+			
+			g_ctl->decode_func_start();
+
+			$$ = name;
+		}
+	;
+
+
+lambda_parse_header:
+	def '.' PARSE opt_argument_list
+		{
+			name_list_t* vp = (name_list_t*)$4;
+
+			// check argv
+			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
+				yyerror("argv not allowed in parse object");
+			}
+
+			if (vp == NULL) {
+				yyerror("at least 1 argument needed in parse object");
+			}
+
+			static int count = 1;
+			char buff[256];
+			sprintf(buff, "#%d_parse_lambda", count++);
+			const char* name = parser_strdup(buff);
+			parserCode::push_code_stack(name, vp);
+			g_parse->do_parse_init();
+
+			$$ = name;
+		}
+	;
+
 
 opt_superclass:/*{{{*/
 	  // empty
@@ -1094,22 +1166,6 @@ expression_list:/*{{{*/
 			$$ = $1 + 1;
 		}
 	| expression
-		{
-			$$ = 1;
-		}
-	;
-/*}}}*/
-
-tuple_expression_list:/*{{{*/
-	tuple_expression_list ',' expression
-		{
-			$$ = $1 + 1;
-		}
-	| expression ',' expression
-		{
-			$$ = 2;
-		}
-	| expression ','
 		{
 			$$ = 1;
 		}

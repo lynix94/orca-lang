@@ -62,7 +62,6 @@ lf					\n
 {crlf}				{ parser_lineno++; }
 {lf}				{ parser_lineno++; }
 
-pure				{ return PURE; }
 static				{ return STATIC; }
 def					{ return DEF; }
 clone				{ return CLONE; }

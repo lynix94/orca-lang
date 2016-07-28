@@ -1,5 +1,5 @@
 
-parse def calc(str)
+def.parse calc(str)
 {
 	stmt : stmt '+' mul
 				def(...) {

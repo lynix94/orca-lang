@@ -1,7 +1,7 @@
 
 print: 'quick sort 10~-10';
 
-decode def qsort(a)
+def.decode qsort(a)
 {
 	[] -> 
 	{

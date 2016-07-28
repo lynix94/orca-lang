@@ -72,7 +72,7 @@ if s != [2, 3]:
 
 
 
-decode def tail(p)
+def.decode tail(p)
 {
 	[]	-> print: 'done';
 	%x:%xs	-> {

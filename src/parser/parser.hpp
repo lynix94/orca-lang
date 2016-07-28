@@ -94,28 +94,27 @@ extern int yydebug;
      SUB_ASSIGN = 303,
      MUL_ASSIGN = 304,
      DIV_ASSIGN = 305,
-     PURE = 306,
-     NIL_ = 307,
-     RIGHT_ARROW = 308,
-     LEFT_ARROW = 309,
-     PARALLEL = 310,
-     ASSIGNMENT = 311,
-     ONCE = 312,
-     NAME = 313,
-     STRING = 314,
-     FORMAT_STRING_HEAD = 315,
-     FORMAT_STRING_TAIL = 316,
-     RE_STRING = 317,
-     RE_FORMAT_STRING_HEAD = 318,
-     HEX_STRING = 319,
-     SHELL_STRING_HEAD = 320,
-     CONTEXT = 321,
-     NUMBER = 322,
-     MINUS_NUMBER = 323,
-     BIG_NUMBER = 324,
-     MINUS_BIG_NUMBER = 325,
-     REAL = 326,
-     MINUS_REAL = 327
+     NIL_ = 306,
+     RIGHT_ARROW = 307,
+     LEFT_ARROW = 308,
+     PARALLEL = 309,
+     ASSIGNMENT = 310,
+     ONCE = 311,
+     NAME = 312,
+     STRING = 313,
+     FORMAT_STRING_HEAD = 314,
+     FORMAT_STRING_TAIL = 315,
+     RE_STRING = 316,
+     RE_FORMAT_STRING_HEAD = 317,
+     HEX_STRING = 318,
+     SHELL_STRING_HEAD = 319,
+     CONTEXT = 320,
+     NUMBER = 321,
+     MINUS_NUMBER = 322,
+     BIG_NUMBER = 323,
+     MINUS_BIG_NUMBER = 324,
+     REAL = 325,
+     MINUS_REAL = 326
    };
 #endif
 
@@ -136,7 +135,7 @@ typedef union YYSTYPE
 
 
 /* Line 2058 of yacc.c  */
-#line 140 "../src/parser/parser.hpp"
+#line 139 "../src/parser/parser.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

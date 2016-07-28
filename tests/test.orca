@@ -17,7 +17,7 @@ test_vectors = [
   'test_iter',
   'test_lambda',
   'test_thread',
-  'test_pure',
+ #'test_pure',
   'test_once',
   'test_scope',
   'test_decode',
