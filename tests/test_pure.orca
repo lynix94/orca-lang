@@ -19,7 +19,8 @@ print: t1 = stopwatch.elapse();
 stopwatch.lap();
 
 
-pure def pure_fibo(n)
+@pure
+def pure_fibo(n)
 {
 	if n == 0:
 		return 0;

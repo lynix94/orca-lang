@@ -123,7 +123,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(orcaincludedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 liborca_la_DEPENDENCIES =
-am_liborca_la_OBJECTS = lexer.lo parser.lo parser_common.lo \
+am_liborca_la_OBJECTS = parser.lo lexer.lo parser_common.lo \
 	parserCode.lo parserControl.lo parserException.lo parserOP.lo \
 	parserParse.lo orcaBoolean.lo orcaInteger.lo orcaFloat.lo \
 	orcaList.lo orcaListIter.lo orcaListIterator.lo \
@@ -356,8 +356,8 @@ orca_CFLAGS = $(AM_CFLAGS)
 orca_LDFLAGS = $(top_builddir)/src/liborca.la  
 lib_LTLIBRARIES = liborca.la 
 liborca_la_SOURCES = \
-		$(PARSER_DIR)/lexer.cpp \
 		$(PARSER_DIR)/parser.cpp \
+		$(PARSER_DIR)/lexer.cpp \
 		$(PARSER_DIR)/parser_common.cpp \
 		$(PARSER_DIR)/parserCode.cpp \
 		$(PARSER_DIR)/parserControl.cpp \
@@ -605,19 +605,19 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
 
-lexer.lo: $(PARSER_DIR)/lexer.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lexer.lo -MD -MP -MF $(DEPDIR)/lexer.Tpo -c -o lexer.lo `test -f '$(PARSER_DIR)/lexer.cpp' || echo '$(srcdir)/'`$(PARSER_DIR)/lexer.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lexer.Tpo $(DEPDIR)/lexer.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(PARSER_DIR)/lexer.cpp' object='lexer.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lexer.lo `test -f '$(PARSER_DIR)/lexer.cpp' || echo '$(srcdir)/'`$(PARSER_DIR)/lexer.cpp
-
 parser.lo: $(PARSER_DIR)/parser.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT parser.lo -MD -MP -MF $(DEPDIR)/parser.Tpo -c -o parser.lo `test -f '$(PARSER_DIR)/parser.cpp' || echo '$(srcdir)/'`$(PARSER_DIR)/parser.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/parser.Tpo $(DEPDIR)/parser.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(PARSER_DIR)/parser.cpp' object='parser.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o parser.lo `test -f '$(PARSER_DIR)/parser.cpp' || echo '$(srcdir)/'`$(PARSER_DIR)/parser.cpp
+
+lexer.lo: $(PARSER_DIR)/lexer.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lexer.lo -MD -MP -MF $(DEPDIR)/lexer.Tpo -c -o lexer.lo `test -f '$(PARSER_DIR)/lexer.cpp' || echo '$(srcdir)/'`$(PARSER_DIR)/lexer.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lexer.Tpo $(DEPDIR)/lexer.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(PARSER_DIR)/lexer.cpp' object='lexer.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lexer.lo `test -f '$(PARSER_DIR)/lexer.cpp' || echo '$(srcdir)/'`$(PARSER_DIR)/lexer.cpp
 
 parser_common.lo: $(PARSER_DIR)/parser_common.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT parser_common.lo -MD -MP -MF $(DEPDIR)/parser_common.Tpo -c -o parser_common.lo `test -f '$(PARSER_DIR)/parser_common.cpp' || echo '$(srcdir)/'`$(PARSER_DIR)/parser_common.cpp

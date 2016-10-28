@@ -845,7 +845,7 @@ lambda_object:/*{{{*/
 			g_op->push_reserved(OP_PUSH_MY);
 			g_op->find_member($1);
 		}
-	| def '.' name  '{'
+	| def '.' name_or_string  '{'
 		{
 			// for serial tagging
 			static int count = 1;
