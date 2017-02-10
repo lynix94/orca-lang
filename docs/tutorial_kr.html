@@ -2829,7 +2829,7 @@ public:
 <p>아래의 calc 객체는 간단한 사칙연산기를 parse 구문으로 구현한 것이다.
 
 <div class="code"><pre>
-parse def calc(str)
+def.parse calc(str)
    {
        stmt : stmt '+' mul
                    %c{
@@ -2893,7 +2893,7 @@ parse def calc(str)
 <p>가장 간단한 예로, 다음의 예를 먼저 보고 설명한다.
 
 <div class="code"><pre>
-a = %cpp{
+a = def.cpp{
   // this is cpp code
   cout << "hello, " << argv[0].String() << endl;
 };
@@ -2901,7 +2901,7 @@ a = %cpp{
 a('world');
 </pre></div>
 
-<p>위의 코드는 hello, world를 출력하는데, %cpp{ ... } 로 정의된 객체의 내부 코드가 CPP 언어로 되어 있는것에 주의하자.
+<p>위의 코드는 hello, world를 출력하는데, def.cpp{ ... } 로 정의된 객체의 내부 코드가 CPP 언어로 되어 있는것에 주의하자.
 %name{ statement } 가 선언되면 오르카는 name  모듈에게 statement 코드를 넘겨주고, 추가적으로 현재의 시간정보와 모듈의 유니크한 이름
 을 넘겨준다.
 

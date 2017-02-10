@@ -2,3 +2,53 @@
 # now thinking 
 
 
+
+
+
+add eval (interpret, parse)
+
+
+
+decode to switch
+swich, select, decode
+
+
+def foo(...) under path
+
+
+channel ? 
+
+
+root, cloud (depent zookeeper or etcd)
+
+
+
+
+# refactoring
+
+move code_top to vm->code_top()
+move parse to vm & parse, interpret lock
+
+using -> import
+nil -> null
+
+
+
+
+
+# remove
+
+windows build
+once
+pure
+dfsd
+
+
+# add
+
+cache
+
+
+
+
+

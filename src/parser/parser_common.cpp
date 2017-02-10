@@ -39,7 +39,7 @@ int yyFlexLexer::yywrap()/*{{{*/
 void yyerror(const char* s)/*{{{*/
 {
 	print("[%s - %d]%s, nearby('%s')\n", parser_filename.c_str(), parser_lineno, s, yytext);
-	if (!is_interactive()) {
+	if (!is_interactive() and !is_eval()) {
 		exit(0);
 	}
 }/*}}}*/
@@ -137,6 +137,47 @@ bool parse(const string& filename)/*{{{*/
 
 extern orcaData g_last_pop_stack;
 
+orcaData eval(orcaVM* vm, const string& src)/*{{{*/
+{
+	set_eval(true);
+
+	printf(">>> eval: %s\n", src.c_str());
+	parser_curr_fp = fmemopen((void*)src.c_str(), src.size(), "r");
+
+	// init
+	parserCode::init();
+	parserCode::push_code_stack((char*)"eval", NULL, false);
+	code_top->init_current();  
+
+	// parse
+	int rv;
+	try {
+		parse_init();
+		rv = yyparse();
+
+		if (rv == 0) {
+			code_top->push_char(OP_RETURN);
+
+			code_top->eval(vm);
+		}
+
+		if (!is<TYPE_NIL>(g_last_pop_stack)) {
+			parserCode::init();
+			set_eval(false);
+			return g_last_pop_stack;
+		}
+	}
+	catch(orcaException& e) {
+		printf("uncaugted exception: %s %s\n", e.who(), e.what());
+		cout << e.m_stack_trace << endl;
+	}
+
+	parserCode::init();
+	set_eval(false);
+	return NIL;
+}
+/*}}}*/
+
 bool interpret(orcaVM* vm)/*{{{*/
 {
 	parser_curr_fp = stdin;
@@ -151,6 +192,7 @@ bool interpret(orcaVM* vm)/*{{{*/
 	do {
 		try {
 			parse_init();
+
 			rv = yyparse();
 
 			if (rv == 0) {
@@ -161,6 +203,7 @@ bool interpret(orcaVM* vm)/*{{{*/
 			if (!is<TYPE_NIL>(g_last_pop_stack))
 				cout << g_last_pop_stack.string_(vm) << endl;
 			g_last_pop_stack = NIL;
+
 			code_top->init_current();
 		}
 		catch(orcaException& e) {
@@ -288,6 +331,7 @@ short ltohs(short in)/*{{{*/
 /*}}}*/
 
 static bool g_interactive = false;
+static bool g_eval = false;
 
 void set_interactive(bool flag)/*{{{*/
 {
@@ -298,6 +342,17 @@ void set_interactive(bool flag)/*{{{*/
 bool is_interactive()/*{{{*/
 {
 	return g_interactive;
+}
+/*}}}*/
+
+void set_eval(bool flag)
+{
+	g_eval = flag;
+}
+
+bool is_eval()/*{{{*/
+{
+	return g_eval;
 }
 /*}}}*/
 

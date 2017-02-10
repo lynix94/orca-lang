@@ -29,6 +29,10 @@
 #include "orca_opcode.h"
 #include "parserParse.h"
 
+
+//TEMP
+#include "orcaRoot.h"
+
 parserException s_ex;
 parserException* g_ex = &s_ex;
 
@@ -155,6 +159,7 @@ const char* get_context();
 %token PARALLEL
 %token ASSIGNMENT
 %token ONCE 
+%token EVAL
 
 %token<cp> NAME
 %token<cp> STRING
@@ -1747,8 +1752,21 @@ primary_object:/*{{{*/
 			g_op->push_nil();
 		}
 	| '(' expression ')'
+	| reserved_functions
 	;
 /*}}}*/
+
+reserved_functions:
+	eval_function
+	;
+
+
+eval_function:
+	EVAL '(' expression ')'
+		{
+			g_op->eval();
+		}
+	;
 
 postfix_object:/*{{{*/
 	  postfix_object '.' name_or_string

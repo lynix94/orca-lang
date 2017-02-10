@@ -56,6 +56,7 @@ public:
 	void rotate();
 	void dup();
 	void dup2();
+	void eval();
 	void do_scope_start();
 	void do_scope_end();
 

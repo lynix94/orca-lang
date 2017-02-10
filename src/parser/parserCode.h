@@ -74,6 +74,7 @@ public:
 
 	// for interpreter
 	void interpret(orcaVM* vm);
+	void eval(orcaVM* vm);
 	void init_current();
 
 	void set_argv_on();

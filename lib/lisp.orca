@@ -172,7 +172,7 @@ def compile(src)
 	return (code, ..fmap);
 }
 
-parse def parse_code(src)
+def.parse parse_code(src)
 {
 	stmt:	expr_list
 		;

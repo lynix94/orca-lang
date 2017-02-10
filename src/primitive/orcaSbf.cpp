@@ -107,7 +107,7 @@ orcaSbf::~orcaSbf()
 
 	m_local->decrease(false);
 	delete m_local;
-	if (is_interactive()) {
+	if (is_interactive() || is_eval()) {
 		free(m_code);
 	}
 }

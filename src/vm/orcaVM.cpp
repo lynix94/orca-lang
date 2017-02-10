@@ -637,6 +637,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 	if (current == NULL) current = g_root;
 
 	for(int i=0; i<size; i++) {
+		PRINT1("[%02x] ", (unsigned char)*(c + i));
 		switch((unsigned char)c[i])
 		{
 		case OP_DEF_START: // this, flag, len, cp
@@ -665,6 +666,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			PRINT0("\t\t DEF END\n");
 			o = v[v.size()-1];
 			current = o;
+			m_curr = o;
 			v.pop_back();
 			break;
 
@@ -844,7 +846,6 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 				orcaData out = do_context(mod, name, code, last_write_time);
 				current->insert_member(name, out);
 			}
-
 		} // switch
 	} // for
 
@@ -1255,6 +1256,19 @@ do_assign_list:
 				m_stack->dup2();
 				break;
 
+			case OP_EVAL:
+				PRINT1("\t\t%p : eval\n", c);
+				p1 = m_stack->pop();
+				if (is<TYPE_STR>(p1) == false) {
+					throw orcaException(this, "orca.type", "eval parameter should be a string");
+					break;
+				}
+
+				d = eval(this, p1.s());
+				d.dump();
+				m_stack->push(d);
+				break;
+
 			case OP_NOT:
 				PRINT1("\t\t%p : not\n", c);
 				if (m_stack->pop().i() == 1) {
@@ -1263,7 +1277,6 @@ do_assign_list:
 				else {
 					m_stack->push(true);
 				}
-				
 				break;
 
 			case OP_JMP_TRUE:	
@@ -2071,7 +2084,7 @@ do_assign_list:
 
 			case OP_POP_STACK:
 				PRINT1("\t\t%p : remove stack\n", c);
-				if (is_interactive()) {
+				if (is_interactive() || is_eval()) {
 					g_last_pop_stack = m_stack->pop();
 				}
 				else {
@@ -2309,7 +2322,7 @@ do_assign_list:
 				int rule = TO_INT(&c[1+sizeof(int)+sizeof(int)]);
 
 				char* new_code = const_cast<char*>(code);
-				if (is_interactive()) {
+				if (is_interactive() || is_eval()) {
 					int size = c - code;
 					new_code = g_codes.new_code(size);
 					memcpy(new_code, code, size);
@@ -2627,7 +2640,11 @@ orcaData orcaVM::do_context(const char* mod, const char* name, const char* cp, t
 	bool ret;
 
 	ret = g_root->has_member(mod, out);
-	if (ret == false) return NIL;
+	if (ret == false) {
+		printf("ERROR: module %s (for context) not found\n", mod);
+		return NIL;
+	}
+
 	modp = out.Object();
 
 	// set last write time

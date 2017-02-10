@@ -15,6 +15,8 @@
 #include <string>
 #include <vector>
 
+#include "orcaData.h"
+
 using namespace std;
 
 typedef vector<const char*> name_list_t;
@@ -60,9 +62,12 @@ void parse_init();
 void parse_cleanup();
 bool parse(const string& filename);
 bool interpret(orcaVM* vm);
+orcaData eval(orcaVM* vm, const string& src);
 
 void set_interactive(bool flag);
 bool is_interactive();
+void set_eval(bool flag);
+bool is_eval();
 
 char* parser_alloc(size_t size);
 const char* parser_strdup(const char* str);

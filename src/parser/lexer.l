@@ -105,6 +105,9 @@ throw				{ return THROW; }
 nil					{ return NIL_; }
 parallel			{ return PARALLEL; }
 
+eval				{ return EVAL; }
+
+
 
 "||"				{ return OR; }
 "&&"				{ return AND; }
@@ -125,6 +128,8 @@ parallel			{ return PARALLEL; }
 
 "->"				{ return RIGHT_ARROW; }
 "<-"				{ return LEFT_ARROW; }
+
+
 
 [a-zA-Z_][a-zA-Z0-9_]*	{
 						yylval.cp = parser_strdup(yytext);

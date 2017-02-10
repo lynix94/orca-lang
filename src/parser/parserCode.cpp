@@ -154,7 +154,22 @@ parserCode::~parserCode() /*{{{*/
 		m_ch.frame_size = htols(m_lvar.size());
 		m_ch.argument_size = htols(m_ch.argument_size);
 
-		if (!is_interactive()) {
+		if (is_interactive() || is_eval()) {
+			m_def.push_back(OP_DEF_CODE);
+
+			// create code block
+			m_code.push_back(OP_RETURN_NIL);
+			char* new_code = new char[m_code.size()];
+			char* b = ll2l((long long)new_code);
+
+			copy(b, b+sizeof(long long), back_inserter(m_def));
+			// set header
+			copy((char*)&m_ch, (char*)&m_ch+sizeof(CodeHeader), m_code.begin());
+
+			// real code copy & return
+			copy(m_code.begin(), m_code.end(), new_code);
+		}
+		else {
 			m_def.push_back(OP_DEF_CODE);
 
 			// code size & code
@@ -175,25 +190,23 @@ parserCode::~parserCode() /*{{{*/
 			copy(m_code.begin() + sizeof(CodeHeader), m_code.end(), back_inserter(m_codeFinal));
 			m_codeFinal.push_back(OP_RETURN_NIL);
 		}
-		else {
-			m_def.push_back(OP_DEF_CODE);
-
-			// create code block
-			m_code.push_back(OP_RETURN_NIL);
-			char* new_code = new char[m_code.size()];
-			char* b = ll2l((long long)new_code);
-
-			copy(b, b+sizeof(long long), back_inserter(m_def));
-			// set header
-			copy((char*)&m_ch, (char*)&m_ch+sizeof(CodeHeader), m_code.begin());
-
-			// real code copy & return
-			copy(m_code.begin(), m_code.end(), new_code);
-		}
 	}
 
 	if (!m_init.empty()) {
-		if (!is_interactive()) {
+		if (is_interactive() || is_eval()) {
+			m_def.push_back(OP_DEF_INIT);
+
+			// create code block
+			m_init.push_back(OP_RETURN_NIL);
+			char* new_code = new char[m_init.size()];
+			char* b = ll2l((long long)new_code);
+
+			copy(b, b+sizeof(long long), back_inserter(m_def));
+
+			// real code copy & return
+			copy(m_init.begin(), m_init.end(), new_code);
+		}
+		else { // parse
 			m_def.push_back(OP_DEF_INIT);
 
 			// code size & code
@@ -211,19 +224,6 @@ parserCode::~parserCode() /*{{{*/
 			copy(m_init.begin(), m_init.end(), back_inserter(m_codeFinal));
 			m_codeFinal.push_back(OP_RETURN_NIL);
 		}
-		else {
-			m_def.push_back(OP_DEF_INIT);
-
-			// create code block
-			m_init.push_back(OP_RETURN_NIL);
-			char* new_code = new char[m_init.size()];
-			char* b = ll2l((long long)new_code);
-
-			copy(b, b+sizeof(long long), back_inserter(m_def));
-
-			// real code copy & return
-			copy(m_init.begin(), m_init.end(), new_code);
-		}
 	}
 
 	m_def.push_back(OP_DEF_END);
@@ -240,7 +240,20 @@ void parserCode::make_super(int super_n) /*{{{*/
 	ch.frame_size = htols(m_lvar.size());
 	ch.argument_size = htols(m_ch.argument_size);
 
-	if (!is_interactive()) {
+	if (is_interactive() || is_eval()) {
+		// create code block
+		m_code.push_back(OP_RETURN);
+		char* new_code = new char[m_code.size()];
+		char* b = new_code;
+		copy(b, b+sizeof(char*), back_inserter(m_def));
+
+		// set header
+		copy((char*)&ch, (char*)&ch+sizeof(CodeHeader), m_code.begin());
+
+		// real code copy & return
+		copy(m_code.begin(), m_code.end(), new_code);
+	}
+	else {
 		// code size & code (add root code header for excact index)
 		char* b = i2l(m_codeFinal.size() + sizeof(CodeHeader));
 		copy(b, b+sizeof(char*), back_inserter(m_def));
@@ -254,19 +267,6 @@ void parserCode::make_super(int super_n) /*{{{*/
 
 		// and clean up code
 		m_code.resize(sizeof(CodeHeader));
-	}
-	else {
-		// create code block
-		m_code.push_back(OP_RETURN);
-		char* new_code = new char[m_code.size()];
-		char* b = new_code;
-		copy(b, b+sizeof(char*), back_inserter(m_def));
-
-		// set header
-		copy((char*)&ch, (char*)&ch+sizeof(CodeHeader), m_code.begin());
-
-		// real code copy & return
-		copy(m_code.begin(), m_code.end(), new_code);
 	}
 }
 /*}}}*/
@@ -309,6 +309,7 @@ char* parserCode::find_in_space(const char* s) /*{{{*/
 }
 /*}}}*/
 
+
 void parserCode::reg_object(const char* s, int flag_define) /*{{{*/
 {
 	m_def.push_back(OP_REG);
@@ -319,7 +320,7 @@ void parserCode::reg_object(const char* s, int flag_define) /*{{{*/
 }
 /*}}}*/
 
-void parserCode::do_context(const char* mod, const char* name, const char* code)
+void parserCode::do_context(const char* mod, const char* name, const char* code)/*{{{*/
 {
 	int len;
 
@@ -340,6 +341,7 @@ void parserCode::do_context(const char* mod, const char* name, const char* code)
 	copy(cp, cp+sizeof(int), back_inserter(m_def));
 	copy(code, code + len, back_inserter(m_def));
 }
+/*}}}*/
 
 void parserCode::init_object_start(const char* s) /*{{{*/
 {
@@ -559,7 +561,52 @@ void parserCode::dump() /*{{{*/
 void parserCode::interpret(orcaVM* vm)/*{{{*/
 {
 	if (m_def.size()) {
-		vm->exec_define(&m_def[0], m_def.size(), NULL, NULL, 0);
+		if (!m_init.empty()) {
+			m_def.push_back(OP_DEF_INIT);
+
+			// create code block
+			m_init.push_back(OP_RETURN_NIL);
+			char* new_init = new char[m_init.size()];
+			char* b = ll2l((long long)new_init);
+
+			copy(b, b+sizeof(long long), back_inserter(m_def));
+
+			// real code copy & return
+			copy(m_init.begin(), m_init.end(), new_init);
+		}
+		
+		char* new_def = new char[m_def.size()];
+		copy(m_def.begin(), m_def.end(), new_def);
+		
+		vm->exec_define(new_def, m_def.size(), NULL, NULL, 0);
+	}
+
+	vm->exec_code(&m_code[0]);
+}
+/*}}}*/
+
+void parserCode::eval(orcaVM* vm)/*{{{*/
+{
+	if (m_def.size()) {
+
+		if (!m_init.empty()) {
+			m_def.push_back(OP_DEF_INIT);
+
+			// create code block
+			m_init.push_back(OP_RETURN_NIL);
+			char* new_code = new char[m_init.size()];
+			char* b = ll2l((long long)new_code);
+
+			copy(b, b+sizeof(long long), back_inserter(m_def));
+
+			// real code copy & return
+			copy(m_init.begin(), m_init.end(), new_code);
+		}
+		
+		char* new_def = new char[m_def.size()];
+		copy(m_def.begin(), m_def.end(), new_def);
+		
+		vm->exec_define(new_def, m_def.size(), NULL, vm->m_curr, 0);
 	}
 
 	vm->exec_code(&m_code[0]);
@@ -567,10 +614,10 @@ void parserCode::interpret(orcaVM* vm)/*{{{*/
 /*}}}*/
 
 
-
 void parserCode::init_current() /*{{{*/
 {
 	m_def.clear();
+	m_init.clear();
 	m_code.resize(sizeof(CodeHeader));
 }
 /*}}}*/

@@ -2811,7 +2811,7 @@ but, It contains it's lexical analyser in it.
 
 
 <div class="code"><pre>
-parse def calc(str)
+def.parse calc(str)
    {
        stmt : stmt '+' mul
                    %c{
@@ -2880,7 +2880,7 @@ handle means It get it's text code and compile and make result object itself.
 
 
 <div class="code"><pre>
-a = %cpp{
+a = def.cpp {
   // this is cpp code
   cout << "hello, " << argv[0].String() << endl;
 };
@@ -2888,7 +2888,7 @@ a = %cpp{
 a('world');
 </pre></div>
 
-<p>this code prints 'hello, world'. and internal codes in %cpp{ ... } is written by C++ language.
+<p>this code prints 'hello, world'. and internal codes in def.cpp { ... } is written by C++ language.
 If %name{ statement } is appear, Orca call name module and pass statement code, timestamp of source code and unique name.
 That means orca call cpp(statement, unique_name, source_datetime)
 

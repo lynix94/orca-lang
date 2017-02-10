@@ -576,13 +576,7 @@ void orcaObject::member_dump()
 
 void orcaObject::set_name(const char* name)
 {
-	if (is_interactive()) {
-		m_name = strdup(name);
-	}
-	else {
-		m_name = name;
-	}
-
+	m_name = name;
 	make_original();
 }
 

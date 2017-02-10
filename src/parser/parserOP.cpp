@@ -197,6 +197,11 @@ void parserOP::dup2()
 	code_top->push_char(OP_DUP2);
 }
 
+void parserOP::eval()
+{
+	code_top->push_char(OP_EVAL);
+}
+
 void parserOP::do_rc_inc()		
 {
 	code_top->push_char(OP_RC_INC); 
