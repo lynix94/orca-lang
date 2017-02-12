@@ -13,7 +13,7 @@
 
 #include "orcaList.h"
 #include "orcaStack.h"
-#include "parser_common.h"
+#include "parserParser.h"
 
 #define TO_SBF(a)	static_cast<orcaSbf*>(a)
 

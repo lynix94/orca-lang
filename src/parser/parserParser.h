@@ -2,13 +2,13 @@
 
 /**********************************************************************
 
-  parser_common.h - common routine & utils
+  parserParser.h - common routine & utils
 
   Copyright (C) 2009-2011 Lee, Ki-Yeul
 
 **********************************************************************/
-#ifndef _DEF_PARSER_COMMON
-#define _DEF_PARSER_COMMON
+#ifndef _DEF_PARSER_PARSER
+#define _DEF_PARSER_PARSER
 
 // lex, yacc function
 #include <FlexLexer.h>
@@ -58,21 +58,47 @@ class orcaVM;
 void print(const char* fmt, ...);
 void hex_dump(unsigned char* data, int len);
 
-void parse_init();
-void parse_cleanup();
-bool parse(const string& filename);
-bool interpret(orcaVM* vm);
-orcaData eval(orcaVM* vm, const string& src);
 
-void set_interactive(bool flag);
-bool is_interactive();
-void set_eval(bool flag);
-bool is_eval();
+class parserParser
+{
+public:
+	void init();
+	void cleanup();
 
-char* parser_alloc(size_t size);
-const char* parser_strdup(const char* str);
-name_list_t* parser_new_name_list();
-void parser_free_all();
+	bool parse(const string& filename);
+	bool interpret(orcaVM* vm);
+	orcaData eval(orcaVM* vm, const string& src);
+
+	void set_interactive(bool flag);
+	bool is_interactive();
+	void set_eval(bool flag);
+	bool is_eval();
+
+
+	char* alloc(size_t size);
+	const char* strdup(const char* str);
+	name_list_t* new_name_list();
+	void free_all();
+
+public:
+	FILE* curr_fp;
+	int lineno;
+	string filename;
+	string module_name;
+
+
+	bool flag_interactive;
+	bool flag_eval;
+
+private:
+	vector<const char*> s_pool;
+	vector<name_list_t*> s_pool_nl;
+};
+
+extern parserParser* g_parser;
+
+
+
 
 #endif
 

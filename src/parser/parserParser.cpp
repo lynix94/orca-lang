@@ -2,7 +2,7 @@
 
 /**********************************************************************
 
-  parser_common.c - common routine & utils
+  parserParser.cpp - common routine & utils
 
   Copyright (C) 2009-2011 Lee, Ki-Yeul
 
@@ -14,10 +14,13 @@
 #include <string.h>
 #include <ctype.h> // tolower
 
-#include "parser_common.h"
+#include "parserParser.h"
 #include "parserCode.h"
 #include "orcaException.h"
 #include "orcaVM.h"
+
+parserParser s_parser;
+parserParser* g_parser = &s_parser;
 
 FILE* parser_curr_fp;
 int parser_lineno = 1;
@@ -39,7 +42,7 @@ int yyFlexLexer::yywrap()/*{{{*/
 void yyerror(const char* s)/*{{{*/
 {
 	print("[%s - %d]%s, nearby('%s')\n", parser_filename.c_str(), parser_lineno, s, yytext);
-	if (!is_interactive() and !is_eval()) {
+	if (!g_parser->is_interactive() and !g_parser->is_eval()) {
 		exit(0);
 	}
 }/*}}}*/
@@ -70,25 +73,32 @@ void hex_dump(unsigned char* data, int len)/*{{{*/
 }
 /*}}}*/
 
-void parse_init()/*{{{*/
+void parserParser::init()/*{{{*/
 {
 	if (lexer != NULL) delete lexer;
 	lexer = new yyFlexLexer;
-	parser_free_all();
+	free_all();
+
+	curr_fp = NULL;
+	lineno = 1;
+	filename = "";
+	module_name = "";
+	//flag_interactive = false;
+	flag_eval = false;
 }
 /*}}}*/
 
-void parse_cleanup()/*{{{*/
+void parserParser::cleanup()/*{{{*/
 {
 	if (lexer != NULL) delete lexer;
 	lexer = NULL;
-	parser_free_all();
+	free_all();
 }
 /*}}}*/
 
 
 
-bool parse(const string& filename)/*{{{*/
+bool parserParser::parse(const string& filename)/*{{{*/
 {
 	// open
 	parser_curr_fp = fopen(filename.c_str(), "r");
@@ -112,7 +122,7 @@ bool parse(const string& filename)/*{{{*/
 	code_top->set_argv_on();	// enable argv 
 
 	// parse
-	parse_init();
+	init();
 	if (yyparse() != 0) {
 		return false;
 	}
@@ -127,7 +137,7 @@ bool parse(const string& filename)/*{{{*/
 
 	// clean up
 	fclose(parser_curr_fp);
-	parser_free_all();
+	free_all();
 	return true;
 }
 
@@ -137,7 +147,7 @@ bool parse(const string& filename)/*{{{*/
 
 extern orcaData g_last_pop_stack;
 
-orcaData eval(orcaVM* vm, const string& src)/*{{{*/
+orcaData parserParser::eval(orcaVM* vm, const string& src)/*{{{*/
 {
 	set_eval(true);
 
@@ -152,7 +162,7 @@ orcaData eval(orcaVM* vm, const string& src)/*{{{*/
 	// parse
 	int rv;
 	try {
-		parse_init();
+		init();
 		rv = yyparse();
 
 		if (rv == 0) {
@@ -178,7 +188,7 @@ orcaData eval(orcaVM* vm, const string& src)/*{{{*/
 }
 /*}}}*/
 
-bool interpret(orcaVM* vm)/*{{{*/
+bool parserParser::interpret(orcaVM* vm)/*{{{*/
 {
 	parser_curr_fp = stdin;
 
@@ -191,7 +201,7 @@ bool interpret(orcaVM* vm)/*{{{*/
 	int rv;
 	do {
 		try {
-			parse_init();
+			init();
 
 			rv = yyparse();
 
@@ -224,6 +234,74 @@ bool interpret(orcaVM* vm)/*{{{*/
 }
 /*}}}*/
 
+void parserParser::set_interactive(bool flag)/*{{{*/
+{
+	flag_interactive = flag;
+}
+/*}}}*/
+
+bool parserParser::is_interactive()/*{{{*/
+{
+	return flag_interactive;
+}
+/*}}}*/
+
+void parserParser::set_eval(bool flag)/*{{{*/
+{
+	flag_eval = flag;
+}
+/*}}}*/
+bool parserParser::is_eval()/*{{{*/
+{
+	return flag_eval;
+}
+/*}}}*/
+
+char* parserParser::alloc(size_t size)/*{{{*/
+{
+	char* cp = (char*)malloc(size);
+	s_pool.push_back(cp);
+	return cp;
+}
+/*}}}*/
+
+const char* parserParser::strdup(const char* str)/*{{{*/
+{
+	const char* cp = (const char*)strdup((char*)str);
+	s_pool.push_back(cp);
+	return cp;
+}
+/*}}}*/
+
+name_list_t* parserParser::new_name_list()/*{{{*/
+{
+	name_list_t* np = new name_list_t;
+	s_pool_nl.push_back(np);
+	return np;
+}
+/*}}}*/
+
+void parserParser::free_all()/*{{{*/
+{
+	vector<const char*>::iterator vi = s_pool.begin();
+	for (; vi!=s_pool.end(); ++vi) {
+		free ((char*)*vi);
+	}
+	s_pool.clear();
+
+	vector<name_list_t*>::iterator it = s_pool_nl.begin();
+	for (; it!=s_pool_nl.end(); ++it) {
+		delete *it;
+	}
+	s_pool_nl.clear();
+}
+/*}}}*/
+
+
+
+
+// common files
+// defined at orca_common.h 
 char* ll2l(long long i) /*{{{*/
 {
 	static char byte[8];
@@ -327,75 +405,6 @@ short ltohs(short in)/*{{{*/
 #else
 	return in;
 #endif
-}
-/*}}}*/
-
-static bool g_interactive = false;
-static bool g_eval = false;
-
-void set_interactive(bool flag)/*{{{*/
-{
-	g_interactive = flag;
-}
-/*}}}*/
-
-bool is_interactive()/*{{{*/
-{
-	return g_interactive;
-}
-/*}}}*/
-
-void set_eval(bool flag)
-{
-	g_eval = flag;
-}
-
-bool is_eval()/*{{{*/
-{
-	return g_eval;
-}
-/*}}}*/
-
-static vector<const char*> s_pool;
-static vector<name_list_t*> s_pool_nl;
-
-char* parser_alloc(size_t size)/*{{{*/
-{
-	char* cp = (char*)malloc(size);
-	s_pool.push_back(cp);
-	return cp;
-}
-/*}}}*/
-
-const char* parser_strdup(const char* str)/*{{{*/
-{
-	const char* cp = (const char*)strdup((char*)str);
-	s_pool.push_back(cp);
-	return cp;
-}
-/*}}}*/
-
-name_list_t* parser_new_name_list()/*{{{*/
-{
-	name_list_t* np = new name_list_t;
-	s_pool_nl.push_back(np);
-	return np;
-}
-/*}}}*/
-
-void parser_free_all()/*{{{*/
-{
-	vector<const char*>::iterator vi = s_pool.begin();
-	for (; vi!=s_pool.end(); ++vi) {
-		free ((char*)*vi);
-	}
-	s_pool.clear();
-
-	vector<name_list_t*>::iterator it = s_pool_nl.begin();
-	for (; it!=s_pool_nl.end(); ++it) {
-		delete *it;
-	}
-	s_pool_nl.clear();
 }
 /*}}}*/
 

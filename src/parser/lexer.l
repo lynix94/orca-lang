@@ -20,7 +20,7 @@ using namespace std;
 
 int my_yyinput(char* buff, int max_size);
 
-#include "parser_common.h"
+#include "parserParser.h"
 #include "parser.hpp"
 #include "orca_common.h"
 
@@ -132,7 +132,7 @@ eval				{ return EVAL; }
 
 
 [a-zA-Z_][a-zA-Z0-9_]*	{
-						yylval.cp = parser_strdup(yytext);
+						yylval.cp = g_parser->strdup(yytext);
 						return NAME; 
 					}
 
@@ -155,7 +155,7 @@ eval				{ return EVAL; }
 						}
 
 						if (f_overflow) {
-							yylval.cp = parser_strdup(yytext);
+							yylval.cp = g_parser->strdup(yytext);
 
 							if (minus) {
 								return MINUS_BIG_NUMBER; 
@@ -185,7 +185,7 @@ eval				{ return EVAL; }
 						unsigned long long val = 0;
 						while (c[i] != '\0') {
 							if (val > UINT_MAX) {
-								yylval.cp = parser_strdup(yytext);
+								yylval.cp = g_parser->strdup(yytext);
 								if (minus) {
 									return MINUS_BIG_NUMBER; 
 								}
@@ -223,7 +223,7 @@ eval				{ return EVAL; }
 						unsigned long long val = 0;
 						while (c[i] != '\0') {
 							if (val > UINT_MAX) {
-								yylval.cp = parser_strdup(yytext);
+								yylval.cp = g_parser->strdup(yytext);
 								if (minus) {
 									return MINUS_BIG_NUMBER; 
 								}
@@ -398,7 +398,7 @@ int my_yyinput(char* buff, int max_size)/*{{{*/
 retry:
 
 #ifdef WIN32
-	if (is_interactive()) {
+	if (g_parser->is_interactive()) {
 	    parser_curr_fp = stdin;
 		printf("$ ");
 	}
@@ -410,7 +410,7 @@ retry:
 		n = strlen(buff);
 	}
 #else
-	if (is_interactive()) {
+	if (g_parser->is_interactive()) {
 		char *cp, *line = readline("$ ");
 		if (line != NULL) {
 			for(cp = line; isspace(*cp); cp++);
@@ -453,7 +453,7 @@ retry:
 	}
 
 
-	if (is_interactive()) {
+	if (g_parser->is_interactive()) {
 		if (g_shell_start) {
 			buff[n++] = -1;
 			buff[n] = 0;
@@ -549,7 +549,7 @@ static const char* get_string(char end)/*{{{*/
 		g_format_string = 0;
 	}
 
-	return parser_strdup(str.c_str());
+	return g_parser->strdup(str.c_str());
 }
 /*}}}*/
 
@@ -597,7 +597,7 @@ static const char* get_comment(char end)/*{{{*/
 		str += c;
 	}
 
-	return parser_strdup(str.c_str());
+	return g_parser->strdup(str.c_str());
 }
 /*}}}*/
 
@@ -630,7 +630,7 @@ const char* get_context()/*{{{*/
 		str += c;
 	}
 
-	return parser_strdup(str.c_str());
+	return g_parser->strdup(str.c_str());
 }
 /*}}}*/
 static const char* get_hex_string(char end)/*{{{*/
@@ -668,7 +668,7 @@ static const char* get_hex_string(char end)/*{{{*/
 		out += h<<4 | l;
 	}
 
-	return parser_strdup(out.c_str());
+	return g_parser->strdup(out.c_str());
 }
 /*}}}*/
 
@@ -710,7 +710,7 @@ static const char* get_bin_string(char end)/*{{{*/
 		out += val;
 	}
 
-	return parser_strdup(out.c_str());
+	return g_parser->strdup(out.c_str());
 }
 /*}}}*/
 

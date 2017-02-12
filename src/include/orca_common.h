@@ -69,7 +69,7 @@ struct CodeHeader
 	char  flag_argv;
 };
 
-// impl at parser_common.cpp
+// impl at parserParser.cpp
 char* ll2l(long long i);
 char* i2l(int i);
 char* s2l(short s);

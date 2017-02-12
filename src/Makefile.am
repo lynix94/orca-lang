@@ -33,7 +33,7 @@ lib_LTLIBRARIES = liborca.la
 liborca_la_SOURCES = \
 		$(PARSER_DIR)/parser.cpp \
 		$(PARSER_DIR)/lexer.cpp \
-		$(PARSER_DIR)/parser_common.cpp \
+		$(PARSER_DIR)/parserParser.cpp \
 		$(PARSER_DIR)/parserCode.cpp \
 		$(PARSER_DIR)/parserControl.cpp \
 		$(PARSER_DIR)/parserException.cpp \

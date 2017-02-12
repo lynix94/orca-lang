@@ -20,7 +20,7 @@
 #include <limits.h>
 #include <vector>
 
-#include "parser_common.h"
+#include "parserParser.h"
 
 #include "parserCode.h"
 #include "parserControl.h"
@@ -436,7 +436,7 @@ object_path:/*{{{*/
 		{
 			char buff[1024];
 			sprintf(buff, "%s.%s", $1, $3);
-			$$ = parser_strdup(buff);
+			$$ = g_parser->strdup(buff);
 		}
 	| name_or_string
 		{
@@ -909,7 +909,7 @@ lambda_define_header:
 			static int count = 1;
 			char buff[256];
 			sprintf(buff, "#%d_lambda", count++);
-			const char* name = parser_strdup(buff);
+			const char* name = g_parser->strdup(buff);
 			parserCode::push_code_stack(name, vp, $1);
 
 			if (flag_argv == true) {
@@ -941,7 +941,7 @@ lambda_decode_header:
 			static int count = 1;
 			char buff[256];
 			sprintf(buff, "#%d_decode_lambda", count++);
-			const char* name = parser_strdup(buff);
+			const char* name = g_parser->strdup(buff);
 			parserCode::push_code_stack(name, vp, $1);
 
 			if (flag_argv == true) {
@@ -973,7 +973,7 @@ lambda_parse_header:
 			static int count = 1;
 			char buff[256];
 			sprintf(buff, "#%d_parse_lambda", count++);
-			const char* name = parser_strdup(buff);
+			const char* name = g_parser->strdup(buff);
 			parserCode::push_code_stack(name, vp);
 			g_parse->do_parse_init();
 
@@ -1005,7 +1005,7 @@ opt_argument_list:/*{{{*/
 		}
 	| '(' TRIPLE_DOT ')'	
 		{
-			name_list_t* vs = parser_new_name_list();
+			name_list_t* vs = g_parser->new_name_list();
 			vs->push_back("...");
 			$$ = vs;
 		}
@@ -1031,7 +1031,7 @@ name_list:/*{{{*/
 		}
 	| name
 		{
-			name_list_t* vs = parser_new_name_list();
+			name_list_t* vs = g_parser->new_name_list();
 			vs->push_back($1);
 			$$ = vs;
 		}

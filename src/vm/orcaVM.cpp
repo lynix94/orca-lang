@@ -66,7 +66,7 @@ namespace fs = boost::filesystem;
 #include "orcaObjectParents.h"
 
 // parser
-#include "parser_common.h"
+#include "parserParser.h"
 #include "parserParse.h"
 
 // core
@@ -1264,7 +1264,7 @@ do_assign_list:
 					break;
 				}
 
-				d = eval(this, p1.s());
+				d = g_parser->eval(this, p1.s());
 				d.dump();
 				m_stack->push(d);
 				break;
@@ -2084,7 +2084,7 @@ do_assign_list:
 
 			case OP_POP_STACK:
 				PRINT1("\t\t%p : remove stack\n", c);
-				if (is_interactive() || is_eval()) {
+				if (g_parser->is_interactive() || g_parser->is_eval()) {
 					g_last_pop_stack = m_stack->pop();
 				}
 				else {
@@ -2322,7 +2322,7 @@ do_assign_list:
 				int rule = TO_INT(&c[1+sizeof(int)+sizeof(int)]);
 
 				char* new_code = const_cast<char*>(code);
-				if (is_interactive() || is_eval()) {
+				if (g_parser->is_interactive() || g_parser->is_eval()) {
 					int size = c - code;
 					new_code = g_codes.new_code(size);
 					memcpy(new_code, code, size);
@@ -2786,10 +2786,10 @@ bool orcaVM::load(const string& input_name, orcaObject* parent) /*{{{*/
 		if (need_recompile) {
 			if (fp_kw) fclose(fp_kw);
 
-			bool back = is_interactive();
-			set_interactive(false);
-			bool ret = parse(new_name);
-			set_interactive(back);
+			bool back = g_parser->is_interactive();
+			g_parser->set_interactive(false);
+			bool ret = g_parser->parse(new_name);
+			g_parser->set_interactive(back);
 
 			if (!ret) {
 				cout << "compile error: " << input_name << endl;
@@ -2960,9 +2960,9 @@ void orcaVM::set_caller(orcaObject* o)/*{{{*/
 
 int orca_launch_module(orcaVM* vm, char* module, int argc, char** argv)/*{{{*/
 {
-	set_interactive(false);
+	g_parser->set_interactive(false);
 
-	parse_init();
+	g_parser->init();
 
 	vm->m_module = g_root;
 	vm->m_curr = g_root;
@@ -3025,7 +3025,7 @@ int orca_launch_module(orcaVM* vm, char* module, int argc, char** argv)/*{{{*/
 		exit(-1);
 	}
 
-	parse_cleanup();
+	g_parser->cleanup();
 	if (flag_cd) chdir(cwd.string().c_str());
 	return 1;
 }
@@ -3033,17 +3033,17 @@ int orca_launch_module(orcaVM* vm, char* module, int argc, char** argv)/*{{{*/
 
 int orca_launch_interpreter(orcaVM* vm)/*{{{*/
 {
-	set_interactive(true);
+	g_parser->set_interactive(true);
 	vm->reserve_local();
 
-	parse_init();
+	g_parser->init();
 
 	vm->m_module = g_root;
 	vm->m_curr = g_root;
 
-	interpret(vm);
+	g_parser->interpret(vm);
 
-	parse_cleanup();
+	g_parser->cleanup();
 	return 1;
 }
 /*}}}*/

@@ -11,7 +11,7 @@
 
 #include "orca_opcode.h"
 #include "parserCode.h"
-#include "parser_common.h"
+#include "parserParser.h"
 #include "parserOP.h"
 #include "orcaVM.h"
 
@@ -154,7 +154,7 @@ parserCode::~parserCode() /*{{{*/
 		m_ch.frame_size = htols(m_lvar.size());
 		m_ch.argument_size = htols(m_ch.argument_size);
 
-		if (is_interactive() || is_eval()) {
+		if (g_parser->is_interactive() || g_parser->is_eval()) {
 			m_def.push_back(OP_DEF_CODE);
 
 			// create code block
@@ -193,7 +193,7 @@ parserCode::~parserCode() /*{{{*/
 	}
 
 	if (!m_init.empty()) {
-		if (is_interactive() || is_eval()) {
+		if (g_parser->is_interactive() || g_parser->is_eval()) {
 			m_def.push_back(OP_DEF_INIT);
 
 			// create code block
@@ -240,7 +240,7 @@ void parserCode::make_super(int super_n) /*{{{*/
 	ch.frame_size = htols(m_lvar.size());
 	ch.argument_size = htols(m_ch.argument_size);
 
-	if (is_interactive() || is_eval()) {
+	if (g_parser->is_interactive() || g_parser->is_eval()) {
 		// create code block
 		m_code.push_back(OP_RETURN);
 		char* new_code = new char[m_code.size()];
