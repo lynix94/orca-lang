@@ -267,7 +267,7 @@ char* parserParser::alloc(size_t size)/*{{{*/
 
 const char* parserParser::strdup(const char* str)/*{{{*/
 {
-	const char* cp = (const char*)strdup((char*)str);
+	const char* cp = (const char*)::strdup((char*)str);
 	s_pool.push_back(cp);
 	return cp;
 }
