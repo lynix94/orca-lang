@@ -176,7 +176,12 @@ void thread_pool::set_stop(pthread_t tid)
 {
 	PRINT1("thread stop, tid:%d\n", (int)tid);
 	m_mutex_done.lock();
+
+	// shoud be protected by same mutex (with m_mutex_start)
+	m_mutex_start.lock();
 	dec_run(tid);
+	m_mutex_start.unlock();
+
 	m_cond_done.signal();
 	m_mutex_done.unlock();
 
