@@ -855,7 +855,7 @@ lambda_object:/*{{{*/
 			// for serial tagging
 			static int count = 1;
 			char name[256];
-			sprintf(name, "__%s_%d_context", g_parse_module_name.c_str(), count++);
+			sprintf(name, "__%s_%d_context", g_parser->module_name.c_str(), count++);
 
 			const char* cp = get_context();
 			//print("get_context(): '%s'\n", cp);

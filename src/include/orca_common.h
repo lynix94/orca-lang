@@ -16,7 +16,7 @@
 
 using namespace std;
 
-#define _VM_DEBUG_
+//#define _VM_DEBUG_
 
 #ifdef _VM_DEBUG_
 #define PRINT0(f)				printf(f)

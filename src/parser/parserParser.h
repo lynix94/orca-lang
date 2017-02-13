@@ -21,11 +21,6 @@ using namespace std;
 
 typedef vector<const char*> name_list_t;
 
-extern FILE* parser_curr_fp;
-extern int parser_lineno;
-extern string g_parse_module_name;
-
-
 extern yyFlexLexer *lexer;
 
 void yyerror(const char* s);
@@ -62,6 +57,8 @@ void hex_dump(unsigned char* data, int len);
 class parserParser
 {
 public:
+	parserParser();
+
 	void init();
 	void cleanup();
 

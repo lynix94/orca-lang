@@ -59,8 +59,8 @@ lf					\n
 {ws}				;
 {cpp_comment} 		; 
 {sharp_comment}		; 
-{crlf}				{ parser_lineno++; }
-{lf}				{ parser_lineno++; }
+{crlf}				{ g_parser->lineno++; }
+{lf}				{ g_parser->lineno++; }
 
 static				{ return STATIC; }
 def					{ return DEF; }
@@ -399,11 +399,10 @@ retry:
 
 #ifdef WIN32
 	if (g_parser->is_interactive()) {
-	    parser_curr_fp = stdin;
 		printf("$ ");
 	}
 
-	if (fgets(buff, max_size, parser_curr_fp) == NULL) {
+	if (fgets(buff, max_size, g_parser->curr_fp) == NULL) {
 		n = 0;
 	}
 	else {	
@@ -426,7 +425,7 @@ retry:
 		}
 	}
 	else {
-		if (fgets(buff, max_size, parser_curr_fp) == NULL) {
+		if (fgets(buff, max_size, g_parser->curr_fp) == NULL) {
 			n = 0;
 		}
 		else {
@@ -470,12 +469,12 @@ retry:
 			do {
 				printf("* ");
 				char add[1024*5];
-				if (fgets(add, sizeof(add), parser_curr_fp) == NULL) {
+				if (fgets(add, sizeof(add), g_parser->curr_fp) == NULL) {
 					break;
 				}
 
 				if (add[0] == '\r' || add[0] == '\n') {
-					parser_lineno++;
+					g_parser->lineno++;
 					break;
 				}
 
@@ -502,7 +501,7 @@ static const char* get_string(char end)/*{{{*/
 
 	while ((c = lexer->yyinput()) != end && c != 0 && c!= -1) {
 		if (c == '\r' || c == '\n') { 
-			parser_lineno++;
+			g_parser->lineno++;
 			break;
 		}
 
@@ -576,7 +575,7 @@ static const char* get_comment(char end)/*{{{*/
 		}
 
 		if (c == '\r' || c == '\n') { 
-			parser_lineno++;
+			g_parser->lineno++;
 		}
 
 		if (end == '\'' && c == '$') {
@@ -624,7 +623,7 @@ const char* get_context()/*{{{*/
 
 
 		if (c == '\r' || c == '\n') { 
-			parser_lineno++;
+			g_parser->lineno++;
 		}
 
 		str += c;
@@ -641,7 +640,7 @@ static const char* get_hex_string(char end)/*{{{*/
 
 	while ((c = lexer->yyinput()) != end && c != 0 && c!= -1) {
 		if (c == '\r' || c == '\n') { 
-			parser_lineno++;
+			g_parser->lineno++;
 			break;
 		}
 
@@ -680,7 +679,7 @@ static const char* get_bin_string(char end)/*{{{*/
 
 	while ((c = lexer->yyinput()) != end && c != 0 && c!= -1) {
 		if (c == '\r' || c == '\n') { 
-			parser_lineno++;
+			g_parser->lineno++;
 			break;
 		}
 

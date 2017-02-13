@@ -22,10 +22,6 @@
 parserParser s_parser;
 parserParser* g_parser = &s_parser;
 
-FILE* parser_curr_fp;
-int parser_lineno = 1;
-string parser_filename = "";
-string g_parse_module_name; // for context
 
 yyFlexLexer *lexer = NULL;
 
@@ -41,7 +37,7 @@ int yyFlexLexer::yywrap()/*{{{*/
 
 void yyerror(const char* s)/*{{{*/
 {
-	print("[%s - %d]%s, nearby('%s')\n", parser_filename.c_str(), parser_lineno, s, yytext);
+	print("[%s - %d]%s, nearby('%s')\n", g_parser->filename.c_str(), g_parser->lineno, s, yytext);
 	if (!g_parser->is_interactive() and !g_parser->is_eval()) {
 		exit(0);
 	}
@@ -73,18 +69,23 @@ void hex_dump(unsigned char* data, int len)/*{{{*/
 }
 /*}}}*/
 
+parserParser::parserParser()/*{{{*/
+{
+	curr_fp = NULL;
+	lineno = 1;
+	filename = "";
+	module_name = "";
+	flag_interactive = false;
+	flag_eval = false;
+}
+
+/*}}}*/
+
 void parserParser::init()/*{{{*/
 {
 	if (lexer != NULL) delete lexer;
 	lexer = new yyFlexLexer;
 	free_all();
-
-	curr_fp = NULL;
-	lineno = 1;
-	filename = "";
-	module_name = "";
-	//flag_interactive = false;
-	flag_eval = false;
 }
 /*}}}*/
 
@@ -97,13 +98,12 @@ void parserParser::cleanup()/*{{{*/
 /*}}}*/
 
 
-
 bool parserParser::parse(const string& filename)/*{{{*/
 {
 	// open
-	parser_curr_fp = fopen(filename.c_str(), "r");
-	parser_lineno = 1;
-	parser_filename = filename;
+	curr_fp = fopen(filename.c_str(), "r");
+	lineno = 1;
+	this->filename = filename;
 
 	// init
 	parserCode::init();
@@ -115,7 +115,7 @@ bool parserParser::parse(const string& filename)/*{{{*/
 	if (filename.rfind(".") > 0) 
 		module_name = module_name.substr( 0, module_name.rfind(".") );
 
-	g_parse_module_name = module_name;
+	this->module_name = module_name;
 
 	parserCode::push_code_stack((char*)module_name.c_str(), NULL, false);
 	code_top->find_lvar((char*)"argv");
@@ -136,7 +136,7 @@ bool parserParser::parse(const string& filename)/*{{{*/
 #endif
 
 	// clean up
-	fclose(parser_curr_fp);
+	fclose(curr_fp);
 	free_all();
 	return true;
 }
@@ -152,7 +152,7 @@ orcaData parserParser::eval(orcaVM* vm, const string& src)/*{{{*/
 	set_eval(true);
 
 	printf(">>> eval: %s\n", src.c_str());
-	parser_curr_fp = fmemopen((void*)src.c_str(), src.size(), "r");
+	curr_fp = fmemopen((void*)src.c_str(), src.size(), "r");
 
 	// init
 	parserCode::init();
@@ -190,7 +190,7 @@ orcaData parserParser::eval(orcaVM* vm, const string& src)/*{{{*/
 
 bool parserParser::interpret(orcaVM* vm)/*{{{*/
 {
-	parser_curr_fp = stdin;
+	curr_fp = stdin;
 
 	// init
 	parserCode::init();

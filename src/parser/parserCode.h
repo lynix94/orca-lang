@@ -29,6 +29,8 @@ public:
 	parserCode(const char* s);
 	parserCode(const char* s, vector<const char*>* param, int flag = 0);
 	~parserCode();
+	void pop_code();
+
 	static void init();
 
 	void using_object(const char* s, const char* by = NULL);
@@ -81,6 +83,14 @@ public:
 	const char* get_name();
 
 private:
+	void pop_and_process_code(bool interpret_or_eval = false);
+	void pop_and_process_init(bool interpret_or_eval = false);
+
+
+
+
+
+private:
 	map<string, short> m_lvar;
 
 	static map<string, string> m_space;	// search space
@@ -88,19 +98,20 @@ private:
 	static vector<char> m_def;
 	static vector<parserCode*> m_codeStack;
 
-	vector<char> m_code;
 	CodeHeader m_ch;
+	vector<char> m_code;
 
+	int m_init_begin; 
 	vector<char> m_init;
-	int m_init_begin;
 
+
+public:
 	string m_name;
 
 	// debug info
 	static vector<int> m_debugFinal;
 	map<int, int> m_debug;
 	static int m_debug_lineno;
-
 };
 
 
