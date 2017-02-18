@@ -24,22 +24,25 @@ def scope
 
 .scope {
 	print: .scope.flag_start;
-	if !.scope.flag_start:
+	if !.scope.flag_start {
 		throw test.scope, 'scope_start not called';
+	}
 
 	print: 'scope mid';
 }
 
-if !.scope.flag_end:
+if !.scope.flag_end {
 	throw test.scope, 'scope_end not called';
+}
 
 
 .scope();
 
 try {
 	.scope {
-		if !.scope.flag_start:
+		if !.scope.flag_start {
 			throw test.scope, 'scope_start not called';
+		}
 
 		print: 'scope mid';
 		throw scope, 'test';
@@ -53,8 +56,9 @@ catch scope: msg {
 }
 
 
-if !.scope.flag_end:
+if !.scope.flag_end {
 	throw test.scope, 'scope_end not called';
+}
 
 print: my, ' OK';
 

@@ -36,15 +36,17 @@ r = dist.dist_do(10, 20, def(a, b){ return a + b; });
 print: r.is_done(100);
 print: ret = r.pop_obj();
 
-if ret != 30:
+if ret != 30 {
 	throw test.dist, 'dist_do failed';
+}
 
 list = [1..100];
 rs = dist.dist_for(list, def(a) { return a * a; } );
 print: rs;
 
-if rs != %[ x*x | x<-1~100 ]:
+if rs != %[ x*x | x<-1~100 ] {
 	throw test.dist, 'dist_do failed';
+}
 
 print: '## now quit: ', dist.shutdown();
 return 'OK', my;

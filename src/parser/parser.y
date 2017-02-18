@@ -256,15 +256,15 @@ parallel_stmt:/*{{{*/
 		{
 			g_ctl->parallel_start();
 		}
-	statement_or_block
+	statement_block
 		{
 			g_ctl->parallel_end();
 		}
-	| PARALLEL FOR lvar IN object parallel_option ':'
+	| PARALLEL FOR lvar IN object parallel_option
 		{
 			g_ctl->parallel_for_start($3);
 		}
-	statement_or_block
+	statement_block
 		{
 			g_ctl->parallel_for_end();
 		}
@@ -1079,29 +1079,29 @@ elif_stmt:/*{{{*/
 		{
 			g_ctl->else_start();
 		}
-	bool_expr ':'
+	bool_expr 
 		{
 			g_ctl->if_start();
 		}
-	statement_or_block
+	statement_block
 	;
 /*}}}*/
 
 else_stmt:/*{{{*/
-	ELSE ':'
+	ELSE
 		{
 			g_ctl->else_start();
 		}
-	statement_or_block
+	statement_block
 	;
 /*}}}*/
 
 if_stmt:/*{{{*/
-	IF bool_expr ':'
+	IF bool_expr 
 		{
 			g_ctl->if_start();
 		}
-	statement_or_block
+	statement_block
 	;
 /*}}}*/
 
@@ -1110,7 +1110,7 @@ do_stmt:/*{{{*/
 		{
 			g_ctl->do_start();
 		}
-	statement_or_block WHILE bool_expr ';'
+	statement_block WHILE bool_expr ';'
 		{
 			g_ctl->do_end();
 		}
@@ -1122,7 +1122,7 @@ times_stmt:/*{{{*/
 		{
 			g_ctl->times_start();
 		}
-	statement_or_block 
+	statement_block 
 		{
 			g_ctl->times_end();
 		}
@@ -1134,11 +1134,11 @@ while_stmt:/*{{{*/
 		{
 			g_ctl->while_start_1();
 		}
-	bool_expr ':'
+	bool_expr 
 		{
 			g_ctl->while_start_2();
 		}
-	statement_or_block
+	statement_block
 		{
 			g_ctl->while_end();
 		}
@@ -1146,11 +1146,11 @@ while_stmt:/*{{{*/
 /*}}}*/
 
 for_stmt:/*{{{*/
-	FOR lvar IN object ':'
+	FOR lvar IN object 
 		{
 			g_ctl->for_start($2);
 		}
-	statement_or_block
+	statement_block
 		{
 			g_ctl->for_end();
 		}

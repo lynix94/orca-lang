@@ -50,14 +50,16 @@ catch {
 fs.write('/mnt/dfs1/file1', 'file1');
 print: ret1 = fs.read('/mnt/dfs1/file1');
 print: ret2 = fs.read('dir1/file1');
-if ret1 != ret2:
+if ret1 != ret2 {
 	throw test.dfsd, 'dfsd read/write fail';
+}
 
 fs.write('/mnt/dfs2/file2', 'file2');
 print: ret1 = fs.read('/mnt/dfs2/file2');
 print: ret2 = fs.read('dir2/file2');
-if ret1 != ret2:
+if ret1 != ret2 {
 	throw test.dfsd, 'dfsd read/write fail';
+}
 
 
 print: '## unmount: ';
@@ -70,14 +72,16 @@ fs.mount_dist_dir('/mnt/dfs', ('127.0.0.1', port), ('127.0.0.1', port+1));
 fs.write('/mnt/dfs/file1', 'file1');
 print: ret1 = fs.read('/mnt/dfs/file1');
 print: ret2 = fs.read('dir1/file1');
-if ret1 != ret2:
+if ret1 != ret2 {
 	throw test.dfsd, 'dfsd read/write fail';
+}
 
 fs.write('/mnt/dfs/file2', 'file2');
 print: ret1 = fs.read('/mnt/dfs/file2');
 print: ret2 = fs.read('dir2/file2');
-if ret1 != ret2:
+if ret1 != ret2 {
 	throw test.dfsd, 'dfsd read/write fail';
+}
 
 
 print: '## now shutdown: ';

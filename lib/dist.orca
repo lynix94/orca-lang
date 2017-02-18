@@ -29,7 +29,7 @@ def add(ip, port)
 
 def pop_one
 {
-	while ..clients.size() == 0: {
+	while ..clients.size() == 0 {
 		time.msleep(100);
 	}
 		
@@ -62,23 +62,24 @@ def dist_for(items, f)
 	rcount = type.map();
 	ret = [];
 
-	for a in items: {
+	for a in items {
 		r = ..dist_do(a, f);
 		clients.push_back(r);
 
-		if !rcount.has_key(r.id): 
+		if !rcount.has_key(r.id) {
 			rcount[r.id] = 0;
+		}
 
 		rcount[r.id] += 1;
 	}
 
-	for r in clients: {
+	for r in clients {
 		r.is_done(-1);
 		ret.push_back(r.get_obj(rcount[r.id] - 1));
 		rcount[r.id] -= 1;
 	}
 
-	for r in clients: {
+	for r in clients {
 		r.clean_obj();
 	}
 
@@ -87,7 +88,7 @@ def dist_for(items, f)
 
 def shutdown
 {
-	for a in ..clients: {
+	for a in ..clients {
 		a.shutdown();
 	}
 }

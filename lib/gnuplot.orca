@@ -19,7 +19,7 @@ def run(cmd)
 
 def set(cmd)
 {
-	if cmd == 'line': {
+	if cmd == 'line' {
 		..with_line = true;
 		return;
 	}
@@ -37,18 +37,21 @@ def sadd(name, data, grouping)
 {
 	..name.push_back(name);
 
-	if grouping == nil:
+	if grouping == nil {
 		..sdata.push_back(data);
-	elif grouping == true: {
+	}
+	elif grouping == true {
 		new_data = [];
 		alg.copy(data.begin(), data.end(), new_data.begin());
 
 		it = new_data.begin();
-		while true: {
+		while true {
 			b = it()[1];
-			if it.next() == nil: break;
+			if it.next() == nil {
+				break;
+			}
 
-			if b > it()[1]: {
+			if b > it()[1] {
 				it.insert(('', '', ''));
 			}
 		}
@@ -74,24 +77,28 @@ def splot(cmd_end)
 
 	cmd = ..cmd;
 	cmd += 'splot ';
-	for name in ..name.begin(): {
+	for name in ..name.begin() {
 		cmd += '"${file_name + order}" title \'${name()}\'';
-		if ..with_line:
+		if ..with_line {
 			cmd += ' with line';
+		}
 
-		if name != ..name.last():
+		if name != ..name.last() {
 			cmd += ', \\\n';
+		}
 
 		order += 1;
 	}
 
 	cmd += '\n' + cmd_end;
 
-	for j in [0..owner.sdata.size()-1]: {
+	for j in [0..owner.sdata.size()-1] {
 		f = io.open(file_name + (j+1),'w');
 
-		for i in %[x|x<-0~]: {
-			if i >= ..sdata[j].size(): break;
+		for i in %[x|x<-0~] {
+			if i >= ..sdata[j].size() {
+				break;
+			}
 
 			str = '';
 			str += ..sdata[j][i][0] + '\t'
@@ -106,8 +113,9 @@ def splot(cmd_end)
 
 	..run(cmd);
 
-	for i in [1..order]:
+	for i in [1..order] {
 		os.remove(file_name + i);
+	}
 }
 
 
@@ -120,24 +128,29 @@ def plot(cmd_end)
 
 	cmd = ..cmd;
 	cmd += 'plot ';
-	for name in ..name.begin(): {
+	for name in ..name.begin() {
 		cmd += '"${file_name}" using ${idx}:${idx+1} title \'${name()}\'';
 		idx += 2;
-		if ..with_line:
+		if ..with_line {
 			cmd += ' with line';
+		}
 
-		if name != ..name.last():
+		if name != ..name.last() {
 			cmd += ', \\\n';
+		}
 	}
 
 	cmd += '\n' + cmd_end;
 
 	f = io.open(file_name,'w');
 
-	for i in %[x|x<-0~]: {
-		if i >= ..data[0].size(): break;
+	for i in %[x|x<-0~] {
+		if i >= ..data[0].size() {
+			break;
+		}
+
 		str = '';
-		for j in [0..owner.data.size()-1]: {
+		for j in [0..owner.data.size()-1] {
 			str += ..data[j][i][0] + '\t' + ..data[j][i][1] + '\t';
 		}
 		str += '\n';

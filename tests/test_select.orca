@@ -16,10 +16,10 @@ def server {
 	sock.bind(..port);
 	sock.listen();
 
-	while true: {
+	while true {
 		fd = select.select([sock.get()], [], [], 1000);
 
-		if fd[0] == [sock.get()]: {
+		if fd[0] == [sock.get()] {
 			new_cl = sock.accept();
 
 			str = new_cl.recv();
@@ -39,8 +39,9 @@ def client {
 	msg = sock.recv();
 
 	print: 'recv: ', msg;
-	if msg.strip() != 'hello, socket':
+	if msg.strip() != 'hello, socket' {
 		throw test.socket, 'socket abnormal';
+	}
 
 	sock.close();
 }

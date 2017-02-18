@@ -8,82 +8,97 @@ print: time.time_of_day();
 
 print: t1 = time.clone('01:02:03');
 
-if t1.hour != 1 || t1.minute != 2 || t1.second != 3:
+if t1.hour != 1 || t1.minute != 2 || t1.second != 3 {
 	throw test.time, 'time value is invalid';
+}
 
 print: '# add operation with : int, time, date, duration';
 print: t1 = time.clone('01:02:03');
 print: t2 = t1+1;
-if t2 != time.clone('01:02:03.000001'):
+if t2 != time.clone('01:02:03.000001') {
 	throw test.time, 'time operation failed';
+}
 
 print: t2 = t1+ 1000000 * 60 * 60 * 2 + 1000000 * 60 * 30 + 1000000 * 40; # 2:30:40
-if t2 != time.clone('03:32:43'):
+if t2 != time.clone('03:32:43') {
 	throw test.time, 'time operation failed';
+}
 
 print: t2 = t1 + t1;
-if t2 != time.clone('02:04:06'):
+if t2 != time.clone('02:04:06') {
 	throw test.time, 'time operation failed';
+}
 
 print: ret = t1 + date.clone('2000-01-02');
-if ret != datetime.clone('2000-01-02 01:02:03'):
+if ret != datetime.clone('2000-01-02 01:02:03') {
 	throw test.time, 'time operation failed';
+}
 
 print: t2 = time.hours(10) + time.minutes(20) + time.seconds(30) + time.microseconds(40);
 print: ret = t1 + t2;
 print: z = time.clone('11.22.33.000040');
 
-if ret != time.clone('11:22:33.000040'):
+if ret != time.clone('11:22:33.000040') {
 	throw test.time, 'time operation failed';
+}
 
 
 
 print: '# sub operation with : int, time, duration';
 print: t1 = time.clone('01:02:03');
 print: t2 = t1-1;
-if t2 != time.clone('01:02:02.999999'):
+if t2 != time.clone('01:02:02.999999') {
 	throw test.time, 'time operation failed';
+}
 
 print: t2 = t1 -  1000000 * 60 * 60 * 2 - 1000000 * 60 * 30 - 1000000 * 40; # 2:30:40
-if t2 != time.clone('-01:28:37'):
+if t2 != time.clone('-01:28:37') {
 	throw test.time, 'time operation failed';
+}
 
 print: t2 = t1 - t1;
-if t2 != time.clone('00:00:00'):
+if t2 != time.clone('00:00:00') {
 	throw test.time, 'time operation failed';
+}
 
 print: t2 = t1 - t1 - t1;
-if t2 != time.clone('-01:02:03'):
+if t2 != time.clone('-01:02:03') {
 	throw test.time, 'time operation failed';
+}
 
 print: t2 = time.hours(10) - time.minutes(20) - time.seconds(30) - time.microseconds(40);
 print: ret = t1 - t2;
 
-if ret != time.clone('-08.37.26.999960'):
+if ret != time.clone('-08.37.26.999960') {
 	throw test.time, 'time operation failed';
+}
 
 
 print: '# mul operation with : int';
 
 print: t2 = -t1;
 print: ret = t1 + t2;
-if ret != time.clone('00:00:00'):
+if ret != time.clone('00:00:00') {
 	throw test.time, 'time operation failed';
+}
 
 print: t2 = t1*10;
 print: ret = t1 + t2;
-if ret != time.clone('11:22:33'):
+if ret != time.clone('11:22:33') {
 	throw test.time, 'time operation failed';
+}
 
 print: '# compare';
 print: t1 = time.clone('01:02:03');
 print: t2 = time.clone('01:02:04');
 
-if t1 >= t2:
+if t1 >= t2 {
 	throw test.time, 'time comparison fail';
+}
 	
-if t1 == t2:
+if t1 == t2 {
 	throw test.time, 'time comparison fail';
+}
 
 
 print: 'OK: ', my;

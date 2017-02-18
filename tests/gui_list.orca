@@ -30,10 +30,10 @@ def main : window
 				# argv[1]() : list item. like this -> [ true, 'name' ]
 				name = argv[1]()[1];
 
-				if argv[0]: {	# select
+				if argv[0] {	# select
 					.selected[name] = true;
 				}
-				else: {			# deselect
+				else {			# deselect
 					.selected.erase_key(name);
 				}
 

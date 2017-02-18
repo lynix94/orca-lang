@@ -36,27 +36,32 @@ def derived : test_oo.base
 a = my.derived.clone();
 b = a.clone();
 
-if !(b.type < my.base):
+if !(b.type < my.base) {
 	throw test.oo, 'issubclassof fail';
+}
 
-if !(a.type <= my.derived):
+if !(a.type <= my.derived) {
 	throw test.oo, 'isinstanceof fail';
+}
 
 a.init();
 b.init();
 print(a.m1, ' ', a.m2);
-if a.m1 != 0 || a.m2 != 0:
+if a.m1 != 0 || a.m2 != 0 {
 	throw test.oo, 'init fail';
+}
 
 a.foo1();
 a.foo2();
 print: '${a.m1} ${a.m2}';
-if a.m1 != 20 || a.m2 != 20: 
+if a.m1 != 20 || a.m2 != 20 {
 	throw test.oo, 'instance a fail';
+}
 
 print(b.m1, ' ', b.m2);
-if b.m1 != 0 || b.m2 != 0:
+if b.m1 != 0 || b.m2 != 0 {
 	throw test.oo, 'instance b fail';
+}
 
 
 print('OK');

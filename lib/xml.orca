@@ -26,26 +26,33 @@ def decoding(str)
 		{
 			head = decoding(one_tag);
 
-			if head.type == type.map:
+			if head.type == type.map {
 				tag = head;
-			elif head.type == type.string:
+			}
+			elif head.type == type.string {
 				tag = { '$text':head };
+			}
 					
-			if attrs.type == type.string && attrs.strip().length() > 0: {
+			if attrs.type == type.string && attrs.strip().length() > 0 {
 				attrs = decoding(attrs);
 				tag['$attrs'] = attrs;
 			}
 	
-			if remain.type == type.string && remain.strip().length()>0: {
+			if remain.type == type.string && remain.strip().length()>0 {
 				tail = decoding(remain);
-				if tail.has_key(name): {
+				if tail.has_key(name) {
 					tmp = tail[name];
-					if tmp.type == type.tuple:
+					if tmp.type == type.tuple {
 						tmp.push_back(tag);
-					else:
+					}
+					else {
 						tail[name] = (tmp, tag);
+					}
 				}
-				else: tail[name] = tag;
+				else {
+					tail[name] = tag;
+				}
+
 				return tail;	
 			}
 
@@ -55,21 +62,25 @@ def decoding(str)
 	'<', %name = r'[a-zA-Z_][a-zA-Z_0-9]*', %attrs, '/>', %remain ->
 		{
 			tag = type.map();
-			if attrs.type == type.string && attrs.strip().length() > 0: {
+			if attrs.type == type.string && attrs.strip().length() > 0 {
 				attrs = decoding(attrs);
 				tag['$attrs'] = attrs;
 			}
 	
-			if remain.type == type.string && remain.strip().length()>0: {
+			if remain.type == type.string && remain.strip().length()>0 {
 				tail = decoding(remain);
-				if tail.has_key(name): {
+				if tail.has_key(name) {
 					tmp = tail[name];
-					if tmp.type == type.tuple:
+					if tmp.type == type.tuple {
 						tmp.push_back(tag);
-					else:
+					}
+					else {
 						tail[name] = (tmp, tag);
+					}
 				}
-				else: tail[name] = tag;
+				else {
+					tail[name] = tag;
+				}
 				return tail;	
 			}
 
@@ -80,7 +91,7 @@ def decoding(str)
 		{
 			value = decoding(value);
 			tail = type.map();
-			if remain.type == type.string && remain.strip().length() > 0: {
+			if remain.type == type.string && remain.strip().length() > 0 {
 				tail = decoding(remain);
 			}
 
@@ -101,41 +112,62 @@ def decoding(str)
 def encoding(obj)
 {
 	ret = '';
-	if obj.type == type.map: {
-		for a in obj.begin(): {
-			if a.second().type == type.tuple: {
-				for b in a.second().begin(): {
+	if obj.type == type.map {
+		for a in obj.begin() {
+			if a.second().type == type.tuple {
+				for b in a.second().begin() {
 					attrs = '';
-					if b().type == type.map && b().has_key('$attrs'): {
-						for c in b()['$attrs'].begin(): 
+					if b().type == type.map && b().has_key('$attrs') {
+						for c in b()['$attrs'].begin() {
 							attrs += c.first() + '=' + c.second() + ' ';
+						}
 					}
 
-					if a.first() == '$attrs': continue;
+					if a.first() == '$attrs' {
+						continue;
+					}
 
-					if a.first() == '$info': ret += '<? ';
-					elif a.first() != '$text': ret += '<${a.first()} ${attrs}>';
+					if a.first() == '$info' {
+						ret += '<? ';
+					}
+					elif a.first() != '$text' {
+						ret += '<${a.first()} ${attrs}>';
+					}
+
 					ret += encoding(b());
-					if a.first() == '$info': ret += ' ?>';
-					elif a.first() != '$text': ret += '</${a.first()}>';
+					if a.first() == '$info' {
+						ret += ' ?>';
+					}
+					elif a.first() != '$text' {
+						ret += '</${a.first()}>';
+					}
 				}
 			}
-			else : {
-				if a.first() != '$attrs': {
+			else {
+				if a.first() != '$attrs' {
 
-					if a.first() == '$info': ret += '<? ';
-					elif a.first() != '$text': ret += '<${a.first()}>';
+					if a.first() == '$info' {
+						ret += '<? ';
+					}
+					elif a.first() != '$text' {
+						ret += '<${a.first()}>';
+					}
+
 					ret += encoding(a.second());
-					if a.first() == '$info': ret += ' ?>';
-					elif a.first() != '$text': ret += '</${a.first()}>';
+					if a.first() == '$info' {
+						ret += ' ?>';
+					}
+					elif a.first() != '$text' {
+						ret += '</${a.first()}>';
+					}
 				}
 			}
 		}
 	}
-	elif obj.type == type.string: {
+	elif obj.type == type.string {
 		return obj;
 	}
-	else: {
+	else {
 	}
 
 	return ret;
@@ -144,45 +176,72 @@ def encoding(obj)
 
 def beutify(obj, tab)
 {
-	if tab == nil: tab = 0;
-	else:	tab += 1;
+	if tab == nil {
+		tab = 0;
+	}
+	else {
+		tab += 1;
+	}
 
 	ret = '';
-	if obj.type == type.map: {
-		for a in obj.begin(): {
-			if a.second().type == type.tuple: {
-				for b in a.second().begin(): {
+	if obj.type == type.map {
+		for a in obj.begin() {
+			if a.second().type == type.tuple {
+				for b in a.second().begin() {
 					attrs = '';
-					if b().type == type.map && b().has_key('$attrs'): {
-						for c in b()['$attrs'].begin(): 
+					if b().type == type.map && b().has_key('$attrs') {
+						for c in b()['$attrs'].begin() {
 							attrs += c.first() + '=' + c.second() + ' ';
+						}
 					}
 
-					if a.first() == '$attrs': continue;
+					if a.first() == '$attrs' {
+						continue;
+					}
 
-					if a.first() == '$info': ret += '<? ';
-					elif a.first() != '$text': ret += '\t'*tab + '<${a.first()} ${attrs}>\n';
+					if a.first() == '$info' {
+						ret += '<? ';
+					}
+					elif a.first() != '$text' {
+						ret += '\t'*tab + '<${a.first()} ${attrs}>\n';
+					}
+
 					ret += beutify(b(), tab);
-					if a.first() == '$info': ret += ' ?>\n';
-					elif a.first() != '$text': ret += '\n' + '\t'*tab + '</${a.first()}>\n';
+
+					if a.first() == '$info' {
+						ret += ' ?>\n';
+					}
+					elif a.first() != '$text' {
+						ret += '\n' + '\t'*tab + '</${a.first()}>\n';
+					}
 				}
 			}
-			else : {
-				if a.first() != '$attrs': {
+			else {
+				if a.first() != '$attrs' {
 
-					if a.first() == '$info': ret += '<? ';
-					elif a.first() != '$text': ret += '\t'*tab + '<${a.first()}>\n';
+					if a.first() == '$info' {
+						ret += '<? ';
+					}
+					elif a.first() != '$text' {
+						ret += '\t'*tab + '<${a.first()}>\n';
+					}
+
 					ret += beutify(a.second(), tab);
-					if a.first() == '$info': ret += ' ?>\n';
-					elif a.first() != '$text': ret += '\n' + '\t'*tab + '</${a.first()}>\n';
+
+					if a.first() == '$info' {
+						ret += ' ?>\n';
+					}
+					elif a.first() != '$text' {
+						ret += '\n' + '\t'*tab + '</${a.first()}>\n';
+					}
 				}
 			}
 		}
 	}
-	elif obj.type == type.string: {
+	elif obj.type == type.string {
 		return '\t'*tab + obj;
 	}
-	else: {
+	else {
 	}
 
 	return ret;

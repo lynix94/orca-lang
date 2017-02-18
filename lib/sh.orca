@@ -6,8 +6,7 @@ return my.script.clone(argv[2]);
 def script(...)
 {
   new_cmd = .cmd;
-  for i in [0..argv.size()-1]: 
-  {
+  for i in [0..argv.size()-1] {
 	new_cmd = new_cmd.replace('argv[%d]'%i, argv[i]);
   }
 

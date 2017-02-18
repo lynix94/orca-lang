@@ -8,17 +8,20 @@ def apply(f, list)
 
 def bind_result(...)
 {
-	if argv == nil:
+	if argv == nil {
 		argv = type.tuple();
+	}
 
 	list = [];
-	if my.order > 1:
+	if my.order > 1 {
 		list += argv[0:my.order-1].list();
+	}
 
 	list += [my.a];
 
-	if argv.size() >= my.order:
+	if argv.size() >= my.order {
 		list += argv[my.order-1:].list();
+	}
 
 	return root.fun.apply(my.f, list);
 
@@ -71,8 +74,9 @@ def map(list, f)
 {
 	result = [];
 	
-	for a in list.begin():
+	for a in list.begin() {
 		result.push_back(f(a()));
+	}
 
 	return result;
 }
@@ -80,36 +84,38 @@ def map(list, f)
 
 def reduce(a, b, c)
 {
-	if c == nil: {
+	if c == nil {
 		initial = nil;
 		list = a;
 		f = b;
 	}
-	else: {
+	else {
 		initial = a;
 		list = b;
 		f = c;
 	}
 	
-	if initial == nil: {
+	if initial == nil {
 		result = list[0];
 
 		decode list
 		{
 			%head:%tail ->
 			{
-				if tail == []:
+				if tail == [] {
 					result = f(result, nil);
-				else:
-					for a in tail.begin(): {
+				}
+				else {
+					for a in tail.begin() {
 						result = f(result, a());
 					}
+				}
 			}
 		}
 	}
-	else: {
+	else {
 		result = initial;
-		for a in list.begin(): {
+		for a in list.begin() {
 			result = f(result, a());
 		}
 	}

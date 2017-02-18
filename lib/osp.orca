@@ -14,15 +14,16 @@ def result;
 mod_name = argv[0].replace('/', '_');
 mod_name = mod_name.replace('.', '_');
 
-if fs.isexists(mod_name): {
+if fs.isexists(mod_name) {
 	mod_time = os.last_write_time(mod_name);
 	src_time = os.last_write_time(argv[0]);
 
-	if mod_time >= src_time: {
-		if httpd.members[mod_name]:
+	if mod_time >= src_time {
+		if httpd.members[mod_name] {
 			return httpd.members[mod_name](argv[1]);
+		}
 	}
-	else: {
+	else {
 		orca.unload(mod_name, httpd);
 	}
 }
@@ -40,18 +41,20 @@ body = '';
 
 def param;
 my.param = argv[0];
-if my.param == nil:
+if my.param == nil {
 	my.param = type.map();
+}
+
 param = my.param;
 
 def get_session(flag)
 {
 	session = nil;
-	if ..param.has_key('orca_session'): {
+	if ..param.has_key('orca_session') {
 		session = httpd.session.get_session(..param['orca_session']);
 	}
 
-	if session == nil && flag == true: { 
+	if session == nil && flag == true { 
 		sid = httpd.session.alloc_session();
 		..header.push_back('Set-Cookie: orca_session=${sid}');
 		session = httpd.session.get_session(sid);
@@ -62,7 +65,7 @@ def get_session(flag)
 
 def free_session()
 {
-	if ..param.has_key('orca_session'): {
+	if ..param.has_key('orca_session') {
 		httpd.session.free_session(..param['orca_session']);
 	}
 }
@@ -82,7 +85,7 @@ start = 0;
 idx = 0;
 do {
 	idx = str.find('<%', start);
-	if idx < 0: {
+	if idx < 0 {
 		.append_str(str[start:]);
 		break;
 	}
@@ -91,7 +94,7 @@ do {
 
 	start = idx+2;
 	idx = str.find('%>', start);
-	if idx < 0: {
+	if idx < 0 {
 		throw osp.parsing, 'invalid format';
 	}
 
@@ -115,16 +118,17 @@ def append_str(str)
 
 def append_code(str)
 {
-	if str[0] == '=': {
+	if str[0] == '=' {
 		..result += 'body.push_back(' + str[1:] + ');\n';
 	}
-	elif str[0] == '@': {
+	elif str[0] == '@' {
 		str = str[1:].strip();
 
-		if str == 'session':
+		if str == 'session' {
 			..enable_session();
+		}
 	}
-	else: {
+	else {
 		..result += str + '\n';
 	}
 }

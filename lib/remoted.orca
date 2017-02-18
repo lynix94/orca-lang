@@ -21,7 +21,9 @@ static def magic;
 
 do {
 	sock = .sock.accept();
-	if .shut_down: break;
+	if .shut_down {
+		break;
+	}
 	
 	cl = .client.clone(sock);
 	thread.run(cl.runs);
@@ -64,10 +66,10 @@ def client
 	def recv()
 	{
 		header = ..sock.recv(remoted.magic.length() + 5);
-		if header.starts_with(remoted.magic): {
+		if header.starts_with(remoted.magic) {
 			len = header[-5:-1).integer();
 		}
-		else: {
+		else {
 			..sock.recv(0, 0);
 		}
 		
@@ -85,7 +87,7 @@ def client
 				remoted.log:'## wait...';
 
 				cmd = ..recv();
-				if ..do_what(cmd) == '<shutdown>': {
+				if ..do_what(cmd) == '<shutdown>' {
 					..sock.close();
 					owner.owner.shut_down = true;
 					sock = socket.create();
@@ -108,8 +110,9 @@ def client
 	{
 		obj = ..pop_obj();
 
-		if obj == nil:
+		if obj == nil {
 			return false;
+		}
 
 		obj.members[name] = new_obj;
 		return true;
@@ -124,18 +127,21 @@ def client
 		{
 		%head, '.', %tail -> 
 			{ 
-				if head == 'root':
+				if head == 'root' {
 					.obj = root;
-				else:
+				}
+				else {
 					.obj = .obj.members[head];
+				}
 
 				return find_obj(tail);
 			}
 		%head -> 
 			{ 
-				if head == 'root':
+				if head == 'root' {
 					.obj = root;
-				else: {
+				}
+				else {
 					.obj = .obj.members[head];
 				}
 			}
@@ -143,10 +149,12 @@ def client
 
 		return .obj;
 
-		if path == 'root':
+		if path == 'root' {
 			.obj = root;
-		else:
+		}
+		else {
 			.obj = .obj.members[head];
+		}
 
 		return .obj;
 	}
@@ -173,7 +181,7 @@ def client
 
 	def clean_obj()
 	{
-		while ..obj_stack.size() > 0 && ..obj_stack[-1] == '___DUMMY___': {
+		while ..obj_stack.size() > 0 && ..obj_stack[-1] == '___DUMMY___' {
 			..obj_stack.pop_back();
 		}
 		
@@ -187,7 +195,7 @@ def client
 			'<push>', %tail  -> 
 				{ 
 					cl = pack.check_code(tail);
-					for a in cl: {
+					for a in cl {
 						..send('<req_code>'+a);
 						rcv = ..recv();
 						do_what(rcv);
@@ -224,8 +232,9 @@ def client
 				{ 
 					try {
 						obj = ..find_obj(name);
-						if obj.id != root.id:
+						if obj.id != root.id {
 							..pop_obj();
+						}
 		
 						..push_obj(obj);
 						..send: '<ok:find>';
@@ -247,8 +256,8 @@ def client
 				{
 					n = tail.integer();
 					param = [];
-					if (n>0): {
-						for i in [1..n]: {
+					if (n>0) {
+						for i in [1..n] {
 							param .push_front(..pop_obj());
 						}
 					}

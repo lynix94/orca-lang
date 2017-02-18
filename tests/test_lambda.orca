@@ -1,7 +1,7 @@
 
 
 def for_each(list, functor) {
-  for a in list: {
+  for a in list {
     functor(a);
   }
 }

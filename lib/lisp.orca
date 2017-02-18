@@ -7,8 +7,9 @@ using lisp;
 
 # handle context lisp
 
-if argv == nil:
+if argv == nil {
 	return;
+}
 
 src_name = argv[0];
 src_time = argv[1];
@@ -16,17 +17,19 @@ src_time = argv[1];
 dstfile = src_name + '.lcf';
 recompile = false;
 
-if !os.isfile(dstfile): 
+if !os.isfile(dstfile) {
 	recompile = true;
-elif os.last_write_time(dstfile) < src_time:
+}
+elif os.last_write_time(dstfile) < src_time {
 	recompile = true;
+}
 
-if recompile: {
+if recompile {
 	code = .compile(argv[2]);
 	bytecode = pack.save(code);
 	os.write(dstfile, bytecode);
 }
-else: {
+else {
 	bytecode = os.read(dstfile);
 	code = pack.load(bytecode);
 }
@@ -41,7 +44,7 @@ return ret;
 def context_obj(...)
 {
 	local = type.map();
-	for i in [0..argv.size()-1]: {
+	for i in [0..argv.size()-1] {
 		local['argv'+i] = argv[i];
 	}
 	local['argv'] = argv.list();
@@ -61,7 +64,7 @@ def init_once
 	}
 	catch { }
 
-	if os.isdir(..path): {
+	if os.isdir(..path) {
 		return;
 	}
 
@@ -107,8 +110,9 @@ def do_list(h, t)
 
 def list(h, t)
 {
-	if h.type == type.list:
+	if h.type == type.list {
 		return h.push_back(t);
+	}
 
 	return [h, t];
 }
@@ -116,33 +120,33 @@ def list(h, t)
 
 def defun(name, code)
 {
-	if name.type == type.list: {
+	if name.type == type.list {
 		f = ..function.clone();
 		f.code = code;
 		f.argv = name[1:];
 		name = name[0];
 
-		if name == 'lambda': {
+		if name == 'lambda' {
 			return f;
 		}
 
 		..fmap[name] = f;
 	}
-	else: {
+	else {
 		..fmap[name] = code;
 	}
 }
 
 def defmacro(name, code)
 {
-	if name.type == type.list: {
+	if name.type == type.list {
 		f = ..function.clone();
 		f.code = code;
 		f.argv = name[1:];
 		name = name[0];
 		..mmap[name] = f;
 	}
-	else: {
+	else {
 		..mmap[name] = code;
 	}
 }
@@ -180,15 +184,15 @@ def.parse parse_code(src)
 	expr:	'(' expr_list ')'
 			def(...){ 
 				code = argv[1];
-				if code[0].type == type.tuple && code[0][0] == 'path': {
+				if code[0].type == type.tuple && code[0][0] == 'path' {
 					name = code[0][1][0];
 
-					if ..owner.mmap.has_key(name): { 
+					if ..owner.mmap.has_key(name) { 
 						function = ..owner.mmap[name].clone();
 						idx = 1;
 
 						new_local = type.map();
-						for p in function.argv: {
+						for p in function.argv {
 							new_local[p] = code[idx];
 							idx += 1;
 						}
@@ -295,7 +299,7 @@ def.parse parse_code(src)
 					mod = root;
 
 					try {
-						for p in argv[2]: {
+						for p in argv[2] {
 							mod = mod.members[p];
 						}
 					
@@ -330,11 +334,11 @@ def.parse parse_code(src)
 	external: path_expr
 				def(...) { 
 					# do macro
-					if argv[0].size() == 1: {
-						if ..owner.mmap.has_key(argv[0][0]): {
+					if argv[0].size() == 1 {
+						if ..owner.mmap.has_key(argv[0][0]) {
 
 							macro =  ..owner.mmap[argv[0][0]];
-							if !macro.type <= ..owner.function: {
+							if !macro.type <= ..owner.function {
 								return ..owner.mmap[argv[0][0]];
 							}
 						}
@@ -367,15 +371,20 @@ def.parse parse_code(src)
 
 	expr_list: expr_list expr
 				def(...) { 
-					if argv[1] != nil: 
+					if argv[1] != nil {
 						argv[0].push_back(argv[1]); 
+					}
 
 					return argv[0];
 				}
 			| expr
 				def(...) {
-					if argv[0] != nil: return [argv[0]]; 
-					else: return [];
+					if argv[0] != nil {
+						return [argv[0]]; 
+					}
+					else {
+						return [];
+					}
 				}
 		;
 
@@ -398,22 +407,25 @@ def execute(pair, local, base)
 	code = pair[0];
 	fmap = pair[1];
 
-	if base == nil:
+	if base == nil {
 		base = caller;
+	}
 
-	if local == nil:
+	if local == nil {
 		local = type.map();
+	}
 
-	if code.type != type.list: {
-		if code.type == type.tuple: {
-			if code[0] == 'path': {
+	if code.type != type.list {
+		if code.type == type.tuple {
+			if code[0] == 'path' {
 				path = code[1];
-				if path.size() == 1: {
+				if path.size() == 1 {
 					name = path[0];
-					if local.has_key(name):
+					if local.has_key(name) {
 						return local[name];
+					}
 
-					if fmap.has_key(name): {
+					if fmap.has_key(name) {
 						return fmap[name].clone();
 					}
 				}
@@ -423,20 +435,24 @@ def execute(pair, local, base)
 
 				# find module first
 				try { 
-					if ..umap.has_key(it()): {
+					if ..umap.has_key(it()) {
 						curr = ..umap[path[0]];
 						it.next();
 					}
 
-					while it != path.end(): {
-						if it() == 'owner': 
+					while it != path.end() {
+						if it() == 'owner' { 
 							curr = curr.owner;
-						elif it() == 'my': 
+						}
+						elif it() == 'my' {
 							curr = curr;
-						elif it() == 'caller': 
+						}
+						elif it() == 'caller' {
 							curr = curr.caller;
-						else: 
+						}
+						else {
 							curr = curr.members[it()];
+						}
 
 						it.next();
 					}
@@ -447,34 +463,38 @@ def execute(pair, local, base)
 
 				return curr;
 			}
-			elif code[0] == 'if': {
+			elif code[0] == 'if' {
 				ret = execute((code[1], fmap), local, base);
-				if ret: {
+				if ret {
 					return execute((code[2], fmap), local, base);
 				}
-				else: {
+				else {
 					return execute((code[3], fmap), local, base);
 				}
 			}
-			elif code[0] == 'cond': {
+			elif code[0] == 'cond' {
 				conditions = code[1];
-				for pair in conditions: {
+				for pair in conditions {
 					ret = execute((pair[0], fmap), local, base);
-					if ret: {
+					if ret {
 						return execute((pair[1], fmap), local, base);
 					}
 				}
 
 				return nil;
 			}
-			elif code[0] == 'let': {
+			elif code[0] == 'let' {
 				lvar_list = code[1];
 				expr = code[2];
 
-				for lvar in lvar_list: {
+				for lvar in lvar_list {
 					tup = lvar[0];
-					if tup[0] != 'path': return nil;
-					if tup[1].size() != 1: return nil;
+					if tup[0] != 'path' {
+						return nil;
+					}
+					if tup[1].size() != 1 {
+						return nil;
+					}
 
 					name = tup[1][0];
 					local[name] = lvar[1];
@@ -482,19 +502,19 @@ def execute(pair, local, base)
 
 				return execute((expr, fmap), local, base);
 			}
-			elif code[0] == 'quote': {
+			elif code[0] == 'quote' {
 				return code[1];
 			}
-			elif code[0] == 'backquote': {
-				for sub_expr in code[1].begin(): {
-					if sub_expr().type == type.tuple && sub_expr()[0] == 'comma': {
+			elif code[0] == 'backquote' {
+				for sub_expr in code[1].begin() {
+					if sub_expr().type == type.tuple && sub_expr()[0] == 'comma' {
 						ret = execute((sub_expr()[1], fmap), local, base);
 						sub_expr(ret);
 					}
 				}
 				return code[1];
 			}
-			else: {
+			else {
 				return nil;
 			}
 		}
@@ -502,22 +522,23 @@ def execute(pair, local, base)
 		return code;
 	}
 	
-	for expr in code.begin(): {
+	for expr in code.begin() {
 		ret = execute((expr(), fmap), local, base);
 		expr(ret);
 	}
 
 
 	#print: '## eval: ', code;
-	if code.size() == 1:
+	if code.size() == 1 {
 		return code[0];
+	}
 
-	if code[0].members.has_key('code'): {
+	if code[0].members.has_key('code') {
 		function = code[0];
 		idx = 1;
 
 		new_local = type.map();
-		for p in function.argv: {
+		for p in function.argv {
 			new_local[p] = code[idx];
 			idx += 1;
 		}

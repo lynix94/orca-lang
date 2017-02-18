@@ -10,48 +10,57 @@ def foo(a,b,c)
 ret = fun.apply(.foo, [1,2,3]);
 print: 'apply: ', ret;
 
-if ret != -4:
+if ret != -4 {
 	throw test.fun, 'apply fail';
+}
 
 ret = fun.apply(.foo, (1,2,3));
 print: 'apply: ', ret;
 
-if ret != -4:
+if ret != -4 {
 	throw test.fun, 'apply fail';
+}
 
 b = fun.bind_1st(.foo, 10);
 print: 'bind_1st: ', ret = b(2,3);
-if ret != 10-2-3:
+if ret != 10-2-3 {
 	throw test.fun, 'bind_1st fail';
+}
 	
 b = fun.bind_2nd(.foo, 10);
 print: 'bind_2nd: ', ret = b(2,3);
-if ret != 2 - 10 - 3:
+if ret != 2 - 10 - 3 {
 	throw test.fun, 'bind_2nd fail';
+}
 	
 b = fun.bind_3rd(.foo, 10);
 print: 'bind_2nd: ', ret = b(2,3);
-if ret != 2 - 3 - 10:
+if ret != 2 - 3 - 10 {
 	throw test.fun, 'bind_3rd fail';
+}
 	
-if fun.bind_1st(.foo, 10)(2,3) != fun.bind_nth(.foo, 10, 1)(2,3):
+if fun.bind_1st(.foo, 10)(2,3) != fun.bind_nth(.foo, 10, 1)(2,3) {
 	throw test.fun, 'bind_nth fail';
+}
 
 
 print: 'map: ', ret = fun.map( [1,2,3,4,5], def(...){ return argv[0]*2; } );
-if ret != [2,4,6,8,10]:
+if ret != [2,4,6,8,10] {
 	throw test.fun, 'map fail';
+}
 	
 print: 'reduce: ', ret = fun.reduce( [1,2,3,4,5], def(...){ return argv[0]+argv[1]; } );
 
-if ret != 1+2+3+4+5:
+if ret != 1+2+3+4+5 {
 	throw test.fun, 'reduce fail';
+}
 	
 
 print: 'reduce: ', ret = fun.reduce( 0, [1,2,3,4,5], def(...){ return argv[0]+argv[1]; });
 
-if ret != 0+1+2+3+4+5:
+if ret != 0+1+2+3+4+5 {
 	throw test.fun, 'reduce fail';
+}
 	
 
 

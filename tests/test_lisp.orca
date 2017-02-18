@@ -13,8 +13,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 4 * 2:
+if r != 4 * 2 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 str = """
@@ -25,8 +26,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 4*2*3+3:
+if r != 4*2*3+3 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 str = """
 ( defun (sum x y) (+ x y) )(sum 4 4)
@@ -36,8 +38,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 4+4:
+if r != 4+4 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 str = """
@@ -53,8 +56,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 3 * 3:
+if r != 3 * 3 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 
@@ -69,8 +73,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 3.141592 * 3.141592:
+if r != 3.141592 * 3.141592 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 
@@ -84,8 +89,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != (10 + 20*20 + 30) / 3:
+if r != (10 + 20*20 + 30) / 3 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 str = """
@@ -96,8 +102,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != [1,2,3,4]:
+if r != [1,2,3,4] {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 str = """
 (car [1 2 3])
@@ -107,8 +114,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 1:
+if r != 1 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 str = """
 ( cdr (list 1 2 3 4))
@@ -118,8 +126,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != [2,3,4]:
+if r != [2,3,4] {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 str = """
@@ -130,8 +139,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 2:
+if r != 2 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 str = """
@@ -142,8 +152,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 3 * 10:
+if r != 3 * 10 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 str = """
@@ -153,8 +164,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 8:
+if r != 8 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 
@@ -167,8 +179,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 3+4:
+if r != 3+4 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 
@@ -185,8 +198,9 @@ print: str;
 print: code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 'hello':
+if r != 'hello' {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 str = """
@@ -197,8 +211,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != math.sin(1):
+if r != math.sin(1) {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 str = """
 ( using math.sin ) (sin 1)
@@ -208,8 +223,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != math.sin(1):
+if r != math.sin(1) {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 def mul(...)
@@ -226,8 +242,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 3*4:
+if r != 3*4 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 
@@ -239,8 +256,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 3*4:
+if r != 3*4 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 
@@ -253,8 +271,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != (3*4)*(3*4):
+if r != (3*4)*(3*4) {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 str = """
@@ -265,8 +284,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r[0] != 1 || r[1][1] != 2 || r[1][2] != 3 || r[2] != 4:
+if r[0] != 1 || r[1][1] != 2 || r[1][2] != 3 || r[2] != 4 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 str = """
@@ -277,8 +297,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r[0] != 1 || r[1][1] != 2 || r[1][2] != 3 || r[2] != 4:
+if r[0] != 1 || r[1][1] != 2 || r[1][2] != 3 || r[2] != 4 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 
@@ -290,8 +311,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != [1, 6, 4]:
+if r != [1, 6, 4] {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 
@@ -303,8 +325,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 25:
+if r != 25 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 
@@ -316,8 +339,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 200:
+if r != 200 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 
@@ -330,8 +354,9 @@ print: str;
 code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
-if r != 30:
+if r != 30 {
 	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+}
 
 
 
@@ -342,8 +367,9 @@ def foo := def.lisp {
 print: .foo;
 print: r = .foo(3, 4);
 
-if r != 3+4:
+if r != 3+4 {
 	throw test.lisp, 'lisp result for context failed';
+}
 
 print: 'OK';
 

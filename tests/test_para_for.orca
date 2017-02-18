@@ -2,19 +2,20 @@ using ipc;
 using time;
 
 list = [1..1000];
-parallel for a in list.begin(): {
+parallel for a in list.begin() {
   a( a()*2 );
 }
 
 print: list;
 
-if list != %[x*2|x<-1~1000]:
+if list != %[x*2|x<-1~1000] {
 	throw test.para_for, 'para for fail';
+}
 
 
 def tot := 0;
 
-parallel for a in %[x|x<-1~1000]: {
+parallel for a in %[x|x<-1~1000] {
 	ipc.mutex {
 		my.tot += a();
 	}
@@ -22,8 +23,9 @@ parallel for a in %[x|x<-1~1000]: {
 
 print: my.tot;
 
-if my.tot != 1001 * 500:
+if my.tot != 1001 * 500 {
 	throw test.para_for, 'para for fail';
+}
 	
 
 	

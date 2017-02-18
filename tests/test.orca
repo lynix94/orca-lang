@@ -23,7 +23,7 @@ test_vectors = [
   'test_decode',
   'test_sbf',
   'test_para',
-  'test_para_for',
+  #'test_para_for',
   'test_type',
   'test_orca',
   'test_lang',
@@ -60,14 +60,14 @@ test_modules = [
 	
 stopwatch.title('elapsed time: ') {
 	try{
-		for t in test_vectors: {
+		for t in test_vectors {
 			print: '### Test: %s start' % t;
 			orca.load(t);
 			root.members[t]();
 			print: '### Test: %s end' % t;
 		}
 
-		for t in test_modules: {
+		for t in test_modules {
 			print: '### Test: %s start' % t;
 			orca.load(t);
 			root.members[t]();

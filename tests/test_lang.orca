@@ -7,66 +7,79 @@ print: my.foo, my.foo.id;
 
 print: my.foo.members['bar'] = 1;
 print: my.foo.bar;
-if my.foo.bar != 1:
+if my.foo.bar != 1 {
 	throw test.lang, 'insert member failed';
+}
 
 
 print: my.foo.members.has_key('bar');
-if my.foo.members.has_key('bar') == false:
+if my.foo.members.has_key('bar') == false {
 	throw test.lang, 'has member failed';
+}
 
 print: ret = my.foo.members['bar'];
-if ret != 1:
+if ret != 1 {
 	throw test.lang, 'get member failed';
+}
 
 print: my.foo.members['bar'] = 2;
 print: my.foo.bar;
-if my.foo.bar != 2:
+if my.foo.bar != 2 {
 	throw test.lang, 'update member failed';
+}
 
 a = my.foo.clone();
 print: ret = a.type <= my.foo;
-if  ret != true:
+if  ret != true {
 	throw test.lang, 'isinstanceof failed';
+}
 
 print: ret = a.type <= root;
-if  ret == true:
+if  ret == true {
 	throw test.lang, 'isinstanceof failed';
+}
 
 
 print: ret = my.child.type < my.foo;
-if ret == true:
+if ret == true {
 	throw test.lang, 'issubclassof failed';
+}
 
 print: my.child.parents;
 print: my.child.parents.push_back(my.foo);
 print: my.child.parents;
 
 print: ret = my.child.type < my.foo;
-if ret == false:
+if ret == false {
 	throw test.lang, 'inherit failed';
+}
 
 print: my.child.bar;
-if my.child.bar != my.foo.bar:
+if my.child.bar != my.foo.bar {
 	throw test.lang, 'inherit failed';
+}
 
 print: my.child.parents.pop_back();
 
 print: ret = my.child.type < my.foo;
-if ret == true:
+if ret == true {
 	throw test.lang, 'dont_inherit failed';
+}
 
 print: ret = my.foo.type == my.child;
-if ret == true:
+if ret == true {
 	throw test.lang, 'issametype failed';
+}
 
 print: ret = my.foo.type == a;
-if ret != true:
+if ret != true {
 	throw test.lang, 'issametype failed';
+}
 
 print: ret = '123'.type == '345';
-if ret != true:
+if ret != true {
 	throw test.lang, 'issametype failed';
+}
 
 print: 'OK', my;
 
