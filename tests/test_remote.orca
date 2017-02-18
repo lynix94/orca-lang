@@ -42,7 +42,7 @@ if c.f.bar() != 'bar of foo' {
 
 
 print: '## remote_do test';
-c.remote_do: 10, 20, def(a, b){
+c.remote_do: 10, 20, lambda(a, b){
     return a + b;
 };
 

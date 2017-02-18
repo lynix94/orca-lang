@@ -160,6 +160,7 @@ const char* get_context();
 %token ASSIGNMENT
 %token ONCE 
 %token EVAL
+%token LAMBDA
 
 %token<cp> NAME
 %token<cp> STRING
@@ -850,7 +851,7 @@ lambda_object:/*{{{*/
 			g_op->push_reserved(OP_PUSH_MY);
 			g_op->find_member($1);
 		}
-	| def '.' name_or_string  '{'
+	| LAMBDA '.' name_or_string  '{'
 		{
 			// for serial tagging
 			static int count = 1;
@@ -891,7 +892,7 @@ lambda_object:/*{{{*/
 /*}}}*/
 
 lambda_define_header:
-	def opt_argument_list
+	LAMBDA opt_argument_list
 		{
 			name_list_t* vp = (name_list_t*)$2;
 
@@ -910,7 +911,7 @@ lambda_define_header:
 			char buff[256];
 			sprintf(buff, "#%d_lambda", count++);
 			const char* name = g_parser->strdup(buff);
-			parserCode::push_code_stack(name, vp, $1);
+			parserCode::push_code_stack(name, vp, 0);
 
 			if (flag_argv == true) {
 				code_top->find_lvar("argv");
@@ -923,7 +924,7 @@ lambda_define_header:
 
 
 lambda_decode_header:
-	def '.' DECODE opt_argument_list
+	LAMBDA '.' DECODE opt_argument_list
 		{
 			name_list_t* vp = (name_list_t*)$4;
 
@@ -942,7 +943,7 @@ lambda_decode_header:
 			char buff[256];
 			sprintf(buff, "#%d_decode_lambda", count++);
 			const char* name = g_parser->strdup(buff);
-			parserCode::push_code_stack(name, vp, $1);
+			parserCode::push_code_stack(name, vp, 0);
 
 			if (flag_argv == true) {
 				code_top->find_lvar("argv");
@@ -957,7 +958,7 @@ lambda_decode_header:
 
 
 lambda_parse_header:
-	def '.' PARSE opt_argument_list
+	LAMBDA '.' PARSE opt_argument_list
 		{
 			name_list_t* vp = (name_list_t*)$4;
 

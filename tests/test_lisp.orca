@@ -360,7 +360,7 @@ if r != 30 {
 
 
 
-def foo := def.lisp {
+def foo := lambda.lisp {
  (+ argv0 argv1)
 };
 

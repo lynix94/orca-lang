@@ -2,35 +2,35 @@
 def.parse calc(str)
 {
 	stmt : stmt '+' mul
-				def(...) {
+				lambda(...) {
 					return argv[0] + argv[2];
 				}
 		| stmt '-' mul
-				def(...) {
+				lambda(...) {
 					return argv[0] - argv[2];
 				}
 		| mul
-				def(...) {
+				lambda(...) {
 					return argv[0];
 				}
 		;
 
 	mul : mul '*' number
-				def(...) {
+				lambda(...) {
 					return argv[0] * argv[2];
 				}
 		|  mul '/' number
-				def(...) {
+				lambda(...) {
 					return argv[0] / argv[2];
 				}
 		| number
-				def(...) {
+				lambda(...) {
 					return argv[0];
 				}
 		;
 
 	number : r'[0-9]+'
-				def(...) {
+				lambda(...) {
 					return argv[0].integer();
 				}
 		;

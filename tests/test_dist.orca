@@ -32,7 +32,7 @@ dist.add('127.0.0.1', port+1);
 dist.add('127.0.0.1', port+2);
 
 
-r = dist.dist_do(10, 20, def(a, b){ return a + b; });
+r = dist.dist_do(10, 20, lambda(a, b){ return a + b; });
 print: r.is_done(100);
 print: ret = r.pop_obj();
 
@@ -41,7 +41,7 @@ if ret != 30 {
 }
 
 list = [1..100];
-rs = dist.dist_for(list, def(a) { return a * a; } );
+rs = dist.dist_for(list, lambda(a) { return a * a; } );
 print: rs;
 
 if rs != %[ x*x | x<-1~100 ] {
