@@ -10,7 +10,7 @@ def __cout__;
 
 print: my.__cout__;
 if my.__cout__.length() <= 0 {
-	throw test.shell, 'shell command fail';
+	throw test.shell <- 'shell command fail';
 }
 
 
@@ -18,7 +18,7 @@ my.__cout__ = '';
 ;echo hello 
 
 if my.__cout__.strip() != 'hello' {
-	throw test.shell, 'shell command fail';
+	throw test.shell <- 'shell command fail';
 }
 
 print: my, 'OK';

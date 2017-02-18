@@ -19,7 +19,7 @@ print('[', output, ' ', output.length(),']');
 
 if input != output {
 	print('ne');
-	throw test.file, 'file operation fail';
+	throw test.file <- 'file operation fail';
 }
 
 

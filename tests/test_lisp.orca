@@ -14,7 +14,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 4 * 2 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -27,7 +27,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 4*2*3+3 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 str = """
@@ -39,7 +39,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 4+4 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -57,7 +57,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 3 * 3 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -74,7 +74,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 3.141592 * 3.141592 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -90,7 +90,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != (10 + 20*20 + 30) / 3 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -103,7 +103,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != [1,2,3,4] {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 str = """
@@ -115,7 +115,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 1 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 str = """
@@ -127,7 +127,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != [2,3,4] {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -140,7 +140,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 2 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -153,7 +153,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 3 * 10 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -165,7 +165,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 8 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -180,7 +180,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 3+4 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -199,7 +199,7 @@ print: code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 'hello' {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -212,7 +212,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != math.sin(1) {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 str = """
@@ -224,7 +224,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != math.sin(1) {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -243,7 +243,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 3*4 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -257,7 +257,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 3*4 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -272,7 +272,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != (3*4)*(3*4) {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -285,7 +285,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r[0] != 1 || r[1][1] != 2 || r[1][2] != 3 || r[2] != 4 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -298,7 +298,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r[0] != 1 || r[1][1] != 2 || r[1][2] != 3 || r[2] != 4 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -312,7 +312,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != [1, 6, 4] {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -326,7 +326,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 25 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -340,7 +340,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 200 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -355,7 +355,7 @@ code = lisp.compile(str);
 print: 'result: ', r = lisp.execute(code);
 
 if r != 30 {
-	throw test.lisp, 'lisp result for ' + str.strip() + ' failed';
+	throw test.lisp <- 'lisp result for ' + str.strip() + ' failed';
 }
 
 
@@ -368,7 +368,7 @@ print: .foo;
 print: r = .foo(3, 4);
 
 if r != 3+4 {
-	throw test.lisp, 'lisp result for context failed';
+	throw test.lisp <- 'lisp result for context failed';
 }
 
 print: 'OK';

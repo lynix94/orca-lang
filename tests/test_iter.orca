@@ -41,7 +41,7 @@ for i in [1..100] {
 print: 'sum2: ', sum2;
 
 if sum != sum2 {
-	throw test.iter, 'test iterator fail';
+	throw test.iter <- 'test iterator fail';
 }
 
 
@@ -53,7 +53,7 @@ for a in item.begin() {
 
 print: 'list sum: ', sum;
 if sum != sum2 {
-	throw test.iter, 'test iterator fail';
+	throw test.iter <- 'test iterator fail';
 }
 
 
@@ -65,7 +65,7 @@ for a in item.begin() {
 print: 'item: ', item;
 
 if item != %[2*x|x<-1~100] {
-	throw test.iter, 'test iterator fail';
+	throw test.iter <- 'test iterator fail';
 }
 
 sum = 0;
@@ -76,7 +76,7 @@ for a in item.begin() {
 
 print: 'tuple sum: ', sum;
 if sum != sum2 {
-	throw test.iter, 'test iterator fail';
+	throw test.iter <- 'test iterator fail';
 }
 
 item = (1..100);
@@ -87,7 +87,7 @@ for a in item.begin() {
 print: 'tuple pow sum: ', item;
 
 if item != %[2*x|x<-1~100].tuple() {
-	throw test.iter, 'test iterator fail';
+	throw test.iter <- 'test iterator fail';
 }
 
 	
@@ -99,7 +99,7 @@ for a in item.begin() {
 
 print: 'map sum: ', sum;
 if sum !=  1+2+3+4+5 {
-	throw test.iter, 'test iterator fail';
+	throw test.iter <- 'test iterator fail';
 }
 
 item =  { 1:1, 2:2, 3:3, 4:4, 5:5 };
@@ -110,7 +110,7 @@ for a in item.begin() {
 print: 'map pow sum: ', item;
 
 if item  !=  { 1:2, 2:4, 3:6, 4:8, 5:10 } {
-	throw test.iter, 'test iterator fail';
+	throw test.iter <- 'test iterator fail';
 }
 
 print: 'OK';

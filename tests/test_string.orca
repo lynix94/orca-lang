@@ -12,7 +12,7 @@ format_str = 'name: ${name} age: ${age+10}';
 print(format_str);
 
 if format_str != 'name: tom age: 20' {
-	throw test.string, 'format fail';
+	throw test.string <- 'format fail';
 }
 
 str = '01234567890123456789';
@@ -20,63 +20,63 @@ str = '01234567890123456789';
 # string indexing
 print: str[3];
 if str[3] != '3' {
-	throw test.string, 'string index fail';
+	throw test.string <- 'string index fail';
 }
 
 print: str[3:6];
 if str[3:6] != '345' {
-	throw test.string, 'string slice fail';
+	throw test.string <- 'string slice fail';
 }
 
 print: str[-3:0];
 if str[-3:] != '789' {
-	throw test.string, 'string slice fail';
+	throw test.string <- 'string slice fail';
 }
 
 print: str[5:0];
 if str[5:0] != '54321' {
-	throw test.string, 'string reverse slice fail';
+	throw test.string <- 'string reverse slice fail';
 }
 
 # str len
 print(len = str.length());
 if len != 20 {
-	throw test.string, 'string length fail';
+	throw test.string <- 'string length fail';
 }
 
 # str find
 print(ret = str.find('345'));
 if ret != 3 {
-	throw test.string, 'string find fail';
+	throw test.string <- 'string find fail';
 }
 
 
 # str strip
 str = '  hello  ';
 if str.strip() != 'hello' {
-	throw test.string, 'string strip fail';
+	throw test.string <- 'string strip fail';
 }
 
 str = '  hello  ';
 if str.lstrip() != 'hello  ' {
-	throw test.string, 'string lstrip fail';
+	throw test.string <- 'string lstrip fail';
 }
 
 str = '  hello  ';
 if str.rstrip() != '  hello' {
-	throw test.string, 'string rstrip fail';
+	throw test.string <- 'string rstrip fail';
 }
 
 # compare
 print('123' > '02');
 if '123' <= '02' {
-	throw test.string, 'string compare fail';
+	throw test.string <- 'string compare fail';
 }
 
 str = '34236';
 print(ret = str.integer());
 if ret != 34236 {
-	throw test.string, 'string to integer fail';
+	throw test.string <- 'string to integer fail';
 }
 
 # str cat
@@ -86,58 +86,58 @@ c = a + b;
 print(c);
 
 if c != '111222' {
-	throw test.string, 'string cat fail';
+	throw test.string <- 'string cat fail';
 }
 
 # slicing
 str = '0123456789';
 print(str[0:3]);
 if str[0:3] != '012' {
-	throw test.string, 'string slicing fail';
+	throw test.string <- 'string slicing fail';
 }
 
 print(str[0:3));
 if str[0:3) != '0123' {
-	throw test.string, 'string slicing fail';
+	throw test.string <- 'string slicing fail';
 }
 
 print(str[-1:0) );	# reverse
 if str[-1:0) != '9876543210' {
-	throw test.string, 'string slicing fail';
+	throw test.string <- 'string slicing fail';
 }
 
 print(str[3:3+3]);
 if str[3:3+3] != '345' {
-	throw test.string, 'string slicing fail';
+	throw test.string <- 'string slicing fail';
 }
 
 # replace
 str = '000 AAA 000 AAA';
 print: str.replace('AAA', '###');
 if str.replace('AAA', '###') != '000 ### 000 ###' {
-	throw test.string, 'string replace fail';
+	throw test.string <- 'string replace fail';
 }
 
 print: str.replace('AAA', '###', 0, 7);
 if str.replace('AAA', '###', 0, 7) != '000 ### 000 AAA' {
-	throw test.string, 'string replace fail';
+	throw test.string <- 'string replace fail';
 }
 	
 
 # regex
 str = '123abc456def';
 if str != r'[0-9a-z]+' {
-	throw test.string, 'regex compare fail';
+	throw test.string <- 'regex compare fail';
 }
 
 print: str.find(r'[a-z]+[0-9]+');
 if str.find(r'[a-z]+[0-9]+') != ('abc456', 3, 9) {
-	throw test.string, 'regex find fail';
+	throw test.string <- 'regex find fail';
 }
 
 print: str.find_all(r'[0-9]+[a-z]+');
 if str.find_all(r'[0-9]+[a-z]+') != [ ('123abc', 0, 6), ('456def', 6, 12) ] {
-	throw test.string, 'regex find all fail';
+	throw test.string <- 'regex find all fail';
 }
 
 print: str.find_all(r'([0-9]+)[a-z]+');	# sub group
@@ -145,67 +145,67 @@ if str.find_all(r'([0-9]+)[a-z]+') !=
 	[ (('123abc',0,6), ('123',0,3)), 
 	  (('456def',6,12), ('456',6,9)) ]
 {
-	throw test.string, 'regex find all with subgroup fail';
+	throw test.string <- 'regex find all with subgroup fail';
 }
 
 print: str.replace(r'[0-9]+', '{{$0}}');
 if str.replace(r'[0-9]+', '{{$0}}') != '{{123}}abc{{456}}def' {
-	throw test.string, 'regex replace fail';
+	throw test.string <- 'regex replace fail';
 }
 
 # chomp, hash, push_back, start_with
 print: result = 'aaa.bbb.ccc'.chomp('.');
 if result != ['aaa', 'bbb', 'ccc'] {
-	throw test.string, 'string chomp fail';
+	throw test.string <- 'string chomp fail';
 }
 
 print: result = 'aaa000bbb111ccc'.chomp(r'[0-9]+');
 if result != ['aaa', 'bbb', 'ccc'] {
-	throw test.string, 'string chomp fail';
+	throw test.string <- 'string chomp fail';
 }
 
 a = 'aaa';
 print: result = a.push_back('bbb');
 if a != 'aaabbb' {
-	throw test.string, 'string push_back fail';
+	throw test.string <- 'string push_back fail';
 }
 
 print: result = 'aaabbbccc'.starts_with('aaa');
 if result != true {
-	throw test.string, 'string starts_with fail';
+	throw test.string <- 'string starts_with fail';
 }
 
 print: result = 'aaabbbccc*1!@#$%'.starts_with(r'[a-z]+');
 if result != true {
-	throw test.string, 'string starts_with fail';
+	throw test.string <- 'string starts_with fail';
 }
 
 print: result = 'aaabbbccc*1!@#$%'.starts_with(r'[0-9]+');
 if result == true {
-	throw test.string, 'string starts_with fail';
+	throw test.string <- 'string starts_with fail';
 }
 
 print: '#ends with';
 print: result = 'aaabbbccc'.ends_with('ccc');
 if result != true {
-	throw test.string, 'string ends_with fail';
+	throw test.string <- 'string ends_with fail';
 }
 
 print: result = 'aaabbbccc*1!@#$%111222333'.ends_with(r'[0-9]+');
 if result != true {
-	throw test.string, 'string ends_with fail';
+	throw test.string <- 'string ends_with fail';
 }
 
 print: result = 'aaabbbccc*1!@#$%'.ends_with(r'[0-9]+');
 if result == true {
-	throw test.string, 'string ends_with fail';
+	throw test.string <- 'string ends_with fail';
 }
 
 print: 'hash 1: ', hash1 = 'aaaaaaaaaaaa'.hash();
 print: 'hash 2: ', hash2 = 'bbbbbbbbbbbb'.hash();
 
 if hash1 == hash2 {
-	throw test.string, 'string hash fail';
+	throw test.string <- 'string hash fail';
 }
 
 
@@ -213,21 +213,21 @@ print: 'hash 1: ', hash1 = 'aaaaaaaaaaaa'.hash(10);
 print: 'hash 2: ', hash2 = 'bbbbbbbbbbbb'.hash(10);
 
 if hash1 == hash2 {
-	throw test.string, 'string hash fail';
+	throw test.string <- 'string hash fail';
 }
 
 print: a = 'aAbBcCdD+-*/';
 print: b = a.upper();
 
 if b != 'AABBCCDD+-*/' {
-	throw test.string, 'string upper fail';
+	throw test.string <- 'string upper fail';
 }
 
 print: a = 'aAbBcCdD+-*/';
 print: b = a.lower();
 
 if b != 'aabbccdd+-*/' {
-	throw test.string, 'string upper fail';
+	throw test.string <- 'string upper fail';
 }
 
 

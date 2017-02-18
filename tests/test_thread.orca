@@ -30,7 +30,7 @@ for a in tlist {
 print: .count;
 
 if .count != 30000 {
-	throw test.thread, 'abnormal count';
+	throw test.thread <- 'abnormal count';
 }
 
 print: my, ' OK';

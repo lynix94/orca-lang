@@ -40,7 +40,7 @@ def client {
 
 	print: 'recv: ', msg;
 	if msg.strip() != 'hello, socket' {
-		throw test.socket, 'socket abnormal';
+		throw test.socket <- 'socket abnormal';
 	}
 
 	sock.close();

@@ -4,13 +4,13 @@
 add assert
 improve catch statement
 add log
+make anonymous def
+
+
+### done
 change to lambda
-
-
-
-
 add eval (interpret, parse)
-
+###
 
 
 decode to switch
@@ -33,7 +33,6 @@ root, cloud (depent zookeeper or etcd)
 move code_top to vm->code_top()
 move parse to vm & parse, interpret lock
 
-using -> import
 nil -> null
 
 

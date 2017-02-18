@@ -2,50 +2,50 @@ a = ( 1, 2, 3, 4, 5 );
 
 print: a[0:];
 if a[0:] != a {
-	throw test.tuple, 'tuple slice fail';
+	throw test.tuple <- 'tuple slice fail';
 }
 
 print: a[-1:0);
 if a[-1:0) != (5, 4, 3, 2, 1,) {
-	throw test.tuple, 'tuple reverse fail';
+	throw test.tuple <- 'tuple reverse fail';
 }
 
 b = a[2:3];
 
 print: b;
 if b != [3].tuple() {	# (3) does not means tuple (expression with paren)
-	throw test.tuple, 'tuple index fail';
+	throw test.tuple <- 'tuple index fail';
 }
 
 print: (1,2,3,4,5,).list();
 if (1,2,3,4,5).list() != [1, 2, 3, 4, 5] {
-	throw test.tuple, 'tuple to list fail';
+	throw test.tuple <- 'tuple to list fail';
 }
 
 print: a.size();
 if a.size() != 5 {
-	throw test.tuple, 'tuple size fail';
+	throw test.tuple <- 'tuple size fail';
 }
 	
 print: (1..10);
 if (1..10) != (1,2,3,4,5,6,7,8,9,10) {
-	throw test.tuple, 'tuple generate fail';
+	throw test.tuple <- 'tuple generate fail';
 }
 
 a = 2;
 print: (3..(-3+a));
 if (3..(-3+a)) != (3,2,1,0,-1) {
-	throw test.tuple, 'tuple generate 2 fail';
+	throw test.tuple <- 'tuple generate 2 fail';
 }
 
 print: (1..10 : 2);
 if (1..10 : 2) != (1,3,5,7,9) {
-	throw test.tuple, 'tuple generate fail';
+	throw test.tuple <- 'tuple generate fail';
 }
 
 print: (10..1 : 2);
 if (10..1 : 2) != (10,8,6,4,2) {
-	throw test.tuple, 'tuple generate fail';
+	throw test.tuple <- 'tuple generate fail';
 }
 
 print: 'OK';

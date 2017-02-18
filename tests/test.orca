@@ -74,7 +74,7 @@ stopwatch.title('elapsed time: ') {
 			print: '### Test: %s end' % t;
 		}
 	}
-	catch test: msg {
+	catch test-> msg {
 		print: '!!! Fail !!!';
 		print: msg;
 		return;

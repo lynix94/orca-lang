@@ -10,7 +10,7 @@ def lock(obj)
 {
 	id = obj.id;
 	if id == 0 {
-		throw orca.type, 'obj has no address';
+		throw orca.type <- 'obj has no address';
 	}
 
 	.mutex {

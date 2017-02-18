@@ -15,7 +15,7 @@ alg.traverse (a, my.acc);
 print: r = my.acc.sum;
 
 if r != 1+2+3+4+5+6+7 {
-	throw test.alg, 'traverse failed';
+	throw test.alg <- 'traverse failed';
 }
 
 
@@ -25,7 +25,7 @@ alg.for_each(a.begin(), a.end(), my.acc);
 print: r = my.acc.sum;
 
 if r != 5050 {
-	throw test.alg, 'for_each failed';
+	throw test.alg <- 'for_each failed';
 }
 
 
@@ -36,7 +36,7 @@ alg.for_each_iterator(a.begin(), a.end(), lambda(it) { it(it()*2); });
 print: r = a;
 
 if r != [2..200 : 2] {
-	throw test.alg, 'for_each_iterator failed';
+	throw test.alg <- 'for_each_iterator failed';
 }
 
 
@@ -45,7 +45,7 @@ r = alg.find(a.begin(), a.end(), 40);
 print: r, ' ', r();
 
 if r() != 40 {
-	throw test.alg, 'find failed';
+	throw test.alg <- 'find failed';
 }
 
 
@@ -62,7 +62,7 @@ r = alg.find_if(a.begin(), a.end(), lambda(it){
 print: r, ' ', r();
 
 if r() != 12 {
-	throw test.alg, 'find_if failed';
+	throw test.alg <- 'find_if failed';
 }
 
 
@@ -74,7 +74,7 @@ alg.remove(a.begin(), a.end(), 3);
 print: a;
 
 if a != [1,2,4,5,6,7,8,9,10] {
-	throw test.alg, 'remove failed';
+	throw test.alg <- 'remove failed';
 }
 
 
@@ -86,7 +86,7 @@ alg.remove(a.begin(), a.end(), -100);
 print: a;
 
 if a != [1..10] {
-	throw test.alg, 'remove failed';
+	throw test.alg <- 'remove failed';
 }
 
 
@@ -98,7 +98,7 @@ alg.remove_if(a.begin(), a.end(), lambda(it){ return it % 3 == 0; });
 print: a;
 
 if a != %[x|x<-1~100, x%3!=0] {
-	throw test.alg, 'remove_if failed';
+	throw test.alg <- 'remove_if failed';
 }
 
 
@@ -108,7 +108,7 @@ alg.replace(a.begin(), a.end(), 3, 30);
 print: a;
 
 if a != [1,2,30,4,5,6,7,8,9,10] {
-	throw test.alg, 'replace failed';
+	throw test.alg <- 'replace failed';
 }
 
 
@@ -118,7 +118,7 @@ alg.replace_if(a.begin(), a.end(), lambda(it){ return it % 3 == 0; }, 30);
 print: a;
 
 if a != [1,2,30,4,5,30,7,8,30,10] {
-	throw test.alg, 'replace_if failed';
+	throw test.alg <- 'replace_if failed';
 }
 
 
@@ -130,7 +130,7 @@ alg.erase(a.find(3), a.find(7));
 print: a;
 
 if a != [1,2,7,8,9,10] {
-	throw test.alg, 'erase failed';
+	throw test.alg <- 'erase failed';
 }
 
 
@@ -140,7 +140,7 @@ alg.erase(a.find(3), a.find(100));
 print: a;
 
 if a != [1,2] {
-	throw test.alg, 'erase failed';
+	throw test.alg <- 'erase failed';
 }
 
 
@@ -153,7 +153,7 @@ alg.copy(a.begin(), a.end(), b.begin());
 print: b;
 
 if b != [1..10] {
-	throw test.alg, 'copy failed';
+	throw test.alg <- 'copy failed';
 }
 
 
@@ -164,7 +164,7 @@ alg.copy(a.find(3), a.find(7), b.find(104));
 print: b;
 
 if b != [101, 102, 103, 3, 4, 5, 6, 104, 105, 106, 107, 108, 109, 110] {
-	throw test.alg, 'copy failed';
+	throw test.alg <- 'copy failed';
 }
 
 
@@ -176,7 +176,7 @@ alg.copy_n(a.find(3), 2, b.find(104));
 print: b;
 
 if b != [101, 102, 103, 3, 4, 104, 105, 106, 107, 108, 109, 110] {
-	throw test.alg, 'copy_n failed';
+	throw test.alg <- 'copy_n failed';
 }
 
 
@@ -187,7 +187,7 @@ a = [1, 2, 3, 2, 2, 10, 20, 30];
 print: r = alg.count(a.begin(), a.end(), 2);
 
 if r != 3 {
-	throw test.alg, 'count failed';
+	throw test.alg <- 'count failed';
 }
 
 
@@ -197,7 +197,7 @@ a = [1, 2, 3, 2, 2, 10, 20, 30];
 print: r = alg.count_if(a.begin(), a.end(), lambda(it) { return it%2 == 0; });
 
 if r != 6 {
-	throw test.alg, 'count_if failed';
+	throw test.alg <- 'count_if failed';
 }
 
 
@@ -208,7 +208,7 @@ alg.transform(a.begin(), a.end(), b.begin(), lambda(it) { return it*10; });
 
 print: b;
 if b != [10, 20, 30, 20, 20, 100, 200, 300] {
-	throw test.alg, 'transform failed';
+	throw test.alg <- 'transform failed';
 }
 
 
@@ -221,7 +221,7 @@ alg.transform(a.begin(), a.end(), b.begin(), c.begin(), lambda(a, b){ return a+b
 
 print: c; 
 if c != [1+3, 2+5, 3+8, 2+4, 2+3] {
-	throw test.alg, 'transform failed';
+	throw test.alg <- 'transform failed';
 }
 
 
@@ -232,7 +232,7 @@ b = ['1', '2', '3', '2', '2'];
 print: r = alg.equal(a.begin(), a.end(), b.begin(), lambda(a, b){ return a == b.integer(); });
 
 if r == false {
-	throw test.alg, 'equal failed';
+	throw test.alg <- 'equal failed';
 }
 
 
@@ -242,13 +242,13 @@ a = [1, 2, 2, 2, 3, 4];
 print: r = alg.equal_range(a.begin(), a.end(), 2);
 
 if r == true {
-	throw test.alg, 'equal_range failed';
+	throw test.alg <- 'equal_range failed';
 }
 
 print: r = alg.equal_range(a.find(2), a.find(3), 2);
 
 if r == false {
-	throw test.alg, 'equal_range failed';
+	throw test.alg <- 'equal_range failed';
 }
 
 print: 'OK';

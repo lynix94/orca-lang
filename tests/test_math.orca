@@ -9,7 +9,7 @@ for i in sin.begin() {
 
 print: sin;
 if sin[0] != 0 {
-	throw test.math, 'sin failed';
+	throw test.math <- 'sin failed';
 }
 
 	
@@ -20,7 +20,7 @@ for i in cos.begin() {
 }
 print: cos;
 if cos[0] != 1 {
-	throw test.math, 'cos failed';
+	throw test.math <- 'cos failed';
 }
 	
 
@@ -31,7 +31,7 @@ for i in tan.begin() {
 }
 print: tan;
 if tan[0] != 0 {
-	throw test.math, 'tan failed';
+	throw test.math <- 'tan failed';
 }
 
 
@@ -42,7 +42,7 @@ for i in asin.begin() {
 }
 print: asin;
 if asin[0] != 0 {
-	throw test.math, 'asin failed';
+	throw test.math <- 'asin failed';
 }
 	
 acos = [0..1 : 0.1];
@@ -52,7 +52,7 @@ for i in acos.begin() {
 }
 print: acos;
 if acos[0] <= 1.5707 || acos[0] >= 1.5709 {
-	throw test.math, 'acos failed';
+	throw test.math <- 'acos failed';
 }
 	
 
@@ -63,7 +63,7 @@ for i in atan.begin() {
 }
 print: atan;
 if atan[0] != 0 {
-	throw test.math, 'atan failed';
+	throw test.math <- 'atan failed';
 }
 
 sinh = [0..1 : 0.1];
@@ -74,7 +74,7 @@ for i in sinh.begin() {
 
 print: sinh;
 if sinh[0] != 0 {
-	throw test.math, 'sinh failed';
+	throw test.math <- 'sinh failed';
 }
 
 cosh = [0..1 : 0.1];
@@ -84,7 +84,7 @@ for i in cosh.begin() {
 }
 print: cosh;
 if cosh[0] != 1 {
-	throw test.math, 'cosh failed';
+	throw test.math <- 'cosh failed';
 }
 
 atan2 = [0..1 : 0.1];
@@ -94,7 +94,7 @@ for i in atan2.begin() {
 }
 print: atan2;
 if atan2[0] != 0 {
-	throw test.math, 'atan2 failed';
+	throw test.math <- 'atan2 failed';
 }
 
 
@@ -103,97 +103,97 @@ if atan2[0] != 0 {
 
 print: r = math.ceil(10.1);
 if r != 11 {
-	throw test.math, 'ceil failed';
+	throw test.math <- 'ceil failed';
 }
 
 print: r = math.ceil(10.999999);
 if r != 11 {
-	throw test.math, 'ceil failed';
+	throw test.math <- 'ceil failed';
 }
 
 print: r = math.floor(30.3);
 if r != 30 {
-	throw test.math, 'floor failed';
+	throw test.math <- 'floor failed';
 }
 
 print: r = math.floor(30.99999);
 if r != 30 {
-	throw test.math, 'floor failed';
+	throw test.math <- 'floor failed';
 }
 
 print: r = math.exp(20);
 if r <= 4.85164e+08 || r >= 4.85166e+08 {
-	throw test.math, 'exp failed';
+	throw test.math <- 'exp failed';
 }
 
 print: r = math.fabs(-30);
 if r.integer() != 30 {
-	throw test.math, 'fabs failed';
+	throw test.math <- 'fabs failed';
 }
 
 print: r = math.fabs(-30.0004);
 if r.integer() != 30 {
-	throw test.math, 'fabs failed';
+	throw test.math <- 'fabs failed';
 }
 
 print: r = math.fabs(-math.exp(20));
 if r != math.exp(20) {
-	throw test.math, 'fabs failed';
+	throw test.math <- 'fabs failed';
 }
 
 print: r = math.fmod(30.3, 0.4);
 if math.ceil(r*10) != 3 {
-	throw test.math, 'fmod failed';
+	throw test.math <- 'fmod failed';
 }
 	
 print: r = math.fmod(30.3, 0.1);
 if math.ceil(r*10) != 1 {
-	throw test.math, 'fmod failed';
+	throw test.math <- 'fmod failed';
 }
 
 print: r = math.fmod(30.3, 30);
 if math.ceil(r*10) != 4 {
-	throw test.math, 'fmod failed';
+	throw test.math <- 'fmod failed';
 }
 
 print: r = math.frexp(30.3);
 if r.type != type.tuple || math.ceil(r[0]*100000) != 94688 || r[1] != 5 {
-	throw test.math, 'frexp failed';
+	throw test.math <- 'frexp failed';
 }
 
 print: r = math.ldexp(30.3, 4);
 if r.integer() != 484 {
-	throw test.math, 'ldexp failed';
+	throw test.math <- 'ldexp failed';
 }
 
 print: r = math.log(1234567890);
 if (r*1000).integer() != 20933 {
-	throw test.math, 'log10 failed';
+	throw test.math <- 'log10 failed';
 }
 
 print: r = math.log10(10000000);
 if r != 7 {
-	throw test.math, 'log10 failed';
+	throw test.math <- 'log10 failed';
 }
 
 print: r = math.log10(100000000000000000000);
 if r != 20 {
-	throw test.math, 'log10 failed';
+	throw test.math <- 'log10 failed';
 }
 
 print: r = math.modf(30.3);
 if (r[0]*10).integer() != 3 || r[1] != 30 {
-	throw test.math, 'modf failed';
+	throw test.math <- 'modf failed';
 }
 
 print: r = math.pow(10, 2);
 if r != 100 {
-	throw test.math, 'pow failed';
+	throw test.math <- 'pow failed';
 }
 
 print: r = math.sqrt(4);
 if r != 2 {
-	throw test.math, 'pow failed';
+	throw test.math <- 'pow failed';
 }
 
 print: 'OK';

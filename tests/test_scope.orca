@@ -25,14 +25,14 @@ def scope
 .scope {
 	print: .scope.flag_start;
 	if !.scope.flag_start {
-		throw test.scope, 'scope_start not called';
+		throw test.scope <- 'scope_start not called';
 	}
 
 	print: 'scope mid';
 }
 
 if !.scope.flag_end {
-	throw test.scope, 'scope_end not called';
+	throw test.scope <- 'scope_end not called';
 }
 
 
@@ -41,23 +41,23 @@ if !.scope.flag_end {
 try {
 	.scope {
 		if !.scope.flag_start {
-			throw test.scope, 'scope_start not called';
+			throw test.scope <- 'scope_start not called';
 		}
 
 		print: 'scope mid';
-		throw scope, 'test';
+		throw scope <- 'test';
 
 		print: 'this printing will be ignored by throw, but scope end will be preinted';
-		throw test.scope, 'abnormal scope termination';
+		throw test.scope <- 'abnormal scope termination';
 	}
 }
-catch scope: msg {
+catch scope -> msg {
 	print: 'catched', msg;
 }
 
 
 if !.scope.flag_end {
-	throw test.scope, 'scope_end not called';
+	throw test.scope <- 'scope_end not called';
 }
 
 print: my, ' OK';

@@ -95,7 +95,7 @@ do {
 	start = idx+2;
 	idx = str.find('%>', start);
 	if idx < 0 {
-		throw osp.parsing, 'invalid format';
+		throw osp.parsing <- 'invalid format';
 	}
 
 	.append_code(str[start:idx]);

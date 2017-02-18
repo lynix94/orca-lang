@@ -388,7 +388,7 @@ catch_stmt:/*{{{*/
 		{
 			g_ex->goto_finally();
 		}
-	| CATCH object_path ':' name_list
+	| CATCH object_path RIGHT_ARROW name_list
 		{
 			name_list_t* vp = (name_list_t*)$4;
 			g_ex->catch_start($2, vp);
@@ -413,7 +413,7 @@ throw_stmt:/*{{{*/
 		{
 			g_ex->do_throw($2, 0);
 		}
-	| THROW object_path ',' expression_list ';'
+	| THROW object_path LEFT_ARROW expression_list ';'
 		{
 			g_ex->do_throw($2, $4);
 		}

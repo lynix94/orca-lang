@@ -15,11 +15,11 @@ print: str = xml.encoding(ret);
 print: str = xml.beutify(ret);
 
 if ret['tag_a']['tag_b'].size() != 2 {
-	throw test.xml, 'xml decoding failed';
+	throw test.xml <- 'xml decoding failed';
 }
 
 if ret['tag_a']['tag_c']['$text'] != 'text of tag c' {
-	throw test.xml, 'xml decoding failed';
+	throw test.xml <- 'xml decoding failed';
 }
 
 str = io.open('categories.xml').read();

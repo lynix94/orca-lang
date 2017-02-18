@@ -2,7 +2,7 @@ using io.print;
 
 print('simple if');
 if 10 > 20 {
-	throw test.control, 'if statement fail';
+	throw test.control <- 'if statement fail';
 }
 
 
@@ -10,21 +10,21 @@ print('if else');
 a = 0;
 
 if 10 > 30 {
-	throw test.control, 'if else statement fail';
+	throw test.control <- 'if else statement fail';
 }
 else {
 	a = 10;
 }
 
 if a != 10 {
-	throw test.control, 'if else statement fail';
+	throw test.control <- 'if else statement fail';
 }
 
 
 
 print('simple while');
 while false {
-	throw test.control, 'simple while statement fail';
+	throw test.control <- 'simple while statement fail';
 }
 
 
@@ -35,7 +35,7 @@ while a < 100 {
 
 
 if a != 100 {
-	throw test.control, 'while statement fail';
+	throw test.control <- 'while statement fail';
 }
 
 print('simple do while');
@@ -47,7 +47,7 @@ do {
 
 print(a);
 if a != 100 {
-	throw test.control, 'simple do while statement fail';
+	throw test.control <- 'simple do while statement fail';
 }
 
 print('simple times do');
@@ -59,7 +59,7 @@ a = 0;
 
 print(a);
 if a != 100 {
-	throw test.control, 'simple times do statement fail';
+	throw test.control <- 'simple times do statement fail';
 }
 
 print('nested');
@@ -80,7 +80,7 @@ do {
 
 print(c);
 if c != 1000 {
-	throw test.control, 'nested control statement fail';
+	throw test.control <- 'nested control statement fail';
 }
 
 print('simple for');
@@ -93,7 +93,7 @@ for b in a {
 
 print(c);
 if c != 55 {
-	throw test.control, 'simple for statement fail';
+	throw test.control <- 'simple for statement fail';
 }
 
 print('simple for');
@@ -109,7 +109,7 @@ for a in l {
 
 print(d);
 if (d != 1000) {
-	throw test.control, 'nested for statement fail';
+	throw test.control <- 'nested for statement fail';
 }
 
 print('simple tuple for');
@@ -122,7 +122,7 @@ for b in a {
 
 print(c);
 if c != 55 {
-	throw test.control, 'tuple for statement fail';
+	throw test.control <- 'tuple for statement fail';
 }
 
 
@@ -141,7 +141,7 @@ do {
 
 print: a;
 if a != 16 {
-	throw test.control, 'continue fail';
+	throw test.control <- 'continue fail';
 }
 
 a = 0;
@@ -158,7 +158,7 @@ do {
 
 print: a;
 if a != 5 {
-	throw test.control, 'break fail';
+	throw test.control <- 'break fail';
 }
 
 
@@ -174,7 +174,7 @@ while a > -1 {
 
 print: a;
 if a != 10 {
-	throw test.control, 'while, break fail';
+	throw test.control <- 'while, break fail';
 }
 
 
@@ -193,7 +193,7 @@ for a in [1..30] {
 
 print: a;
 if a != 9 {
-	throw test.control, 'for, break fail';
+	throw test.control <- 'for, break fail';
 }
 
 

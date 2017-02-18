@@ -41,7 +41,7 @@ print: t2 = stopwatch.elapse();
 stopwatch.lap();
 
 if f1 != f2 || t1 <= t2 {
-	throw test.test_pure, 'pure result fail';
+	throw test.test_pure <- 'pure result fail';
 }
 	
 

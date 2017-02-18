@@ -88,91 +88,91 @@ print: 'now a: ${a}, b: ${b}';
 print: 'mag of a is bigger than b';
 print: 'a==b: ', a == b;
 if (a == b) != false {
-	throw test.operator, 'operator eq fail';
+	throw test.operator <- 'operator eq fail';
 }
 
 print: 'a!=b: ', a != b;
 if (a != b) != true {
-	throw test.operator, 'operator neq fail';
+	throw test.operator <- 'operator neq fail';
 }
 
 print: 'a<b: ', a < b;
 if (a < b) != false {
-	throw test.operator, 'operator lt fail';
+	throw test.operator <- 'operator lt fail';
 }
 
 print: 'a<=b: ', a <= b;
 if (a <= b) != false {
-	throw test.operator, 'operator le fail';
+	throw test.operator <- 'operator le fail';
 }
 
 print: 'a>b: ', a > b;
 if (a > b) != true {
-	throw test.operator, 'operator gt fail';
+	throw test.operator <- 'operator gt fail';
 }
 
 print: 'a>=b: ', a >= b;
 if (a >= b) != true {
-	throw test.operator, 'operator ge fail';
+	throw test.operator <- 'operator ge fail';
 }
 
 
 print: 'some other tests';
 print: 'a==a: ', a == a;
 if (a == a) != true {
-	throw test.operator, 'self eq fail';
+	throw test.operator <- 'self eq fail';
 }
 
 print: 'a!=a: ', a != a;
 if (a != a) != false {
-	throw test.operator, 'self neq fail';
+	throw test.operator <- 'self neq fail';
 }
 
 print: 'a<a: ', a < a;
 if (a < a) != false {
-	throw test.operator, 'self lt fail';
+	throw test.operator <- 'self lt fail';
 }
 
 print: 'a<=a: ', a <= a;
 if (a <= a) != true {
-	throw test.operator, 'self le fail';
+	throw test.operator <- 'self le fail';
 }
 
 print: 'a>a: ', a > a;
 if (a > a) != false {
-	throw test.operator, 'self gt fail';
+	throw test.operator <- 'self gt fail';
 }
 
 print: 'a>=a: ', a >= a;
 if (a >= a) != true {
-	throw test.operator, 'self ge fail';
+	throw test.operator <- 'self ge fail';
 }
 
 print: 'test for map';
 m = { a:'complex a', b:'complex b' };
 print: m[a];
 if m[a] != 'complex a' {
-	throw test.operator, 'test for map fail';
+	throw test.operator <- 'test for map fail';
 }
 
 print: 'a+1: ', a+1;
 if a+1 != .complex.clone(41, 60) {
-	throw test.operator, 'complex + int fail';
+	throw test.operator <- 'complex + int fail';
 }
 
 print: 'a-1: ', a-1;
 if a-1 != .complex.clone(39, 60) {
-	throw test.operator, 'complex - int fail';
+	throw test.operator <- 'complex - int fail';
 }
 
 print: '1-a: ', 1-a;
 if a-1 != .complex.clone(-39, -60) {
-	throw test.operator, 'int - complex fail';
+	throw test.operator <- 'int - complex fail';
 }
 
 print: a[0], a['1'], a[2];
 if a[0] != 0 {
-	throw test.operator, 'operator_get_at fail';
+	throw test.operator <- 'operator_get_at fail';
 }
 
 print: a[0] = 1;
@@ -180,7 +180,7 @@ print: a[1] = 2;
 a[1] = 2;
 print: b = (a[0] = 3);
 if b != (0, 3) {
-	throw test.operator, 'operator_get_at fail';
+	throw test.operator <- 'operator_get_at fail';
 }
 
 print: 'OK';
