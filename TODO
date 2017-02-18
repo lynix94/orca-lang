@@ -1,46 +1,31 @@
 
 # now thinking 
-
 add assert
-improve catch statement
 add log
 make anonymous def
+channel ? 
+def foo(...) under path
+select
 
 
 ### done
 change to lambda
 add eval (interpret, parse)
+improve catch statement
 ###
 
 
 decode to switch
 swich, select, decode
-
-
-def foo(...) under path
-
-
-channel ? 
-
-
 root, cloud (depent zookeeper or etcd)
 
-
-
-
 # refactoring
-
 move code_top to vm->code_top()
 move parse to vm & parse, interpret lock
-
 nil -> null
 
 
-
-
-
 # remove
-
 windows build
 once
 pure
@@ -48,7 +33,6 @@ dfsd
 
 
 # add
-
 cache
 
 

@@ -1,7 +1,6 @@
 
 def traverse(obj, fun)
 {
-	print('>>>', obj)
 	fun(obj);
 	if obj.members.has_key('begin') {
 		for a in obj.begin() {
