@@ -94,6 +94,7 @@ const char* get_context();
 %type <integer> def						// flag
 %type <integer> assign_type				// '=', '+'...
 %type <integer> pattern_list			// num of pattern
+%type <integer> assign_target_list
 
 %type <real> real
 %type <real> minus_real
@@ -236,9 +237,83 @@ statement:/*{{{*/
 	| scope_stmt
 	| parallel_stmt
 	| debug_stmt 
+	| channel_stmt 
 	| ';'
 	;
 /*}}}*/
+
+channel_stmt:
+	expression LEFT_ARROW
+		{
+			g_ctl->channel_in_start();
+		}
+	expression_list ';'
+		{
+			g_ctl->channel_in_end($4);
+		}
+	| expression RIGHT_ARROW
+		{
+			g_ctl->channel_out_start();
+		}
+	assign_target_list ';'
+		{
+			g_ctl->channel_out_end($4);
+		}
+	;
+
+assign_target_list:
+	  assign_target_list ',' assign_target
+		{
+			$$ = $1 + 1;
+		}
+	| assign_target
+		{
+			$$ = 1;
+		}
+	;
+
+assign_target:
+	  lvar
+		{
+			g_op->assign_local($1);
+		}
+	| postfix_object '.' name_or_string
+		{
+			g_op->assign_member($3);
+		}
+	| postfix_object '.' reserved_object
+		{
+			g_op->assign_reserved($3);
+		}
+	| postfix_object '[' slice_expression ']' assign_type 
+		{
+			g_op->assign_list(false);
+		}
+	| postfix_object '[' slice_expression ')' assign_type 
+		{
+			g_op->assign_list(true);
+		}
+	| DOUBLE_DOT name_or_string
+		{
+			g_op->push_reserved(OP_PUSH_OWNER);
+			g_op->assign_member($2);
+		}
+	| DOUBLE_DOT reserved_object
+		{
+			g_op->push_reserved(OP_PUSH_OWNER);
+			g_op->assign_reserved($2);
+		}
+	| '.' name_or_string
+		{
+			g_op->push_reserved(OP_PUSH_MY);
+			g_op->assign_member($2);
+		}
+	| '.' reserved_object
+		{
+			g_op->push_reserved(OP_PUSH_MY);
+			g_op->assign_reserved($2);
+		}
+	;
 
 scope_stmt:/*{{{*/
 	expression
@@ -613,7 +688,7 @@ decode_pattern_stmt:/*{{{*/
 		{
 			g_ctl->decode_pattern_start();
 		}
-	decode_pattern RIGHT_ARROW 
+	decode_pattern RIGHT_ARROW
 		{
 			g_ctl->decode_pattern_shift();
 		}
@@ -1184,6 +1259,7 @@ expression:/*{{{*/
 	;
 /*}}}*/
 
+
 assign_expr:	/*{{{*/
 	  lvar assign_type 
 		{
@@ -1479,6 +1555,7 @@ numeric_expr:/*{{{*/
 	add_expr
 	;
 /*}}}*/
+
 
 add_expr:/*{{{*/
 	add_expr '+' mul_expr

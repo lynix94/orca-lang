@@ -72,6 +72,12 @@ public:
 	void once_start();
 	void once_end();
 
+	void channel_in_start();
+	void channel_in_end(int num);
+
+	void channel_out_start();
+	void channel_out_end(int num);
+
 private:
 	struct context {
 		context() : start(0), end(0), pass2(0) { }
