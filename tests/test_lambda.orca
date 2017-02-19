@@ -1,16 +1,16 @@
 
 
 def for_each(list, functor) {
-  for a in list: {
+  for a in list {
     functor(a);
   }
 }
 
-my.for_each([1..10], def(a){ print(a); });
+my.for_each([1..10], lambda(a){ print(a); });
 
 # below is same with above statement
 
-my.for_each: [1..10], def(a){
+my.for_each: [1..10], lambda(a){
   print: a;
 };
 

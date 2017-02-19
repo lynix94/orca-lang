@@ -18,7 +18,7 @@ static def magic;
 .cache = type.tuple();
 
 .hash_size = 1000;
-for i in [1..my.hash_size]: {
+for i in [1..my.hash_size] {
 	.cache.push_back( type.list() );
 }
 
@@ -72,10 +72,10 @@ def client
 	def recv()
 	{
 		header = ..sock.recv(cached.magic.length() + 5);
-		if header.starts_with(cached.magic): {
+		if header.starts_with(cached.magic) {
 			len = header[-5:-1).integer();
 		}
-		else: {
+		else {
 			..sock.recv(0, 0);
 		}
 		
@@ -112,9 +112,10 @@ def client
 
 		it = list.find(key);
 
-		for a in list: {
-			if a[0] == key:
+		for a in list {
+			if a[0] == key {
 				return a[1];
+			}
 		}
 
 		return nil;
@@ -127,8 +128,11 @@ def client
 
 		it = list.find(key);
 
-		for a in list: {
-			if a[0] == key: a[1] = value;
+		for a in list {
+			if a[0] == key {
+				a[1] = value;
+			}
+
 			return true;
 		}
 
@@ -141,8 +145,11 @@ def client
 		print: '# remove: ', key, key.hash(cached.hash_size);
 		list = ..cache[key.hash(cached.hash_size)];
 
-		for it in list.begin(): {
-			if it()[0] == key: it.erase();
+		for it in list.begin() {
+			if it()[0] == key {
+				it.erase();
+			}
+
 			return true;
 		}
 
@@ -169,8 +176,9 @@ def client
 				{ 
 					result = false;
 					value = ..find_val(path);
-					if value != nil:
+					if value != nil {
 						result = true;
+					}
 
 					..send: pack.save(result);
 				}
@@ -184,13 +192,19 @@ def client
 
 			'<read>', %path, ',', %size, ',', %offset -> 
 				{ 
-					if size == 'nil': size = '1000000000';
-					if offset == 'nil': offset = '0';
+					if size == 'nil' {
+						size = '1000000000';
+					}
+
+					if offset == 'nil' {
+						offset = '0';
+					}
+
 					size = size.integer();
 					offset = offset.integer();
 
 					value = ..find_val(path);
-					if value == nil : {
+					if value == nil {
 						..send: pack.save(value); 
 						return;
 					}
@@ -200,7 +214,10 @@ def client
 
 			'<write>', %path, ',', %offset, ',', %data -> 
 				{ 
-					if offset == 'nil': offset = '0';
+					if offset == 'nil' {
+						offset = '0';
+					}
+
 					offset = offset.integer();
 					obj = ..add_val(path, data, offset);
 					..send: pack.save(obj);

@@ -17,9 +17,9 @@ fh.close();
 print('[', input, ' ', input.length(),']');
 print('[', output, ' ', output.length(),']');
 
-if input != output: {
+if input != output {
 	print('ne');
-	throw test.file, 'file operation fail';
+	throw test.file <- 'file operation fail';
 }
 
 

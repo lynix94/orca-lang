@@ -13,7 +13,7 @@ print: '## httpd start';
 
 def sock;
 
-if os.isdir(argv[0]) == false: {
+if os.isdir(argv[0]) == false {
 	print: argv[0], ' is not directory';
 	return;
 }
@@ -93,19 +93,22 @@ ${header}
 		len = 0;
 		hlen = 0;
 		CL = msg.find(r'Content-Length: ([0-9]+)');
-		if CL != nil: {
+		if CL != nil {
 			len = CL[1][0].integer();
 			hlen = CL[1][2];
 		}
 
 		len += hlen;
-		if msg.length() >= len: {
+		if msg.length() >= len {
 			return msg;
 		}
 
 		do {
 			part = ..sock.recv(0, 2000);
-			if part.length() == 0: break;
+			if part.length() == 0 {
+				break;
+			}
+
 			msg.push_back(part);
 		} while msg.length() < len;
 
@@ -137,16 +140,19 @@ ${header}
 
 	def get_param(str, p)
 	{
-		if p == nil: p = type.map();
+		if p == nil {
+			p = type.map();
+		}
 
 		str = str.strip();
 		list = str.chomp('&');
-		for a in list: {
+		for a in list {
 			kv = a.chomp('=');
 			k = kv[0];
 			v = '';
-			if kv.size() > 1:
+			if kv.size() > 1 {
 				v = kv[1];
+			}
 
 			p[k] = v;
 		}
@@ -165,79 +171,90 @@ ${header}
 
 		// process url parameters
 		p = type.map();
-		if ret.size() > 1:
+		if ret.size() > 1 {
 			p = ..get_param(ret[1], p);
+		}
 
 		// process cookie
 		cookie = msg.find(r'Cookie: ([^\n]+)');
-		if cookie != nil: {
+		if cookie != nil {
 			str = cookie[1][0];
 			str_list = str.chomp('; ');
-			for a in str_list:
+			for a in str_list {
 				p = ..get_param(a, p);
+			}
 		}
 
 		// process multipart parameters
 		multi = msg.find(r'Content-Type: multipart/form-data; boundary=([-_0-9a-zA-Z]+)');
 
-		if multi != nil: {
+		if multi != nil {
 			boundary = '--' + multi[1][0];
 			list = msg.chomp(boundary);
 			list.pop_front();
 			list.pop_back();
 
 			it = list.begin();
-			for a in it: {
+			for a in it {
 				name = a().find(r'name=\"([^\"]+)\"');
-				if name == nil: continue;
+				if name == nil {
+					continue;
+				}
+
 				name = name[1][0];
 
 				value = a().find(r'[\r|]\n[\r|]\n(.*)');
-				if value == nil: continue;
+				if value == nil {
+					continue;
+				}
+
 				value = value[1][0];
 
 				p[name] = value;
 			}
 		}
-		else: {
+		else {
 			// process post parameter
 			post_param = msg.find(r'[\r|]\n[\r|]\n([a-zA-Z_][a-zA-Z_0-9=&]+)');
 
-			if post_param != nil: 
+			if post_param != nil {
 				p = ..get_param(post_param[1][0], p);
+			}
 		}
 		
 
 		// process response
-		if !fs.isexists(uri): {
+		if !fs.isexists(uri) {
 			..send_error('404 Not Found');
 			return;
 		}
 
-		if fs.isdir(uri): {
+		if fs.isdir(uri) {
 			uri += '/index.html';
 		}
 
-		if uri.ends_with('.orca'): {
+		if uri.ends_with('.orca') {
 			mod_path = uri[:-5] + '.kw';
 			reload = true;
-			if fs.isexists(mod_path): {
+			if fs.isexists(mod_path) {
 				mod_time = os.last_write_time(mod_path);
 				src_time = os.last_write_time(uri);
 
-				if mod_time >= src_time: 
+				if mod_time >= src_time {
 					reload = false;
+				}
 			}
 
 			mod_name = mod_path[:-3];
 			idx = mod_name[-1:0).find('/');
-			if idx > 0: {
+			if idx > 0 {
 				idx *= -1;
 				mod_name = mod_name[idx:];
 			}
 
-			if reload: 
+			if reload {
 				orca.unload(mod_name, httpd);
+			}
 
 			orca.load(uri[:-5], httpd);
 
@@ -246,12 +263,12 @@ ${header}
 			header = ret[0];
 			body = ret[1];
 		}
-		elif uri.ends_with('.osp'): {
+		elif uri.ends_with('.osp') {
 			ret = osp(uri, p);
 			header = ret[0];
 			body = ret[1];
 		}
-		else: {
+		else {
 			try {
 				body = fs.read(uri);
 			}
@@ -287,16 +304,18 @@ def session
 
 	def get_session(id)
 	{
-		if ..session.has_key(id):
+		if ..session.has_key(id) {
 			return ..session[id];
+		}
 
 		return nil;
 	}
 
 	def free_session(id)
 	{
-		if ..session.has_key(id):
+		if ..session.has_key(id) {
 			..session.remove_key(id);
+		}
 	}
 }
 

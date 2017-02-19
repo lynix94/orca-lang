@@ -1,13 +1,14 @@
 using fun;
 
-if argv.typename != 'tuple':
+if argv.typename != 'tuple' {
 	return nil;
+}
 
 mod = argv[0].chomp('.');
 orca.load(mod[0]);
 
 f = root;
-for a in mod: {
+for a in mod {
 	f = f.members[a];
 }
 

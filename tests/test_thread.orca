@@ -19,16 +19,19 @@ def foo(mtx) {
 m = mutex.clone();
 
 tlist = [];
-for a in [1..30]: {
+for a in [1..30] {
 	tlist.push_back( thread.run(my.foo, m) );
 }
 
-for a in tlist: a.join();
+for a in tlist {
+	a.join();
+}
 
 print: .count;
 
-if .count != 30000:
-	throw test.thread, 'abnormal count';
+if .count != 30000 {
+	throw test.thread <- 'abnormal count';
+}
 
 print: my, ' OK';
 

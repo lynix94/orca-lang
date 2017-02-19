@@ -27,7 +27,7 @@ th2.join();
 def inc_thread(key) {
 	sem = ipc.semaphore.clone();
 	sem.set(key, 10);
-	for a in [1..10]: {
+	for a in [1..10] {
 		print: 'produced...';
 		sem.inc();
 		msleep(1);
@@ -37,7 +37,7 @@ def inc_thread(key) {
 def dec_thread(key) {
 	sem = ipc.semaphore.clone();
 	sem.set(key, 10);
-	for a in [1..10]: {
+	for a in [1..10] {
 		sem.dec();
 		print: 'consumed...';
 	}

@@ -1,229 +1,281 @@
 
 
 print: r = '%010d' % 10;
-if r != '0000000010':
-	throw test.format, 'string format failed';
+if r != '0000000010' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010d' % 100000000000000000000000000000000000000;
-if r != '100000000000000000000000000000000000000':
-	throw test.format, 'string format failed';
+if r != '100000000000000000000000000000000000000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010d' % 10.23;
-if r != '0000000010':
-	throw test.format, 'string format failed';
+if r != '0000000010' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010d' % '100';
-if r != '0000000100':
-	throw test.format, 'string format failed';
+if r != '0000000100' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010d' % 'aaa';
-if r != '0000000000':
-	throw test.format, 'string format failed';
+if r != '0000000000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010d' % true;
-if r != '0000000001':
-	throw test.format, 'string format failed';
+if r != '0000000001' {
+	throw test.format <- 'string format failed';
+}
 
 
 print: r = '%010x' % 10;
-if r != '000000000a':
-	throw test.format, 'string format failed';
+if r != '000000000a' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010x' % 100000000000000000000000000000000000000;
-if r != '4b3b4ca85a86c47a098a224000000000':
-	throw test.format, 'string format failed';
+if r != '4b3b4ca85a86c47a098a224000000000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010x' % 10.23;
-if r != '000000000a':
-	throw test.format, 'string format failed';
+if r != '000000000a' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010x' % '100';
-if r != '0000000064':
-	throw test.format, 'string format failed';
+if r != '0000000064' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010x' % 'aaa';
-if r != '0000000000':
-	throw test.format, 'string format failed';
+if r != '0000000000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010x' % true;
-if r != '0000000001':
-	throw test.format, 'string format failed';
+if r != '0000000001' {
+	throw test.format <- 'string format failed';
+}
 
 
 print: r = '%010f' % 10;
-if r != '010.000000':
-	throw test.format, 'string format failed';
+if r != '010.000000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010f' % 100000000000000000000000000000000000000;
-if !r.starts_with('9999999999999999'):
-	throw test.format, 'string format failed';
+if !r.starts_with('9999999999999999') {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010f' % 10.23;
-if r != '010.230000':
-	throw test.format, 'string format failed';
+if r != '010.230000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010f' % '100';
-if r != '100.000000':
-	throw test.format, 'string format failed';
+if r != '100.000000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010f' % 'aaa';
-if r != '000.000000':
-	throw test.format, 'string format failed';
+if r != '000.000000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010f' % true;
-if r != '001.000000':
-	throw test.format, 'string format failed';
+if r != '001.000000' {
+	throw test.format <- 'string format failed';
+}
 
 
 print: r = '%010e' % 10;
-if r.replace('+00', '+0') != '1.000000e+01':
-	throw test.format, 'string format failed';
+if r.replace('+00', '+0') != '1.000000e+01' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010e' % 100000000000000000000000000000000000000;
-if r.replace('+0', '+') != '1.000000e+38':
-	throw test.format, 'string format failed';
+if r.replace('+0', '+') != '1.000000e+38' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010e' % 10.23;
-if r.replace('+00', '+0') != '1.023000e+01':
-	throw test.format, 'string format failed';
+if r.replace('+00', '+0') != '1.023000e+01' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010e' % '100';
-if r.replace('+00', '+0') != '1.000000e+02':
-	throw test.format, 'string format failed';
+if r.replace('+00', '+0') != '1.000000e+02' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010e' % 'aaa';
-if r.replace('+000', '+00') != '0.000000e+00':
-	throw test.format, 'string format failed';
+if r.replace('+000', '+00') != '0.000000e+00' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010e' % true;
-if r.replace('+000', '+00') != '1.000000e+00':
-	throw test.format, 'string format failed';
+if r.replace('+000', '+00') != '1.000000e+00' {
+	throw test.format <- 'string format failed';
+}
 
 
 
 print: r = '%010g' % 10;
-if r != '0000000010':
-	throw test.gormat, 'string format failed';
+if r != '0000000010' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010g' % 100000000000000000000000000000000000000;
-if r != '000001e+38' && r != '00001e+038':
-	throw test.gormat, 'string format failed';
+if r != '000001e+38' && r != '00001e+038' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010g' % 10.23;
-if r != '0000010.23':
-	throw test.gormat, 'string format failed';
+if r != '0000010.23' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010g' % '100';
-if r != '0000000100':
-	throw test.gormat, 'string format failed';
+if r != '0000000100' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010g' % 'aaa';
-if r != '0000000000':
-	throw test.gormat, 'string format failed';
+if r != '0000000000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010g' % true;
-if r != '0000000001':
-	throw test.gormat, 'string format failed';
+if r != '0000000001' {
+	throw test.format <- 'string format failed';
+}
 
 
 
 
 print: r = '%10s' % 10;
-if r != '        10':
-	throw test.gormat, 'string format failed';
+if r != '        10' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%10s' % 100000000000000000000000000000000000000;
-if r != '100000000000000000000000000000000000000':
-	throw test.gormat, 'string format failed';
+if r != '100000000000000000000000000000000000000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%10s' % 10.23;
-if r != '     10.23':
-	throw test.gormat, 'string format failed';
+if r != '     10.23' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%10s' % '100';
-if r != '       100':
-	throw test.gormat, 'string format failed';
+if r != '       100' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%10s' % 'aaa';
-if r != '       aaa':
-	throw test.gormat, 'string format failed';
+if r != '       aaa' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%10s' % true;
-if r != '      true':
-	throw test.gormat, 'string format failed';
+if r != '      true' {
+	throw test.format <- 'string format failed';
+}
 
 
 
 print: r = '%010d, %f' % (10, 10);
-if r != '0000000010, 10.000000':
-	throw test.gormat, 'string format failed';
+if r != '0000000010, 10.000000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010d, %f' % (100000000000000000000000000000000000000, 99999999999999999999999);
-if !r.starts_with('100000000000000000000000000000000000000, 9999999999999999'):
-	throw test.gormat, 'string format failed';
+if !r.starts_with('100000000000000000000000000000000000000, 9999999999999999') {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010d, %f' % (10.23, 10.23);
-if r != '0000000010, 10.230000':
-	throw test.gormat, 'string format failed';
+if r != '0000000010, 10.230000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010d, %f' % ('100', '111');
-if r != '0000000100, 111.000000':
-	throw test.gormat, 'string format failed';
+if r != '0000000100, 111.000000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010d, %f' % ('aaa', 'bbb');
-if r != '0000000000, 0.000000':
-	throw test.gormat, 'string format failed';
+if r != '0000000000, 0.000000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%010d, %f' % (true, false);
-if r != '0000000001, 0.000000':
-	throw test.gormat, 'string format failed';
+if r != '0000000001, 0.000000' {
+	throw test.format <- 'string format failed';
+}
 
 
 
 
 i = 1000000000000000000000000000000000000;
 print: r = i.string();
-if r != '1000000000000000000000000000000000000':
-	throw test.format, 'string format failed';
+if r != '1000000000000000000000000000000000000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = i.string('%40d');
-if r != '   1000000000000000000000000000000000000':
-	throw test.format, 'string format failed';
+if r != '   1000000000000000000000000000000000000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = i.string('%40x');
-if r != '          c097ce7bc90715b34b9f1000000000':
-	throw test.format, 'string format failed';
+if r != '          c097ce7bc90715b34b9f1000000000' {
+	throw test.format <- 'string format failed';
+}
 
 
 print: r = i.string();
-if r != '1000000000000000000000000000000000000':
-	throw test.format, 'string format failed';
+if r != '1000000000000000000000000000000000000' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = i.string('%30f');
-#if r != '999999999999999894846684784341549056.000000':
-#	throw test.format, 'string format failed';
+#if r != '999999999999999894846684784341549056.000000' {
+#	throw test.format <- 'string format failed';
+#}
 
 
 
 print: r = '%p' % root;
-if !r.starts_with('0x'):
-	throw test.format, 'string format failed';
+if !r.starts_with('0x') {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%p' % my;
-if !r.starts_with('0x'):
-	throw test.format, 'string format failed';
+if !r.starts_with('0x') {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%p' % [1,2,3];
-if !r.starts_with('0x'):
-	throw test.format, 'string format failed';
+if !r.starts_with('0x') {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%% %d' % 10;
-if r != '%% 10':
-	throw test.format, 'string format failed';
+if r != '%% 10' {
+	throw test.format <- 'string format failed';
+}
 
 print: r = '%%' % 10;
-if r != '%%':
-	throw test.format, 'string format failed';
+if r != '%%' {
+	throw test.format <- 'string format failed';
+}
 
 
 

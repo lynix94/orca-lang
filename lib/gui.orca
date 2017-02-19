@@ -34,14 +34,14 @@ def window
 
 	def make
 	{
-		if owner.handle != nil: {
+		if owner.handle != nil {
 			return;
 		}
 
 		owner.init_gtk();
 		owner();
 
-		if owner.type < gui.table: {
+		if owner.type < gui.table {
 			return;
 		}
 
@@ -234,7 +234,7 @@ def entry : window
 
 		def '[]'(k)
 		{
-			if k == 'text': {
+			if k == 'text' {
 				return ..owner.handle.get_data('text');
 			}
 
@@ -293,16 +293,18 @@ def list : window
 
 	def '[]='(k, v)
 	{
-		if k.type != type.int:
+		if k.type != type.int {
 			return;
+		}
 
 		owner.handle.set_data(k, v);
 	}
 
 	def '[]'(k)
 	{
-		if k.type!= type.int:
+		if k.type!= type.int {
 			return nil;
+		}
 
 		return owner.handle.get_data(k);
 	}
@@ -333,16 +335,18 @@ def tree : window
 
 	def '[]='(k, v)
 	{
-		if k.type != type.int:
+		if k.type != type.int {
 			return;
+		}
 
 		owner.handle.set_data(k, v);
 	}
 
 	def '[]'(k)
 	{
-		if k.type != type.int:
+		if k.type != type.int {
 			return nil;
+		}
 
 		return owner.handle.get_data(k);
 	}

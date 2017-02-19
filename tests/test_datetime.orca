@@ -9,78 +9,93 @@ print: datetime.now().time();
 
 
 print: ret = datetime.now().date() == date.today();
-if ret == false:
-	throw test.datetime, 'invalid datetime.now';
+if ret == false {
+	throw test.datetime <- 'invalid datetime.now';
+}
 
 
 print: '# add operation';
 print: dt1 = datetime.clone('2010-01-02 10:20:30');
 
 print: dt2 = dt1 + 1;
-if dt2 != datetime.clone('2010-01-02 10:20:30.000001'):
-	throw test.datetime, 'datetime op failed';
+if dt2 != datetime.clone('2010-01-02 10:20:30.000001') {
+	throw test.datetime <- 'datetime op failed';
+}
 
 print: dt2 = dt1 + 1000000 * 3600 * 24 * 2 + 1000000 * 3600* 2; # 2 day, 2hour
 
-if dt2 != datetime.clone('2010-01-04 12:20:30'):
-	throw test.datetime, 'datetime op failed';
+if dt2 != datetime.clone('2010-01-04 12:20:30') {
+	throw test.datetime <- 'datetime op failed';
+}
 
 print: dt2 = dt1 + date.years(10) + date.months(1) + date.days(3);
-if dt2 != datetime.clone('2020-02-05 10:20:30'):
-	throw test.datetime, 'datetime op failed';
+if dt2 != datetime.clone('2020-02-05 10:20:30') {
+	throw test.datetime <- 'datetime op failed';
+}
 
 print: dt2 = dt1 + time.hours(10) + time.minutes(20) + time.seconds(30);
-if dt2 != datetime.clone('2010-01-02 20:41:00'):
-	throw test.datetime, 'datetime op failed';
+if dt2 != datetime.clone('2010-01-02 20:41:00') {
+	throw test.datetime <- 'datetime op failed';
+}
 
 print: dt2 = dt1 + date.years(1) + date.months(3) + time.hours(10) + time.minutes(20) + time.seconds(30);
-if dt2 != datetime.clone('2011-04-02 20:41:00'):
-	throw test.datetime, 'datetime op failed';
+if dt2 != datetime.clone('2011-04-02 20:41:00') {
+	throw test.datetime <- 'datetime op failed';
+}
 
 
 print: '# sub operation';
 print: dt1 = datetime.clone('2010-01-02 10:20:30');
 
 print: dt2 = dt1 - 1;
-if dt2 != datetime.clone('2010-01-02 10:20:29.999999'):
-	throw test.datetime, 'datetime op failed';
+if dt2 != datetime.clone('2010-01-02 10:20:29.999999') {
+	throw test.datetime <- 'datetime op failed';
+}
 
 print: dt2 = dt1 - 1000000 * 3600 * 24 * 2 - 1000000 * 3600* 2; # 2 day, 2hour
 
-if dt2 != datetime.clone('2009-12-31 08:20:30'):
-	throw test.datetime, 'datetime op failed';
+if dt2 != datetime.clone('2009-12-31 08:20:30') {
+	throw test.datetime <- 'datetime op failed';
+}
 
 print: dt2 = dt1 - date.years(10) - date.months(1) - date.days(3);
-if dt2 != datetime.clone('1999-11-29 10:20:30'):
-	throw test.datetime, 'datetime op failed';
+if dt2 != datetime.clone('1999-11-29 10:20:30') {
+	throw test.datetime <- 'datetime op failed';
+}
 
 print: dt2 = dt1 - time.hours(10) - time.minutes(20) - time.seconds(30);
-if dt2 != datetime.clone('2010-01-02 00:00:00'):
-	throw test.datetime, 'datetime op failed';
+if dt2 != datetime.clone('2010-01-02 00:00:00') {
+	throw test.datetime <- 'datetime op failed';
+}
 
 print: dt2 = dt1 - date.years(1) - date.months(3) - time.hours(10) - time.minutes(20) - time.seconds(30);
-if dt2 != datetime.clone('2008-10-02 00:00:00'):
-	throw test.datetime, 'datetime op failed';
+if dt2 != datetime.clone('2008-10-02 00:00:00') {
+	throw test.datetime <- 'datetime op failed';
+}
 
 print: '# comparison';
 print: dt1 = datetime.clone('2010-01-02 10:20:30');
 print: dt2 = datetime.clone('2010-01-02 10:20:40');
 
 print: ret = dt1 == dt2;
-if ret == true:
-	throw test.datetime, 'datetime op failed';
+if ret == true {
+	throw test.datetime <- 'datetime op failed';
+}
 
 print: ret = dt1 > dt2;
-if ret == true:
-	throw test.datetime, 'datetime op failed';
+if ret == true {
+	throw test.datetime <- 'datetime op failed';
+}
 
 print: ret = dt1 > date.clone('2010-01-02');
-if ret == false:
-	throw test.datetime, 'datetime op failed';
+if ret == false {
+	throw test.datetime <- 'datetime op failed';
+}
 
 print: ret = dt1 == date.clone('2010-01-02');
-if ret == true:
-	throw test.datetime, 'datetime op failed';
+if ret == true {
+	throw test.datetime <- 'datetime op failed';
+}
 
 
 

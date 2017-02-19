@@ -94,6 +94,7 @@ const char* get_context();
 %type <integer> def						// flag
 %type <integer> assign_type				// '=', '+'...
 %type <integer> pattern_list			// num of pattern
+%type <integer> assign_target_list
 
 %type <real> real
 %type <real> minus_real
@@ -160,6 +161,7 @@ const char* get_context();
 %token ASSIGNMENT
 %token ONCE 
 %token EVAL
+%token LAMBDA
 
 %token<cp> NAME
 %token<cp> STRING
@@ -235,9 +237,83 @@ statement:/*{{{*/
 	| scope_stmt
 	| parallel_stmt
 	| debug_stmt 
+	| channel_stmt 
 	| ';'
 	;
 /*}}}*/
+
+channel_stmt:
+	expression LEFT_ARROW
+		{
+			g_ctl->channel_in_start();
+		}
+	expression_list ';'
+		{
+			g_ctl->channel_in_end($4);
+		}
+	| expression RIGHT_ARROW
+		{
+			g_ctl->channel_out_start();
+		}
+	assign_target_list ';'
+		{
+			g_ctl->channel_out_end($4);
+		}
+	;
+
+assign_target_list:
+	  assign_target_list ',' assign_target
+		{
+			$$ = $1 + 1;
+		}
+	| assign_target
+		{
+			$$ = 1;
+		}
+	;
+
+assign_target:
+	  lvar
+		{
+			g_op->assign_local($1);
+		}
+	| postfix_object '.' name_or_string
+		{
+			g_op->assign_member($3);
+		}
+	| postfix_object '.' reserved_object
+		{
+			g_op->assign_reserved($3);
+		}
+	| postfix_object '[' slice_expression ']' assign_type 
+		{
+			g_op->assign_list(false);
+		}
+	| postfix_object '[' slice_expression ')' assign_type 
+		{
+			g_op->assign_list(true);
+		}
+	| DOUBLE_DOT name_or_string
+		{
+			g_op->push_reserved(OP_PUSH_OWNER);
+			g_op->assign_member($2);
+		}
+	| DOUBLE_DOT reserved_object
+		{
+			g_op->push_reserved(OP_PUSH_OWNER);
+			g_op->assign_reserved($2);
+		}
+	| '.' name_or_string
+		{
+			g_op->push_reserved(OP_PUSH_MY);
+			g_op->assign_member($2);
+		}
+	| '.' reserved_object
+		{
+			g_op->push_reserved(OP_PUSH_MY);
+			g_op->assign_reserved($2);
+		}
+	;
 
 scope_stmt:/*{{{*/
 	expression
@@ -256,15 +332,15 @@ parallel_stmt:/*{{{*/
 		{
 			g_ctl->parallel_start();
 		}
-	statement_or_block
+	statement_block
 		{
 			g_ctl->parallel_end();
 		}
-	| PARALLEL FOR lvar IN object parallel_option ':'
+	| PARALLEL FOR lvar IN object parallel_option
 		{
 			g_ctl->parallel_for_start($3);
 		}
-	statement_or_block
+	statement_block
 		{
 			g_ctl->parallel_for_end();
 		}
@@ -387,7 +463,7 @@ catch_stmt:/*{{{*/
 		{
 			g_ex->goto_finally();
 		}
-	| CATCH object_path ':' name_list
+	| CATCH object_path RIGHT_ARROW name_list
 		{
 			name_list_t* vp = (name_list_t*)$4;
 			g_ex->catch_start($2, vp);
@@ -412,7 +488,7 @@ throw_stmt:/*{{{*/
 		{
 			g_ex->do_throw($2, 0);
 		}
-	| THROW object_path ',' expression_list ';'
+	| THROW object_path LEFT_ARROW expression_list ';'
 		{
 			g_ex->do_throw($2, $4);
 		}
@@ -612,7 +688,7 @@ decode_pattern_stmt:/*{{{*/
 		{
 			g_ctl->decode_pattern_start();
 		}
-	decode_pattern RIGHT_ARROW 
+	decode_pattern RIGHT_ARROW
 		{
 			g_ctl->decode_pattern_shift();
 		}
@@ -850,7 +926,7 @@ lambda_object:/*{{{*/
 			g_op->push_reserved(OP_PUSH_MY);
 			g_op->find_member($1);
 		}
-	| def '.' name_or_string  '{'
+	| LAMBDA '.' name_or_string  '{'
 		{
 			// for serial tagging
 			static int count = 1;
@@ -891,7 +967,7 @@ lambda_object:/*{{{*/
 /*}}}*/
 
 lambda_define_header:
-	def opt_argument_list
+	LAMBDA opt_argument_list
 		{
 			name_list_t* vp = (name_list_t*)$2;
 
@@ -910,7 +986,7 @@ lambda_define_header:
 			char buff[256];
 			sprintf(buff, "#%d_lambda", count++);
 			const char* name = g_parser->strdup(buff);
-			parserCode::push_code_stack(name, vp, $1);
+			parserCode::push_code_stack(name, vp, 0);
 
 			if (flag_argv == true) {
 				code_top->find_lvar("argv");
@@ -923,7 +999,7 @@ lambda_define_header:
 
 
 lambda_decode_header:
-	def '.' DECODE opt_argument_list
+	LAMBDA '.' DECODE opt_argument_list
 		{
 			name_list_t* vp = (name_list_t*)$4;
 
@@ -942,7 +1018,7 @@ lambda_decode_header:
 			char buff[256];
 			sprintf(buff, "#%d_decode_lambda", count++);
 			const char* name = g_parser->strdup(buff);
-			parserCode::push_code_stack(name, vp, $1);
+			parserCode::push_code_stack(name, vp, 0);
 
 			if (flag_argv == true) {
 				code_top->find_lvar("argv");
@@ -957,7 +1033,7 @@ lambda_decode_header:
 
 
 lambda_parse_header:
-	def '.' PARSE opt_argument_list
+	LAMBDA '.' PARSE opt_argument_list
 		{
 			name_list_t* vp = (name_list_t*)$4;
 
@@ -1079,29 +1155,29 @@ elif_stmt:/*{{{*/
 		{
 			g_ctl->else_start();
 		}
-	bool_expr ':'
+	bool_expr 
 		{
 			g_ctl->if_start();
 		}
-	statement_or_block
+	statement_block
 	;
 /*}}}*/
 
 else_stmt:/*{{{*/
-	ELSE ':'
+	ELSE
 		{
 			g_ctl->else_start();
 		}
-	statement_or_block
+	statement_block
 	;
 /*}}}*/
 
 if_stmt:/*{{{*/
-	IF bool_expr ':'
+	IF bool_expr 
 		{
 			g_ctl->if_start();
 		}
-	statement_or_block
+	statement_block
 	;
 /*}}}*/
 
@@ -1110,7 +1186,7 @@ do_stmt:/*{{{*/
 		{
 			g_ctl->do_start();
 		}
-	statement_or_block WHILE bool_expr ';'
+	statement_block WHILE bool_expr ';'
 		{
 			g_ctl->do_end();
 		}
@@ -1122,7 +1198,7 @@ times_stmt:/*{{{*/
 		{
 			g_ctl->times_start();
 		}
-	statement_or_block 
+	statement_block 
 		{
 			g_ctl->times_end();
 		}
@@ -1134,11 +1210,11 @@ while_stmt:/*{{{*/
 		{
 			g_ctl->while_start_1();
 		}
-	bool_expr ':'
+	bool_expr 
 		{
 			g_ctl->while_start_2();
 		}
-	statement_or_block
+	statement_block
 		{
 			g_ctl->while_end();
 		}
@@ -1146,11 +1222,11 @@ while_stmt:/*{{{*/
 /*}}}*/
 
 for_stmt:/*{{{*/
-	FOR lvar IN object ':'
+	FOR lvar IN object 
 		{
 			g_ctl->for_start($2);
 		}
-	statement_or_block
+	statement_block
 		{
 			g_ctl->for_end();
 		}
@@ -1182,6 +1258,7 @@ expression:/*{{{*/
 	| once_expr
 	;
 /*}}}*/
+
 
 assign_expr:	/*{{{*/
 	  lvar assign_type 
@@ -1478,6 +1555,7 @@ numeric_expr:/*{{{*/
 	add_expr
 	;
 /*}}}*/
+
 
 add_expr:/*{{{*/
 	add_expr '+' mul_expr

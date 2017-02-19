@@ -106,6 +106,7 @@ nil					{ return NIL_; }
 parallel			{ return PARALLEL; }
 
 eval				{ return EVAL; }
+lambda				{ return LAMBDA; }
 
 
 

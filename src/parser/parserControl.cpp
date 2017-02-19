@@ -635,3 +635,25 @@ void parserControl::once_end()
 	m_in_once = false;
 }
 
+
+void parserControl::channel_in_start()
+{
+
+}
+ 
+void parserControl::channel_in_end(int num)
+{
+
+}
+ 
+void parserControl::channel_out_start()
+{
+
+}
+ 
+void parserControl::channel_out_end(int num)
+{
+
+}
+ 
+

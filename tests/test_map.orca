@@ -4,22 +4,25 @@ a = {1:3, 3:[1, 2], 'Lee':'KY', 0:'Zero', };
 print: a;
 
 print: a.keys();
-if a.keys() != [0, 1, 3, 'Lee']:
-	throw test.map, 'map keys fail';
+if a.keys() != [0, 1, 3, 'Lee'] {
+	throw test.map <- 'map keys fail';
+}
 
 
 print: a.values();
-if a.values() != ['Zero', 3, [1, 2], 'KY']:
-	throw test.map, 'map values fail';
+if a.values() != ['Zero', 3, [1, 2], 'KY'] {
+	throw test.map <- 'map values fail';
+}
 
 print: a.size();
-if a.size() != 4: {
-	throw test.map, 'map size fail';
+if a.size() != 4 {
+	throw test.map <- 'map size fail';
 }
 
 print: a[3];
-if a[3] != [1, 2]: 
-	throw test.map, 'map index fail';
+if a[3] != [1, 2] {
+	throw test.map <- 'map index fail';
+}
 
 # not yet
 #print: a[0:3);
@@ -29,8 +32,9 @@ if a[3] != [1, 2]:
 
 a['hello'] = 'world';
 print: a['hello'];
-if a['hello'] != 'world': 
-	throw test.map, 'map assign fail';
+if a['hello'] != 'world' {
+	throw test.map <- 'map assign fail';
+}
 
 
 print('OK');

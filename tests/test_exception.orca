@@ -7,7 +7,7 @@ catch aaa {
 }
 catch bbb {
 	print: 'bbb catched';
-	throw test.ex, 'invalid catch';
+	throw test.ex <- 'invalid catch';
 }
 
 def foo(a)
@@ -31,8 +31,8 @@ finally {
 }
 
 
-if a != 1: {
-	throw test.ex, 'invalid catch';
+if a != 1 {
+	throw test.ex <- 'invalid catch';
 }
 
 
@@ -44,12 +44,12 @@ try {
 			throw ccc;
 		} catch aaa {
 			print: 'aaa catched';
-			throw test.ex, 'invalid catch';
+			throw test.ex <- 'invalid catch';
 		}
 	}
 	catch bbb {
 		print: 'bbb catched';
-		throw test.ex, 'invalid catch';
+		throw test.ex <- 'invalid catch';
 	}
 }
 catch ccc {
@@ -64,17 +64,20 @@ finally {
 # exception argument
 
 try {
-	throw aaa, 10, 20.0, 'str';
+	throw aaa <- 10, 20.0, 'str';
 }
-catch aaa: a, b, c {
-	if a != 10:
-		throw test.ex, 'exception param fail';
+catch aaa -> a, b, c {
+	if a != 10 {
+		throw test.ex <- 'exception param fail';
+	}
 
-	if b != 20.0:
-		throw test.ex, 'exception param fail';
+	if b != 20.0 {
+		throw test.ex <- 'exception param fail';
+	}
 
-	if c != 'str':
-		throw test.ex, 'exception param fail';
+	if c != 'str' {
+		throw test.ex <- 'exception param fail';
+	}
 }
 
 print: 'OK';

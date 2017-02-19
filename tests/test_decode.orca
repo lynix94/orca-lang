@@ -12,8 +12,9 @@ decode msg
 	'aaa', 'bdb', 'ccc' -> result = 3;
 }
 
-if result != 2:
-  throw test.decoding, 'simle string decoding failed';
+if result != 2 {
+  throw test.decoding <- 'simle string decoding failed';
+}
 
 
 
@@ -30,8 +31,9 @@ decode msg
 	'aaa', 'bdb', 'ccc' -> 		result = 3;
 }
 
-if result != 2:
-  throw test.decoding, 'simle regex decoding failed';
+if result != 2 {
+  throw test.decoding <- 'simle regex decoding failed';
+}
 
 
 
@@ -50,8 +52,9 @@ decode msg
 }
 
 print : 'head:', head, 'number:', number, 'tail:', tail;
-if head != 'aaa' || number != '100' || tail != 'bbb':
-  throw test.decoding, 'decode assign failed';
+if head != 'aaa' || number != '100' || tail != 'bbb' {
+  throw test.decoding <- 'decode assign failed';
+}
 
 
 print: 'list decoding';
@@ -67,8 +70,9 @@ decode lists
 
 print: s;
 
-if s != [2, 3]:
-  throw test.decoding, 'list decoding failed';
+if s != [2, 3] {
+  throw test.decoding <- 'list decoding failed';
+}
 
 
 

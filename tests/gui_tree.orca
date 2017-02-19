@@ -35,7 +35,7 @@ def main : window
 
 				def toggle_child(it, toggle)
 				{
-					if it.child_size() > 0: {
+					if it.child_size() > 0 {
 						for a in it.child_begin(): 
 							toggle_child(a, toggle);
 					}
@@ -81,11 +81,14 @@ def main : window
 				my.event['clicked'] = def(){
 					it = upper('box').items.current;
 					new = upper('input_sibling').new.attr['text'];
-					if new.length() <= 0: return;
+					if new.length() <= 0 {
+						 return;
+					}
 
-					if it == nil: 
+					if it == nil {
 						upper('box').items.push_back([false, new]);
-					else: {
+					}
+					else {
 						it.insert([false, new]);
 					}
 				};
@@ -106,10 +109,12 @@ def main : window
 					new = upper('input_child').new.attr['text'];
 					if new.length() <= 0: return;
 
-					if it == nil: 
+					if it == nil {
 						upper('box').items.push_back([false, new]);
-					else: 
+					}
+					else {
 						it.push_child([false, new]);
+					}
 				};
 			}
 		}

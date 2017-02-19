@@ -17,7 +17,7 @@ static def magic;
 
 
 .magic = 'orca.ds_0.4:';
-if os.isdir(argv[0]) == false: {
+if os.isdir(argv[0]) == false {
 	print: argv[0], ' is not directory';
 	return;
 }
@@ -31,7 +31,9 @@ my.port = argv[1];
 
 do {
 	sock = .sock.accept();
-	if .shut_down: break;
+	if .shut_down {
+		break;
+	}
 
 	cl = .client.clone(sock, argv[0]);
 	thread.run(cl.run);
@@ -72,10 +74,10 @@ def client
 	def recv()
 	{
 		header = ..sock.recv(dfsd.magic.length() + 5);
-		if header.starts_with(dfsd.magic): {
+		if header.starts_with(dfsd.magic) {
 			len = header[-5:-1).integer();
 		}
-		else: {
+		else {
 			..sock.recv(0, 0);
 		}
 		
@@ -93,7 +95,7 @@ def client
 				print:'## wait...';
 
 				cmd = ..recv();
-				if ..do_what(cmd) == '<shutdown>': {
+				if ..do_what(cmd) == '<shutdown>' {
 					..sock.close();
 					owner.owner.shut_down = true;
 					sock = socket.create();
@@ -121,16 +123,16 @@ def client
 				{ 
 					obj = nil;
 					
-					if cmd == 'ping': {
+					if cmd == 'ping' {
 						obj = true;
 					}
-					elif cmd == 'shutdown': {
+					elif cmd == 'shutdown' {
 						obj = true;
 						..send: pack.save(obj);
 						time.msleep(200);
 						return '<shutdown>';
 					}
-					elif fs.members.has_key(cmd): {
+					elif fs.members.has_key(cmd) {
 						obj = fs.members[cmd](..dfs_root + path);
 					}
 
@@ -139,8 +141,13 @@ def client
 
 			'<read>', %path, ',', %size, ',', %offset -> 
 				{ 
-					if size == 'nil': size = nil;
-					if offset == 'nil': offset = nil;
+					if size == 'nil' {
+						size = nil;
+					}
+
+					if offset == 'nil' {
+						offset = nil;
+					}
 
 					obj = fs.read(..dfs_root + path, size, offset);
 					..send: pack.save(obj);
@@ -148,8 +155,13 @@ def client
 
 			'<write>', %path, ',', %offset, ',', %data -> 
 				{ 
-					if data == 'nil': data = nil;
-					if offset == 'nil': offset = nil;
+					if data == 'nil' {
+						data = nil;
+					}
+
+					if offset == 'nil' {
+						offset = nil;
+					}
 
 					obj = fs.write(..dfs_root + path, data, offset);
 					..send: pack.save(obj);

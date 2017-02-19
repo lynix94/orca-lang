@@ -20,8 +20,9 @@ c = remotec.clone('127.0.0.1', port);
 
 c.var_a = 'variable a';
 print: c.var_a;
-if c.var_a != 'variable a':
-	throw test.remote, 'remote variable set fail';
+if c.var_a != 'variable a' {
+	throw test.remote <- 'remote variable set fail';
+}
 
 def foo
 {
@@ -35,12 +36,13 @@ f = my.foo.clone();
 
 c.f = f;
 print: c.f.bar();
-if c.f.bar() != 'bar of foo':
-	throw test.remote, 'remote object set fail';
+if c.f.bar() != 'bar of foo' {
+	throw test.remote <- 'remote object set fail';
+}
 
 
 print: '## remote_do test';
-c.remote_do: 10, 20, def(a, b){
+c.remote_do: 10, 20, lambda(a, b){
     return a + b;
 };
 
@@ -49,8 +51,9 @@ do {
 } while (ret == false);
 
 print: ret = c.pop_obj();
-if ret != 30:
-	throw test.remote, 'remote do fail';
+if ret != 30 {
+	throw test.remote <- 'remote do fail';
+}
 	
 
 print: '## now quit: ', c.shutdown();

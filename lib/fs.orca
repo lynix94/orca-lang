@@ -34,10 +34,10 @@ def server
 	def recv()
 	{
 		header = ..sock.recv(fs.magic.length() + 5);
-		if header.starts_with(fs.magic): {
+		if header.starts_with(fs.magic) {
 			len = header[-5:-1).integer();
 		}
-		else: {
+		else {
 			..sock.recv(0, 0);
 		}
 		
@@ -61,10 +61,12 @@ def server
 
 def mount(path, ip, port)
 {
-	if path[-1] == '/':
+	if path[-1] == '/' {
 		p = path[:-1];
-	else: 
+	}
+	else {
 		p = path;
+	}
 
 	sock = ..server.clone();
 	sock.sock = socket.create();
@@ -77,18 +79,18 @@ def unmount(path, flag)
 	mi = ..mtable.upper_bound(path);
 	try {
 		mi.prev();
-		if path.starts_with(mi.first()): {
-			if mi.second().type == type.tuple: {
-				for a in mi.second(): {
-					if flag == true: {
+		if path.starts_with(mi.first()) {
+			if mi.second().type == type.tuple {
+				for a in mi.second() {
+					if flag == true {
 						a.send('<fs1>shutdown,/');
 						msg = a.recv();
 					}
 					a.close();
 				}
 			}
-			else: {
-				if flag == true: {
+			else {
+				if flag == true {
 					mi.second().send('<fs1>shutdown,/');
 					msg = mi.secon().recv();
 				}
@@ -110,20 +112,23 @@ def shutdown(path)
 
 def mount_dist_dir(path, ...)
 {
-	if path[-1] == '/':
+	if path[-1] == '/' {
 		p = path[:-1];
-	else: 
+	}
+	else {
 		p = path;
+	}
 
 	p = path;
 		
-	for a in argv: {
+	for a in argv {
 		sock = ..server.clone();
 		sock.sock = socket.create();
 		sock.sock.connect(a[0], a[1]);
 
-		if !..mtable.has_key(p):
+		if !..mtable.has_key(p) {
 			..mtable[p] = type.tuple();
+		}
 
 		..mtable[p].push_back(sock);
 	}
@@ -134,14 +139,14 @@ def check_in_table(path)
 	mi = ..mtable.upper_bound(path);
 	try {
 		mi.prev();
-		if path.starts_with(mi.first() + '/'): {
-			if mi.second().type == type.tuple: {
+		if path.starts_with(mi.first() + '/') {
+			if mi.second().type == type.tuple {
 				tp = mi.second();
 				len = tp.size();
 				nth = path.hash(len);
 				return (tp[nth], path[mi.first().length():]);
 			}
-			else: {
+			else {
 				return (mi.second(), path[mi.first().length():]);
 			}
 		}
@@ -156,7 +161,7 @@ def check_in_table(path)
 def fs1(cmd, path)
 {
 	ret =  ..check_in_table(path);
-	if ret == nil: {
+	if ret == nil {
 		return os.members[cmd](path);
 	}
 
@@ -209,7 +214,7 @@ def ping(path)
 def read(path, size, offset)
 {
 	ret =  ..check_in_table(path);
-	if ret == nil: {
+	if ret == nil {
 		return os.read(path, size, offset);
 	}
 
@@ -222,7 +227,7 @@ def read(path, size, offset)
 def write(path, data, offset)
 {
 	ret =  ..check_in_table(path);
-	if ret == nil: {
+	if ret == nil {
 		return os.write(path, data, offset);
 	}
 
@@ -237,7 +242,7 @@ def copy(src, dest)
 	rs =  ..check_in_table(src);
 	rd =  ..check_in_table(dest);
 
-	if rs == nil && rd == nil: {
+	if rs == nil && rd == nil {
 		return os.copy(src, dest);
 	}
 
@@ -251,11 +256,11 @@ def rename(src, dest)
 	rs =  ..check_in_table(src);
 	rd =  ..check_in_table(dest);
 
-	if rs == nil && rd == nil: {
+	if rs == nil && rd == nil {
 		return os.rename(src, dest);
 	}
 
-	if rs[0] == rd[0]: { # same machine
+	if rs[0] == rd[0] { # same machine
 		rs[0].send('<rename>${rs[1]},${rd[1]}');
 		msg = rs[0].recv();
 		ret = pack.load(msg);

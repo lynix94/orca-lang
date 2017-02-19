@@ -4,15 +4,16 @@ def comma(str)
 	idx = 0;
 	do {
 		idx = str.find(',', idx);
-		if idx < 0: 
+		if idx < 0 {
 			return nil;
+		}
 
 		bo = str.find_all('{', 0, idx).size();
 		bc = str.find_all('}', 0, idx).size();
 		ao = str.find_all('[', 0, idx).size();
 		ac = str.find_all(']', 0, idx).size();
 
-		if bo != bc || ao != ac: {
+		if bo != bc || ao != ac {
 			idx += 1;
 			continue;
 		}
@@ -27,14 +28,14 @@ def tag(open, close, str)
 	idx = 0;
 	do {
 		idx = str.find(close, idx);
-		if idx < 0: {
+		if idx < 0 {
 			return nil;
 		}
 
 		o = str.find_all(open, 0, idx-1).size();
 		c = str.find_all(close, 0, idx-1).size();
 
-		if o != c: {
+		if o != c {
 			idx += 1;
 			continue;
 		}
@@ -49,11 +50,13 @@ def string(end, str)
 	idx = 0;
 	do {
 		idx = str.find(end, idx);
-		if idx < 0: 
+		if idx < 0 {
 			return nil;
+		}
 
-		if str[idx-1] == '\\': 
+		if str[idx-1] == '\\' {
 			continue;
+		}
 
 		break;
 	} while true;
@@ -102,7 +105,7 @@ def match_one_tag(str)
 	idx = 0;
 	do {
 		idx = str.find('</', idx);
-		if idx < 0: {
+		if idx < 0 {
 			return nil;
 		}
 
@@ -113,7 +116,7 @@ def match_one_tag(str)
 		o -= c;
 		o -= oc;
 
-		if o != c: {
+		if o != c {
 			idx += 1;
 			continue;
 		}

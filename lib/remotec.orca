@@ -19,18 +19,19 @@ remotec.log: '## call: ', argv;
 
 len = 0;
 
-if argv.type == type.tuple:
-	for p in argv: {
+if argv.type == type.tuple {
+	for p in argv {
 		.push_obj(p);
 		len += 1;
 	}
+}
 
 .call_obj(len);
 
-if .flag_nowait: {
+if .flag_nowait {
 	return nil;
 }
-else: {
+else {
 	.server.recv();
 	ret = .pop_obj();
 	return ret;
@@ -57,10 +58,10 @@ def server
 	def recv()
 	{
 		header = ..sock.recv(remotec.magic.length() + 5);
-		if header.starts_with(remotec.magic): {
+		if header.starts_with(remotec.magic) {
 			len = header[-5:-1).integer();
 		}
-		else: {
+		else {
 			..sock.recv(0, 0);
 		}
 		
@@ -80,12 +81,12 @@ def server
 
 def init(ip, port)
 {
-	if ip == nil: {
+	if ip == nil {
 		..flag_running = nil;
 		..flag_root = false;
 		..flag_nowait = false;
 	}
-	else: {
+	else {
 		..server.sock = socket.create();
 		..server.sock.connect(ip, port);
 		..flag_running = false;
@@ -103,11 +104,13 @@ def call_obj(num)
 	3 times do {
 		..server.send('<call>'+num);
 		msg = ..server.recv();
-		if msg == '<ok:call start>': {
-			if ..flag_running.type == type.bool:
+		if msg == '<ok:call start>' {
+			if ..flag_running.type == type.bool {
 				..flag_running  = true;
-			else:
+			}
+			else {
 				..flag_running.flag_running  = true;
+			}
 
 			break;
 		}
@@ -144,8 +147,9 @@ def assign_obj(name)
 		..server.send('<assign>'+name);
 		
 		msg = ..server.recv();
-		if msg == '<ok:assign>':
+		if msg == '<ok:assign>' {
 			break;
+		}
 	} 
 }
 
@@ -154,9 +158,10 @@ def find_obj(name)
 	3 times do {
 		..server.send('<find>'+name);
 		msg = ..server.recv();
-		if msg == '<ok:find>':
+		if msg == '<ok:find>' {
 			break;
-		elif msg[0:4] == '<nok': {
+		}
+		elif msg[0:4] == '<nok' {
 			break;
 		}
 	} 
@@ -168,7 +173,7 @@ def pop_obj()
 		..server.send('<pop>');
 		msg = ..server.recv();
 
-		if msg[0:8] == '<ok:pop>': {
+		if msg[0:8] == '<ok:pop>' {
 			obj = pack.load(msg[8:]);
 			break;
 		}
@@ -183,7 +188,7 @@ def get_obj(idx)
 		..server.send('<get>' + idx);
 		msg = ..server.recv();
 
-		if msg[0:8] == '<ok:get>': {
+		if msg[0:8] == '<ok:get>' {
 			obj = pack.load(msg[8:]);
 			break;
 		}
@@ -198,7 +203,7 @@ def clean_obj()
 		..server.send('<clean>');
 		msg = ..server.recv();
 
-		if msg == '<ok:clean>': {
+		if msg == '<ok:clean>' {
 			break;
 		}
 	} 
@@ -210,21 +215,22 @@ def clean_obj()
 def '.attr'(name)
 {
 	remotec.log: 'get: ', name;
-	if ..flag_root: {
+	if ..flag_root {
 		..find_obj('root');
 
 		attr = owner.clone();
 		attr.server.sock = owner.server.sock;
 		attr.flag_running = owner;
 	}
-	else:
+	else {
 		attr = owner;
+	}
 
 		
-	if name == '__nowait__': {
+	if name == '__nowait__' {
 		..flag_nowait = true;
 	}
-	else: {
+	else {
 		..find_obj(name);
 	}
 
@@ -234,14 +240,15 @@ def '.attr'(name)
 def '.attr_last'(name)
 {
 	remotec.log: 'get_last: ', name;
-	if ..flag_root: {
+	if ..flag_root {
 		..find_obj('root');
 
 		attr = owner.clone();
 		attr.server.sock = owner.server.sock;
 	}
-	else:
+	else {
 		attr = owner;
+	}
 
 	..find_obj(name);
 	obj = ..pop_obj();
@@ -250,7 +257,7 @@ def '.attr_last'(name)
 
 def '.attr='(name, data)
 {
-	if ..flag_root: {
+	if ..flag_root {
 		..find_obj('root');
 	}
 
@@ -265,7 +272,7 @@ def remote_do(...)
 	..push_obj(f);
 	argv.pop_back();
 
-	for p in argv: {
+	for p in argv {
 		..push_obj(p);
 	}
 
@@ -274,11 +281,11 @@ def remote_do(...)
 
 def is_done(timeout)
 {
-	if ..flag_running == false: {
+	if ..flag_running == false {
 		return true;
 	}
 
-	if select.readable(..server.sock.get(), timeout): {
+	if select.readable(..server.sock.get(), timeout) {
 		..flag_running = false;
 		..server.recv();
 		return true;
@@ -291,8 +298,9 @@ def ping
 {
 	..server.send('<ping>');
 	msg = ..server.recv();
-	if msg == '<ack>':
+	if msg == '<ack>' {
 		return true;
+	}
 
 	return false;
 }
@@ -301,8 +309,9 @@ def shutdown
 {
 	..server.send('<shutdown>');
 	msg = ..server.recv();
-	if msg == '<ack>':
+	if msg == '<ack>' {
 		return true;
+	}
 
 	return false;
 }

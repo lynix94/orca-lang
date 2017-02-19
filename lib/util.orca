@@ -9,15 +9,17 @@ def lru := __util.lru.clone();
 def lock(obj)
 {
 	id = obj.id;
-	if id == 0:
-		throw orca.type, 'obj has no address';
+	if id == 0 {
+		throw orca.type <- 'obj has no address';
+	}
 
 	.mutex {
-			if .table.has_key(id):
-				return .table[id];
-
-			.table[id] = ipc.mutex.clone();
+		if .table.has_key(id) {
 			return .table[id];
+		}
+
+		.table[id] = ipc.mutex.clone();
+		return .table[id];
 	}
 
 	def table := type.map();
@@ -28,12 +30,14 @@ def upper(name)
 {
 	op = caller.owner;
 
-	while op != nil: {
-		if op.name == name: 
+	while op != nil {
+		if op.name == name {
 			return op;
+		}
 
-		if op.id == root.id:
+		if op.id == root.id {
 			return nil;
+		}
 
 		op = op.owner;
 	}

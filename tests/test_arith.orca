@@ -1,22 +1,26 @@
 
 print('add');
 a = 10 + 20;
-if a != 30: 
-  throw test.arith, 'add fail';
+if a != 30 {
+  throw test.arith <- 'add fail';
+}
 
 print('sub');
 a = 10 - 20;
-if a != -10:
-  throw test.arith, 'sub fail';
+if a != -10 {
+  throw test.arith <- 'sub fail';
+}
 
 print('mul');
 a = 10 * 20;
-if a != 200: throw test.arith, 'mul fail';
+if a != 200 {
+	throw test.arith <- 'mul fail';
+}
 
 print('div');
 a = 20 / 5;
-if a != 4: {
-	throw test.arith, 'div fail';
+if a != 4 {
+	throw test.arith <- 'div fail';
 }
 
 print('mix');
@@ -28,47 +32,57 @@ d = 40;
 e = (a+b)*c/d;
 
 print: e;
-if e != 22: throw test.arith, 'arithmetic operation fail';
+if e != 22 {
+	throw test.arith <- 'arithmetic operation fail';
+}
 
 print: 'assign op';
 a=10;
 a += 10;
-if a != 20:
-  throw test.arith, 'add assign operation fail';
+if a != 20 {
+  throw test.arith <- 'add assign operation fail';
+}
 
 a -= 5;
-if a != 15:
-  throw test.arith, 'sub assign operation fail';
+if a != 15 {
+  throw test.arith <- 'sub assign operation fail';
+}
 
 a *= 4;
-if a != 60:
-  throw test.arith, 'mul assign operation fail';
+if a != 60 {
+  throw test.arith <- 'mul assign operation fail';
+}
 
 a /= 2;
-if a != 30:
-  throw test.arith, 'div assign operation fail';
+if a != 30 {
+  throw test.arith <- 'div assign operation fail';
+}
 
 
 
 print: 'real test';
 print('add');
 a = 10.0 + 20;
-if a != 30.0: 
-  throw test.arith, 'add fail';
+if a != 30.0 {
+  throw test.arith <- 'add fail';
+}
 
 print('sub');
 a = 10.0 - 20;
-if a != -10.0:
-  throw test.arith, 'sub fail';
+if a != -10.0 {
+  throw test.arith <- 'sub fail';
+}
 
 print('mul');
 a = 10.0 * 20.0;
-if a != 200.0: throw test.arith, 'mul fail';
+if a != 200.0 {
+	throw test.arith <- 'mul fail';
+}
 
 print('div');
 a = 20 / 5.0;
-if a != 4.0: {
-	throw test.arith, 'div fail';
+if a != 4.0 {
+	throw test.arith <- 'div fail';
 }
 
 print('mix');
@@ -80,32 +94,40 @@ d = 40;
 e = (a+b)*c/d;
 
 print: e;
-if e != 22.5: throw test.arith, 'arithmetic operation fail';
+if e != 22.5 {
+	 throw test.arith <- 'arithmetic operation fail';
+}
+
 
 print: 'assign op';
 a=10.0;
 a += 10;
-if a != 20.0:
-  throw test.arith, 'add assign operation fail';
+if a != 20.0 {
+  throw test.arith <- 'add assign operation fail';
+}
 
 a -= 5;
-if a != 15.0:
-  throw test.arith, 'sub assign operation fail';
+if a != 15.0 {
+  throw test.arith <- 'sub assign operation fail';
+}
 
 a *= 4;
-if a != 60.0:
-  throw test.arith, 'mul assign operation fail';
+if a != 60.0 {
+  throw test.arith <- 'mul assign operation fail';
+}
 
 a /= 2;
-if a != 30.0:
-  throw test.arith, 'div assign operation fail';
+if a != 30.0 {
+  throw test.arith <- 'div assign operation fail';
+}
 
 
 print: 'big number test';
 a = 1111111111 * 1111111111;
 print: a;
-if a != 1234567900987654321:
-  throw test.arith, 'big number mul fail';
+if a != 1234567900987654321 {
+  throw test.arith <- 'big number mul fail';
+}
 
 a = 20000000000000;
 b = a;
@@ -115,33 +137,41 @@ a += a;
 b *= 8;
 
 print: a, ' ', b;
-if a != b:
-  throw test.arith, 'big number add, mul fail';
+if a != b {
+  throw test.arith <- 'big number add, mul fail';
+}
 
 
 
 # conversion
 
-if 10.3.integer() != 10 :
-  throw test.arith, 'float to integer fail';
+if 10.3.integer() != 10 {
+  throw test.arith <- 'float to integer fail';
+}
 
-if 10.5.string() != '10.5' :
-  throw test.arith, 'float to string fail';
+if 10.5.string() != '10.5' {
+  throw test.arith <- 'float to string fail';
+}
 
-if 10.float() != 10.0 :
-  throw test.arith, 'integer to float fail';
+if 10.float() != 10.0 {
+  throw test.arith <- 'integer to float fail';
+}
 
-if 10.string() != '10' :
-  throw test.arith, 'integer to string fail';
+if 10.string() != '10' {
+  throw test.arith <- 'integer to string fail';
+}
 
-if '10'.integer() != 10 :
-  throw test.arith, 'string to integer fail';
+if '10'.integer() != 10 {
+  throw test.arith <- 'string to integer fail';
+}
 
-if '10.3428'.float() != 10.3428 :
-  throw test.arith, 'string to float fail';
+if '10.3428'.float() != 10.3428 {
+  throw test.arith <- 'string to float fail';
+}
 
-if '10e-10'.float() != 10e-10 :
-  throw test.arith, 'string to float fail';
+if '10e-10'.float() != 10e-10 {
+  throw test.arith <- 'string to float fail';
+}
 
 
 

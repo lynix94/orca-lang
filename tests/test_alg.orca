@@ -4,8 +4,9 @@ def acc(a)
 {
 	def sum := 0;
 
-	if a.type == type.int:
+	if a.type == type.int {
 		my.sum += a;
+	}
 }
 
 a = [1, 2, [3, 4, (5, 6)], 7];
@@ -13,8 +14,9 @@ my.acc.sum = 0;
 alg.traverse (a, my.acc);
 print: r = my.acc.sum;
 
-if r != 1+2+3+4+5+6+7:
-	throw test.alg, 'traverse failed';
+if r != 1+2+3+4+5+6+7 {
+	throw test.alg <- 'traverse failed';
+}
 
 
 a = [1..100];
@@ -22,41 +24,46 @@ my.acc.sum = 0;
 alg.for_each(a.begin(), a.end(), my.acc);
 print: r = my.acc.sum;
 
-if r != 5050:
-	throw test.alg, 'for_each failed';
+if r != 5050 {
+	throw test.alg <- 'for_each failed';
+}
 
 
 
 
 a = [1..100];
-alg.for_each_iterator(a.begin(), a.end(), def(it) { it(it()*2); });
+alg.for_each_iterator(a.begin(), a.end(), lambda(it) { it(it()*2); });
 print: r = a;
 
-if r != [2..200 : 2]:
-	throw test.alg, 'for_each_iterator failed';
+if r != [2..200 : 2] {
+	throw test.alg <- 'for_each_iterator failed';
+}
 
 
 a = [1..100];
 r = alg.find(a.begin(), a.end(), 40);
 print: r, ' ', r();
 
-if r() != 40:
-	throw test.alg, 'find failed';
+if r() != 40 {
+	throw test.alg <- 'find failed';
+}
 
 
 
 a = [1..100];
-r = alg.find_if(a.begin(), a.end(), def(it){ 
+r = alg.find_if(a.begin(), a.end(), lambda(it){ 
 			v = it();
-			if v % 3 == 0 && v % 4 == 0:
+			if v % 3 == 0 && v % 4 == 0 {
 				return true;
+			}
 			return false;
 		});
 
 print: r, ' ', r();
 
-if r() != 12:
-	throw test.alg, 'find_if failed';
+if r() != 12 {
+	throw test.alg <- 'find_if failed';
+}
 
 
 
@@ -66,8 +73,9 @@ alg.remove(a.begin(), a.end(), 3);
 
 print: a;
 
-if a != [1,2,4,5,6,7,8,9,10]:
-	throw test.alg, 'remove failed';
+if a != [1,2,4,5,6,7,8,9,10] {
+	throw test.alg <- 'remove failed';
+}
 
 
 
@@ -77,19 +85,21 @@ alg.remove(a.begin(), a.end(), -100);
 
 print: a;
 
-if a != [1..10]:
-	throw test.alg, 'remove failed';
+if a != [1..10] {
+	throw test.alg <- 'remove failed';
+}
 
 
 
 
 a = [1..100];
-alg.remove_if(a.begin(), a.end(), def(it){ return it % 3 == 0; });
+alg.remove_if(a.begin(), a.end(), lambda(it){ return it % 3 == 0; });
 
 print: a;
 
-if a != %[x|x<-1~100, x%3!=0]:
-	throw test.alg, 'remove_if failed';
+if a != %[x|x<-1~100, x%3!=0] {
+	throw test.alg <- 'remove_if failed';
+}
 
 
 a = [1..10];
@@ -97,17 +107,19 @@ alg.replace(a.begin(), a.end(), 3, 30);
 
 print: a;
 
-if a != [1,2,30,4,5,6,7,8,9,10]:
-	throw test.alg, 'replace failed';
+if a != [1,2,30,4,5,6,7,8,9,10] {
+	throw test.alg <- 'replace failed';
+}
 
 
 a = [1..10];
-alg.replace_if(a.begin(), a.end(), def(it){ return it % 3 == 0; }, 30);
+alg.replace_if(a.begin(), a.end(), lambda(it){ return it % 3 == 0; }, 30);
 
 print: a;
 
-if a != [1,2,30,4,5,30,7,8,30,10]:
-	throw test.alg, 'replace_if failed';
+if a != [1,2,30,4,5,30,7,8,30,10] {
+	throw test.alg <- 'replace_if failed';
+}
 
 
 
@@ -117,8 +129,9 @@ alg.erase(a.find(3), a.find(7));
 
 print: a;
 
-if a != [1,2,7,8,9,10]:
-	throw test.alg, 'erase failed';
+if a != [1,2,7,8,9,10] {
+	throw test.alg <- 'erase failed';
+}
 
 
 a = [1..10];
@@ -126,8 +139,9 @@ alg.erase(a.find(3), a.find(100));
 
 print: a;
 
-if a != [1,2]:
-	throw test.alg, 'erase failed';
+if a != [1,2] {
+	throw test.alg <- 'erase failed';
+}
 
 
 
@@ -138,8 +152,9 @@ alg.copy(a.begin(), a.end(), b.begin());
 
 print: b;
 
-if b != [1..10]:
-	throw test.alg, 'copy failed';
+if b != [1..10] {
+	throw test.alg <- 'copy failed';
+}
 
 
 a = [1..10];
@@ -148,8 +163,9 @@ alg.copy(a.find(3), a.find(7), b.find(104));
 
 print: b;
 
-if b != [101, 102, 103, 3, 4, 5, 6, 104, 105, 106, 107, 108, 109, 110]:
-	throw test.alg, 'copy failed';
+if b != [101, 102, 103, 3, 4, 5, 6, 104, 105, 106, 107, 108, 109, 110] {
+	throw test.alg <- 'copy failed';
+}
 
 
 
@@ -159,8 +175,9 @@ alg.copy_n(a.find(3), 2, b.find(104));
 
 print: b;
 
-if b != [101, 102, 103, 3, 4, 104, 105, 106, 107, 108, 109, 110]:
-	throw test.alg, 'copy_n failed';
+if b != [101, 102, 103, 3, 4, 104, 105, 106, 107, 108, 109, 110] {
+	throw test.alg <- 'copy_n failed';
+}
 
 
 
@@ -169,27 +186,30 @@ if b != [101, 102, 103, 3, 4, 104, 105, 106, 107, 108, 109, 110]:
 a = [1, 2, 3, 2, 2, 10, 20, 30];
 print: r = alg.count(a.begin(), a.end(), 2);
 
-if r != 3:
-	throw test.alg, 'count failed';
+if r != 3 {
+	throw test.alg <- 'count failed';
+}
 
 
 
 
 a = [1, 2, 3, 2, 2, 10, 20, 30];
-print: r = alg.count_if(a.begin(), a.end(), def(it) { return it%2 == 0; });
+print: r = alg.count_if(a.begin(), a.end(), lambda(it) { return it%2 == 0; });
 
-if r != 6:
-	throw test.alg, 'count_if failed';
+if r != 6 {
+	throw test.alg <- 'count_if failed';
+}
 
 
 a = [1, 2, 3, 2, 2, 10, 20, 30];
 b = [];
 
-alg.transform(a.begin(), a.end(), b.begin(), def(it) { return it*10; });
+alg.transform(a.begin(), a.end(), b.begin(), lambda(it) { return it*10; });
 
 print: b;
-if b != [10, 20, 30, 20, 20, 100, 200, 300]:
-	throw test.alg, 'transform failed';
+if b != [10, 20, 30, 20, 20, 100, 200, 300] {
+	throw test.alg <- 'transform failed';
+}
 
 
 
@@ -197,21 +217,23 @@ a = [1, 2, 3, 2, 2];
 b = [3, 5, 8, 4, 3];
 c = [];
 
-alg.transform(a.begin(), a.end(), b.begin(), c.begin(), def(a, b){ return a+b; });
+alg.transform(a.begin(), a.end(), b.begin(), c.begin(), lambda(a, b){ return a+b; });
 
 print: c; 
-if c != [1+3, 2+5, 3+8, 2+4, 2+3]:
-	throw test.alg, 'transform failed';
+if c != [1+3, 2+5, 3+8, 2+4, 2+3] {
+	throw test.alg <- 'transform failed';
+}
 
 
 
 a = [1, 2, 3, 2, 2];
 b = ['1', '2', '3', '2', '2'];
 
-print: r = alg.equal(a.begin(), a.end(), b.begin(), def(a, b){ return a == b.integer(); });
+print: r = alg.equal(a.begin(), a.end(), b.begin(), lambda(a, b){ return a == b.integer(); });
 
-if r == false:
-	throw test.alg, 'equal failed';
+if r == false {
+	throw test.alg <- 'equal failed';
+}
 
 
 
@@ -219,13 +241,15 @@ a = [1, 2, 2, 2, 3, 4];
 
 print: r = alg.equal_range(a.begin(), a.end(), 2);
 
-if r == true:
-	throw test.alg, 'equal_range failed';
+if r == true {
+	throw test.alg <- 'equal_range failed';
+}
 
 print: r = alg.equal_range(a.find(2), a.find(3), 2);
 
-if r == false:
-	throw test.alg, 'equal_range failed';
+if r == false {
+	throw test.alg <- 'equal_range failed';
+}
 
 print: 'OK';
 

@@ -3,7 +3,7 @@ using time;
 
 def foo
 {
-	for a in [1..2]: {
+	for a in [1..2] {
 		//time.msleep(1);
 		print: a;
 	}
@@ -11,7 +11,7 @@ def foo
 
 def bar
 {
-	for a in [100000..100001]: {
+	for a in [100000..100001] {
 		//time.msleep(1);
 		print: a;
 	}
