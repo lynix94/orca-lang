@@ -63,9 +63,8 @@ public:
 	void join_all();
 
 	portCond m_cond_start;
-	portMutex m_mutex_start;
+	portMutex m_mutex_pool;
 	portCond m_cond_done;
-	portMutex m_mutex_done;
 	
 private:
 	void set_start(pthread_t tid);
