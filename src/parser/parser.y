@@ -69,6 +69,7 @@ const char* get_context();
 %type <cp> lvar
 %type <cp> p_var
 %type <cp> object_path
+%type <cp> opt_under
 %type <cp> big_number
 %type <cp> minus_big_number
 %type <cp> lambda_define_header
@@ -162,6 +163,7 @@ const char* get_context();
 %token ONCE 
 %token EVAL
 %token LAMBDA
+%token UNDER
 
 %token<cp> NAME
 %token<cp> STRING
@@ -790,6 +792,17 @@ name_or_string:/*{{{*/
 	;
 /*}}}*/
 
+opt_under:
+	 /* empty */
+		{
+			$$ = NULL;
+		}
+	| UNDER object_path
+		{
+			$$ = $2;
+		}
+	;
+
 define_stmt:/*{{{*/
 	def name_or_string ';'
 		{
@@ -808,84 +821,7 @@ define_stmt:/*{{{*/
 			g_op->pop_stack();
 			code_top->init_object_done();
 		}
-	| define_header opt_superclass
-		{
-			if ($2) {
-				code_top->make_super($2);
-			}
-		}
-	  statement_block 
-		{
-			parserCode::pop_code_stack();
-		}
-	| def '.' name_or_string name_or_string '{'
-		{
-			const char* cp = get_context();
-			print("get_context(): '%s'\n", cp);
-			code_top->do_context($3, $4, cp);
-			//TODO: fail check
-		}
-	| def '.' PARSE name_or_string opt_argument_list
-		{
-			name_list_t* vp = (name_list_t*)$5;
-
-			// check argv
-			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
-				yyerror("argv not allowed in parse object");
-			}
-
-			if (vp == NULL) {
-				yyerror("at least 1 argument needed in parse object");
-			}
-
-			parserCode::push_code_stack($4, vp);
-			g_parse->do_parse_init();
-		}
-	'{' bnf_stmt_list '}'
-		{
-			vector<char>& def = parserCode::get_def();
-
-			g_parse->make_table();
-			//g_parse->dump();
-			g_parse->do_parse(def);
-			g_parse->cleanup();
-
-			parserCode::pop_code_stack();
-		}
-	| def '.' DECODE name_or_string opt_argument_list
-		{
-			name_list_t* vp = (name_list_t*)$5;
-
-			// check argv
-			bool flag_argv = false;
-			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
-				vp->pop_back();
-				flag_argv = true;
-
-				if (vp->empty()) {	// if argv only, make vp as NULL
-					vp = NULL;
-				}
-			}
-
-			parserCode::push_code_stack($4, vp, $1);
-
-			if (flag_argv == true) {
-				code_top->find_lvar("argv");
-				code_top->set_argv_on();
-			}
-			
-			g_ctl->decode_func_start();
-		}
-	'{' decode_pattern_stmt_list '}'
-		{
-			g_ctl->decode_end();
-			parserCode::pop_code_stack();
-		}
-	;
-/*}}}*/
-
-define_header:/*{{{*/
-	def name_or_string opt_argument_list
+	| def name_or_string opt_argument_list opt_superclass opt_under
 		{
 			name_list_t* vp = (name_list_t*)$3;
 
@@ -900,12 +836,83 @@ define_header:/*{{{*/
 				}
 			}
 
-			parserCode::push_code_stack($2, vp, $1);
+			parserCode::push_code_stack($2, vp, $1, $5);
 
 			if (flag_argv == true) {
 				code_top->find_lvar("argv");
 				code_top->set_argv_on();
 			}
+
+			if ($4) {
+				code_top->make_super($4);
+			}
+		}
+	  statement_block 
+		{
+			parserCode::pop_code_stack();
+		}
+	| def '.' name_or_string name_or_string opt_under '{'
+		{
+			const char* cp = get_context();
+			print("get_context(): '%s'\n", cp);
+			code_top->do_context($3, $4, cp);
+			//TODO: fail check
+		}
+	| def '.' PARSE name_or_string opt_argument_list opt_under
+		{
+			name_list_t* vp = (name_list_t*)$5;
+
+			// check argv
+			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
+				yyerror("argv not allowed in parse object");
+			}
+
+			if (vp == NULL) {
+				yyerror("at least 1 argument needed in parse object");
+			}
+
+			parserCode::push_code_stack($4, vp, $1, $6);
+			g_parse->do_parse_init();
+		}
+	'{' bnf_stmt_list '}'
+		{
+			vector<char>& def = parserCode::get_def();
+
+			g_parse->make_table();
+			//g_parse->dump();
+			g_parse->do_parse(def);
+			g_parse->cleanup();
+
+			parserCode::pop_code_stack();
+		}
+	| def '.' DECODE name_or_string opt_argument_list opt_under
+		{
+			name_list_t* vp = (name_list_t*)$5;
+
+			// check argv
+			bool flag_argv = false;
+			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
+				vp->pop_back();
+				flag_argv = true;
+
+				if (vp->empty()) {	// if argv only, make vp as NULL
+					vp = NULL;
+				}
+			}
+
+			parserCode::push_code_stack($4, vp, $1, $6);
+
+			if (flag_argv == true) {
+				code_top->find_lvar("argv");
+				code_top->set_argv_on();
+			}
+			
+			g_ctl->decode_func_start();
+		}
+	'{' decode_pattern_stmt_list '}'
+		{
+			g_ctl->decode_end();
+			parserCode::pop_code_stack();
 		}
 	;
 /*}}}*/
