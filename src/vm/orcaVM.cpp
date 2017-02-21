@@ -640,7 +640,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 		PRINT1("[%02x] ", (unsigned char)*(c + i));
 		switch((unsigned char)c[i])
 		{
-		case OP_DEF_START: // this, flag, len, cp
+		case OP_DEF_START: // this, flag, len, name_cp
 			o = new orcaObject();
 			o->make_original();
 			d.o_set(o);
@@ -662,12 +662,66 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			if (mod == NULL) mod = current;
 			break;
 
+		case OP_DEF_UNDER_START:  { // this, flag, len, name_cp, len, under_cp
+			o = new orcaObject();
+			o->make_original();
+			d.o_set(o);
+			d.o()->set_name(&c[i+1+1+1]);
+
+			int len = c[i+1+1];
+			PRINT3("\t\t DEF under start: %s under %s, (%p)\n", &c[i+1+1+1], &c[i+1+1+1+len+1], d.o());
+			orcaObject* op = g_root;
+			orcaData out;
+
+			char buff[1024];
+			strncpy(buff, &c[i+1+1+1+len+1], 1024);
+
+			char *last;
+			char *tok = strtok_r(buff, ".", &last);
+			if (op->has_member(tok, out) == false) {
+				throw orcaException(this, "orca.define", string("define under failed"));
+			}
+			op = out.Object();
+
+			while (tok != NULL) {
+				tok = strtok_r(NULL, ".", &last);
+				if (tok == NULL) break;
+				if (op->has_member(tok, out) == false) {
+					throw orcaException(this, "orca.define", string("define under failed"));
+				}
+
+				op = out.Object();
+			}
+			
+			if (c[i+1] & BIT_DEFINE_STATIC)
+				op->insert_static(d.o()->get_name(), d);
+			else
+				op->insert_member(d.o()->get_name(), d);
+
+			d.o()->set_flag(c[i+1]);
+
+			v.push_back(current);
+			v.push_back(op);
+			current = d.o();
+			i += c[i+1+1] + 1;
+			break;
+		  }
+
 		case OP_DEF_END:
 			PRINT0("\t\t DEF END\n");
 			o = v[v.size()-1];
 			current = o;
 			m_curr = o;
 			v.pop_back();
+			break;
+
+		case OP_DEF_UNDER_END:
+			PRINT0("\t\t DEF UNDER END\n");
+			o = v[v.size()-2];
+			current = o;
+			m_curr = o;
+			v.pop_back(); // under target Object
+			v.pop_back(); // real saved current
 			break;
 
 		case OP_REG: // this, flag, len, cp

@@ -142,6 +142,8 @@
 #define OP_DEF_START_PARSER			0xCA
 #define OP_DEF_INIT					0xCB
 #define OP_CONTEXT					0xCC
+#define OP_DEF_UNDER_START			0xCD
+#define OP_DEF_UNDER_END			0xCE
 
 #endif
 
