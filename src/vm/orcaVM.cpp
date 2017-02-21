@@ -933,6 +933,7 @@ fast_jmp:
 
 			case OP_ASSIGN_LOCAL:	
 				PRINT2("\t\t%p : assign local (%d)\n", c, TO_SHORT(&c[1]));
+m_stack->dump();
 				j = TO_SHORT(&c[1]);
 				p1 = m_stack->pop();
 				m_local->set(j, p1);
@@ -1771,7 +1772,6 @@ do_assign_list:
 
 				PRINT2("\t\t%p : make tuple (%d)\n", c, len); 
 
-
 				orcaTuple* tp;
 				if (len > 0) {
 					tp = new orcaTuple(len);
@@ -2581,6 +2581,37 @@ do_assign_list:
 				break;
 			  }
 
+			case OP_CHANNEL_IN:
+				PRINT2("\t\t%p : channel in check (jump to: %x)\n", c, TO_INT(&c[1]));
+				d = m_stack->pop();
+				d = channel_in(d);
+
+				if (is<TYPE_NIL>(d) == false) {
+					m_stack->push(d); // "<-" function
+					c += sizeof(int) + FJ_INC;
+					goto fast_jmp;
+				}
+				else  {
+					c = code + TO_INT(&c[1]);
+					goto fast_jmp;
+				}
+				break;
+
+			case OP_CHANNEL_OUT: {
+				PRINT3("\t\t%p : channel out check (jump to: %x, count: %d)\n", c, TO_INT(&c[1]), TO_INT(&c[1+4]));
+				d = m_stack->pop();
+				int num = TO_INT(&c[1+sizeof(int)]);
+				if (channel_out(d, num)) {
+					c += sizeof(int) + sizeof(int) + FJ_INC;
+					goto fast_jmp;
+				}
+				else  {
+					c = code + TO_INT(&c[1]);
+					goto fast_jmp;
+				}
+				break;
+			  }
+
 			default:
 				PRINT2("\t\t%p : UNKNOWN: %x\n", c, *c); 
 				break;
@@ -2957,6 +2988,69 @@ void orcaVM::set_caller(orcaObject* o)/*{{{*/
 	//m_local->set(IDX_CALLER, o);
 }
 /*}}}*/
+
+orcaData orcaVM::channel_in(orcaData d)
+{
+	if (is<TYPE_OBJ>(d) == false) {
+		return NIL;
+	}
+
+	orcaObject* o = d.o();
+	orcaData ret;
+	if (o->has_member("<-", ret)) {
+		return ret;
+	}
+
+	return NIL;
+}
+
+bool orcaVM::channel_out(orcaData d, int num)
+{
+	if (is<TYPE_OBJ>(d) == false) {
+		return false;
+	}
+
+	orcaObject* o = d.o();
+	orcaData fun;
+	if (o->has_member("->", fun) == false) {
+		return false;
+	}
+
+	if (is<TYPE_NIL>(fun)) {
+		return false;
+	}
+
+	m_stack->push(fun);
+	m_stack->push(num);
+	call(1);
+	orcaData ret = m_stack->pop();
+
+	if (isobj<orcaTuple>(ret)) {
+		orcaTuple* tp = TO_TUPLE(ret.o());
+		int tsize = tp->size();
+
+		for (int i=num-1; i>=0; i--) {
+			if (i<tsize) {
+				m_stack->push(tp->at(i));
+			}
+			else {
+				m_stack->push(NIL);
+			}
+		}
+	}
+	else {
+		for (int i=0; i<num-1; i++) {
+			m_stack->push(NIL);
+		}
+
+		m_stack->push(ret);
+	}
+
+	m_stack->dump();
+	return true;
+}
+
+
 
 int orca_launch_module(orcaVM* vm, char* module, int argc, char** argv)/*{{{*/
 {

@@ -103,6 +103,9 @@ public:
 	orcaData do_context(const char* mod, const char* name, 
 						const char* cp, time_t last_write_time);
 
+	orcaData channel_in(orcaData d);
+	bool channel_out(orcaData d, int num);
+
 private:
 	orcaData& handle_throw(const char* name);
 	orcaForStack* m_for_stack;

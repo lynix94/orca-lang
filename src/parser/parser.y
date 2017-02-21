@@ -276,42 +276,51 @@ assign_target:
 	  lvar
 		{
 			g_op->assign_local($1);
+			g_op->pop_stack();
 		}
 	| postfix_object '.' name_or_string
 		{
 			g_op->assign_member($3);
+			g_op->pop_stack();
 		}
 	| postfix_object '.' reserved_object
 		{
 			g_op->assign_reserved($3);
+			g_op->pop_stack();
 		}
 	| postfix_object '[' slice_expression ']' assign_type 
 		{
 			g_op->assign_list(false);
+			g_op->pop_stack();
 		}
 	| postfix_object '[' slice_expression ')' assign_type 
 		{
 			g_op->assign_list(true);
+			g_op->pop_stack();
 		}
 	| DOUBLE_DOT name_or_string
 		{
 			g_op->push_reserved(OP_PUSH_OWNER);
 			g_op->assign_member($2);
+			g_op->pop_stack();
 		}
 	| DOUBLE_DOT reserved_object
 		{
 			g_op->push_reserved(OP_PUSH_OWNER);
 			g_op->assign_reserved($2);
+			g_op->pop_stack();
 		}
 	| '.' name_or_string
 		{
 			g_op->push_reserved(OP_PUSH_MY);
 			g_op->assign_member($2);
+			g_op->pop_stack();
 		}
 	| '.' reserved_object
 		{
 			g_op->push_reserved(OP_PUSH_MY);
 			g_op->assign_reserved($2);
+			g_op->pop_stack();
 		}
 	;
 

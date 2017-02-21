@@ -3,10 +3,13 @@
 add assert
 add log
 make anonymous def
-channel ? 
 def foo(...) under path
-select
 
+select
+sync queue
+
+
+channel
 
 
 ### done

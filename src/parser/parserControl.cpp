@@ -638,22 +638,43 @@ void parserControl::once_end()
 
 void parserControl::channel_in_start()
 {
+	code_top->push_char(OP_CHANNEL_IN);
 
+	context ctx;
+	ctx.pass2 = code_top->size();
+	m_ctl.push_back(ctx);
+	
+	code_top->increase(sizeof(int));
 }
  
 void parserControl::channel_in_end(int num)
 {
+	// call if check ok
+	g_op->call(num);
 
+	// 2pass set
+	int pos_if_false = m_ctl[m_ctl.size()-1].pass2;
+	m_ctl.pop_back();
+	code_top->set_int(code_top->size(), pos_if_false);
 }
  
 void parserControl::channel_out_start()
 {
+	code_top->push_char(OP_CHANNEL_OUT);
 
+	context ctx;
+	ctx.pass2 = code_top->size();
+	m_ctl.push_back(ctx);
+	
+	code_top->increase(sizeof(int) * 2); // jump address, out num
 }
  
 void parserControl::channel_out_end(int num)
 {
-
+	int pos_if_false = m_ctl[m_ctl.size()-1].pass2;
+	m_ctl.pop_back();
+	code_top->set_int(code_top->size(), pos_if_false);
+	code_top->set_int(num, pos_if_false + sizeof(int));
 }
  
 

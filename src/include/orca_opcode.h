@@ -120,6 +120,8 @@
 #define OP_SBF_LIST					0x81
 #define OP_SBF_RANGE				0x82
 #define OP_SIMPLE_RETURN			0x83
+#define OP_CHANNEL_IN				0x84
+#define OP_CHANNEL_OUT				0x85
 
 #define OP_RC_INC					0x90
 #define OP_RC_DEC					0x91
