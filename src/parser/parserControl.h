@@ -74,7 +74,6 @@ public:
 
 	void channel_in_start();
 	void channel_in_end(int num);
-
 	void channel_out_start();
 	void channel_out_end(int num);
 

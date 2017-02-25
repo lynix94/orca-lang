@@ -267,6 +267,7 @@ struct LIBORCA_API orcaData
 	int& ir()						{ return v.i; }	// for fast mod
 	int i()							{ return v.i; }
 	double r()						{ return v.r; }
+	bool b()						{ return v.i == 1 ? true : false; }
 	orcaObject* o()					{ return v.o; }
 	StringObject* so()				{ return v.so; }
 	string& s()	const				{ return v.so->s; }
@@ -283,6 +284,7 @@ struct LIBORCA_API orcaData
 	
 	// for change ( use orcaData for creation() )
 	void i(int i)					{ v.i = i; } 
+	void b(bool b)					{ b==true ? v.i = 1 : v.i = 0; }
 	void r(double r)				{ v.r = r; }
 	void o(orcaObject* o)			{ v.o = o; }
 	void s(string& s)				{ v.so->s.swap(s); }
