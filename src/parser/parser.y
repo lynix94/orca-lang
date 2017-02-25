@@ -244,7 +244,7 @@ statement:/*{{{*/
 	;
 /*}}}*/
 
-channel_stmt:
+channel_stmt:/*{{{*/
 	expression LEFT_ARROW
 		{
 			g_ctl->channel_in_start();
@@ -262,8 +262,9 @@ channel_stmt:
 			g_ctl->channel_out_end($4);
 		}
 	;
+/*}}}*/
 
-assign_target_list:
+assign_target_list:/*{{{*/
 	  assign_target_list ',' assign_target
 		{
 			$$ = $1 + 1;
@@ -273,8 +274,9 @@ assign_target_list:
 			$$ = 1;
 		}
 	;
+/*}}}*/
 
-assign_target:
+assign_target:/*{{{*/
 	  lvar
 		{
 			g_op->assign_local($1);
@@ -316,6 +318,7 @@ assign_target:
 			g_op->assign_reserved($2);
 		}
 	;
+/*}}}*/
 
 scope_stmt:/*{{{*/
 	expression
@@ -759,7 +762,7 @@ loop_stmt:/*{{{*/
 	;
 /*}}}*/
 
-def:
+def:/*{{{*/
 	STATIC DEF
 		{
 			$$ = BIT_DEFINE_STATIC;
@@ -769,7 +772,7 @@ def:
 			$$ = 0;
 		}
 	;
-
+/*}}}*/
 
 name_or_string:/*{{{*/
 	name
@@ -783,7 +786,7 @@ name_or_string:/*{{{*/
 	;
 /*}}}*/
 
-opt_under:
+opt_under:/*{{{*/
 	 /* empty */
 		{
 			$$ = NULL;
@@ -793,6 +796,7 @@ opt_under:
 			$$ = $2;
 		}
 	;
+/*}}}*/
 
 define_stmt:/*{{{*/
 	def name_or_string ';'
@@ -842,14 +846,25 @@ define_stmt:/*{{{*/
 		{
 			parserCode::pop_code_stack();
 		}
-	| def '.' name_or_string name_or_string opt_under '{'
+	| define_context_stmt
+	| define_parse_stmt
+	| define_decode_stmt
+	;
+	
+
+define_context_stmt:
+	  def '.' name_or_string name_or_string opt_under '{'
 		{
 			const char* cp = get_context();
 			print("get_context(): '%s'\n", cp);
-			code_top->do_context($3, $4, cp);
+			code_top->do_context($3, $4, cp, $5);
 			//TODO: fail check
 		}
-	| def '.' PARSE name_or_string opt_argument_list opt_under
+	;
+
+
+define_parse_stmt:
+	  def '.' PARSE name_or_string opt_argument_list opt_under
 		{
 			name_list_t* vp = (name_list_t*)$5;
 
@@ -876,7 +891,11 @@ define_stmt:/*{{{*/
 
 			parserCode::pop_code_stack();
 		}
-	| def '.' DECODE name_or_string opt_argument_list opt_under
+	;
+
+
+define_decode_stmt:
+	  def '.' DECODE name_or_string opt_argument_list opt_under
 		{
 			name_list_t* vp = (name_list_t*)$5;
 
@@ -907,6 +926,7 @@ define_stmt:/*{{{*/
 		}
 	;
 /*}}}*/
+
 
 once_expr:/*{{{*/
 	ONCE
@@ -973,7 +993,7 @@ lambda_object:/*{{{*/
 	;
 /*}}}*/
 
-lambda_define_header:
+lambda_define_header:/*{{{*/
 	LAMBDA opt_argument_list
 		{
 			name_list_t* vp = (name_list_t*)$2;
@@ -1003,9 +1023,9 @@ lambda_define_header:
 			$$ = name;
 		}
 	;
+/*}}}*/
 
-
-lambda_decode_header:
+lambda_decode_header:/*{{{*/
 	LAMBDA '.' DECODE opt_argument_list
 		{
 			name_list_t* vp = (name_list_t*)$4;
@@ -1037,9 +1057,9 @@ lambda_decode_header:
 			$$ = name;
 		}
 	;
+/*}}}*/
 
-
-lambda_parse_header:
+lambda_parse_header:/*{{{*/
 	LAMBDA '.' PARSE opt_argument_list
 		{
 			name_list_t* vp = (name_list_t*)$4;
@@ -1063,7 +1083,7 @@ lambda_parse_header:
 			$$ = name;
 		}
 	;
-
+/*}}}*/
 
 opt_superclass:/*{{{*/
 	  // empty
@@ -1265,7 +1285,6 @@ expression:/*{{{*/
 	| once_expr
 	;
 /*}}}*/
-
 
 assign_expr:	/*{{{*/
 	  lvar assign_type 
@@ -1563,7 +1582,6 @@ numeric_expr:/*{{{*/
 	;
 /*}}}*/
 
-
 add_expr:/*{{{*/
 	add_expr '+' mul_expr
 		{
@@ -1841,17 +1859,18 @@ primary_object:/*{{{*/
 	;
 /*}}}*/
 
-reserved_functions:
+reserved_functions:/*{{{*/
 	eval_function
 	;
+/*}}}*/
 
-
-eval_function:
+eval_function:/*{{{*/
 	EVAL '(' expression ')'
 		{
 			g_op->eval();
 		}
 	;
+/*}}}*/
 
 postfix_object:/*{{{*/
 	  postfix_object '.' name_or_string

@@ -367,7 +367,7 @@ void parserCode::reg_object(const char* s, int flag_define) /*{{{*/
 }
 /*}}}*/
 
-void parserCode::do_context(const char* mod, const char* name, const char* code)/*{{{*/
+void parserCode::do_context(const char* mod, const char* name, const char* code, const char* under_path)/*{{{*/
 {
 	int len;
 
@@ -387,6 +387,14 @@ void parserCode::do_context(const char* mod, const char* name, const char* code)
 	char* cp = i2l(len);
 	copy(cp, cp+sizeof(int), back_inserter(m_def));
 	copy(code, code + len, back_inserter(m_def));
+
+	len = 0;
+	if (under_path) {
+		len = strlen(under_path)+1;
+	}
+
+	m_def.push_back(len);
+	copy(under_path, under_path + len, back_inserter(m_def));
 }
 /*}}}*/
 

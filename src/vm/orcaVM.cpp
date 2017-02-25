@@ -885,21 +885,60 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			break;
 
 		case OP_CONTEXT: {
-				int mod_len = c[i+1];
-				const char* mod = &c[i+2];
+			int mod_len = c[i+1];
+			const char* mod = &c[i+1+1];
 
-				int name_len = c[i+2+mod_len];
-				const char* name = &c[i+2+mod_len+1];
+			int name_len = c[i+1+mod_len+1];
+			const char* name = &c[i+1+mod_len+1+1];
 
-				int code_len  = TO_INT(&c[i+2+mod_len+name_len+1]);
-				const char* code = &c[i+2+mod_len+name_len+1+sizeof(int)];
+			int code_len  = TO_INT(&c[i+1+mod_len+1+name_len+1]);
+			const char* code = &c[i+1+mod_len+1+name_len+sizeof(int)+1];
+			int under_len  = c[i+1+mod_len+1+name_len+sizeof(int)+code_len+1];
+			const char* under = NULL;
 
-				i += 1+1+sizeof(int)+mod_len+name_len+code_len;
-				PRINT3("\t\t  context object: %s, %s, %s\n", mod, name, code);
-
-				orcaData out = do_context(mod, name, code, last_write_time);
-				current->insert_member(name, out);
+			if (under_len > 0) {
+				under = &c[i+1+mod_len+1+name_len+sizeof(int)+code_len+1+1];
 			}
+
+			i += 1+mod_len + 1+name_len + sizeof(int)+code_len + 1+under_len;
+			if (under_len > 0) {
+				PRINT3("\t\t  context object: %s, %s, '%s'\n", mod, name, code);
+			}
+			else {
+				PRINT4("\t\t  context object: %s, %s, %s, '%s'\n", mod, name, under, code);
+			}
+
+			orcaData out = do_context(mod, name, code, last_write_time);
+
+			orcaObject* op = current;
+			if	(under) {
+				op = g_root;
+				orcaData out;
+
+				char buff[1024];
+				strncpy(buff, under, 1024);
+
+				char *last;
+				char *tok = strtok_r(buff, ".", &last);
+				if (op->has_member(tok, out) == false) {
+					throw orcaException(this, "orca.define", string("define under failed"));
+				}
+				op = out.Object();
+
+				while (tok != NULL) {
+					tok = strtok_r(NULL, ".", &last);
+					if (tok == NULL) break;
+					if (op->has_member(tok, out) == false) {
+						throw orcaException(this, "orca.define", string("define under failed"));
+					}
+
+					op = out.Object();
+				}
+			}
+
+			op->insert_member(name, out);
+		  }
+
 		} // switch
 	} // for
 
