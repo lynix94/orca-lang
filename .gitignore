@@ -1,8 +1,13 @@
 *.o
 *.la
 *.lo
-tests/*.kw
 Makefile
 .*
+*.kw
+parser.cpp
+parser.hpp
+parser.output
+lexer.cpp
+
 
 

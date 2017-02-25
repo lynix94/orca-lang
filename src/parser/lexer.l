@@ -634,6 +634,7 @@ const char* get_context()/*{{{*/
 	return g_parser->strdup(str.c_str());
 }
 /*}}}*/
+
 static const char* get_hex_string(char end)/*{{{*/
 {
 	char c;

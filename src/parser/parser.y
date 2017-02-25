@@ -66,6 +66,7 @@ const char* get_context();
 // type define/*{{{*/
 %type <cp> name
 %type <cp> name_or_string
+%type <cp> opt_name_or_string
 %type <cp> lvar
 %type <cp> p_var
 %type <cp> object_path
@@ -783,6 +784,18 @@ def:/*{{{*/
 	;
 /*}}}*/
 
+opt_name_or_string:/*{{{*/
+	/* empty */
+		{
+			$$ = NULL;
+		}
+	| name_or_string
+		{
+			$$ = $1;
+		}
+	;
+/*}}}*/
+
 name_or_string:/*{{{*/
 	name
 		{
@@ -825,8 +838,16 @@ define_stmt:/*{{{*/
 			g_op->pop_stack();
 			code_top->init_object_done();
 		}
-	| def name_or_string opt_argument_list opt_superclass opt_under
+	| def opt_name_or_string opt_argument_list opt_superclass opt_under
 		{
+			const char* name = $2;
+			static int count = 1;
+			char buff[1024];
+			if (name == NULL) {
+				sprintf(buff, "__%s_%d_anonymous", g_parser->module_name.c_str(), count++);
+				name = buff;
+			}
+
 			name_list_t* vp = (name_list_t*)$3;
 
 			// check argv
@@ -840,7 +861,8 @@ define_stmt:/*{{{*/
 				}
 			}
 
-			parserCode::push_code_stack($2, vp, $1, $5);
+
+			parserCode::push_code_stack(name, vp, $1, $5);
 
 			if (flag_argv == true) {
 				code_top->find_lvar("argv");
@@ -859,22 +881,38 @@ define_stmt:/*{{{*/
 	| define_parse_stmt
 	| define_decode_stmt
 	;
-	
+	/*}}}*/
 
-define_context_stmt:
-	  def '.' name_or_string name_or_string opt_under '{'
+define_context_stmt:/*{{{*/
+	  def '.' name_or_string opt_name_or_string opt_under '{'
 		{
+			const char* name = $4;
+			static int count = 1;
+			char buff[1024];
+			if (name == NULL) {
+				sprintf(buff, "__%s_%d_ctx_anonymous", g_parser->module_name.c_str(), count++);
+				name = buff;
+			}
+
 			const char* cp = get_context();
 			print("get_context(): '%s'\n", cp);
-			code_top->do_context($3, $4, cp, $5);
+			code_top->do_context($3, name, cp, $5);
 			//TODO: fail check
 		}
 	;
+/*}}}*/
 
-
-define_parse_stmt:
-	  def '.' PARSE name_or_string opt_argument_list opt_under
+define_parse_stmt:/*{{{*/
+	  def '.' PARSE opt_name_or_string opt_argument_list opt_under
 		{
+			const char* name = $4;
+			static int count = 1;
+			char buff[1024];
+			if (name == NULL) {
+				sprintf(buff, "__%s_%d_parse_anonymous", g_parser->module_name.c_str(), count++);
+				name = buff;
+			}
+
 			name_list_t* vp = (name_list_t*)$5;
 
 			// check argv
@@ -886,7 +924,7 @@ define_parse_stmt:
 				yyerror("at least 1 argument needed in parse object");
 			}
 
-			parserCode::push_code_stack($4, vp, $1, $6);
+			parserCode::push_code_stack(name, vp, $1, $6);
 			g_parse->do_parse_init();
 		}
 	'{' bnf_stmt_list '}'
@@ -901,11 +939,19 @@ define_parse_stmt:
 			parserCode::pop_code_stack();
 		}
 	;
+/*}}}*/
 
-
-define_decode_stmt:
-	  def '.' DECODE name_or_string opt_argument_list opt_under
+define_decode_stmt:/*{{{*/
+	  def '.' DECODE opt_name_or_string opt_argument_list opt_under
 		{
+			const char* name = $4;
+			static int count = 1;
+			char buff[1024];
+			if (name == NULL) {
+				sprintf(buff, "__%s_%d_decode_anonymous", g_parser->module_name.c_str(), count++);
+				name = buff;
+			}
+
 			name_list_t* vp = (name_list_t*)$5;
 
 			// check argv
@@ -919,7 +965,7 @@ define_decode_stmt:
 				}
 			}
 
-			parserCode::push_code_stack($4, vp, $1, $6);
+			parserCode::push_code_stack(name, vp, $1, $6);
 
 			if (flag_argv == true) {
 				code_top->find_lvar("argv");
@@ -935,7 +981,6 @@ define_decode_stmt:
 		}
 	;
 /*}}}*/
-
 
 once_expr:/*{{{*/
 	ONCE
@@ -966,13 +1011,12 @@ lambda_object:/*{{{*/
 		{
 			// for serial tagging
 			static int count = 1;
-			char name[256];
+			char name[1024];
 			sprintf(name, "__%s_%d_context", g_parser->module_name.c_str(), count++);
 
 			const char* cp = get_context();
 			//print("get_context(): '%s'\n", cp);
 			code_top->do_context($3, name, cp);
-			//TODO: fail check
 
 			g_op->push_reserved(OP_PUSH_MY);
 			g_op->find_member(name);
@@ -1019,7 +1063,7 @@ lambda_define_header:/*{{{*/
 			}
 
 			static int count = 1;
-			char buff[256];
+			char buff[1024];
 			sprintf(buff, "#%d_lambda", count++);
 			const char* name = g_parser->strdup(buff);
 			parserCode::push_code_stack(name, vp, 0);
@@ -1051,7 +1095,7 @@ lambda_decode_header:/*{{{*/
 			}
 
 			static int count = 1;
-			char buff[256];
+			char buff[1024];
 			sprintf(buff, "#%d_decode_lambda", count++);
 			const char* name = g_parser->strdup(buff);
 			parserCode::push_code_stack(name, vp, 0);
@@ -1083,7 +1127,7 @@ lambda_parse_header:/*{{{*/
 			}
 
 			static int count = 1;
-			char buff[256];
+			char buff[1024];
 			sprintf(buff, "#%d_parse_lambda", count++);
 			const char* name = g_parser->strdup(buff);
 			parserCode::push_code_stack(name, vp);

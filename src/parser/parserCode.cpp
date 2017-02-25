@@ -540,12 +540,13 @@ void parserCode::push_code_stack(const char* name, const char* under_path)/*{{{*
 }
 /*}}}*/
 
-void parserCode::reinit_code_stack_for_interpreter()
+void parserCode::reinit_code_stack_for_interpreter()/*{{{*/
 {
 	while (parserCode::m_codeStack.size() > 1) {
 		pop_code_stack();
 	}
 }
+/*}}}*/
 
 void parserCode::push_code_stack(const char* name, vector<const char*>* param, int flag_define, const char* under_path)/*{{{*/
 {

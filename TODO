@@ -1,32 +1,37 @@
 
 # now thinking 
-add assert
-add log
 make anonymous def
-def foo(...) under path
-
+html lib
 select
-sync queue
+root, cloud (depent zookeeper or etcd)
+
+#channel
+channel assert
+channel log
+channel queue
+channel dist queue
+
+# storage
+sqlite
+memcached
+leveldb
 
 
-channel
+# refactoring
+move code_top to vm->code_top()
+move parse to vm & parse, interpret lock
+nil -> null
 
 
 ### done
 change to lambda
 add eval (interpret, parse)
 improve catch statement
+def foo(...) under path
+channel
 ###
 
 
-decode to switch
-swich, select, decode
-root, cloud (depent zookeeper or etcd)
-
-# refactoring
-move code_top to vm->code_top()
-move parse to vm & parse, interpret lock
-nil -> null
 
 
 # remove
