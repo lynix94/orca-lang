@@ -861,16 +861,14 @@ define_stmt:/*{{{*/
 				}
 			}
 
-
+			if ($4) { // IMPORTANT: should be front of push_code_stack (parents code are cleared)
+				code_top->make_super($4);
+			}
 			parserCode::push_code_stack(name, vp, $1, $5);
 
 			if (flag_argv == true) {
 				code_top->find_lvar("argv");
 				code_top->set_argv_on();
-			}
-
-			if ($4) {
-				code_top->make_super($4);
 			}
 		}
 	  statement_block 
@@ -995,13 +993,7 @@ once_expr:/*{{{*/
 /*}}}*/
 
 lambda_object:/*{{{*/
-	lambda_define_header opt_superclass
-		{
-			if ($2) {
-				code_top->make_super($2);
-			}
-		}
-	statement_block
+	lambda_define_header statement_block
 		{
 			parserCode::pop_code_stack();
 			g_op->push_reserved(OP_PUSH_MY);
@@ -1047,7 +1039,7 @@ lambda_object:/*{{{*/
 /*}}}*/
 
 lambda_define_header:/*{{{*/
-	LAMBDA opt_argument_list
+	LAMBDA opt_argument_list opt_superclass
 		{
 			name_list_t* vp = (name_list_t*)$2;
 
@@ -1066,6 +1058,10 @@ lambda_define_header:/*{{{*/
 			char buff[1024];
 			sprintf(buff, "#%d_lambda", count++);
 			const char* name = g_parser->strdup(buff);
+
+			if ($3) { // IMPORTANT: should be front of push_code_stack (parents code are cleared)
+				code_top->make_super($3);
+			}
 			parserCode::push_code_stack(name, vp, 0);
 
 			if (flag_argv == true) {

@@ -637,7 +637,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 	if (current == NULL) current = g_root;
 
 	for(int i=0; i<size; i++) {
-		PRINT1("[%02x] ", (unsigned char)*(c + i));
+		PRINT2("%u[%02x] ", i, (unsigned char)*(c + i));
 		switch((unsigned char)c[i])
 		{
 		case OP_DEF_START: // this, flag, len, name_cp
@@ -646,7 +646,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			d.o_set(o);
 			d.o()->set_name(&c[i+1+1+1]);
 
-			PRINT2("\t\t DEF start: %s, (%p)\n", &c[i+1+1+1], d.o());
+			PRINT3("\t\t DEF start: %s(%d), (%p)\n", &c[i+1+1+1], c[i+1+1], d.o());
 
 			if (c[i+1] & BIT_DEFINE_STATIC)
 				current->insert_static(d.o()->get_name(), d);
@@ -657,7 +657,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 
 			v.push_back(current);
 			current = d.o();
-			i += c[i+1+1] + 1;
+			i += 1 + 1 + c[i+1+1];
 
 			if (mod == NULL) mod = current;
 			break;
@@ -703,7 +703,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			v.push_back(current);
 			v.push_back(op);
 			current = d.o();
-			i += c[i+1+1] + 1;
+			i += 1 + 1 + c[i+1+1] + 1 + c[i+1+1+1+len];
 			break;
 		  }
 
@@ -731,7 +731,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			else
 				current->insert_member(&c[i+1+1+1], NIL);
 
-			i += c[i+1+1] + 1;
+			i += 1 + 1 + c[i+1+1];
 			break;
 
 		case OP_DEF_CODE:
@@ -749,7 +749,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			break;
 
 		case OP_DEF_SUPER:
-			PRINT2("\t\t  super define: %d, %x\n", c[i+1], TO_INT(&c[i+2]));
+			PRINT2("\t\t  super define: %d, %d\n", c[i+1], TO_INT(&c[i+2]));
 m_stack->dump();
 			exec_code(code + TO_INT(&c[i+2]));
 			count = c[i+1];
@@ -773,7 +773,7 @@ m_stack->dump();
 					}
 				}
 			}
-			i += 5;
+			i += 1 + sizeof(int);
 			break;
 
 		case OP_USING: {
@@ -789,7 +789,7 @@ m_stack->dump();
 					throw orcaException(this, "orca.module", "module launch failure");
 				}
 			}
-			i += c[i+1] + 1;
+			i += 1 + c[i+1];
 			break;
 
 		case OP_USING_EXT: {
@@ -999,10 +999,11 @@ void orcaVM::exec_code(const char* code, const char* offset)/*{{{*/
 		c = code + sizeof(CodeHeader);
 	}
 
+	const char* sp = c;
 	for(;;c++) {
 fast_jmp:
 		try {
-			PRINT1("[%02x] ", (unsigned char)*c);
+			PRINT2("%u[%02x] ", sp - c, (unsigned char)*c);
 			switch((unsigned char)*c)
 			{
 			case OP_NOP:	

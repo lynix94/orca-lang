@@ -8,6 +8,7 @@ parser.cpp
 parser.hpp
 parser.output
 lexer.cpp
+libtool
 
 
 

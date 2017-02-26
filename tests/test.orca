@@ -10,7 +10,7 @@ test_vectors = [
   'test_exception',
   'test_string',
   'test_format',
-#  'test_oo',
+  'test_oo',
   'test_gc',
   'test_operator',
   'test_shell',

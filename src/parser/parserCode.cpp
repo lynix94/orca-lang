@@ -302,15 +302,15 @@ void parserCode::make_super(int super_n) /*{{{*/
 		copy(m_code.begin(), m_code.end(), new_code);
 	}
 	else {
-		// code size & code (add root code header for excact index)
+		// code size & code (add root code header for exact index)
 		char* b = i2l(m_codeFinal.size() + sizeof(CodeHeader));
 		copy(b, b+sizeof(char*), back_inserter(m_def));
 
 		// set header
 		copy((char*)&ch, (char*)&ch+sizeof(CodeHeader), back_inserter(m_codeFinal));
 		// real code copy & return
+
 		copy(m_code.begin(), m_code.end(), back_inserter(m_codeFinal));
-		
 		m_codeFinal.push_back(OP_RETURN);
 
 		// and clean up code

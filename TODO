@@ -1,12 +1,8 @@
 # bug
 -- test_oo failed
 
-
 # bug fixed
 -- using namespace conflict
-
-
-
 
 # now thinking 
 id, members -> ID, MEMBERS (upper)

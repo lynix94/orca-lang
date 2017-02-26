@@ -36,6 +36,7 @@ a = my.derived.clone();
 b = a.clone();
 
 if !(b.type < my.base) {
+	print(b.type);
 	throw test.oo <- 'issubclassof fail';
 }
 
