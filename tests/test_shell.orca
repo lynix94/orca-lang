@@ -1,8 +1,9 @@
 using os;
 using system;
 
-if system.os().find('Linux') == -1:
+if system.os().find('Linux') == -1 {
 	return;
+}
 
 def __cout__;
 

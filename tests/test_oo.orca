@@ -1,6 +1,5 @@
 
 using test_oo;
-using io.print;
 
 def base
 {

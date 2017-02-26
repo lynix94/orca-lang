@@ -1,6 +1,15 @@
+# bug
+-- test_oo failed
+
+
+# bug fixed
+-- using namespace conflict
+
+
+
 
 # now thinking 
-make anonymous def
+id, members -> ID, MEMBERS (upper)
 html lib
 select
 root, cloud (depent zookeeper or etcd)
@@ -16,21 +25,28 @@ sqlite
 memcached
 leveldb
 
+# test
+channel
+eval
+under
+anonymous
+assert
+log
+
 
 # refactoring
+length check
 move code_top to vm->code_top()
 move parse to vm & parse, interpret lock
-nil -> null
 
 
 ### done
 change to lambda
 add eval (interpret, parse)
 improve catch statement
-def foo(...) under path
 channel
-###
-
+def foo(...) under path
+make anonymous def
 
 
 

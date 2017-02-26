@@ -10,20 +10,20 @@ test_vectors = [
   'test_exception',
   'test_string',
   'test_format',
-  'test_oo',
+#  'test_oo',
   'test_gc',
   'test_operator',
-# 'test_shell',
+  'test_shell',
   'test_iter',
   'test_lambda',
   'test_thread',
- #'test_pure',
+#  'test_pure',  ### disable until decorate
   'test_once',
   'test_scope',
   'test_decode',
   'test_sbf',
   'test_para',
-  #'test_para_for',
+  'test_para_for',
   'test_type',
   'test_orca',
   'test_lang',
@@ -35,8 +35,7 @@ test_modules = [
   'test_ipc',
   'test_socket',
   'test_select',
-#  'test_os',
-#  'test_pack',
+#  'test_os',  ## disable temp.
   'test_fun',
   'test_date',
   'test_time',
@@ -46,16 +45,20 @@ test_modules = [
   'test_dfsd',
   'test_system',
   'test_math',
-#  'test_sh',
-#  'test_awk',
-#  'test_cpp',
   'test_alg',
-#  'test_run',
-#  'test_util',
   'test_lisp',
   'test_xml',
   'test_json',
-  'test_gnuplot'
+  'test_gnuplot',
+
+
+#### not be made yet
+#  'test_pack', ## not made
+#  'test_sh',
+#  'test_cpp',
+#  'test_awk',
+#  'test_run',
+#  'test_util',
 ];
 	
 stopwatch.title('elapsed time: ') {

@@ -750,8 +750,10 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 
 		case OP_DEF_SUPER:
 			PRINT2("\t\t  super define: %d, %x\n", c[i+1], TO_INT(&c[i+2]));
+m_stack->dump();
 			exec_code(code + TO_INT(&c[i+2]));
 			count = c[i+1];
+m_stack->dump();
 			for(j=0; j<count; j++) {
 				if (!is<TYPE_OBJ>(m_stack->top())) {
 					throw orcaException(this, "orca.type", 
@@ -1026,7 +1028,6 @@ fast_jmp:
 
 			case OP_ASSIGN_LOCAL:	
 				PRINT2("\t\t%p : assign local (%d)\n", c, TO_SHORT(&c[1]));
-m_stack->dump();
 				j = TO_SHORT(&c[1]);
 				p1 = m_stack->pop();
 				m_local->set(j, p1);

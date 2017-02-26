@@ -288,11 +288,20 @@ void parserOP::push_lvar(const char* s)/*{{{*/
 		return;
 	}
 
-	// second, find it from using space
-	bool ret = push_mvar_using_space(s);
+	// local should be faster than using space
+	bool ret = code_top->check_lvar(s);
+	if (ret == true) {
+		short idx = code_top->find_lvar(s);
+		code_top->push_char(OP_PUSH_LVAR);
+		code_top->push_short(idx);
+		return;
+	}
 
-	// now, find it from local variable set;
-	if (ret == false) {	
+	// last, find it from using space
+	ret = push_mvar_using_space(s);
+
+	// if not exists at all, make one
+	if (ret == false) {
 		short idx = code_top->find_lvar(s);
 		code_top->push_char(OP_PUSH_LVAR);
 		code_top->push_short(idx);
