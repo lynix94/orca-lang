@@ -26,8 +26,7 @@ using namespace std;
 class parserCode 
 {
 public:
-	parserCode(const char* s, const char* under_path = NULL);
-	parserCode(const char* s, vector<const char*>* param, int flag = 0, const char* under_path = NULL);
+	parserCode(const char* s, vector<const char*>* param, int flag = 0, vector<const char*>* supers = NULL, const char* under_path = NULL);
 	~parserCode();
 	void pop_code();
 
@@ -41,7 +40,6 @@ public:
 
 	void init_object_start(const char* s);
 	void init_object_done();
-	void make_super(int super_n);
 	static void Final(string name);
 
 	int find_lvar(const char* s);
@@ -66,8 +64,7 @@ public:
 	int size();
 	void pop_back();
 
-	static void push_code_stack(const char* name, const char* under_path = NULL);
-	static void push_code_stack(const char* name, vector<const char*>* param, int flag = 0, const char* under_path = NULL);
+	static void push_code_stack(const char* name, vector<const char*>* param, int flag = 0, vector<const char*>* super_class = NULL, const char* under_path = NULL);
 
 	// just case for exception in interpreter
 	static void reinit_code_stack_for_interpreter();

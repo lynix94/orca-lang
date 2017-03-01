@@ -84,12 +84,11 @@ const char* get_context();
 %type <bp> bnf_node
 
 %type <integer> number					// integer
-%type <integer> minus_number					// integer
+%type <integer> minus_number			// integer
 %type <integer> expression_stmt			// num of expr
 %type <integer> expression_list			// num of expr
 %type <integer> pair_list				// num of expr
 %type <integer> opt_expr_list			// num of expr
-%type <integer> opt_superclass			// num of superclass
 %type <integer> elif_stmt_list			// num of elif stmt
 %type <integer> reserved_object			// reserved object enum value
 %type <integer> calling_body			// num of arguemnts
@@ -103,6 +102,8 @@ const char* get_context();
 
 %type <vector_cp> name_list
 %type <vector_cp> opt_argument_list
+%type <vector_cp> object_path_list
+%type <vector_cp> opt_superclass
 
 
 /*}}}*/
@@ -842,6 +843,7 @@ define_stmt:/*{{{*/
 		{
 			const char* name = $2;
 			static int count = 1;
+			name_list_t* supers = (name_list_t*)$4;
 			char buff[1024];
 			if (name == NULL) {
 				sprintf(buff, "__%s_%d_anonymous", g_parser->module_name.c_str(), count++);
@@ -861,10 +863,7 @@ define_stmt:/*{{{*/
 				}
 			}
 
-			if ($4) { // IMPORTANT: should be front of push_code_stack (parents code are cleared)
-				code_top->make_super($4);
-			}
-			parserCode::push_code_stack(name, vp, $1, $5);
+			parserCode::push_code_stack(name, vp, $1, supers, $5);
 
 			if (flag_argv == true) {
 				code_top->find_lvar("argv");
@@ -922,7 +921,7 @@ define_parse_stmt:/*{{{*/
 				yyerror("at least 1 argument needed in parse object");
 			}
 
-			parserCode::push_code_stack(name, vp, $1, $6);
+			parserCode::push_code_stack(name, vp, $1, NULL, $6);
 			g_parse->do_parse_init();
 		}
 	'{' bnf_stmt_list '}'
@@ -963,7 +962,7 @@ define_decode_stmt:/*{{{*/
 				}
 			}
 
-			parserCode::push_code_stack(name, vp, $1, $6);
+			parserCode::push_code_stack(name, vp, $1, NULL, $6);
 
 			if (flag_argv == true) {
 				code_top->find_lvar("argv");
@@ -1041,16 +1040,17 @@ lambda_object:/*{{{*/
 lambda_define_header:/*{{{*/
 	LAMBDA opt_argument_list opt_superclass
 		{
-			name_list_t* vp = (name_list_t*)$2;
+			name_list_t* params = (name_list_t*)$2;
+			name_list_t* supers = (name_list_t*)$3;
 
 			// check argv
 			bool flag_argv = false;
-			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
-				vp->pop_back();
+			if (params && strcmp((*params)[params->size()-1], "...") == 0) {
+				params->pop_back();
 				flag_argv = true;
 
-				if (vp->empty()) {	// if argv only, make vp as NULL
-					vp = NULL;
+				if (params->empty()) {	// if argv only, make params as NULL
+					params = NULL;
 				}
 			}
 
@@ -1059,10 +1059,7 @@ lambda_define_header:/*{{{*/
 			sprintf(buff, "#%d_lambda", count++);
 			const char* name = g_parser->strdup(buff);
 
-			if ($3) { // IMPORTANT: should be front of push_code_stack (parents code are cleared)
-				code_top->make_super($3);
-			}
-			parserCode::push_code_stack(name, vp, 0);
+			parserCode::push_code_stack(name, params, 0, supers);
 
 			if (flag_argv == true) {
 				code_top->find_lvar("argv");
@@ -1094,7 +1091,7 @@ lambda_decode_header:/*{{{*/
 			char buff[1024];
 			sprintf(buff, "#%d_decode_lambda", count++);
 			const char* name = g_parser->strdup(buff);
-			parserCode::push_code_stack(name, vp, 0);
+			parserCode::push_code_stack(name, vp);
 
 			if (flag_argv == true) {
 				code_top->find_lvar("argv");
@@ -1139,12 +1136,27 @@ opt_superclass:/*{{{*/
 		{
 			$$ = 0;
 		}
-	| ':' expression_list
+	| ':' object_path_list
 		{
 			$$ = $2;
 		}
 	;
 /*}}}*/
+
+object_path_list:
+	  object_path_list ',' object_path
+		{
+			name_list_t* vs = (name_list_t*)$1;
+			vs->push_back($3);
+			$$ = vs;
+		}
+	| object_path
+		{
+			name_list_t* vs = g_parser->new_name_list();
+			vs->push_back($1);
+			$$ = vs;
+		}
+	;
 
 opt_argument_list:/*{{{*/
 	  // empty

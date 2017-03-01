@@ -1,14 +1,14 @@
 *.o
 *.la
 *.lo
-Makefile
 .*
 *.kw
 parser.cpp
 parser.hpp
 parser.output
 lexer.cpp
-libtool
+*.lcf
+*.once
 
 
 

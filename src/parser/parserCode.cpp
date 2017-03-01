@@ -88,45 +88,7 @@ void parserCode::Final(string name) /*{{{*/
 }
 /*}}}*/
 
-parserCode::parserCode(const char* module_name, const char* under_path) /*{{{*/
-{
-	m_name = module_name;
-	if (under_path) {
-		m_def.push_back(OP_DEF_UNDER_START);
-		m_flag_under = true;
-	}
-	else {
-		m_def.push_back(OP_DEF_START);
-		m_flag_under = false;
-	}
-
-	m_def.push_back(0);	// non static, non pure
-	m_def.push_back(m_name.length()+1);
-	copy(m_name.begin(), m_name.end(), back_inserter(m_def));
-	m_def.push_back(0);
-
-	if (under_path) {
-		m_def.push_back(strlen(under_path) + 1);
-		copy(under_path, under_path + strlen(under_path), back_inserter(m_def));
-		m_def.push_back(0);
-	}
-
-	// reserve code header
-	m_code.resize(sizeof(CodeHeader));
-	m_ch.frame_size=0;
-	m_ch.argument_size=0;
-
-	// set default objects
-	m_space["orca"] = "orca";
-	m_space["io"] = "io";
-	m_space["print"] = "io.print";
-	m_space["os"] = "os";
-	m_space["type"] = "type";
-	m_space["sort"] = "sort";
-}
-/*}}}*/
-
-parserCode::parserCode(const char* module_name, vector<const char*>* param, int flag_define, const char* under_path) /*{{{*/
+parserCode::parserCode(const char* module_name, vector<const char*>* param, int flag_define, vector<const char*>* supers, const char* under_path) /*{{{*/
 {
 	m_name = module_name;
 
@@ -150,6 +112,21 @@ parserCode::parserCode(const char* module_name, vector<const char*>* param, int 
 		m_def.push_back(strlen(under_path) + 1);
 		copy(under_path, under_path + strlen(under_path), back_inserter(m_def));
 		m_def.push_back(0);
+	}
+
+	if (supers) {
+		for (int i=0; i<supers->size(); i++) {
+			m_def.push_back(OP_DEF_SUPER);
+			const char* cp = (*supers)[i];
+			int len = strlen(cp);
+			if (len > 254) {
+				throw "parents name exceeds length";
+			}
+
+			m_def.push_back(len + 1);
+			copy(cp, cp + len, back_inserter(m_def));
+			m_def.push_back(0);
+		}
 	}
 
 	// make local variable index
@@ -274,47 +251,6 @@ parserCode::~parserCode() /*{{{*/
 	}
 	else {
 		m_def.push_back(OP_DEF_END);
-	}
-}
-/*}}}*/
-
-void parserCode::make_super(int super_n) /*{{{*/
-{
-	m_def.push_back(OP_DEF_SUPER);
-	m_def.push_back(super_n);
-
-	// set code header
-	CodeHeader ch;
-	ch.frame_size = htols(m_lvar.size());
-	ch.argument_size = htols(m_ch.argument_size);
-
-	if (g_parser->is_interactive() || g_parser->is_eval()) {
-		// create code block
-		m_code.push_back(OP_RETURN);
-		char* new_code = new char[m_code.size()];
-		char* b = new_code;
-		copy(b, b+sizeof(char*), back_inserter(m_def));
-
-		// set header
-		copy((char*)&ch, (char*)&ch+sizeof(CodeHeader), m_code.begin());
-
-		// real code copy & return
-		copy(m_code.begin(), m_code.end(), new_code);
-	}
-	else {
-		// code size & code (add root code header for exact index)
-		char* b = i2l(m_codeFinal.size() + sizeof(CodeHeader));
-		copy(b, b+sizeof(char*), back_inserter(m_def));
-
-		// set header
-		copy((char*)&ch, (char*)&ch+sizeof(CodeHeader), back_inserter(m_codeFinal));
-		// real code copy & return
-
-		copy(m_code.begin(), m_code.end(), back_inserter(m_codeFinal));
-		m_codeFinal.push_back(OP_RETURN);
-
-		// and clean up code
-		m_code.resize(sizeof(CodeHeader));
 	}
 }
 /*}}}*/
@@ -533,13 +469,6 @@ int parserCode::size()/*{{{*/
 }
 /*}}}*/
 
-void parserCode::push_code_stack(const char* name, const char* under_path)/*{{{*/
-{
-	parserCode* c = new parserCode(name, under_path);
-	parserCode::m_codeStack.push_back(c);
-}
-/*}}}*/
-
 void parserCode::reinit_code_stack_for_interpreter()/*{{{*/
 {
 	while (parserCode::m_codeStack.size() > 1) {
@@ -548,9 +477,9 @@ void parserCode::reinit_code_stack_for_interpreter()/*{{{*/
 }
 /*}}}*/
 
-void parserCode::push_code_stack(const char* name, vector<const char*>* param, int flag_define, const char* under_path)/*{{{*/
+void parserCode::push_code_stack(const char* name, vector<const char*>* param, int flag_define, vector<const char*>* super_class, const char* under_path)/*{{{*/
 {
-	parserCode* c = new parserCode(name, param, flag_define, under_path);
+	parserCode* c = new parserCode(name, param, flag_define, super_class, under_path);
 	parserCode::m_codeStack.push_back(c);
 }
 /*}}}*/

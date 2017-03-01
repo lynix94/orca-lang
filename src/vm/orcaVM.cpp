@@ -408,7 +408,7 @@ void orcaVM::call(int param_n, const char* addr)/*{{{*/
 	}
 	else if (is<TYPE_OBJ>(f)) {
 #ifdef _VM_DEBUG_
-		char buff[256];
+		char buff[1024];
 		PRINT1("\t\t  object called: %s\n", f.o()->dump(buff));
 #endif
 		int inc_size=param_n;
@@ -631,6 +631,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 	orcaObject* o;
 	orcaData d;
 	int count, j;
+	vector<orcaObject*> parents;
 
 	orcaObject* mod = NULL;
 
@@ -748,37 +749,51 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			i += sizeof(long long);
 			break;
 
-		case OP_DEF_SUPER:
-			PRINT2("\t\t  super define: %d, %d\n", c[i+1], TO_INT(&c[i+2]));
-m_stack->dump();
-			exec_code(code + TO_INT(&c[i+2]));
-			count = c[i+1];
-m_stack->dump();
-			for(j=0; j<count; j++) {
-				if (!is<TYPE_OBJ>(m_stack->top())) {
-					throw orcaException(this, "orca.type", 
-						string("parent ") + m_stack->pop().dump_str() + 
-						" must be object type");
-				}
-				else {
-					orcaObject* op = current->make_super(m_stack->pop().o());
-					if (op->has_member("init", d)) {
-						m_stack->push(d);
-						d.rc_inc();
-						// cause init refer p1 (by owner)
-						// and it can gc on that
-						call(0, code);
-						m_stack->dummy_pop();
-						d.set_rc(d.get_rc()-1);
-					}
-				}
+		case OP_DEF_SUPER: {
+			PRINT1("\t\t  super define: %s\n", &c[i+2]);
+			const char* path = &c[i+2];
+			
+			orcaObject* op = g_root;
+			orcaData out;
+
+			char buff[256];
+			strncpy(buff, path, 256);
+
+			char *last;
+			char *tok = strtok_r(buff, ".", &last);
+			if (op->has_member(tok, out) == false) {
+				throw orcaException(this, "orca.define", string("inherit parents failed"));
 			}
-			i += 1 + sizeof(int);
+			op = out.Object();
+
+			while (tok != NULL) {
+				tok = strtok_r(NULL, ".", &last);
+				if (tok == NULL) break;
+				if (op->has_member(tok, out) == false) {
+					throw orcaException(this, "orca.define", string("inherit parents failed"));
+				}
+
+				op = out.Object();
+			}
+
+			op = current->make_super(op);
+			if (op->has_member("init", d)) {
+				m_stack->push(d);
+				d.rc_inc();
+				// cause init refer p1 (by owner)
+				// and it can gc on that
+				call(0, code);
+				m_stack->dummy_pop();
+				d.set_rc(d.get_rc()-1);
+			}
+
+			i += 1 + c[i+1];
 			break;
+		  }
 
 		case OP_USING: {
 				PRINT1("\t\t  using: %s\n", &c[i+2]);
-				char buff[256];
+				char buff[1024];
 
 				for(j=0; c[i+2 + j] != '.' && j<c[i+1]; j++) 
 					buff[j] = c[i+2 + j];
@@ -795,7 +810,7 @@ m_stack->dump();
 		case OP_USING_EXT: {
 				PRINT2("\t\t  using external: %s, %s\n", &c[i+3], &c[i+2 + c[i+1] + 1]);
 
-				char buff[256];
+				char buff[1024];
 				const char *by = &c[i+2 + c[i+1]+1];
 
 				for(j=0; c[i+3 + j] != '.' && j<c[i+1]; j++) 
@@ -1003,7 +1018,7 @@ void orcaVM::exec_code(const char* code, const char* offset)/*{{{*/
 	for(;;c++) {
 fast_jmp:
 		try {
-			PRINT2("%u[%02x] ", sp - c, (unsigned char)*c);
+			PRINT2("%u[%02x] ", c - sp, (unsigned char)*c);
 			switch((unsigned char)*c)
 			{
 			case OP_NOP:	

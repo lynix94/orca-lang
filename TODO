@@ -31,8 +31,7 @@ log
 
 
 # refactoring
-length check
-move code_top to vm->code_top()
+length check & change code to unsigned
 move parse to vm & parse, interpret lock
 
 
