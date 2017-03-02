@@ -5,6 +5,7 @@
 -- test_oo failed
 
 # now thinking 
+.new (vs .clone)
 fix trace.orca trace
 support directory parsing (name.orca)
 support main.orca.html

@@ -1382,17 +1382,21 @@ do_assign_list:
 
 			case OP_NOT:
 				PRINT1("\t\t%p : not\n", c);
-				if (m_stack->pop().i() == 1) {
-					m_stack->push(false);
-				}
-				else {
+
+				d = m_stack->pop();
+				if (is<TYPE_BOOL>(d) && d.b() == false) {
 					m_stack->push(true);
 				}
+				else {
+					m_stack->push(false);
+				}
+
 				break;
 
-			case OP_JMP_TRUE:	
+			case OP_JMP_TRUE: {
 				PRINT2("\t\t%p : jmp if true (to: %x)\n", c, TO_INT(&c[1]));
-				if (m_stack->pop().i() == 1) {
+				d = m_stack->pop();
+				if (is<TYPE_BOOL>(d) && d.b() == true) {
 					c = code + TO_INT(&c[1]);
 					goto fast_jmp;
 				}
@@ -1402,10 +1406,13 @@ do_assign_list:
 				}
 
 				break;
+			  }
 
 			case OP_JMP_FALSE:	
 				PRINT2("\t\t%p : jmp if false (to: %x)\n", c, TO_INT(&c[1]));
-				if (m_stack->pop().i() == 0) {
+			
+				d = m_stack->pop();
+				if (is<TYPE_BOOL>(d) && d.b() == false) {
 					c = code + TO_INT(&c[1]);
 					goto fast_jmp;
 				}
