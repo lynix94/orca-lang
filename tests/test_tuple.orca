@@ -1,3 +1,9 @@
+
+a = (,);
+if a.size() != 0 {
+	throw test.tuple <- 'make empty tuple failed';
+}
+
 a = ( 1, 2, 3, 4, 5 );
 
 print: a[0:];
@@ -47,6 +53,7 @@ print: (10..1 : 2);
 if (10..1 : 2) != (10,8,6,4,2) {
 	throw test.tuple <- 'tuple generate fail';
 }
+
 
 print: 'OK';
 return true;

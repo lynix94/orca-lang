@@ -1,22 +1,26 @@
 # bug
--- test_oo failed
 
 # bug fixed
 -- using namespace conflict
+-- test_oo failed
 
 # now thinking 
 support directory parsing (name.orca)
 support main.orca.html
-id, members -> ID, MEMBERS (upper)
 html lib
 select
-root, cloud (depent zookeeper or etcd)
+root, cloud (depend zookeeper or etcd)
 
 #channel
 channel assert
 channel log
 channel queue
 channel dist queue
+
+
+# modlue
+type.XXX.make(...)
+  ex) type.tuple.make(1,2,3) => (1,2,3)
 
 # storage
 sqlite
@@ -44,6 +48,7 @@ improve catch statement
 channel
 def foo(...) under path
 make anonymous def
+id, members -> ID, MEMBERS (upper)
 
 
 

@@ -1883,7 +1883,7 @@ do_assign_list:
 				PRINT2("\t\t%p : make tuple (%d)\n", c, len); 
 
 				orcaTuple* tp;
-				if (len > 0) {
+				if (len >= 0) {
 					tp = new orcaTuple(len);
 					for (j=len-1; j>=0; j--) {
 						orcaData d = m_stack->top();

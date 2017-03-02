@@ -1,4 +1,15 @@
 
+a = [ ];
+if a.size() != 0 {
+	throw test.list <- 'make empty list failed';
+}
+
+a = [,];
+if a.size() != 0 {
+	throw test.list <- 'make empty list failed';
+}
+
+
 a = [ 1, 2, 3, 4, 5, ];
 
 print: a[0:];
