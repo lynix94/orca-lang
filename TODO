@@ -5,6 +5,7 @@
 -- test_oo failed
 
 # now thinking 
+fix trace.orca trace
 support directory parsing (name.orca)
 support main.orca.html
 html lib

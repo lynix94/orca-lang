@@ -3107,6 +3107,15 @@ orcaData orcaVM::channel_in(orcaData d)
 
 	orcaObject* o = d.o();
 	orcaData ret;
+	if (o->has_member("<-?", ret)) {
+		if (is<TYPE_BOOL>(ret) == false || ret.b() == false) {
+			return NIL;
+		}
+	}
+	else {
+		return NIL;
+	}
+
 	if (o->has_member("<-", ret)) {
 		return ret;
 	}
@@ -3121,7 +3130,17 @@ bool orcaVM::channel_out(orcaData d, int num)
 	}
 
 	orcaObject* o = d.o();
-	orcaData fun;
+	orcaData ret, fun;
+	if (o->has_member("->?", ret)) {
+		if (is<TYPE_BOOL>(ret) == false || ret.b() == false) {
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
+
+
 	if (o->has_member("->", fun) == false) {
 		return false;
 	}
@@ -3133,7 +3152,7 @@ bool orcaVM::channel_out(orcaData d, int num)
 	m_stack->push(fun);
 	m_stack->push(num);
 	call(1);
-	orcaData ret = m_stack->pop();
+	ret = m_stack->pop();
 
 	if (isobj<orcaTuple>(ret)) {
 		orcaTuple* tp = TO_TUPLE(ret.o());
