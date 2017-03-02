@@ -284,8 +284,8 @@ orcaData orcaVM::invoke_internal_func(InternalFunction& in) /*{{{*/
 		r = g_string.hash(this, d.so->s); 
 		break;
 
-	case FI_STR_CHOMP:	
-		r = g_string.chomp(this, d.so->s); 
+	case FI_STR_SPLIT:	
+		r = g_string.split(this, d.so->s); 
 		break;
 
 	case FI_STR_PUSH_BACK:	
@@ -1691,12 +1691,12 @@ do_assign_list:
 					break;
 				}
 				else {
-					if (strcmp(&c[2], "type") == 0)
+					if (strcmp(&c[2], "TYPE") == 0)
 					{
 						d.type_set(p1);
 					}
-					else if (strcmp(&c[2], "typename") == 0 ||  
-							 strcmp(&c[2], "name") == 0)
+					else if (strcmp(&c[2], "TYPENAME") == 0 ||  
+							 strcmp(&c[2], "NAME") == 0)
 					{
 						string str;
 						switch (p1.get_type())
@@ -1715,26 +1715,26 @@ do_assign_list:
 
 						d = str;
 					}
-					else if (strcmp(&c[2], "id") == 0) {
+					else if (strcmp(&c[2], "ID") == 0) {
 						d = p1.id();
 					}
-					else if (strcmp(&c[2], "rc") == 0) {
+					else if (strcmp(&c[2], "RC") == 0) {
 						d = p1.get_rc();
 					}
-					else if (strcmp(&c[2], "members") == 0) {
+					else if (strcmp(&c[2], "MEMBERS") == 0) {
 						orcaObjectMembers* mp = new orcaObjectMembers(p1);
 						d = mp;
 					}
-					else if (strcmp(&c[2], "static_members") == 0) {
+					else if (strcmp(&c[2], "STATIC_MEMBERS") == 0) {
 						orcaObjectMembers* mp = new orcaObjectMembers(p1);
 						mp->set_static();
 						d = mp;
 					}
-					else if (strcmp(&c[2], "parents") == 0) {
+					else if (strcmp(&c[2], "PARENTS") == 0) {
 						orcaObjectParents* pp = new orcaObjectParents(p1);
 						d = pp;
 					}
-					else if (strcmp(&c[2], "original") == 0) {
+					else if (strcmp(&c[2], "ORIGINAL") == 0) {
 						d = NIL;
 					}
 					else {

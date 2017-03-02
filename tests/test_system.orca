@@ -1,30 +1,30 @@
 
 using system;
 
-print: system.members;
+print: system.MEMBERS;
 
 print: 'system.cpu_n(): ',  n = system.cpu_n();
-if n.type != type.int || n < 1 {
+if n.TYPE != type.int || n < 1 {
 	throw test.system <- 'cpu_n failed';
 }
 
 print: 'system.memory(): ', m = system.memory();
-if m.type != type.int || m < 1024*1024*32 { // maybe...
+if m.TYPE != type.int || m < 1024*1024*32 { // maybe...
 	throw test.system <- 'memory failed';
 }
 
 print: 'system.free(): ', f = system.free();
-if f.type != type.int || f >= m || f < 1024 {
+if f.TYPE != type.int || f >= m || f < 1024 {
 	throw test.system <- 'free failed';
 }
 
 print: 'system.os(): ', r = system.os();
-if r.type != type.string {
+if r.TYPE != type.string {
 	throw test.system <- 'os failed';
 }
 
 print: 'system.version(): ', r = system.version();
-if r.type != type.string {
+if r.TYPE != type.string {
 	throw test.system <- 'version failed';
 }
 

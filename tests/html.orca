@@ -73,7 +73,7 @@ def br()
 
 def tag(name, attr, txt)
 {
-	if txt.typename == 'string': {
+	if txt.TYPENAME == 'string': {
 		..result += '    ' * ..depth;
 		..result += '<${name} ${attr}>';
 		..result += txt;

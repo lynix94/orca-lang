@@ -236,7 +236,7 @@ orcaData orcaPack::load(char** cp)/*{{{*/
 
 	case 'N': {
 		string str = &c[1];
-		vector<string> path = kyString::chomp(str, ".");
+		vector<string> path = kyString::split(str, ".");
 		orcaData curr = g_root;
 		for (int i=0; i<path.size(); i++) {
 			if (is<TYPE_OBJ>(curr) == false)
@@ -260,7 +260,7 @@ orcaData orcaPack::load(char** cp)/*{{{*/
 			init = str.substr(idx+1);
 		}
 
-		vector<string> path = kyString::chomp(path_name, ".");
+		vector<string> path = kyString::split(path_name, ".");
 		orcaData curr = g_root;
 		for (int i=0; i<path.size(); i++) {
 			if (is<TYPE_OBJ>(curr) == false)

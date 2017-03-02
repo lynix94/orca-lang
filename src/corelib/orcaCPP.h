@@ -106,7 +106,7 @@ public:
 		string cflags;
 		string ldflags;
 
-		vector<string> lines = kyString::chomp(src_code, "\n");
+		vector<string> lines = kyString::split(src_code, "\n");
 		for (int i=0; i<lines.size(); i++) {
 			string line = kyString::strip(lines[i]);
 			if (kyString::starts_with(line, "#include")) {

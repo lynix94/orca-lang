@@ -66,14 +66,14 @@ stopwatch.title('elapsed time: ') {
 		for t in test_vectors {
 			print: '### Test: %s start' % t;
 			orca.load(t);
-			root.members[t]();
+			root.MEMBERS[t]();
 			print: '### Test: %s end' % t;
 		}
 
 		for t in test_modules {
 			print: '### Test: %s start' % t;
 			orca.load(t);
-			root.members[t]();
+			root.MEMBERS[t]();
 			print: '### Test: %s end' % t;
 		}
 	}

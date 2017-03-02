@@ -117,7 +117,7 @@ ${header}
 
 	def run()
 	{
-		print: 'thread ${my.id} launced';
+		print: 'thread ${my.ID} launced';
 
 		do {
 			try {
@@ -135,7 +135,7 @@ ${header}
 			}
 		} while(true);
 
-		print: 'thread ${my.id} done';
+		print: 'thread ${my.ID} done';
 	}
 
 	def get_param(str, p)
@@ -145,9 +145,9 @@ ${header}
 		}
 
 		str = str.strip();
-		list = str.chomp('&');
+		list = str.split('&');
 		for a in list {
-			kv = a.chomp('=');
+			kv = a.split('=');
 			k = kv[0];
 			v = '';
 			if kv.size() > 1 {
@@ -166,7 +166,7 @@ ${header}
 		body = '';
 		url = '.' + msg.find(r'[GET|POST] ([^ ]+) ')[1][0];
 
-		ret = url.chomp('?');
+		ret = url.split('?');
 		uri = ret[0];
 
 		// process url parameters
@@ -179,7 +179,7 @@ ${header}
 		cookie = msg.find(r'Cookie: ([^\n]+)');
 		if cookie != nil {
 			str = cookie[1][0];
-			str_list = str.chomp('; ');
+			str_list = str.split('; ');
 			for a in str_list {
 				p = ..get_param(a, p);
 			}
@@ -190,7 +190,7 @@ ${header}
 
 		if multi != nil {
 			boundary = '--' + multi[1][0];
-			list = msg.chomp(boundary);
+			list = msg.split(boundary);
 			list.pop_front();
 			list.pop_back();
 
@@ -258,7 +258,7 @@ ${header}
 
 			orca.load(uri[:-5], httpd);
 
-			f = httpd.members[mod_name];
+			f = httpd.MEMBERS[mod_name];
 			ret = f(p);
 			header = ret[0];
 			body = ret[1];

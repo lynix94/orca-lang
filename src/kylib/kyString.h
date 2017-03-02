@@ -52,8 +52,8 @@ public:
 
 	static int hash(const string& src, int mod = INT_MAX);
 
-	static vector<string> chomp(const string& src, const string& s);
-	static vector<string> chomp(const string& src, boost::regex& r);
+	static vector<string> split(const string& src, const string& s);
+	static vector<string> split(const string& src, boost::regex& r);
 
 	static string to_escape(const string& src);
 	static string from_escape(const string& src);

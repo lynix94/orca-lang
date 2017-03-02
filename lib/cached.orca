@@ -86,7 +86,7 @@ def client
 
 	def run()
 	{
-		print: 'thread ${my.id} launced';
+		print: 'thread ${my.ID} launced';
 
 		do {
 			try {
@@ -102,7 +102,7 @@ def client
 			}
 		} while(true);
 
-		print: 'thread ${my.id} done';
+		print: 'thread ${my.ID} done';
 	}
 
 	def find_val(key)

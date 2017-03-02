@@ -3,53 +3,53 @@
 def foo { }
 def child { }
 
-print: my.foo, my.foo.id;
+print: my.foo, my.foo.ID;
 
-print: my.foo.members['bar'] = 1;
+print: my.foo.MEMBERS['bar'] = 1;
 print: my.foo.bar;
 if my.foo.bar != 1 {
 	throw test.lang <- 'insert member failed';
 }
 
 
-print: my.foo.members.has_key('bar');
-if my.foo.members.has_key('bar') == false {
+print: my.foo.MEMBERS.has_key('bar');
+if my.foo.MEMBERS.has_key('bar') == false {
 	throw test.lang <- 'has member failed';
 }
 
-print: ret = my.foo.members['bar'];
+print: ret = my.foo.MEMBERS['bar'];
 if ret != 1 {
 	throw test.lang <- 'get member failed';
 }
 
-print: my.foo.members['bar'] = 2;
+print: my.foo.MEMBERS['bar'] = 2;
 print: my.foo.bar;
 if my.foo.bar != 2 {
 	throw test.lang <- 'update member failed';
 }
 
 a = my.foo.clone();
-print: ret = a.type <= my.foo;
+print: ret = a.TYPE <= my.foo;
 if  ret != true {
 	throw test.lang <- 'isinstanceof failed';
 }
 
-print: ret = a.type <= root;
+print: ret = a.TYPE <= root;
 if  ret == true {
 	throw test.lang <- 'isinstanceof failed';
 }
 
 
-print: ret = my.child.type < my.foo;
+print: ret = my.child.TYPE < my.foo;
 if ret == true {
 	throw test.lang <- 'issubclassof failed';
 }
 
-print: my.child.parents;
-print: my.child.parents.push_back(my.foo);
-print: my.child.parents;
+print: my.child.PARENTS;
+print: my.child.PARENTS.push_back(my.foo);
+print: my.child.PARENTS;
 
-print: ret = my.child.type < my.foo;
+print: ret = my.child.TYPE < my.foo;
 if ret == false {
 	throw test.lang <- 'inherit failed';
 }
@@ -59,24 +59,24 @@ if my.child.bar != my.foo.bar {
 	throw test.lang <- 'inherit failed';
 }
 
-print: my.child.parents.pop_back();
+print: my.child.PARENTS.pop_back();
 
-print: ret = my.child.type < my.foo;
+print: ret = my.child.TYPE < my.foo;
 if ret == true {
 	throw test.lang <- 'dont_inherit failed';
 }
 
-print: ret = my.foo.type == my.child;
+print: ret = my.foo.TYPE == my.child;
 if ret == true {
 	throw test.lang <- 'issametype failed';
 }
 
-print: ret = my.foo.type == a;
+print: ret = my.foo.TYPE == a;
 if ret != true {
 	throw test.lang <- 'issametype failed';
 }
 
-print: ret = '123'.type == '345';
+print: ret = '123'.TYPE == '345';
 if ret != true {
 	throw test.lang <- 'issametype failed';
 }

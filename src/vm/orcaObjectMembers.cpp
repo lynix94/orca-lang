@@ -21,7 +21,7 @@
 
 orcaObjectMembers::orcaObjectMembers(orcaData src) : m_src(src) 
 { 
-	set_name("members");
+	set_name("MEMBERS");
 	insert_native_function("[]", (object_fp)&orcaObjectMembers::ex_get_at);
 	insert_native_function("[]=", (object_fp)&orcaObjectMembers::ex_set_at);
 	insert_native_function("string", (object_fp)&orcaObjectMembers::ex_string);

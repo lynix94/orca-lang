@@ -2,7 +2,7 @@
 def traverse(obj, fun)
 {
 	fun(obj);
-	if obj.members.has_key('begin') {
+	if obj.MEMBERS.has_key('begin') {
 		for a in obj.begin() {
 			traverse(a(), fun);
 		}

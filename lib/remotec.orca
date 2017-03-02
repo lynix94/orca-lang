@@ -19,7 +19,7 @@ remotec.log: '## call: ', argv;
 
 len = 0;
 
-if argv.type == type.tuple {
+if argv.TYPE == type.tuple {
 	for p in argv {
 		.push_obj(p);
 		len += 1;
@@ -105,7 +105,7 @@ def call_obj(num)
 		..server.send('<call>'+num);
 		msg = ..server.recv();
 		if msg == '<ok:call start>' {
-			if ..flag_running.type == type.bool {
+			if ..flag_running.TYPE == type.bool {
 				..flag_running  = true;
 			}
 			else {

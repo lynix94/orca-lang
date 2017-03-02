@@ -5,6 +5,8 @@
 -- using namespace conflict
 
 # now thinking 
+support directory parsing (name.orca)
+support main.orca.html
 id, members -> ID, MEMBERS (upper)
 html lib
 select

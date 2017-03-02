@@ -15,7 +15,7 @@
 
 orcaObjectMembersIter::orcaObjectMembersIter(orcaObject* src, int pos)
 {
-	set_name("members_iterator");
+	set_name("MEMBERS_ITERATOR");
 	insert_native_function("first", (object_fp)&orcaObjectMembersIter::ex_first);
 	insert_native_function("second", (object_fp)&orcaObjectMembersIter::ex_second);
 	insert_native_function("next", (object_fp)&orcaObjectMembersIter::ex_next);

@@ -80,7 +80,7 @@ def unmount(path, flag)
 	try {
 		mi.prev();
 		if path.starts_with(mi.first()) {
-			if mi.second().type == type.tuple {
+			if mi.second().TYPE == type.tuple {
 				for a in mi.second() {
 					if flag == true {
 						a.send('<fs1>shutdown,/');
@@ -140,7 +140,7 @@ def check_in_table(path)
 	try {
 		mi.prev();
 		if path.starts_with(mi.first() + '/') {
-			if mi.second().type == type.tuple {
+			if mi.second().TYPE == type.tuple {
 				tp = mi.second();
 				len = tp.size();
 				nth = path.hash(len);
@@ -162,7 +162,7 @@ def fs1(cmd, path)
 {
 	ret =  ..check_in_table(path);
 	if ret == nil {
-		return os.members[cmd](path);
+		return os.MEMBERS[cmd](path);
 	}
 
 	ret[0].send('<fs1>${cmd},${ret[1]}');

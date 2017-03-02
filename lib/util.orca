@@ -8,7 +8,7 @@ def lru := __util.lru.clone();
 
 def lock(obj)
 {
-	id = obj.id;
+	id = obj.ID;
 	if id == 0 {
 		throw orca.type <- 'obj has no address';
 	}
@@ -31,11 +31,11 @@ def upper(name)
 	op = caller.owner;
 
 	while op != nil {
-		if op.name == name {
+		if op.NAME == name {
 			return op;
 		}
 
-		if op.id == root.id {
+		if op.ID == root.ID {
 			return nil;
 		}
 

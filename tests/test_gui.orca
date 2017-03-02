@@ -99,12 +99,12 @@ def main : window
 
 			a.source.attr['text'] = i[2];
 			a.source.event['clicked'] = bind_1st(upper('main').src_window, i[3]);
-			my.members['tmp' +  count] = a;
+			my.MEMBERS['tmp' +  count] = a;
 			count += 1;
 
 			sep = gui.hsep.clone();
 			sep.make();
-			my.members['sep' + i] = sep;
+			my.MEMBERS['sep' + i] = sep;
 		}
 	}
 }

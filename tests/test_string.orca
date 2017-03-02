@@ -153,15 +153,15 @@ if str.replace(r'[0-9]+', '{{$0}}') != '{{123}}abc{{456}}def' {
 	throw test.string <- 'regex replace fail';
 }
 
-# chomp, hash, push_back, start_with
-print: result = 'aaa.bbb.ccc'.chomp('.');
+# split, hash, push_back, start_with
+print: result = 'aaa.bbb.ccc'.split('.');
 if result != ['aaa', 'bbb', 'ccc'] {
-	throw test.string <- 'string chomp fail';
+	throw test.string <- 'string split fail';
 }
 
-print: result = 'aaa000bbb111ccc'.chomp(r'[0-9]+');
+print: result = 'aaa000bbb111ccc'.split(r'[0-9]+');
 if result != ['aaa', 'bbb', 'ccc'] {
-	throw test.string <- 'string chomp fail';
+	throw test.string <- 'string split fail';
 }
 
 a = 'aaa';

@@ -41,14 +41,14 @@ def window
 		owner.init_gtk();
 		owner();
 
-		if owner.type < gui.table {
+		if owner.TYPE < gui.table {
 			return;
 		}
 
-		members = owner.members.values();
+		members = owner.MEMBERS.values();
 
 		alg.remove_if: members.begin(), members.end(), def(a){
-			return !(a.type < window);
+			return !(a.TYPE < window);
 		};
 
 		members.sort(def(a, b){ return a.order < b.order; });
@@ -293,7 +293,7 @@ def list : window
 
 	def '[]='(k, v)
 	{
-		if k.type != type.int {
+		if k.TYPE != type.int {
 			return;
 		}
 
@@ -302,7 +302,7 @@ def list : window
 
 	def '[]'(k)
 	{
-		if k.type!= type.int {
+		if k.TYPE != type.int {
 			return nil;
 		}
 
@@ -335,7 +335,7 @@ def tree : window
 
 	def '[]='(k, v)
 	{
-		if k.type != type.int {
+		if k.TYPE != type.int {
 			return;
 		}
 
@@ -344,7 +344,7 @@ def tree : window
 
 	def '[]'(k)
 	{
-		if k.type != type.int {
+		if k.TYPE != type.int {
 			return nil;
 		}
 

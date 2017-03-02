@@ -44,7 +44,7 @@ orcaString::orcaString() /*{{{*/
 	d.internal(FI_STR_STARTSWITH,"starts_with");		insert_static("starts_with", d); 
 	d.internal(FI_STR_ENDSWITH,"ends_with");			insert_static("ends_with", d); 
 	d.internal(FI_STR_HASH,"hash");						insert_static("hash", d); 
-	d.internal(FI_STR_CHOMP,"chomp");					insert_static("chomp", d); 
+	d.internal(FI_STR_SPLIT,"split");					insert_static("split", d); 
 	d.internal(FI_STR_PUSH_BACK,"push_back");			insert_static("push_back", d); 
 	d.internal(FI_STR_CHAR,"char");						insert_static("char", d); 
 	d.internal(FI_STR_TO_INT,"integer");				insert_static("integer", d); 
@@ -226,7 +226,7 @@ orcaData orcaString::hash(orcaVM* vm, string& str)/*{{{*/
 }
 /*}}}*/
 
-orcaData orcaString::chomp(orcaVM* vm, string& str)/*{{{*/
+orcaData orcaString::split(orcaVM* vm, string& str)/*{{{*/
 {	
 	int s=0, e=INT_MAX;
 	orcaData p = vm->get_param(0);
@@ -270,7 +270,7 @@ orcaData orcaString::chomp(orcaVM* vm, string& str)/*{{{*/
 		}while(true);
 	}
 	else {
-		throw orcaException(vm, "string.param", string("invalid parameter for chomp : ") + p.dump_str());
+		throw orcaException(vm, "string.param", string("invalid parameter for split : ") + p.dump_str());
 	}
 
 	return lp;

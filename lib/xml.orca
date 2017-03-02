@@ -26,23 +26,23 @@ def decoding(str)
 		{
 			head = decoding(one_tag);
 
-			if head.type == type.map {
+			if head.TYPE == type.map {
 				tag = head;
 			}
-			elif head.type == type.string {
+			elif head.TYPE == type.string {
 				tag = { '$text':head };
 			}
 					
-			if attrs.type == type.string && attrs.strip().length() > 0 {
+			if attrs.TYPE == type.string && attrs.strip().length() > 0 {
 				attrs = decoding(attrs);
 				tag['$attrs'] = attrs;
 			}
 	
-			if remain.type == type.string && remain.strip().length()>0 {
+			if remain.TYPE == type.string && remain.strip().length()>0 {
 				tail = decoding(remain);
 				if tail.has_key(name) {
 					tmp = tail[name];
-					if tmp.type == type.tuple {
+					if tmp.TYPE == type.tuple {
 						tmp.push_back(tag);
 					}
 					else {
@@ -62,16 +62,16 @@ def decoding(str)
 	'<', %name = r'[a-zA-Z_][a-zA-Z_0-9]*', %attrs, '/>', %remain ->
 		{
 			tag = type.map();
-			if attrs.type == type.string && attrs.strip().length() > 0 {
+			if attrs.TYPE == type.string && attrs.strip().length() > 0 {
 				attrs = decoding(attrs);
 				tag['$attrs'] = attrs;
 			}
 	
-			if remain.type == type.string && remain.strip().length()>0 {
+			if remain.TYPE == type.string && remain.strip().length()>0 {
 				tail = decoding(remain);
 				if tail.has_key(name) {
 					tmp = tail[name];
-					if tmp.type == type.tuple {
+					if tmp.TYPE == type.tuple {
 						tmp.push_back(tag);
 					}
 					else {
@@ -91,7 +91,7 @@ def decoding(str)
 		{
 			value = decoding(value);
 			tail = type.map();
-			if remain.type == type.string && remain.strip().length() > 0 {
+			if remain.TYPE == type.string && remain.strip().length() > 0 {
 				tail = decoding(remain);
 			}
 
@@ -112,12 +112,12 @@ def decoding(str)
 def encoding(obj)
 {
 	ret = '';
-	if obj.type == type.map {
+	if obj.TYPE == type.map {
 		for a in obj.begin() {
-			if a.second().type == type.tuple {
+			if a.second().TYPE == type.tuple {
 				for b in a.second().begin() {
 					attrs = '';
-					if b().type == type.map && b().has_key('$attrs') {
+					if b().TYPE == type.map && b().has_key('$attrs') {
 						for c in b()['$attrs'].begin() {
 							attrs += c.first() + '=' + c.second() + ' ';
 						}
@@ -164,7 +164,7 @@ def encoding(obj)
 			}
 		}
 	}
-	elif obj.type == type.string {
+	elif obj.TYPE == type.string {
 		return obj;
 	}
 	else {
@@ -184,12 +184,12 @@ def beutify(obj, tab)
 	}
 
 	ret = '';
-	if obj.type == type.map {
+	if obj.TYPE == type.map {
 		for a in obj.begin() {
-			if a.second().type == type.tuple {
+			if a.second().TYPE == type.tuple {
 				for b in a.second().begin() {
 					attrs = '';
-					if b().type == type.map && b().has_key('$attrs') {
+					if b().TYPE == type.map && b().has_key('$attrs') {
 						for c in b()['$attrs'].begin() {
 							attrs += c.first() + '=' + c.second() + ' ';
 						}
@@ -238,7 +238,7 @@ def beutify(obj, tab)
 			}
 		}
 	}
-	elif obj.type == type.string {
+	elif obj.TYPE == type.string {
 		return '\t'*tab + obj;
 	}
 	else {

@@ -326,12 +326,12 @@ orcaData orcaObject::get_member_sub(const char* name, bool last)
 		orcaData d(this, (object_fp)&orcaObject::operator_string, "string");
 		return d;
 	}
-	else if (strcmp(name, "type") == 0) {
+	else if (strcmp(name, "TYPE") == 0) {
 		orcaData d;
 		d.type_set(this);
 		return d;
 	}
-	else if (strcmp(name, "typename") == 0) {
+	else if (strcmp(name, "TYPENAME") == 0) {
 		string str;
 		if (isobj<orcaList>(this)) str = "list";
 		else if (isobj<orcaMap>(this)) str = "map";
@@ -343,27 +343,27 @@ orcaData orcaObject::get_member_sub(const char* name, bool last)
 
 		return str;
 	}
-	else if (strcmp(name, "id") == 0) {
+	else if (strcmp(name, "ID") == 0) {
 		return (long long)this;
 	}
-	else if (strcmp(name, "rc") == 0) {
+	else if (strcmp(name, "RC") == 0) {
 		return get_rc();
 	}
-	else if (strcmp(name, "name") == 0) {
+	else if (strcmp(name, "NAME") == 0) {
 		return get_name();
 	}
-	else if (strcmp(name, "members") == 0) {
+	else if (strcmp(name, "MEMBERS") == 0) {
 		return new orcaObjectMembers(orcaData(this));
 	}
-	else if (strcmp(name, "static_members") == 0) {
+	else if (strcmp(name, "STATIC_MEMBERS") == 0) {
 		orcaObjectMembers* mp = new orcaObjectMembers(orcaData(this));
 		mp->set_static();
 		return mp;
 	}
-	else if (strcmp(name, "parents") == 0) {
+	else if (strcmp(name, "PARENTS") == 0) {
 		return new orcaObjectParents(orcaData(this));
 	}
-	else if (strcmp(name, "original") == 0) {
+	else if (strcmp(name, "ORIGINAL") == 0) {
 		return get_original();
 	}
 

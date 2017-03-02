@@ -27,41 +27,41 @@ if ret == '0123456789a' {
 	throw test.type <- 'type testing is failed';
 }
 
-print: '# typename test';
+print: '# TYPENAME test';
 	
-if [1,2,3].typename != 'list' {
+if [1,2,3].TYPENAME != 'list' {
 	throw test.type <- 'type testing is failed';
 }
 
-if (1,2,3).typename != 'tuple' {
+if (1,2,3).TYPENAME != 'tuple' {
 	throw test.type <- 'type testing is failed';
 }
 
-if {1:2}.typename != 'map' {
+if {1:2}.TYPENAME != 'map' {
 	throw test.type <- 'type testing is failed';
 }
 
-if 1.typename != 'int' {
+if 1.TYPENAME != 'int' {
 	throw test.type <- 'type testing is failed';
 }
 
-if 10000000000000000000000000000000000000.typename != 'int' {
+if 10000000000000000000000000000000000000.TYPENAME != 'int' {
 	throw test.type <- 'type testing is failed';
 }
 
-if 0.1.typename != 'float' {
+if 0.1.TYPENAME != 'float' {
 	throw test.type <- 'type testing is failed';
 }
 
-if 'str'.typename != 'string' {
+if 'str'.TYPENAME != 'string' {
 	throw test.type <- 'type testing is failed';
 }
 
-if true.typename != 'bool' {
+if true.TYPENAME != 'bool' {
 	throw test.type <- 'type testing is failed';
 }
 
-if !my.typename.starts_with('object') {
+if !my.TYPENAME.starts_with('object') {
 	throw test.type <- 'type testing is failed';
 }
 

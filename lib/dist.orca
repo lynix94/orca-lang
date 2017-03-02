@@ -66,17 +66,17 @@ def dist_for(items, f)
 		r = ..dist_do(a, f);
 		clients.push_back(r);
 
-		if !rcount.has_key(r.id) {
-			rcount[r.id] = 0;
+		if !rcount.has_key(r.ID) {
+			rcount[r.ID] = 0;
 		}
 
-		rcount[r.id] += 1;
+		rcount[r.ID] += 1;
 	}
 
 	for r in clients {
 		r.is_done(-1);
-		ret.push_back(r.get_obj(rcount[r.id] - 1));
-		rcount[r.id] -= 1;
+		ret.push_back(r.get_obj(rcount[r.ID] - 1));
+		rcount[r.ID] -= 1;
 	}
 
 	for r in clients {

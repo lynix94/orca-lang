@@ -157,7 +157,7 @@ if math.ceil(r*10) != 4 {
 }
 
 print: r = math.frexp(30.3);
-if r.type != type.tuple || math.ceil(r[0]*100000) != 94688 || r[1] != 5 {
+if r.TYPE != type.tuple || math.ceil(r[0]*100000) != 94688 || r[1] != 5 {
 	throw test.math <- 'frexp failed';
 }
 

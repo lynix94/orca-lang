@@ -36,7 +36,7 @@ public:
 	orcaData starts_with(orcaVM* vm, string& str);
 	orcaData ends_with(orcaVM* vm, string& str);
 	orcaData hash(orcaVM* vm, string& str);
-	orcaData chomp(orcaVM* vm, string& str);
+	orcaData split(orcaVM* vm, string& str);
 	orcaData push_back(orcaVM* vm, string& str);
 	orcaData char_(orcaVM* vm, string& str);
 	orcaData upper(orcaVM* vm, string& str);

@@ -11,7 +11,7 @@ def with_line;
 
 def run(cmd)
 {
-	name = 'plot_' + owner.id() + '.tmp';
+	name = 'plot_' + owner.ID + '.tmp';
 	os.write(name, cmd);
 	os.run('gnuplot ' + name);
 	os.remove(name);
@@ -70,7 +70,7 @@ def clear()
 
 def splot(cmd_end)
 {
-	file_name = 'data_' + owner.id() + '.tmp.';
+	file_name = 'data_' + owner.ID + '.tmp.';
 	order = 1;
 
 	# set command
@@ -121,7 +121,7 @@ def splot(cmd_end)
 
 def plot(cmd_end)
 {
-	file_name = 'data_' + owner.id() + '.tmp';
+	file_name = 'data_' + owner.ID + '.tmp';
 
 	# set command
 	idx = 1;

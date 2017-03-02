@@ -1,7 +1,7 @@
 
 using fibonacci;
 
-if argv[0].type != type.int {
+if argv[0].TYPE != type.int {
 	argv[0] = argv[0].integer();
 }
 

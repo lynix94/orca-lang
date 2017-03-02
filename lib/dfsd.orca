@@ -88,7 +88,7 @@ def client
 
 	def run()
 	{
-		print: 'thread ${my.id} launced';
+		print: 'thread ${my.ID} launced';
 
 		do {
 			try {
@@ -111,7 +111,7 @@ def client
 			}
 		} while(true);
 
-		print: 'thread ${my.id} done';
+		print: 'thread ${my.ID} done';
 	}
 
 	def do_what(msg)
@@ -132,8 +132,8 @@ def client
 						time.msleep(200);
 						return '<shutdown>';
 					}
-					elif fs.members.has_key(cmd) {
-						obj = fs.members[cmd](..dfs_root + path);
+					elif fs.MEMBERS.has_key(cmd) {
+						obj = fs.MEMBERS[cmd](..dfs_root + path);
 					}
 
 					..send: pack.save(obj);

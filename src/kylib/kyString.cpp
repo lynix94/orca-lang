@@ -122,7 +122,7 @@ int kyString::hash(const string& str, int mod)/*{{{*/
 }
 /*}}}*/
 
-vector<string> kyString::chomp(const string& str, const string& by) /*{{{*/
+vector<string> kyString::split(const string& str, const string& by) /*{{{*/
 {	
 	vector<string> vs;
 	int start = 0;
@@ -143,7 +143,7 @@ vector<string> kyString::chomp(const string& str, const string& by) /*{{{*/
 }
 /*}}}*/
 
-vector<string> kyString::chomp(const string& str, regex& re) /*{{{*/
+vector<string> kyString::split(const string& str, regex& re) /*{{{*/
 {	
 	vector<string> vs;
 	int start = 0;

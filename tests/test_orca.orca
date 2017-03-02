@@ -1,6 +1,6 @@
 
 
-if root.members.has_key('fibonacci') {
+if root.MEMBERS.has_key('fibonacci') {
 	throw test.orca <- 'test orca is failed';
 }
 
@@ -8,7 +8,7 @@ orca.load('fibonacci');
 
 print: root.fibonacci;
 
-if !root.members.has_key('fibonacci') {
+if !root.MEMBERS.has_key('fibonacci') {
 	throw test.orca <- 'test orca is failed';
 }
 

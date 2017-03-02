@@ -4,7 +4,7 @@ def acc(a)
 {
 	def sum := 0;
 
-	if a.type == type.int {
+	if a.TYPE == type.int {
 		my.sum += a;
 	}
 }

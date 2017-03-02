@@ -19,8 +19,8 @@ if fs.isexists(mod_name) {
 	src_time = os.last_write_time(argv[0]);
 
 	if mod_time >= src_time {
-		if httpd.members[mod_name] {
-			return httpd.members[mod_name](argv[1]);
+		if httpd.MEMBERS[mod_name] {
+			return httpd.MEMBERS[mod_name](argv[1]);
 		}
 	}
 	else {
@@ -108,7 +108,7 @@ fs.remove(mod_name);
 fs.write(mod_name, .result);
 
 orca.load(mod_name, httpd);
-return httpd.members[mod_name](argv[1]);
+return httpd.MEMBERS[mod_name](argv[1]);
 
 
 def append_str(str)
