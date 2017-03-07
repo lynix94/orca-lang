@@ -24,10 +24,7 @@ public:
 	orcaTrace(orcaVM* vm) : m_vm(vm) { top_cp = NULL; top_name = NULL; }
 
 	void push(const char* name, const char* cp); 
-	void pop() 
-	{
-		m_item.pop_back(); 
-	}
+	void pop();
 
 	std::string dump();
 

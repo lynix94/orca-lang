@@ -192,7 +192,7 @@ orcaData orcaMap::ex_values(orcaVM* vm, int n)
 orcaData orcaMap::ex_has_key(orcaVM* vm, int n) 
 {
 	if (n<1) {
-		throw orcaException(vm, "orca.param", "insuffiecient parameter");
+		throw orcaException(vm, "orca.param", "insufficient parameter");
 	}
 
 	orcamap_iterator mi = m_value.find(vm->get_param(0));
@@ -218,7 +218,7 @@ orcaData orcaMap::ex_find(orcaVM* vm, int n)
 orcaData orcaMap::ex_lower_bound(orcaVM* vm, int n) 
 {
 	if (n<1) {
-		throw orcaException(vm, "orca.param", "insuffiecient parameter");
+		throw orcaException(vm, "orca.param", "insufficient parameter");
 	}
 
 	orcamap_iterator mi = m_value.lower_bound(vm->get_param(0));
@@ -229,7 +229,7 @@ orcaData orcaMap::ex_lower_bound(orcaVM* vm, int n)
 orcaData orcaMap::ex_upper_bound(orcaVM* vm, int n) 
 {
 	if (n<1) {
-		throw orcaException(vm, "orca.param", "insuffiecient parameter");
+		throw orcaException(vm, "orca.param", "insufficient parameter");
 	}
 
 	orcamap_iterator mi = m_value.upper_bound(vm->get_param(0));
@@ -257,7 +257,7 @@ orcaData orcaMap::ex_end(orcaVM* vm, int n)
 orcaData orcaMap::ex_erase_key(orcaVM* vm, int n) 
 {
 	if (n<1) {
-		throw orcaException(vm, "orca.param", "insuffiecient parameter");
+		throw orcaException(vm, "orca.param", "insufficient parameter");
 	}
 
 	bool changed = false;

@@ -211,9 +211,9 @@ void orcaVM::cleanup()/*{{{*/
 
 struct auto_trace/*{{{*/
 {
-	auto_trace(const char* name, orcaVM* vm, const char* filename, const char* cp) {
+	auto_trace(orcaVM* vm) {
 		vp = vm;
-		vp->m_trace->push(name, cp);
+		vp->m_trace->push(vm->m_curr->get_name(), *vm->m_cptr);
 	}
 
 	~auto_trace() {
@@ -375,7 +375,7 @@ struct auto_local/*{{{*/
 };
 /*}}}*/
 
-void orcaVM::call(int param_n, const char* addr)/*{{{*/
+void orcaVM::call(int param_n)/*{{{*/
 {
 #ifdef _VM_DEBUG_
 	char buff[1024]; // for debug message
@@ -425,11 +425,14 @@ void orcaVM::call(int param_n, const char* addr)/*{{{*/
 				set_caller(m_curr);
 				m_stack->pop();
 
-				{{	auto_trace at(m_curr->get_name(), this, m_module->get_name(), addr); 
-					m_trace->top_name = f.o()->get_name();
+				{{	
+printf("%s-%d\n", __FILE__, __LINE__);
+					auto_trace at(this);
+					m_trace->top_name = m_curr->get_name();
 					orcaData ret = (*f.o())(this, param_n);
 					m_local->mark_return(ret);
 					m_stack->push(ret);
+printf("%s-%d\n", __FILE__, __LINE__);
 				}}
 			}}
 		}
@@ -445,7 +448,7 @@ void orcaVM::call(int param_n, const char* addr)/*{{{*/
 					set_caller(m_curr);
 					m_stack->pop();
 
-					{{	auto_trace at(m_curr->get_name(), this, m_module->get_name(), addr); 
+					{{	auto_trace at(this);
 						m_trace->top_name = f.o()->get_name();
 						orcaData ret = (*f.o())(this, param_n);
 						m_local->mark_return(ret);
@@ -782,7 +785,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 				d.rc_inc();
 				// cause init refer p1 (by owner)
 				// and it can gc on that
-				call(0, code);
+				call(0);
 				m_stack->dummy_pop();
 				d.set_rc(d.get_rc()-1);
 			}
@@ -997,6 +1000,8 @@ void orcaVM::parallel_do(const char* code, const char* offset, int* run_count, o
 void orcaVM::exec_code(const char* code, const char* offset)/*{{{*/
 {
 	register const char *c;
+	m_cptr = &c;
+
 	m_trace->top_cp = &c;
 
 	int j;
@@ -1028,7 +1033,7 @@ fast_jmp:
 			case OP_CALL: 
 				PRINT2("\t\t%p : call (param: %d)\n", c, c[1]); 
 				j = c[1];
-				call(j, c);
+				call(j);
 				c += 1 + FJ_INC;
 				goto fast_jmp;
 				break; 
@@ -1036,7 +1041,7 @@ fast_jmp:
 			case OP_CALL_: 
 				PRINT2("\t\t%p : call fast (param: %d)\n", c, c[1]); 
 				j = c[1];
-				call(j, c);
+				call(j);
 				m_stack->dummy_pop();
 				c += 1 + FJ_INC;
 				goto fast_jmp;
@@ -1187,7 +1192,7 @@ do_assign_list:
 					}
 					m_stack->push(p2);
 					m_stack->push(p3);
-					call(2, c);
+					call(2);
 					break;
 				}
 				else {
@@ -1971,7 +1976,7 @@ do_assign_list:
 						// cause init refer p1 (by owner)
 						// and it can gc on that
 						p1.rc_inc();
-						call(c[1], c);
+						call(c[1]);
 						p1.set_rc(p1.get_rc()-1);
 					}
 				}
@@ -2048,7 +2053,7 @@ do_assign_list:
 				}
 				else if (is<TYPE_OBJ>(p1) && p1.o()->has_member("[]", d)) {
 					m_stack->set(1, d);
-					call(1, c);
+					call(1);
 					break;
 				}
 				else {
@@ -2244,7 +2249,7 @@ do_assign_list:
 
 				d = m_stack->top().o()->get_member("scope_start");
 				m_stack->replace(d);
-				call(0, c);
+				call(0);
 				m_stack->dummy_pop();
 				break;
 
@@ -2255,7 +2260,7 @@ do_assign_list:
 				m_stack->push(d);
 				m_local->clean_mark(MARK_SCOPE);
 
-				call(0, c);
+				call(0);
 				m_stack->dummy_pop();
 				break;
 

@@ -77,7 +77,7 @@ public:
 	void cleanup();
 
 	inline orcaData invoke_internal_func(InternalFunction& in);
-	void call(int param_n, const char* addr = NULL);
+	void call(int param_n);
 
 	orcaObject* exec_define(const char* c, int size, const char* code, 
 							orcaObject* parent, time_t last_write_time);
@@ -120,6 +120,7 @@ public:
 	orcaOnce* m_once;
 
 	orcaTrace* m_trace;
+	const char** m_cptr;
 	string m_last_trace_info;
 
 	static map<const char*, int> m_debug;

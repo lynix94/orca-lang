@@ -5,12 +5,13 @@
 -- test_oo failed
 
 # now thinking 
-.new (vs .clone)
-fix trace.orca trace
-support directory parsing (name.orca)
-support main.orca.html
+*** .new (vs .clone)
+decode to switch
+*** fix trace.orca trace
+*** support directory parsing (name.orca)
+*** support main.orca.html
 html lib
-select
+** select
 root, cloud (depend zookeeper or etcd)
 
 #channel
