@@ -19,15 +19,35 @@
 
 using namespace std;
 
-typedef vector<const char*> name_list_t;
+// for flex
+///////////////
+class orcaFlexLexer : public yyFlexLexer
+{
+public:
+	int yylex(); // made in lexer.cpp
 
-extern yyFlexLexer *lexer;
+	// made in lexer.l
+	const char* get_string(char end);
+	const char* get_comment(char end);
+	const char* get_context();
+	const char* get_hex_string(char end);
+	const char* get_bin_string(char end);
+};
 
-void yyerror(const char* s);
-extern "C" int yywrap();
-
-int yyparse();
+extern orcaFlexLexer *lexer;
 int yylex();
+
+
+// for bison
+///////////////
+int yyparse();
+void yyerror(const char* s);
+#ifndef  __LEX__	// only yacc, not lex
+#define yylex() lexer->yylex()
+#endif
+
+
+typedef vector<const char*> name_list_t;
 
 struct cp2_t
 {
@@ -42,11 +62,6 @@ struct int2_t
 };
 
 
-
-#ifndef  __LEX__	// only yacc, not lex
-#define yytext lexer->YYText()
-#define yylex() lexer->yylex()
-#endif
 
 class orcaVM;
 

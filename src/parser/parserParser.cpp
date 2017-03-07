@@ -23,7 +23,7 @@ parserParser s_parser;
 parserParser* g_parser = &s_parser;
 
 
-yyFlexLexer *lexer = NULL;
+orcaFlexLexer *lexer = NULL;
 
 
 int yyFlexLexer::yywrap()/*{{{*/
@@ -37,7 +37,7 @@ int yyFlexLexer::yywrap()/*{{{*/
 
 void yyerror(const char* s)/*{{{*/
 {
-	print("[%s - %d]%s, nearby('%s')\n", g_parser->filename.c_str(), g_parser->lineno, s, yytext);
+	print("[%s - %d]%s, nearby('%s')\n", g_parser->filename.c_str(), g_parser->lineno, s, lexer->YYText());
 	if (!g_parser->is_interactive() and !g_parser->is_eval()) {
 		exit(0);
 	}
@@ -84,7 +84,7 @@ parserParser::parserParser()/*{{{*/
 void parserParser::init()/*{{{*/
 {
 	if (lexer != NULL) delete lexer;
-	lexer = new yyFlexLexer;
+	lexer = new orcaFlexLexer;
 	free_all();
 }
 /*}}}*/

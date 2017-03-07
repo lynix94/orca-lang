@@ -16,6 +16,8 @@
 #define YY_NO_UNISTD_H
 #endif
 
+#undef yyFlexLexer
+
 using namespace std;
 
 int my_yyinput(char* buff, int max_size);
@@ -40,13 +42,12 @@ int my_yyinput(char* buff, int max_size);
 static bool g_shell_start = true;
 static int g_format_string = 0;
 static bool g_comment = false;
-static const char* get_string(char end);
-static const char* get_comment(char end);
-//static const char* get_context();
-const char* get_context();
-static const char* get_hex_string(char end);
-static const char* get_bin_string(char end);
+//%option prefix="orca"
+
+
 %}
+
+%option yyclass="orcaFlexLexer"
 
 ws			        [ \t\r]+
 cpp_comment			\/\/.*
@@ -262,12 +263,12 @@ under				{ return UNDER; }
 					}
 
 \"\"\"				{ 
-						yylval.cp = get_comment('\"');
+						yylval.cp = lexer->get_comment('\"');
 						return STRING;
 					}
 
 \'\'\'				{ 
-						yylval.cp = get_comment('\'');
+						yylval.cp = lexer->get_comment('\'');
 
 						if (g_format_string) {
 							return FORMAT_STRING_HEAD;
@@ -278,7 +279,7 @@ under				{ return UNDER; }
 
 
 '					{ 
-						yylval.cp = get_string('\'');
+						yylval.cp = lexer->get_string('\'');
 
 						if (g_format_string) {
 							return FORMAT_STRING_HEAD;
@@ -288,7 +289,7 @@ under				{ return UNDER; }
 					}
 
 \"					{ 
-						yylval.cp = get_string('\"');
+						yylval.cp = lexer->get_string('\"');
 
 						if (g_format_string) {
 							return FORMAT_STRING_HEAD;
@@ -298,7 +299,7 @@ under				{ return UNDER; }
 					}
 
 r'					{ 
-						yylval.cp = get_string('\'');
+						yylval.cp = lexer->get_string('\'');
 
 						if (g_format_string) {
 							return RE_FORMAT_STRING_HEAD;
@@ -308,7 +309,7 @@ r'					{
 					}
 
 r\"					{ 
-						yylval.cp = get_string('\"');
+						yylval.cp = lexer->get_string('\"');
 
 						if (g_format_string) {
 							return RE_FORMAT_STRING_HEAD;
@@ -318,7 +319,7 @@ r\"					{
 					}
 
 h'					{ 
-						yylval.cp = get_hex_string('\'');
+						yylval.cp = lexer->get_hex_string('\'');
 						if (yylval.cp == NULL) {
 							yyerror("invalid hex string format");
 							return NIL_;
@@ -327,7 +328,7 @@ h'					{
 					}
 
 h\"					{ 
-						yylval.cp = get_hex_string('\"');
+						yylval.cp = lexer->get_hex_string('\"');
 						if (yylval.cp == NULL) {
 							yyerror("invalid hex string format");
 							return NIL_;
@@ -336,7 +337,7 @@ h\"					{
 					}
 
 b'					{ 
-						yylval.cp = get_bin_string('\'');
+						yylval.cp = lexer->get_bin_string('\'');
 						if (yylval.cp == NULL) {
 							yyerror("invalid hex string format");
 							return NIL_;
@@ -345,7 +346,7 @@ b'					{
 					}
 
 b\"					{ 
-						yylval.cp = get_bin_string('\"');
+						yylval.cp = lexer->get_bin_string('\"');
 						if (yylval.cp == NULL) {
 							yyerror("invalid hex string format");
 							return NIL_;
@@ -355,7 +356,7 @@ b\"					{
 
 ;					{ 
 						if (g_shell_start) {
-							yylval.cp = get_string('\n');
+							yylval.cp = lexer->get_string('\n');
 							bool null_flag = true;
 							const char* cp = yylval.cp;
 							for(int i=0; i<strlen(cp); i++) {
@@ -376,9 +377,9 @@ b\"					{
 \}					{
 						if (g_format_string) {
 							if (g_comment) 
-								yylval.cp = get_comment(g_format_string);
+								yylval.cp = lexer->get_comment(g_format_string);
 							else 
-								yylval.cp = get_string(g_format_string);
+								yylval.cp = lexer->get_string(g_format_string);
 
 							return FORMAT_STRING_TAIL;
 						}
@@ -495,7 +496,7 @@ retry:
 }
 /*}}}*/
 
-static const char* get_string(char end)/*{{{*/
+const char* orcaFlexLexer::get_string(char end)/*{{{*/
 {
 	char c;
 	string str;
@@ -554,7 +555,7 @@ static const char* get_string(char end)/*{{{*/
 }
 /*}}}*/
 
-static const char* get_comment(char end)/*{{{*/
+const char* orcaFlexLexer::get_comment(char end)/*{{{*/
 {
 	char c;
 	string str;
@@ -602,7 +603,7 @@ static const char* get_comment(char end)/*{{{*/
 }
 /*}}}*/
 
-const char* get_context()/*{{{*/
+const char* orcaFlexLexer::get_context()/*{{{*/
 {
 	char c;
 	char open = '{';
@@ -635,7 +636,7 @@ const char* get_context()/*{{{*/
 }
 /*}}}*/
 
-static const char* get_hex_string(char end)/*{{{*/
+const char* orcaFlexLexer::get_hex_string(char end)/*{{{*/
 {
 	char c;
 	string str;
@@ -674,7 +675,7 @@ static const char* get_hex_string(char end)/*{{{*/
 }
 /*}}}*/
 
-static const char* get_bin_string(char end)/*{{{*/
+const char* orcaFlexLexer::get_bin_string(char end)/*{{{*/
 {
 	char c;
 	string str;

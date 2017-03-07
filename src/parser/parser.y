@@ -45,8 +45,6 @@ int g_bnf_right_num = 0;
 using namespace std;
 
 
-const char* get_context();
-
 %}
 
 %union 
@@ -891,8 +889,8 @@ define_context_stmt:/*{{{*/
 				name = buff;
 			}
 
-			const char* cp = get_context();
-			print("get_context(): '%s'\n", cp);
+			const char* cp = lexer->get_context();
+			print("lexer->get_context(): '%s'\n", cp);
 			code_top->do_context($3, name, cp, $5);
 			//TODO: fail check
 		}
@@ -1005,8 +1003,8 @@ lambda_object:/*{{{*/
 			char name[1024];
 			sprintf(name, "__%s_%d_context", g_parser->module_name.c_str(), count++);
 
-			const char* cp = get_context();
-			//print("get_context(): '%s'\n", cp);
+			const char* cp = lexer->get_context();
+			//print("lexer->get_context(): '%s'\n", cp);
 			code_top->do_context($3, name, cp);
 
 			g_op->push_reserved(OP_PUSH_MY);
