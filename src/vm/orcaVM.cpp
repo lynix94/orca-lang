@@ -194,6 +194,8 @@ void orcaVM::init()/*{{{*/
 	m_trace = new orcaTrace(this);
 	m_pure = new orcaPure(this);
 	m_once = new orcaOnce();
+
+	m_cptr = NULL;
 }
 /*}}}*/
 
@@ -213,7 +215,12 @@ struct auto_trace/*{{{*/
 {
 	auto_trace(orcaVM* vm) {
 		vp = vm;
-		vp->m_trace->push(vm->m_curr->get_name(), *vm->m_cptr);
+		const char* cp = NULL;
+		if (vm->m_cptr != NULL) {
+			cp = *vm->m_cptr;
+		}
+
+		vp->m_trace->push(vm->m_curr->get_name(), cp);
 	}
 
 	~auto_trace() {
@@ -426,13 +433,11 @@ void orcaVM::call(int param_n)/*{{{*/
 				m_stack->pop();
 
 				{{	
-printf("%s-%d\n", __FILE__, __LINE__);
 					auto_trace at(this);
 					m_trace->top_name = m_curr->get_name();
 					orcaData ret = (*f.o())(this, param_n);
 					m_local->mark_return(ret);
 					m_stack->push(ret);
-printf("%s-%d\n", __FILE__, __LINE__);
 				}}
 			}}
 		}

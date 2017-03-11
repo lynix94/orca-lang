@@ -21,14 +21,11 @@ using namespace std;
 
 void orcaTrace::push(const char* name, const char* cp)
 { 
-printf(">> push: %s\n", name);	
 	m_item.push_back(trace_info(name, cp)); 
 }
 
 void orcaTrace::pop()
 {
-trace_info info = m_item[m_item.size()-1];
-printf(">> pop: %s\n", info.funname);	
 	m_item.pop_back(); 
 }
 

@@ -41,9 +41,12 @@ public:
 	}
 
 	void make_trace() {
-printf("######## exception maked\n");
 		if (m_vm->m_trace->top_name == NULL) {
 			m_vm->m_trace->top_name = m_vm->m_module->get_name();
+		}
+
+		if (m_vm->m_cptr == NULL) {
+			return; // not executed yet
 		}
 
 		m_vm->m_trace->push(m_vm->m_trace->top_name, *m_vm->m_cptr);
