@@ -8,12 +8,12 @@ def scope
 	.flag_end = false;
 
 
-	def scope_start() {
+	def "{" {
 		print: 'scope start';
 		..flag_start = true;
 	}
 
-	def scope_end() {
+	def "}" {
 		print: 'scope end';
 		..flag_end = true;
 	}

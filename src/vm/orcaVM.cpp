@@ -594,7 +594,7 @@ orcaData& orcaVM::handle_throw(const char* name)/*{{{*/
 			case MARK_SCOPE: 
 			  {
 				orcaObject* o = (orcaObject*)ret.mark().vp;
-				orcaData f = o->get_member("scope_end");
+				orcaData f = o->get_member("}");
 				m_stack->push(f);
 				call(0);
 				m_stack->pop(); // because it's void type
@@ -2252,7 +2252,7 @@ do_assign_list:
 				d.mark_scope(m_stack->top().o());
 				m_local->push_back(d);
 
-				d = m_stack->top().o()->get_member("scope_start");
+				d = m_stack->top().o()->get_member("{");
 				m_stack->replace(d);
 				call(0);
 				m_stack->dummy_pop();
@@ -2261,7 +2261,7 @@ do_assign_list:
 			case OP_SCOPE_END:
 				PRINT1("\t\t%p : scope end\n", c);
 				p1 = m_local->get_mark(MARK_SCOPE);
-				d = ((orcaObject*)p1.mark().vp)->get_member("scope_end");
+				d = ((orcaObject*)p1.mark().vp)->get_member("}");
 				m_stack->push(d);
 				m_local->clean_mark(MARK_SCOPE);
 

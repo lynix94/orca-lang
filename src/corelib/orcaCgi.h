@@ -30,8 +30,8 @@ public:
 	orcaTag(string& name, string& out) : m_name(name)
 	{
 		set_name("tag");
-		insert_native_function("scope_start", (object_fp)&orcaTag::ex_scope_start);
-		insert_native_function("scope_end", (object_fp)&orcaTag::ex_scope_end);
+		insert_native_function("{", (object_fp)&orcaTag::ex_scope_start);
+		insert_native_function("}", (object_fp)&orcaTag::ex_scope_end);
 
 		m_out = &out;
 	}
@@ -219,8 +219,8 @@ public:
 	orcaHeader()
 	{
 		set_name("header");
-		insert_static_native_function("scope_start", (object_fp)&orcaHeader::ex_scope_start);
-		insert_static_native_function("scope_end", (object_fp)&orcaHeader::ex_scope_end);
+		insert_static_native_function("{", (object_fp)&orcaHeader::ex_scope_start);
+		insert_static_native_function("}", (object_fp)&orcaHeader::ex_scope_end);
 
 		insert_static("session", new orcaSession());
 		insert_static("cookie", new orcaCookie());
@@ -248,8 +248,8 @@ public:
 	orcaHtml() 
 	{
 		set_name("html");
-		insert_static_native_function("scope_start", (object_fp)&orcaHtml::ex_scope_start);
-		insert_static_native_function("scope_end", (object_fp)&orcaHtml::ex_scope_end);
+		insert_static_native_function("{", (object_fp)&orcaHtml::ex_scope_start);
+		insert_static_native_function("}", (object_fp)&orcaHtml::ex_scope_end);
 
 		insert_static_native_function("tag", (object_fp)&orcaHtml::ex_tag);
 		insert_static_native_function("ctag", (object_fp)&orcaHtml::ex_ctag);

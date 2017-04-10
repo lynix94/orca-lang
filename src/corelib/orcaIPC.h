@@ -46,8 +46,8 @@ public:
 			set_name("mutex");
 			insert_native_function("lock", (object_fp)&orcaMutex::ex_lock);
 			insert_native_function("unlock", (object_fp)&orcaMutex::ex_unlock);
-			insert_native_function("scope_start", (object_fp)&orcaMutex::ex_lock);
-			insert_native_function("scope_end", (object_fp)&orcaMutex::ex_unlock);
+			insert_native_function("{", (object_fp)&orcaMutex::ex_lock);
+			insert_native_function("}", (object_fp)&orcaMutex::ex_unlock);
 		}
 
 		orcaData ex_lock(orcaVM* vm, int n) 

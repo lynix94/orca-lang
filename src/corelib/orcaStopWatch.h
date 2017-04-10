@@ -33,8 +33,8 @@ public:
 		set_name("stopwatch");
 		insert_native_function("start", (object_fp)&orcaStopWatch::ex_start);
 		insert_native_function("elapse", (object_fp)&orcaStopWatch::ex_elapse);
-		insert_native_function("scope_start", (object_fp)&orcaStopWatch::ex_start);
-		insert_native_function("scope_end", (object_fp)&orcaStopWatch::ex_lap);
+		insert_native_function("{", (object_fp)&orcaStopWatch::ex_start);
+		insert_native_function("}", (object_fp)&orcaStopWatch::ex_lap);
 		insert_native_function("lap", (object_fp)&orcaStopWatch::ex_lap);
 		insert_native_function("title", (object_fp)&orcaStopWatch::ex_title);
 

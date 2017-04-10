@@ -89,7 +89,7 @@ def tag(name, attr, txt)
 	}
 
 
-	def scope_start {
+	def "{" {
 		..m_doc.result += '    ' * ..m_doc.depth;
 
 		if ..m_attr == nil:
@@ -101,7 +101,7 @@ def tag(name, attr, txt)
 	}
 
 
-	def scope_end {
+	def "}" {
 		..m_doc.depth -= 1;
 		..m_doc.result += '    ' * ..m_doc.depth;
 		..m_doc.result += '</${..m_name}>\n';
