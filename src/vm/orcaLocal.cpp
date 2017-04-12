@@ -170,7 +170,7 @@ void orcaLocal::decrease(bool clean_mark)
 			case MARK_SCOPE: 
 			  {
                 orcaObject* o = (orcaObject*)lp[i].mark().vp;
-                orcaData f = o->get_member("scope_end");
+                orcaData f = o->get_member("}");
 				orcaVM* vm = get_current_vm();
                 vm->m_stack->push(f);
                 vm->call(0);
