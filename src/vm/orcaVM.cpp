@@ -827,7 +827,10 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 				buff[j] = 0;
 
 				if (strcmp(by, "cpp") == 0) {
-					load_cpp(buff);
+					bool ret = load_cpp(buff);
+					if (ret == false) {
+						throw orcaException(this, "orca.module", string("module file ") + buff + " not exists");
+					}
 				}
 				else {
 					throw orcaException(this, "orca.module", "unknown external parser");
@@ -2890,10 +2893,11 @@ bool orcaVM::load(const string& input_name, orcaObject* parent) /*{{{*/
 		}
 
 		if (flag == false) {
-			if (load_cpp(input_name)) // check cpp module 
+			if (load_cpp(input_name)) { // check cpp module 
 				return true;
+			}
 
-			cout << input_name << " not exists" << endl;
+			cout << "module " << input_name << " not exists" << endl;
 			exit(0);
 		}/*}}}*/
 	}
@@ -3041,7 +3045,7 @@ bool orcaVM::load_cpp(const string& mod_name) /*{{{*/
 	DLHANDLE handle = dlopen(mod_path.c_str(), RTLD_NOW);
 
 	if (handle == NULL) {
-		throw orcaException(this, "orca.module", string("module file ") + mod_path + " not exists");
+		return false;
 	}
 
 	typedef void* (*fp_t)(void);
