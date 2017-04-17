@@ -111,6 +111,7 @@ using namespace std;
 %token STATIC 
 %token DEF 
 %token CLONE 
+%token NEW 
 %token MY
 %token OWNER
 %token CALLER
@@ -2002,6 +2003,14 @@ postfix_object:/*{{{*/
 	| postfix_object '.' CLONE calling_body
 		{
 			g_op->clone($4);
+
+			// this is not normal function call (virtual function call)
+			// so it should mark that don't fast popping
+			g_op->disable_fast_pop();
+		}
+	| postfix_object '.' NEW calling_body
+		{
+			g_op->new_($4);
 
 			// this is not normal function call (virtual function call)
 			// so it should mark that don't fast popping

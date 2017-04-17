@@ -41,6 +41,7 @@ public:
 	void eq();
 	void neq();
 	void clone(int argc);
+	void new_(int argc);
 	void insert_member(int argc);
 	void insert_static_member(int argc);
 	void update_member(int argc);

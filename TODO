@@ -8,7 +8,6 @@ hex diff
 # now thinking 
 *** .new (vs .clone)
 decode to switch
-*** fix trace.orca trace
 *** support directory parsing (name.orca)
 *** support main.orca.html
 html lib
@@ -46,6 +45,8 @@ move parse to vm & parse, interpret lock
 
 
 ### done
+FlexLexer.h
+fix trace.orca trace
 change to lambda
 add eval (interpret, parse)
 improve catch statement

@@ -159,6 +159,12 @@ void parserOP::clone(int argc)
 	code_top->push_char(argc);
 }
 
+void parserOP::new_(int argc)		
+{
+	code_top->push_char(OP_NEW);
+	code_top->push_char(argc);
+}
+
 void parserOP::listat(bool include_right)	
 {
 	if (include_right)

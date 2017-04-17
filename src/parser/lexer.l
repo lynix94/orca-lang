@@ -66,6 +66,7 @@ lf					\n
 static				{ return STATIC; }
 def					{ return DEF; }
 clone				{ return CLONE; }
+new					{ return NEW; }
 
 my					{ return MY; }
 owner				{ return OWNER; }

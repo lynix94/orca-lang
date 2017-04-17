@@ -82,6 +82,7 @@
 #define OP_MAKE_LONG_LIST			0x58
 #define OP_MAKE_LONG_TUPLE			0x59
 #define OP_MAKE_LONG_MAP			0x5A
+#define OP_NEW						0x5B
 
 #define OP_RETURN					0x60
 #define OP_RETURN_NIL				0x61
