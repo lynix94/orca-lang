@@ -79,10 +79,10 @@ public:
 	inline orcaData invoke_internal_func(InternalFunction& in);
 	void call(int param_n);
 
-	orcaObject* exec_define(const char* c, const char* code, orcaObject* owner, time_t last_write_time = 0);
+	orcaObject* exec_define(const char* c, int size, const char* code, 
+							orcaObject* owner, time_t last_write_time);
 
 	void exec_code(const char* c, const char* offset=NULL);
-	orcaObject* exec_new(orcaObject* src);
 	bool load(const string& module_name, orcaObject* owner = NULL);
 	bool load_cpp(const string& mod_name);
 	void reserve_local(); // for interactive

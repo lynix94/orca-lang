@@ -632,383 +632,7 @@ orcaData& orcaVM::handle_throw(const char* name)/*{{{*/
 }
 /*}}}*/
 
-orcaObject* orcaVM::exec_new(orcaObject* src)/*{{{*/
-{
-	orcaObject* curr = m_curr; // changed in exec_define (for init context & others)
-	orcaObject* ret = exec_define(src->m_defaddr, src->m_codeaddr, src->m_owner);
-	m_curr = curr;
-
-	return ret;
-}
-/*}}}*/
-
-orcaObject* orcaVM::exec_define(const char* c, const char* code, orcaObject* owner, time_t last_write_time)/*{{{*/
-{
-	vector<orcaObject*> v;
-	orcaObject* current = owner;
-	orcaObject* o;
-	orcaData d, out;
-	int count, j;
-	vector<orcaObject*> parents;
-	int def_stack = 0;
-
-	orcaObject* mod = NULL;
-
-	if (current == NULL) current = g_root;
-
-	for(int i=0; ;i++) {
-		PRINT2("%u[%02x] ", i, (unsigned char)*(c + i));
-
-		if (def_stack < 0) break;
-
-		switch((unsigned char)c[i])
-		{
-		case OP_DEF_START: // this, flag, len, name_cp
-			def_stack++;
-			o = new orcaObject();
-			o->m_defaddr = c + i;
-			o->m_codeaddr = code;
-			o->make_original();
-			d.o_set(o);
-			d.o()->set_name(&c[i+1+1+1]);
-
-			PRINT3("\t\t DEF start: %s(%d), (%p)\n", &c[i+1+1+1], c[i+1+1], d.o());
-
-			if (current->has_member(d.o()->get_name(), out)) {
-				// skip, do not register
-				d.o()->m_owner = owner;
-			}
-			else {
-				if (c[i+1] & BIT_DEFINE_STATIC) {
-					current->insert_static(d.o()->get_name(), d);
-				}
-				else {
-					current->insert_member(d.o()->get_name(), d);
-				}
-			}
-
-			d.o()->set_flag(c[i+1]);
-
-			v.push_back(current);
-			current = d.o();
-			i += 1 + 1 + c[i+1+1];
-
-			if (mod == NULL) mod = current;
-			break;
-
-		case OP_DEF_UNDER_START:  { // this, flag, len, name_cp, len, under_cp
-			def_stack++;
-			o = new orcaObject();
-			o->make_original();
-			d.o_set(o);
-			d.o()->set_name(&c[i+1+1+1]);
-
-			int len = c[i+1+1];
-			PRINT3("\t\t DEF under start: %s under %s, (%p)\n", &c[i+1+1+1], &c[i+1+1+1+len+1], d.o());
-			orcaObject* op = g_root;
-
-			char buff[1024];
-			strncpy(buff, &c[i+1+1+1+len+1], 1024);
-
-			char *last;
-			char *tok = strtok_r(buff, ".", &last);
-			if (op->has_member(tok, out) == false) {
-				throw orcaException(this, "orca.define", string("define under failed"));
-			}
-			op = out.Object();
-
-			while (tok != NULL) {
-				tok = strtok_r(NULL, ".", &last);
-				if (tok == NULL) break;
-				if (op->has_member(tok, out) == false) {
-					throw orcaException(this, "orca.define", string("define under failed"));
-				}
-
-				op = out.Object();
-			}
-			
-			if (c[i+1] & BIT_DEFINE_STATIC)
-				op->insert_static(d.o()->get_name(), d);
-			else
-				op->insert_member(d.o()->get_name(), d);
-
-			d.o()->set_flag(c[i+1]);
-
-			v.push_back(current);
-			v.push_back(op);
-			current = d.o();
-			i += 1 + 1 + c[i+1+1] + 1 + c[i+1+1+1+len];
-			break;
-		  }
-
-		case OP_DEF_END:
-			PRINT0("\t\t DEF END\n");
-			o = v[v.size()-1];
-			current = o;
-			m_curr = o;
-			v.pop_back();
-			def_stack--;
-
-			if (def_stack == 0) def_stack--; // to break for
-			break;
-
-		case OP_DEF_UNDER_END:
-			def_stack--;
-			PRINT0("\t\t DEF UNDER END\n");
-			o = v[v.size()-2];
-			current = o;
-			m_curr = o;
-			v.pop_back(); // under target Object
-			v.pop_back(); // real saved current
-
-			if (def_stack == 0) def_stack--; // to break for
-			break;
-
-		case OP_REG: // this, flag, len, cp
-			PRINT1("\t\t  regist orcaObject: %s\n", &c[i+1+1+1]);
-			if (c[i+1] & BIT_DEFINE_STATIC) {
-				current->insert_static(&c[i+1+1+1], NIL);
-			}
-			else {
-				current->insert_member(&c[i+1+1+1], NIL);
-			}
-
-			i += 1 + 1 + c[i+1+1];
-			break;
-
-		case OP_DEF_CODE:
-			PRINT1("\t\t  define code: %lld\n", TO_LONGLONG(&c[i+1]));
-			current->m_code = code + TO_LONGLONG(&c[i+1]);
-			i += sizeof(long long);
-			break;
-
-		case OP_DEF_INIT:
-			PRINT1("\t\t  define init code: %lld\n", TO_LONGLONG(&c[i+1]));
-			m_curr = current;
-			exec_code (code, code + TO_LONGLONG(&c[i+1]));
-			m_stack->dummy_pop();
-			i += sizeof(long long);
-			break;
-
-		case OP_DEF_SUPER: {
-			PRINT1("\t\t  super define: %s\n", &c[i+2]);
-			const char* path = &c[i+2];
-			
-			orcaObject* op = g_root;
-
-			char buff[256];
-			strncpy(buff, path, 256);
-
-			char *last;
-			char *tok = strtok_r(buff, ".", &last);
-			if (op->has_member(tok, out) == false) {
-				throw orcaException(this, "orca.define", string("inherit parents failed"));
-			}
-			op = out.Object();
-
-			while (tok != NULL) {
-				tok = strtok_r(NULL, ".", &last);
-				if (tok == NULL) break;
-				if (op->has_member(tok, out) == false) {
-					throw orcaException(this, "orca.define", string("inherit parents failed"));
-				}
-
-				op = out.Object();
-			}
-
-			op = current->make_super(op);
-			if (op->has_member("init", d)) {
-				m_stack->push(d);
-				d.rc_inc();
-				// cause init refer p1 (by owner)
-				// and it can gc on that
-				call(0);
-				m_stack->dummy_pop();
-				d.set_rc(d.get_rc()-1);
-			}
-
-			i += 1 + c[i+1];
-			break;
-		  }
-
-		case OP_USING: {
-				PRINT1("\t\t  using: %s\n", &c[i+2]);
-				char buff[1024];
-
-				for(j=0; c[i+2 + j] != '.' && j<c[i+1]; j++) 
-					buff[j] = c[i+2 + j];
-
-				buff[j] = 0;
-				if (load(buff) == false) {
-					printf("module (%s) load failure\n", buff);
-					throw orcaException(this, "orca.module", "module launch failure");
-				}
-			}
-			i += 1 + c[i+1];
-			break;
-
-		case OP_USING_EXT: {
-				PRINT2("\t\t  using external: %s, %s\n", &c[i+3], &c[i+2 + c[i+1] + 1]);
-
-				char buff[1024];
-				const char *by = &c[i+2 + c[i+1]+1];
-
-				for(j=0; c[i+3 + j] != '.' && j<c[i+1]; j++) 
-					buff[j] = c[i+3 + j];
-
-				buff[j] = 0;
-
-				if (strcmp(by, "cpp") == 0) {
-					bool ret = load_cpp(buff);
-					if (ret == false) {
-						throw orcaException(this, "orca.module", string("module file ") + buff + " not exists");
-					}
-				}
-				else {
-					throw orcaException(this, "orca.module", "unknown external parser");
-				}
-			}
-
-			i += 1 + c[i+1] + 1 + c[i+2];
-			break;
-
-		case OP_PARSE: {
-				orcaParserObject* op = new orcaParserObject(this);
-				current->insert_member("parse", op);
-				
-				int width = TO_INT(&c[i+1]);
-				int depth = TO_INT(&c[i+1 + sizeof(int)]);
-				int rules = TO_INT(&c[i+1 + 2*sizeof(int)]);
-				i += 3 * sizeof(int);
-
-				PRINT2("\t\t  parse object: %d x %d\n", width, depth);
-				// term, nonterm
-				for (int j=0; j<width; j++) { 
-					char type = c[i+1];
-					i++;
-
-					char is_re = 0;
-					if (type == BNF_TERMINAL || type == BNF_WS) {
-						is_re = c[i+1];
-						i++;
-					} 
-
-					int len = c[i+1];
-					i++;
-
-					const char* str = &c[i+1];
-
-					if (type == BNF_TERMINAL) {
-						if (is_re) {
-							op->push_re(str, j);
-						}
-						else {
-							op->push_str(str, j);
-						}
-					}
-					else if (type == BNF_WS) {
-						if (is_re) {
-							op->push_re_ws(str, j);
-						}
-						else {
-							op->push_str_ws(str, j);
-						}
-					}
-					else {
-						op->push_nonterminal(str, j);
-					}
-
-					i += len+1;
-				}
-
-				// table
-				op->resize_table(width + 1, depth);	// 1 for action
-				for (int j=0; j<depth; j++) {
-					for (int k=0; k<=width; k++) {
-
-						char action = c[i+1];
-						short to = TO_SHORT(&c[i+1+1]);
-						i += 1 + sizeof(short);
-						op->set_table(j, k, action, to);
-					}
-				}
-
-				// rules
-				for (int j=0; j<rules; j++) {
-					short left = TO_SHORT(&c[i+1]);
-					i += sizeof(short);
-					short right = TO_SHORT(&c[i+1]);
-					i += sizeof(short);
-					op->new_rule(left, right);
-				}
-			}
-			break;
-
-		case OP_CONTEXT: {
-			int mod_len = c[i+1];
-			const char* mod = &c[i+1+1];
-
-			int name_len = c[i+1+mod_len+1];
-			const char* name = &c[i+1+mod_len+1+1];
-
-			int code_len  = TO_INT(&c[i+1+mod_len+1+name_len+1]);
-			const char* code = &c[i+1+mod_len+1+name_len+sizeof(int)+1];
-			int under_len  = c[i+1+mod_len+1+name_len+sizeof(int)+code_len+1];
-			const char* under = NULL;
-
-			if (under_len > 0) {
-				under = &c[i+1+mod_len+1+name_len+sizeof(int)+code_len+1+1];
-			}
-
-			i += 1+mod_len + 1+name_len + sizeof(int)+code_len + 1+under_len;
-			if (under_len > 0) {
-				PRINT3("\t\t  context object: %s, %s, '%s'\n", mod, name, code);
-			}
-			else {
-				PRINT4("\t\t  context object: %s, %s, %s, '%s'\n", mod, name, under, code);
-			}
-
-			out = do_context(mod, name, code, last_write_time);
-
-			orcaObject* op = current;
-			if	(under) {
-				op = g_root;
-				orcaData out;
-
-				char buff[1024];
-				strncpy(buff, under, 1024);
-
-				char *last;
-				char *tok = strtok_r(buff, ".", &last);
-				if (op->has_member(tok, out) == false) {
-					throw orcaException(this, "orca.define", string("define under failed"));
-				}
-				op = out.Object();
-
-				while (tok != NULL) {
-					tok = strtok_r(NULL, ".", &last);
-					if (tok == NULL) break;
-					if (op->has_member(tok, out) == false) {
-						throw orcaException(this, "orca.define", string("define under failed"));
-					}
-
-					op = out.Object();
-				}
-			}
-
-			op->insert_member(name, out);
-		  }
-
-		} // switch
-	} // for
-
-	return mod;
-}
-/*}}}*/
-
-#if 0
-// TODO: remove
-orcaObject* orcaVM::exec_define_old(const char* c, int size, const char* code, orcaObject* owner, time_t last_write_time)/*{{{*/
+orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaObject* owner, time_t last_write_time)/*{{{*/
 {
 	vector<orcaObject*> v;
 	orcaObject* current = owner;
@@ -1027,8 +651,6 @@ orcaObject* orcaVM::exec_define_old(const char* c, int size, const char* code, o
 		{
 		case OP_DEF_START: // this, flag, len, name_cp
 			o = new orcaObject();
-			o->m_defaddr = c + i;
-			o->m_codeaddr = code;
 			o->make_original();
 			d.o_set(o);
 			d.o()->set_name(&c[i+1+1+1]);
@@ -1351,8 +973,6 @@ orcaObject* orcaVM::exec_define_old(const char* c, int size, const char* code, o
 	return mod;
 }
 /*}}}*/
-#endif 
-
 
 THREAD_RET parallel_thread_entry(void* ap)/*{{{*/
 {
@@ -2350,9 +1970,6 @@ do_assign_list:
 
 			case OP_CLONE: {	
 				PRINT2("\t\t%p : clone, %d\n", c, c[1]); 
-				printf("op clone test\n");
-				m_stack->dump();
-
 				orcaObject* owner = NULL;
 				d = m_stack->at(c[1]);
 				
@@ -2383,33 +2000,30 @@ do_assign_list:
 			  }
 
 			case OP_NEW: {	
-				printf("op new test\n");
-				m_stack->dump();
-
-				PRINT2("\t\t%p : new, %d\n", c, c[1]); 
+				PRINT2("\t\t%p : clone, %d\n", c, c[1]); 
 				orcaObject* owner = NULL;
 				d = m_stack->at(c[1]);
 				
 				if (is<TYPE_OBJ>(d)) {
 					owner = d.o()->get_owner();
 				}
+
+				p1 = d.clone(owner);
+				if (is<TYPE_OBJ>(p1)) {
+					if (p1.o()->has_member("init", p2)) {
+						m_stack->set(c[1], p2);
+						// cause init refer p1 (by owner)
+						// and it can gc on that
+						p1.rc_inc();
+						call(c[1]);
+						p1.set_rc(p1.get_rc()-1);
+					}
+				}
 				else {
-					printf("not yet.....\n");
+					m_stack->dummy_pop(c[1]);
 				}
 
-				orcaObject* src = d.o();
-				orcaObject* dst = exec_new(src);
-
-				if (dst->has_member("init", p2)) {
-					m_stack->set(c[1], p2);
-					// cause init refer p1 (by owner)
-					// and it can gc on that
-					dst->rc_inc();
-					call(c[1]);
-					dst->set_rc(dst->get_rc()-1);
-				}
-
-				m_stack->replace(dst);
+				m_stack->replace(p1);
 
 				c += 1 + 1;
 				goto fast_jmp;
@@ -3409,7 +3023,7 @@ bool orcaVM::load(const string& input_name, orcaObject* owner) /*{{{*/
 		fclose(fp_kw);
 
 		// and recursively define
-		orcaObject* op = exec_define(define, code, owner, last_write_time);
+		orcaObject* op = exec_define(define, header.def_size, code, owner, last_write_time);
 		m_once->reg(op, once_path);
 
 		// read once if possible

@@ -551,7 +551,7 @@ void parserCode::interpret(orcaVM* vm)/*{{{*/
 		char* new_def = new char[m_def.size()];
 		copy(m_def.begin(), m_def.end(), new_def);
 		
-		vm->exec_define(new_def, NULL, NULL);
+		vm->exec_define(new_def, m_def.size(), NULL, NULL, 0);
 	}
 
 	vm->exec_code(&m_code[0]);
@@ -566,7 +566,7 @@ void parserCode::eval(orcaVM* vm)/*{{{*/
 		char* new_def = new char[m_def.size()];
 		copy(m_def.begin(), m_def.end(), new_def);
 		
-		vm->exec_define(new_def, NULL, vm->m_curr);
+		vm->exec_define(new_def, m_def.size(), NULL, vm->m_curr, 0);
 	}
 
 	vm->exec_code(&m_code[0]);

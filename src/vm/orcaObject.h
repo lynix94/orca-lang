@@ -143,8 +143,6 @@ private:
 	list<orcaObject*>* m_parent;
 	const char* m_name;
 	const char* m_code;
-	const char* m_codeaddr;
-	const char* m_defaddr;
 	orcaObject* m_original;
 	char m_flag;
 
