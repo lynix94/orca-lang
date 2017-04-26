@@ -35,16 +35,15 @@ void parserCode::init() /*{{{*/ {
 
 void parserCode::Final(string name) /*{{{*/
 {
-	int idx = name.find(".");
+	int idx = name.find_last_of(".");
 	string oname;
-	if (idx == 0) {
-		idx = name.find(".", 2);
-	}
 
-	if (idx > 0) 
+	if (idx > 0) {
 		oname = name.substr(0, idx) + ".kw";
-	else
+	}
+	else {
 		oname = name + ".kw";
+	}
 
 	FILE* fp = fopen(oname.c_str(), "wb+");
 	if (fp == NULL) {

@@ -15,6 +15,7 @@
 #include <boost/regex.hpp>
 
 using namespace std;
+using namespace boost;
 
 typedef match_results<string::const_iterator> mr_t;
 
