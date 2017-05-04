@@ -27,6 +27,7 @@
 #include <stdarg.h>
 
 #include <string>
+#include <fstream>
 #include <boost/tokenizer.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -2829,6 +2830,7 @@ do_assign_list:
 
 orcaData orcaVM::do_context(const char* mod, const char* name, const char* cp, time_t last_write_time)/*{{{*/
 {
+	printf(">> context by %s, name: %s, code: %s\n", mod, name, cp);
 	orcaData out;
 	orcaObject* modp;
 	bool ret;
@@ -2872,27 +2874,138 @@ static OrcaHeader read_header(FILE* fp_kw)/*{{{*/
 }
 /*}}}*/
 
+bool orcaVM::load_context_helper(const string& mod_name, const string& candidate_name,
+								const string& sub_prefix, orcaObject* owner)
+{
+	load(sub_prefix, g_root);
+
+	ifstream ifs(candidate_name.c_str());
+	string code;
+	code.assign(istreambuf_iterator<char>(ifs), istreambuf_iterator<char>());
+	time_t last_write_time = fs::last_write_time(candidate_name);
+
+	orcaData out = do_context(sub_prefix.c_str(), mod_name.c_str(), code.c_str(), last_write_time);
+	out.dump();
+	owner->insert_member(mod_name.c_str(), out);
+
+	return true;
+}
+
+
+bool orcaVM::load_orca_helper(const string& input_name, const string& mod_name,/*{{{*/
+							const string& candidate_name, const string& kw_name, orcaObject* owner)
+{
+	bool ret;
+	bool need_recompile = false;
+
+	FILE *fp_kw = fopen(kw_name.c_str(), "rb");
+	if (fp_kw == NULL)  {
+		need_recompile = true;
+	}
+	else {
+		if (fs::last_write_time(fs::path(candidate_name))			// check time
+			> fs::last_write_time(fs::path(kw_name)))
+		{
+			need_recompile = true;
+		}
+		else {												// check version
+			OrcaHeader header = read_header(fp_kw);
+			if (header.magic != MAGIC_NO || header.version != ORCA_VERSION) 
+				need_recompile = true;
+		}
+	}
+
+	if (need_recompile) {
+		if (fp_kw) fclose(fp_kw);
+
+		bool back = g_parser->is_interactive();
+		g_parser->set_interactive(false);
+
+		ret = g_parser->parse(candidate_name);
+		g_parser->set_interactive(back);
+
+		if (!ret) {
+			printf("compile error: %s\n", input_name.c_str());
+			return false;
+		}
+
+		fp_kw = fopen(kw_name.c_str(), "rb");
+	}
+
+	if (fp_kw == NULL) {
+		printf("compiled file '%s' open failed...\n", kw_name.c_str());
+		exit(0);
+	}
+
+	time_t last_write_time = fs::last_write_time(fs::path(kw_name));
+		
+	string once_name = fs::complete(candidate_name).string() + ".once";
+
+	OrcaHeader header = read_header(fp_kw);
+	char* define = g_codes.new_define(header.def_size);
+	char* code = g_codes.new_code(header.code_size, mod_name);
+	ret = fread(define, 1, header.def_size, fp_kw);
+	ret = fread(code, 1, header.code_size, fp_kw);
+
+	// read debug info
+	for (int i=0; i<header.debug_size; i+=sizeof(int)*2) {
+		int addr, line;
+		char buff[128];
+		char *tmp;
+
+		ret = fread(&addr, 1, sizeof(int), fp_kw);
+		ret = fread(&line, 1, sizeof(int), fp_kw);
+		tmp = fgets(buff, sizeof(buff), fp_kw);
+		m_debug[code + addr] = line;
+		m_debug_line[code + addr] = buff;
+	}
+
+	m_debug_name[code] = candidate_name;
+	fclose(fp_kw);
+
+	// and recursively define
+	orcaObject* op = exec_define(define, header.def_size, code, owner, last_write_time);
+	m_once->reg(op, once_name);
+
+	// read once if possible
+	portFile f_once;
+	if (!need_recompile && f_once.open(once_name)) {
+		char* buff = f_once.read();
+		char* src = buff;
+		orcaData d = g_pack->load(&buff);
+		m_once->load(op, (orcaMap*)d.Object());
+
+		delete[] src;
+		f_once.close();
+	}
+
+	return true;
+}
+/*}}}*/
+
 bool orcaVM::load(const string& input_name, orcaObject* owner) /*{{{*/
 {
-	time_t last_write_time;
+	//printf(">> load: %s\n", input_name.c_str());
 	int ret;
 
+	string base_name;   // file basename from inputname (without directory)
 	string mod_name;	// module name (not path) without suffix
-	string kw_name;	    // result module path (with suffix)
-	string once_name;	// result once path (with suffix)
+	string main_prefix; // should be orca
+	string sub_prefix;  // could be orca, html & others
+	string kw_name;	    // result module path with .kw suffix
 	string candidate_name;	// source file path (with or without suffix)
 
 	// #1. check if already loaded
 	if (owner == NULL) owner = g_root;
-	mod_name = fs::path(input_name).filename().string();
-	mod_name = mod_name.substr(0, mod_name.find_first_of('.')); 
+	base_name = fs::path(input_name).filename().string();
+	mod_name = base_name.substr(0, base_name.find_first_of('.')); 
 	if (owner->has_member(mod_name.c_str())) {	// alreay loaded
 		return true;
 	}
 
-	// #2. set kw_name.
-	//     mod.orca -> mod.kw, mod -> mod.kw
-	int last_idx = input_name.find_last_of('.');
+	// #2. set main_prefix, sub_prefix & kw_name.
+	//     mod.orca.html -> mod.kw, mod.orca -> mod.kw, mod -> mod.kw
+	int last_idx = input_name.find_last_of('.');/*{{{*/
 	if (last_idx > 1) {
 		kw_name = input_name.substr(0, last_idx) + ".kw";
 	}
@@ -2900,7 +3013,33 @@ bool orcaVM::load(const string& input_name, orcaObject* owner) /*{{{*/
 		kw_name = input_name + ".kw";
 	}
 
-	// #3. set candidate_name
+	vector<string> toks = kyString::split(base_name, ".");
+	switch (toks.size())
+	{
+	case 3:
+		main_prefix = toks[1];
+		sub_prefix = toks[2];
+		break;
+	case 2:
+		main_prefix = toks[1];
+		sub_prefix = toks[1];
+		break;
+	case 1:
+		main_prefix = "orca";
+		sub_prefix = "orca";
+		break;
+	default:
+		printf("load failed abnormal name: %s\n", input_name.c_str());
+		return false;
+	}
+	
+	if (main_prefix != "orca") {
+		printf("load failed abnormal name: %s\n", input_name.c_str());
+		return false;
+	}
+/*}}}*/
+
+	// #3. set candidate_name & find from current working directory
 	candidate_name = input_name;
 	if (!fs::exists(candidate_name)) {	// if not, change name ( + .orca)
 		candidate_name += ".orca";
@@ -2938,7 +3077,7 @@ bool orcaVM::load(const string& input_name, orcaObject* owner) /*{{{*/
 
 	// #5. load
 	if (fs::is_directory(candidate_name)) {
-		if (kyString::ends_with(candidate_name, ".orca")) {
+		if (kyString::ends_with(candidate_name, ".orca")) {/*{{{*/
 			orcaObject* op = new orcaObject();
 			const char* cp = const_strdup(mod_name.c_str());
 			op->set_name(cp);
@@ -2956,92 +3095,13 @@ bool orcaVM::load(const string& input_name, orcaObject* owner) /*{{{*/
 
 				load(m_iter->path().string().c_str(), op);
 			}
-		}
+		}/*}}}*/
 	}
-	else {
-		bool need_recompile = false;/*{{{*/
-
-		FILE *fp_kw = fopen(kw_name.c_str(), "rb");
-		if (fp_kw == NULL)  {
-			need_recompile = true;
-		}
-		else {
-			if (fs::last_write_time(fs::path(candidate_name))			// check time
-				> fs::last_write_time(fs::path(kw_name)))
-			{
-				need_recompile = true;
-			}
-			else {												// check version
-				OrcaHeader header = read_header(fp_kw);
-				if (header.magic != MAGIC_NO || header.version != ORCA_VERSION) 
-					need_recompile = true;
-			}
-		}
-
-		if (need_recompile) {
-			if (fp_kw) fclose(fp_kw);
-
-			bool back = g_parser->is_interactive();
-			g_parser->set_interactive(false);
-
-			bool ret = g_parser->parse(candidate_name);
-			g_parser->set_interactive(back);
-
-			if (!ret) {
-				printf("compile error: %s\n", input_name.c_str());
-				return false;
-			}
-
-			fp_kw = fopen(kw_name.c_str(), "rb");
-		}
-
-		if (fp_kw == NULL) {
-			printf("compiled file '%s' open failed...\n", kw_name.c_str());
-			exit(0);
-		}
-
-		last_write_time = fs::last_write_time(fs::path(kw_name));
-			
-		once_name = fs::complete(candidate_name).string() + ".once";
-
-		OrcaHeader header = read_header(fp_kw);
-		char* define = g_codes.new_define(header.def_size);
-		char* code = g_codes.new_code(header.code_size, mod_name);
-		ret = fread(define, 1, header.def_size, fp_kw);
-		ret = fread(code, 1, header.code_size, fp_kw);
-
-		// read debug info
-		for (int i=0; i<header.debug_size; i+=sizeof(int)*2) {
-			int addr, line;
-			char buff[128];
-			char *tmp;
-
-			ret = fread(&addr, 1, sizeof(int), fp_kw);
-			ret = fread(&line, 1, sizeof(int), fp_kw);
-			tmp = fgets(buff, sizeof(buff), fp_kw);
-			m_debug[code + addr] = line;
-			m_debug_line[code + addr] = buff;
-		}
-
-		m_debug_name[code] = candidate_name;
-		fclose(fp_kw);
-
-		// and recursively define
-		orcaObject* op = exec_define(define, header.def_size, code, owner, last_write_time);
-		m_once->reg(op, once_name);
-
-		// read once if possible
-		portFile f_once;
-		if (!need_recompile && f_once.open(once_name)) {
-			char* buff = f_once.read();
-			char* src = buff;
-			orcaData d = g_pack->load(&buff);
-			m_once->load(op, (orcaMap*)d.Object());
-
-			delete[] src;
-			f_once.close();
-		}
-/*}}}*/
+	else if (sub_prefix == "orca") {
+		load_orca_helper(input_name, mod_name, candidate_name, kw_name, owner);
+	}
+	else { // context load
+		load_context_helper(mod_name, candidate_name, sub_prefix, owner);
 	}
 
 	// #6. do init_once

@@ -85,6 +85,10 @@ public:
 	void exec_code(const char* c, const char* offset=NULL);
 	bool load(const string& module_name, orcaObject* owner = NULL);
 	bool load_cpp(const string& mod_name);
+	bool load_orca_helper(const string& input_name, const string& mod_name,
+						const string& candidate_name, const string& kw_name, orcaObject* owner);
+	bool load_context_helper(const string& mod_name, const string& candidate_name,
+					const string& sub_prefix, orcaObject* owner);
 	void reserve_local(); // for interactive
 	void parallel_do(const char* code, const char* offset, 
 					 int* run_count = NULL, orcaObject* op = NULL, int per = 0,
