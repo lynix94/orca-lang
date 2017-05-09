@@ -44,10 +44,12 @@ return ret;
 def context_obj(...)
 {
 	local = type.map();
-	for i in [0..argv.size()-1] {
-		local['argv'+i] = argv[i];
+	if argv != nil {
+		for i in [0..argv.size()-1] {
+			local['argv'+i] = argv[i];
+		}
+		local['argv'] = argv.list();
 	}
-	local['argv'] = argv.list();
 
 	return lisp.execute(.code, local, .base);
 

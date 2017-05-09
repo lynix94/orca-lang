@@ -819,9 +819,10 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			break;
 
 		case OP_USING_EXT: {
-				PRINT2("\t\t  using external: %s, %s\n", &c[i+3], &c[i+2 + c[i+1] + 1]);
+				PRINT2("\t\t  using context: %s, %s\n", &c[i+3], &c[i+2 + c[i+1] + 1]);
 
 				char buff[1024];
+				char new_name[1024];
 				const char *by = &c[i+2 + c[i+1]+1];
 
 				for(j=0; c[i+3 + j] != '.' && j<c[i+1]; j++) 
@@ -829,14 +830,11 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 
 				buff[j] = 0;
 
-				if (strcmp(by, "cpp") == 0) {
-					bool ret = load_cpp(buff);
-					if (ret == false) {
-						throw orcaException(this, "orca.module", string("module file ") + buff + " not exists");
-					}
-				}
-				else {
-					throw orcaException(this, "orca.module", "unknown external parser");
+				
+				sprintf(new_name, "%s.orca.%s", buff, by);
+				if (load(new_name) == false) {
+					printf("module (%s) load failure\n", new_name);
+					throw orcaException(this, "orca.module", "module launch failure");
 				}
 			}
 

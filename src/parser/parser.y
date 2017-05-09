@@ -515,9 +515,9 @@ using_stmt:/*{{{*/
 		{
 			code_top->using_object($2, NULL);
 		}
-	| USING object_path STRING ';'
+	| USING '.' name object_path ';'
 		{
-			code_top->using_object($2, $3);
+			code_top->using_object($4, $3);
 		}
 	;
 /*}}}*/
