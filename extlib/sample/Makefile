@@ -16,7 +16,7 @@ all	: $(TARGET_LIB)
 $(TARGET_LIB) : $(LIB_OBJ) Makefile
 	$(CXX) -shared -o $(TARGET_LIB) $(LIB_OBJ) $(LDFLAGS)
 
-%o : %cpp
+%.o : %.cpp
 	$(CXX) $(CFLAGS) -c -fPIC $<
 
 install:
