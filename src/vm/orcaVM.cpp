@@ -1969,38 +1969,8 @@ do_assign_list:
 				break;
 			}
 
+			case OP_NEW: 
 			case OP_CLONE: {	
-				PRINT2("\t\t%p : clone, %d\n", c, c[1]); 
-				orcaObject* owner = NULL;
-				d = m_stack->at(c[1]);
-				
-				if (is<TYPE_OBJ>(d)) {
-					owner = d.o()->get_owner();
-				}
-
-				p1 = d.clone(owner);
-				if (is<TYPE_OBJ>(p1)) {
-					if (p1.o()->has_member("init", p2)) {
-						m_stack->set(c[1], p2);
-						// cause init refer p1 (by owner)
-						// and it can gc on that
-						p1.rc_inc();
-						call(c[1]);
-						p1.set_rc(p1.get_rc()-1);
-					}
-				}
-				else {
-					m_stack->dummy_pop(c[1]);
-				}
-
-				m_stack->replace(p1);
-
-				c += 1 + 1;
-				goto fast_jmp;
-				break;
-			  }
-
-			case OP_NEW: {	
 				PRINT2("\t\t%p : clone, %d\n", c, c[1]); 
 				orcaObject* owner = NULL;
 				d = m_stack->at(c[1]);
