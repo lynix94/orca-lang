@@ -688,21 +688,26 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			char buff[1024];
 			strncpy(buff, &c[i+1+1+1+len+1], 1024);
 
-			char *last;
-			char *tok = strtok_r(buff, ".", &last);
-			if (op->has_member(tok, out) == false) {
-				throw orcaException(this, "orca.define", string("define under failed"));
+			if (strcmp(buff, "root") == 0) {
+				op = g_root;
 			}
-			op = out.Object();
-
-			while (tok != NULL) {
-				tok = strtok_r(NULL, ".", &last);
-				if (tok == NULL) break;
+			else {
+				char *last;
+				char *tok = strtok_r(buff, ".", &last);
 				if (op->has_member(tok, out) == false) {
 					throw orcaException(this, "orca.define", string("define under failed"));
 				}
-
 				op = out.Object();
+
+				while (tok != NULL) {
+					tok = strtok_r(NULL, ".", &last);
+					if (tok == NULL) break;
+					if (op->has_member(tok, out) == false) {
+						throw orcaException(this, "orca.define", string("define under failed"));
+					}
+
+					op = out.Object();
+				}
 			}
 			
 			if (c[i+1] & BIT_DEFINE_STATIC)
