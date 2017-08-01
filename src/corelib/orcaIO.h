@@ -105,8 +105,9 @@ public:
 		virtual orcaData operator()(orcaVM* vm, int n) 
 		{
 			char buff[1024];
-			fgets(buff, sizeof(buff), stdin);
-			buff[1023] = 0;
+			if (fgets(buff, sizeof(buff), stdin) == NULL) {
+				return "";
+			}
 
 			return buff;
 		}

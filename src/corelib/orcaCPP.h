@@ -170,11 +170,11 @@ public:
 		string cmd = string("g++ -shared -o ") + mod + " " + file_name + 
 							" -I${ORCA_HOME}/include/orca -L${ORCA_HOME}/lib -lorca" + cflags + ldflags;
 		printf("cpp external module compile: %s\n", cmd.c_str());
-		::system(cmd.c_str());
+		ret = ::system(cmd.c_str());
 #else
 		string cmd = string("vscompile.bat ") + m_path + " " + name + " " + dl_get_filename(name) + " " + cflags + " " + ldflags;
 		printf("cpp external module compile: %s\n", cmd.c_str());
-		::system(cmd.c_str());
+		ret = ::system(cmd.c_str());
 #endif
 
 		if (!fs::exists(mod))

@@ -217,7 +217,7 @@ public:
 	orcaData ex_cd(orcaVM* vm, int n) 
 	{
 		string& name = vm->get_param(0).String();
-		chdir(name.c_str());
+		int ret = chdir(name.c_str());
 		return NIL;
 	}
 
@@ -402,7 +402,8 @@ public:
 
 		string buff;
 		buff.resize(rsize);
-		fread(&buff[0], 1, rsize, fp);
+		int ret = fread(&buff[0], 1, rsize, fp);
+		buff.resize(ret);
 		fclose(fp);
 		
 		return buff;

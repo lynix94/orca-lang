@@ -874,6 +874,9 @@ orcaData orcaGtk::ex_get_data(orcaVM* vm, int n)/*{{{*/
 
 orcaData orcaGtkDialog::ex_messagebox(orcaVM* vm, int n)/*{{{*/
 {
+	if (n < 2) vm->need_param();
+	string str = vm->get_param(1).string_(vm);
+
 	GtkWidget* window = NULL;
 	if (is<TYPE_OBJ>(vm->get_param(0))) {
 		orcaObject* op = vm->get_param(0).o();
@@ -888,7 +891,7 @@ orcaData orcaGtkDialog::ex_messagebox(orcaVM* vm, int n)/*{{{*/
 									GTK_DIALOG_DESTROY_WITH_PARENT,
 									GTK_MESSAGE_INFO,
 									GTK_BUTTONS_OK,
-									"Download Completed", "title");
+									"%s", str.c_str());
 	gtk_window_set_title(GTK_WINDOW(dialog), "Information");
 	gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog);

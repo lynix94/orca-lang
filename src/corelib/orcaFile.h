@@ -97,7 +97,8 @@ public:
 
 		string s;
 		s.resize(size);
-		fread(&s[0], 1, size, m_fp);
+		int ret = fread(&s[0], 1, size, m_fp);
+		s.resize(ret);
 		return s;
 	}
 
@@ -114,8 +115,10 @@ public:
 		string line;
 		do {
 			char buff[4*ONE_K];
-			fgets(buff, sizeof(buff), m_fp);
-			line += buff;
+			if (fgets(buff, sizeof(buff), m_fp) != NULL) {
+				line += buff;
+			}
+
 			if (buff[sizeof(buff)-1] != 0 || buff[sizeof(buff)-2] == 0) {
 				break;
 			}
