@@ -144,9 +144,12 @@
 #define OP_USING_EXT				0xC9
 #define OP_DEF_START_PARSER			0xCA
 #define OP_DEF_INIT					0xCB
-#define OP_CONTEXT					0xCC
 #define OP_DEF_UNDER_START			0xCD
 #define OP_DEF_UNDER_END			0xCE
+#define OP_CONTEXT_START			0xD0
+#define OP_CONTEXT_UNDER_START		0xD1
+#define OP_CONTEXT_END				0xD2
+#define OP_CONTEXT_UNDER_END		0xD3
 
 #endif
 

@@ -36,7 +36,8 @@ public:
 	char* find_in_space(const char* s);
 
 	void reg_object(const char* s, int flag = 0);
-	void do_context(const char* mod, const char* name, const char* code, const char* under_path = NULL);
+	void do_context(const char* mod, const char* name, const char* code, const char* under_path = NULL, int flag = 0);
+	void do_context_end(const char* under_path = NULL);
 
 	void init_object_start(const char* s);
 	void init_object_done();

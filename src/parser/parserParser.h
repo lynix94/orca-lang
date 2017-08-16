@@ -29,9 +29,13 @@ public:
 	// made in lexer.l
 	const char* get_string(char end);
 	const char* get_comment(char end);
+
+	string get_raw_context();
 	const char* get_context();
 	const char* get_hex_string(char end);
 	const char* get_bin_string(char end);
+
+	void yyunput_string(const char* str);
 };
 
 extern orcaFlexLexer *lexer;

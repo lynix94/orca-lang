@@ -302,11 +302,18 @@ void parserCode::reg_object(const char* s, int flag_define) /*{{{*/
 }
 /*}}}*/
 
-void parserCode::do_context(const char* mod, const char* name, const char* code, const char* under_path)/*{{{*/
+void parserCode::do_context(const char* mod, const char* name, const char* code, const char* under_path, int flag)/*{{{*/
 {
 	int len;
 
-	m_def.push_back(OP_CONTEXT);
+	if (under_path) {
+		m_def.push_back(OP_CONTEXT_UNDER_START);
+	}
+	else {
+		m_def.push_back(OP_CONTEXT_START);
+	}
+
+	m_def.push_back(flag);
 
 	len = strlen(mod) + 1;
 	if (len > 255) len = 255;
@@ -323,13 +330,23 @@ void parserCode::do_context(const char* mod, const char* name, const char* code,
 	copy(cp, cp+sizeof(int), back_inserter(m_def));
 	copy(code, code + len, back_inserter(m_def));
 
-	len = 0;
 	if (under_path) {
+		len = 0;
 		len = strlen(under_path)+1;
+		m_def.push_back(len);
+		copy(under_path, under_path + len, back_inserter(m_def));
 	}
+}
+/*}}}*/
 
-	m_def.push_back(len);
-	copy(under_path, under_path + len, back_inserter(m_def));
+void parserCode::do_context_end(const char* under_path)/*{{{*/
+{
+	if (under_path) {
+		m_def.push_back(OP_CONTEXT_UNDER_END);
+	}
+	else {
+		m_def.push_back(OP_CONTEXT_END);
+	}
 }
 /*}}}*/
 

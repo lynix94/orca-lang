@@ -175,8 +175,6 @@ using namespace std;
 %token<cp> HEX_STRING
 %token<cp> SHELL_STRING_HEAD
 
-%token<cp2> CONTEXT 
-
 %token<integer> NUMBER
 %token<integer> MINUS_NUMBER
 %token<cp> BIG_NUMBER
@@ -884,7 +882,7 @@ define_stmt:/*{{{*/
 	/*}}}*/
 
 define_context_stmt:/*{{{*/
-	  def '.' name_or_string opt_name_or_string opt_under '{'
+	def '.' name_or_string opt_name_or_string opt_under '{'
 		{
 			const char* name = $4;
 			static int count = 1;
@@ -895,9 +893,13 @@ define_context_stmt:/*{{{*/
 			}
 
 			const char* cp = lexer->get_context();
-			print("lexer->get_context(): '%s'\n", cp);
-			code_top->do_context($3, name, cp, $5);
+			//print("lexer->get_context(): '%s'\n", cp);
+			code_top->do_context($3, name, cp, $5, $1);
 			//TODO: fail check
+		}
+	open_statement_block
+		{
+			code_top->do_context_end($5);
 		}
 	;
 /*}}}*/
@@ -1014,6 +1016,10 @@ lambda_object:/*{{{*/
 
 			g_op->push_reserved(OP_PUSH_MY);
 			g_op->find_member(name);
+		}
+	  open_statement_block
+		{
+			code_top->do_context_end();
 		}
 	| lambda_decode_header '{' decode_pattern_stmt_list '}'
 		{

@@ -79,6 +79,7 @@ public:
 	inline orcaData invoke_internal_func(InternalFunction& in);
 	void call(int param_n);
 
+	orcaObject* find_object_by_path(const char* path);
 	orcaObject* exec_define(const char* c, int size, const char* code, 
 							orcaObject* owner, time_t last_write_time);
 

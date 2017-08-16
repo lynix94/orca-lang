@@ -635,6 +635,39 @@ orcaData& orcaVM::handle_throw(const char* name)/*{{{*/
 }
 /*}}}*/
 
+orcaObject* orcaVM::find_object_by_path(const char* path)
+{
+	orcaObject* op = g_root;
+	orcaData out;
+
+	char buff[1024];
+	strncpy(buff, path, 1024);
+
+	if (strcmp(buff, "root") == 0) {
+		op = g_root;
+	}
+	else {
+		char *last;
+		char *tok = strtok_r(buff, ".", &last);
+		if (op->has_member(tok, out) == false) {
+			throw orcaException(this, "orca.define", string("define under failed"));
+		}
+		op = out.Object();
+
+		while (tok != NULL) {
+			tok = strtok_r(NULL, ".", &last);
+			if (tok == NULL) break;
+			if (op->has_member(tok, out) == false) {
+				throw orcaException(this, "orca.define", string("define under failed"));
+			}
+
+			op = out.Object();
+		}
+	}
+
+	return op;
+}
+
 orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaObject* owner, time_t last_write_time)/*{{{*/
 {
 	vector<orcaObject*> v;
@@ -652,75 +685,53 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 		PRINT2("%u[%02x] ", i, (unsigned char)*(c + i));
 		switch((unsigned char)c[i])
 		{
-		case OP_DEF_START: // this, flag, len, name_cp
-			o = new orcaObject();
-			o->make_original();
-			d.o_set(o);
-			d.o()->set_name(&c[i+1+1+1]);
-
-			PRINT3("\t\t DEF start: %s(%d), (%p)\n", &c[i+1+1+1], c[i+1+1], d.o());
-
-			if (c[i+1] & BIT_DEFINE_STATIC)
-				current->insert_static(d.o()->get_name(), d);
-			else
-				current->insert_member(d.o()->get_name(), d);
-
-			d.o()->set_flag(c[i+1]);
-
-			v.push_back(current);
-			current = d.o();
-			i += 1 + 1 + c[i+1+1];
-
-			if (mod == NULL) mod = current;
-			break;
-
+		case OP_DEF_START:			// this, flag, len, name_cp
 		case OP_DEF_UNDER_START:  { // this, flag, len, name_cp, len, under_cp
+			bool is_under = false;
+			if ((unsigned char)c[i] == OP_DEF_UNDER_START) {
+				is_under = true;
+			}
+
 			o = new orcaObject();
 			o->make_original();
 			d.o_set(o);
 			d.o()->set_name(&c[i+1+1+1]);
 
-			int len = c[i+1+1];
-			PRINT3("\t\t DEF under start: %s under %s, (%p)\n", &c[i+1+1+1], &c[i+1+1+1+len+1], d.o());
-			orcaObject* op = g_root;
-			orcaData out;
+			orcaObject* op = current;
 
-			char buff[1024];
-			strncpy(buff, &c[i+1+1+1+len+1], 1024);
-
-			if (strcmp(buff, "root") == 0) {
-				op = g_root;
+			int len = 0;
+			if (is_under) {
+				len = c[i+1+1];
+				PRINT3("\t\t DEF under start: %s under %s, (%p)\n", &c[i+1+1+1], &c[i+1+1+1+len+1], d.o());
+				op = find_object_by_path(&c[i+1+1+1+len+1]);
 			}
 			else {
-				char *last;
-				char *tok = strtok_r(buff, ".", &last);
-				if (op->has_member(tok, out) == false) {
-					throw orcaException(this, "orca.define", string("define under failed"));
-				}
-				op = out.Object();
-
-				while (tok != NULL) {
-					tok = strtok_r(NULL, ".", &last);
-					if (tok == NULL) break;
-					if (op->has_member(tok, out) == false) {
-						throw orcaException(this, "orca.define", string("define under failed"));
-					}
-
-					op = out.Object();
-				}
+				PRINT3("\t\t DEF start: %s(%d), (%p)\n", &c[i+1+1+1], c[i+1+1], d.o());
 			}
-			
-			if (c[i+1] & BIT_DEFINE_STATIC)
+
+			if (c[i+1] & BIT_DEFINE_STATIC) {
 				op->insert_static(d.o()->get_name(), d);
-			else
+			}
+			else {
 				op->insert_member(d.o()->get_name(), d);
+			}
 
 			d.o()->set_flag(c[i+1]);
 
-			v.push_back(current);
-			v.push_back(op);
+			if (is_under) {
+				v.push_back(current);
+				v.push_back(op);
+				i += 1 + 1 + c[i+1+1] + 1 + c[i+1+1+1+len];
+			}
+			else {
+				v.push_back(current);
+				i += 1 + 1 + c[i+1+1];
+				if (mod == NULL) {
+					mod = current;
+				}
+			}
+
 			current = d.o();
-			i += 1 + 1 + c[i+1+1] + 1 + c[i+1+1+1+len];
 			break;
 		  }
 
@@ -743,10 +754,12 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 
 		case OP_REG: // this, flag, len, cp
 			PRINT1("\t\t  regist orcaObject: %s\n", &c[i+1+1+1]);
-			if (c[i+1] & BIT_DEFINE_STATIC)
+			if (c[i+1] & BIT_DEFINE_STATIC) {
 				current->insert_static(&c[i+1+1+1], NIL);
-			else
+			}
+			else {
 				current->insert_member(&c[i+1+1+1], NIL);
+			}
 
 			i += 1 + 1 + c[i+1+1];
 			break;
@@ -830,8 +843,9 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 				char new_name[1024];
 				const char *by = &c[i+2 + c[i+1]+1];
 
-				for(j=0; c[i+3 + j] != '.' && j<c[i+1]; j++) 
+				for(j=0; c[i+3 + j] != '.' && j<c[i+1]; j++) {
 					buff[j] = c[i+3 + j];
+				}
 
 				buff[j] = 0;
 
@@ -918,61 +932,73 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			}
 			break;
 
-		case OP_CONTEXT: {
-			int mod_len = c[i+1];
-			const char* mod = &c[i+1+1];
-
-			int name_len = c[i+1+mod_len+1];
-			const char* name = &c[i+1+mod_len+1+1];
-
-			int code_len  = TO_INT(&c[i+1+mod_len+1+name_len+1]);
-			const char* code = &c[i+1+mod_len+1+name_len+sizeof(int)+1];
-			int under_len  = c[i+1+mod_len+1+name_len+sizeof(int)+code_len+1];
-			const char* under = NULL;
-
-			if (under_len > 0) {
-				under = &c[i+1+mod_len+1+name_len+sizeof(int)+code_len+1+1];
+		case OP_CONTEXT_START:    // this, flag, mode_len, mod, name_len, name, code_len, code
+		case OP_CONTEXT_UNDER_START: { // this, flag, mode_len, mod, name_len, name, code_len, code, under_len, under
+			bool is_under = false;
+			if ((unsigned char)c[i] == OP_DEF_UNDER_START) {
+				is_under = true;
 			}
 
-			i += 1+mod_len + 1+name_len + sizeof(int)+code_len + 1+under_len;
-			if (under_len > 0) {
-				PRINT3("\t\t  context object: %s, %s, '%s'\n", mod, name, code);
-			}
-			else {
-				PRINT4("\t\t  context object: %s, %s, %s, '%s'\n", mod, name, under, code);
-			}
+			int mod_len = c[i+1+1];
+			const char* mod = &c[i+1+1+1];
 
-			orcaData out = do_context(mod, name, code, last_write_time);
+			int name_len = c[i+1+1+mod_len+1];
+			const char* name = &c[i+1+1+mod_len+1+1];
+
+			int code_len  = TO_INT(&c[i+1+1+mod_len+1+name_len+1]);
+			const char* code = &c[i+1+1+mod_len+1+name_len+sizeof(int)+1];
 
 			orcaObject* op = current;
-			if	(under) {
-				op = g_root;
-				orcaData out;
+			int under_len = 0;
+			if (is_under) {
+				under_len  = c[i+1+1+mod_len+1+name_len+sizeof(int)+code_len+1];
+				const char* under = &c[i+1+1+mod_len+1+name_len+sizeof(int)+code_len+1+1];
+				PRINT4("\t\t  context object: %s, %s, %s, '%s'\n", mod, name, under, code);
 
-				char buff[1024];
-				strncpy(buff, under, 1024);
-
-				char *last;
-				char *tok = strtok_r(buff, ".", &last);
-				if (op->has_member(tok, out) == false) {
-					throw orcaException(this, "orca.define", string("define under failed"));
-				}
-				op = out.Object();
-
-				while (tok != NULL) {
-					tok = strtok_r(NULL, ".", &last);
-					if (tok == NULL) break;
-					if (op->has_member(tok, out) == false) {
-						throw orcaException(this, "orca.define", string("define under failed"));
-					}
-
-					op = out.Object();
-				}
+				op = find_object_by_path(under);
+			}
+			else {
+				PRINT3("\t\t  context object: %s, %s, '%s'\n", mod, name, code);
 			}
 
-			op->insert_member(name, out);
+			orcaData ctx = do_context(mod, name, code, last_write_time);
+
+			if (c[i+1] & BIT_DEFINE_STATIC) {
+				op->insert_static(name, ctx.Object());
+			}
+			else {
+				op->insert_member(name, ctx.Object());
+			}
+
+			v.push_back(current);
+			if (is_under) {
+				v.push_back(op);
+				i += 1+1+mod_len + 1+name_len + sizeof(int)+code_len + 1+under_len;
+			}
+			else {
+				i += 1+1+mod_len + 1+name_len + sizeof(int)+code_len;
+			}
+
+			current = ctx.o();
+			break;
 		  }
 
+		case OP_CONTEXT_END:
+			PRINT0("\t\t DEF CONTEXT END\n");
+			o = v[v.size()-1];
+			current = o;
+			m_curr = o;
+			v.pop_back();
+			break;
+
+		case OP_CONTEXT_UNDER_END:
+			PRINT0("\t\t DEF CONTEXT UNDER END\n");
+			o = v[v.size()-2];
+			current = o;
+			m_curr = o;
+			v.pop_back(); // under target Object
+			v.pop_back(); // real saved current
+			break;
 		} // switch
 	} // for
 
@@ -2524,7 +2550,7 @@ do_assign_list:
 				break;
 
 			case OP_PARALLEL_FOR: {
-				PRINT3("\t\t%p : parallel for start: %d\n", c, 
+				PRINT3("\t\t%p : parallel for start: (lv:%d), %d\n", c, 
 						TO_SHORT(&c[1]), TO_INT(&c[1 + sizeof(short)])); 
 
 				short lv = TO_SHORT(&c[1]);
@@ -2803,7 +2829,6 @@ do_assign_list:
 
 orcaData orcaVM::do_context(const char* mod, const char* name, const char* cp, time_t last_write_time)/*{{{*/
 {
-	printf(">> context by %s, name: %s, code: %s\n", mod, name, cp);
 	orcaData out;
 	orcaObject* modp;
 	bool ret;

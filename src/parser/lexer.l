@@ -30,6 +30,9 @@ int my_yyinput(char* buff, int max_size);
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
+#include <sstream>
+#include <iostream>
+
 
 #ifndef WIN32
 #include <readline/readline.h>
@@ -43,7 +46,6 @@ static bool g_shell_start = true;
 static int g_format_string = 0;
 static bool g_comment = false;
 //%option prefix="orca"
-
 
 %}
 
@@ -395,6 +397,112 @@ b\"					{
 %%
 
 
+bool starts_with(const char* line, const char* word)
+{
+	bool ret = false;
+	for(int i=0; i<strlen(line); i++) {
+		char c = line[i];
+
+		if (strncmp(&line[i], word, strlen(word)) == 0) {
+			ret = true;
+			break;
+		}
+
+		if (c != ' ' && c != '\t' && 
+		    c != '\n' && c != '\r') 
+		{
+			break;
+		}
+	}
+
+	return ret;
+}
+
+int count_in(const char* line, const char* word)
+{
+	int ret = 0;
+	int len = strlen(line);
+	for (int i=0; i<len; i++) {
+		if (strncmp(line + i, word, strlen(word)) == 0) {
+			if (i > 1 && line[i-1] == '\\') {
+				continue;
+			}
+
+			ret++;
+			i += strlen(word) - 1;
+			continue;
+		}
+	}
+
+	return ret;
+}
+
+
+void split_ctx_def(const string& src, string& ctx, string& def)
+{
+	istringstream f(src);
+	string line;	
+
+	int open = 0;
+	int close = 0;
+	while (getline(f, line)) {
+		if (starts_with(line.c_str(), "def")) {
+			open = close = 0;
+
+			while (true) {
+				def += line + "\n";
+				ctx += "\n";
+
+				open += count_in(line.c_str(), "{");
+				close += count_in(line.c_str(), "}");
+
+				if (open > 0 && open == close) {
+					break;
+				}
+
+				getline(f, line);
+			}
+		}
+		else {
+			ctx += line + "\n";
+			def += "\n";
+		}
+	}
+}
+
+
+
+
+
+string get_block(const string& src, int initial_depth)
+{
+	char c;
+	char open = '{';
+	char close = '}';
+	int depth = initial_depth;
+
+	string str;
+	for (int i=0; i<src.length(); i++) {
+		c = src[i];
+		if (c == open) depth++;
+		else if (c == close) depth--;
+
+		if (depth == 0 && c == close) {
+			break;
+		}
+
+		if (c=='\r' || c == '\n') {
+			g_parser->lineno++;
+		}
+
+		str += c;
+	}
+
+	return str;
+}
+
+
+
 int my_yyinput(char* buff, int max_size)/*{{{*/
 {
 	int i, n;
@@ -438,23 +546,7 @@ retry:
 	}
 #endif
 
-	g_shell_start = false;
-	for(i=0; i<strlen(buff); i++) {
-		char c = buff[i];
-
-		// if first character is ';', this is shell stmt
-		if (c == ';') {	
-			g_shell_start = true;
-			break;
-		}
-
-		if (c != ' ' && c != '\t' && 
-		    c != '\n' && c != '\r') 
-		{
-			break;
-		}
-	}
-
+	g_shell_start = starts_with(buff, ";");
 
 	if (g_parser->is_interactive()) {
 		if (g_shell_start) {
@@ -604,27 +696,22 @@ const char* orcaFlexLexer::get_comment(char end)/*{{{*/
 }
 /*}}}*/
 
-const char* orcaFlexLexer::get_context()/*{{{*/
+string orcaFlexLexer::get_raw_context()/*{{{*/
 {
 	char c;
 	char open = '{';
 	char close = '}';
-	int depth = 0;
+	int depth = 1;
 
 	string str;
-	depth++;
-
 	
-	c = lexer->yyinput();
-
 	while ((c = lexer->yyinput()) != 0 && c != -1) {
 		if (c == open) depth++;
-		if (c == close) depth--;
+		else if (c == close) depth--;
 
 		if (depth == 0 && c == close) {
 			break;
 		}
-
 
 		if (c == '\r' || c == '\n') { 
 			g_parser->lineno++;
@@ -633,7 +720,32 @@ const char* orcaFlexLexer::get_context()/*{{{*/
 		str += c;
 	}
 
-	return g_parser->strdup(str.c_str());
+	yyunput_string("}"); // recover last '}'
+
+	return str;
+
+}
+/*}}}*/
+
+const char* orcaFlexLexer::get_context()/*{{{*/
+{
+	string raw_str = get_raw_context();
+	string ctx, def;
+	split_ctx_def(raw_str, ctx, def);
+
+	yyunput_string(def.c_str());
+	
+	return g_parser->strdup(ctx.c_str());
+}
+/*}}}*/
+
+void orcaFlexLexer::yyunput_string(const char* str)/*{{{*/
+{
+	const char* cp = str + strlen(str) - 1;
+	while (cp >= str) {
+		lexer->yyunput((int)*cp, (char*)lexer->YYText());
+		cp--;
+	}
 }
 /*}}}*/
 
