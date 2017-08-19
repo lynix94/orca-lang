@@ -27,7 +27,8 @@ test_vectors = [
   'test_type',
   'test_orca',
   'test_lang',
-  'test_parse'
+  'test_parse',
+  'test_context',
 ];
 
 test_modules = [

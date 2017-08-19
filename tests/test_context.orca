@@ -1,0 +1,45 @@
+
+
+def foo(...) under root
+{
+	#print: argv;
+
+	ret = my.clone();
+	ret.NAME = argv[0];
+	ret.MEMBERS['text'] = argv[2];
+
+	return ret;
+}
+
+
+def.foo bar {
+	test text 1
+
+	def foobar {
+		a = 10;
+		return a*2;
+	}
+
+	test text 2
+}
+
+
+print: my.bar;
+print: my.bar.MEMBERS;
+
+if my.bar.foobar() != 20 {
+	throw test.context <- 'context failed';
+}
+
+if my.bar.text.find('text 1') < 0 {
+	throw test.context <- 'context failed';
+}
+	
+print: 'OK';
+
+
+
+
+
+
+
