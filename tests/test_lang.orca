@@ -81,6 +81,18 @@ if ret != true {
 	throw test.lang <- 'issametype failed';
 }
 
+print: my.foo.NAME;
+if my.foo.NAME != 'foo' {
+	throw test.lang <- 'NAME failed';
+}
+
+my.foo.NAME = 'foo_2';
+print: my.foo.NAME;
+print: my.MEMBERS;
+if my.foo.NAME != 'foo_2' {
+	throw test.lang <- 'NAME failed';
+}
+	
 print: 'OK', my;
 
 

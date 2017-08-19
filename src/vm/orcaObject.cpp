@@ -84,6 +84,10 @@ orcaObject::~orcaObject()
 		delete m_static;
 		m_static = NULL;
 	}
+
+	if (m_flag & BIT_DEFINE_NAME_CHANGED) {
+		free((void*)m_name);
+	}
 }
 
 void orcaObject::make_original()
@@ -496,6 +500,26 @@ orcaData orcaObject::update_member(const char* name, orcaData d)
 		// second, find at member
 		mi = m_member.find(name);
 		if (mi == m_member.end()) {
+			// try virtual member
+			if (strcmp(name, "string") == 0 
+				|| (strcmp(name, "TYPE") == 0) 
+				|| (strcmp(name, "TYPENAME") == 0)
+				|| (strcmp(name, "ID") == 0)
+				|| (strcmp(name, "RC") == 0)
+				|| (strcmp(name, "MEMBERS") == 0)
+				|| (strcmp(name, "STATIC_MEMBERS") == 0)
+				|| (strcmp(name, "PARENTS") == 0)
+				|| (strcmp(name, "ORIGINAL") == 0))
+			{
+				throw orcaException(get_current_vm(), "orca.name",
+					string("member ") + name + " is read only");
+			}
+			else if (strcmp(name, "NAME") == 0) {
+				m_name = strdup(d.String().c_str());
+				m_flag |= BIT_DEFINE_NAME_CHANGED;
+				return d;
+			}
+
 			// finally... find at parent
 			if (m_parent) {
 				list<orcaObject*>::iterator it = m_parent->begin();
