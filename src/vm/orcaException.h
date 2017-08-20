@@ -23,7 +23,11 @@ public:
 		if (vm == NULL) vm = get_current_vm();
 		m_vm = vm;
 
-		m_msg = msg;
+		if (msg != "") {
+			m_vm->push_param(msg);
+			m_argc++;
+		}
+
 		make_trace();
 		m_vm->m_last_trace_info = m_stack_trace;
 	}
@@ -57,7 +61,13 @@ public:
 	}
 
 	const char* what() {
-		return m_msg.c_str();
+		orcaData d = m_vm->m_stack->at(m_argc-1);
+
+		if (is<TYPE_STR>(d)) {
+			return d.s().c_str();
+		}
+
+		return "";
 	}
 
 	int argc() {
@@ -68,7 +78,6 @@ private:
 	const char* m_id;
 	int m_argc;
 	orcaVM* m_vm;
-	string m_msg;
 
 public:
 	string m_stack_trace;
