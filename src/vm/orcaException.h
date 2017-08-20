@@ -23,11 +23,7 @@ public:
 		if (vm == NULL) vm = get_current_vm();
 		m_vm = vm;
 
-		if (msg != "") {
-			m_vm->push_param(msg);
-			m_argc++;
-		}
-
+		m_msg = msg;
 		make_trace();
 		m_vm->m_last_trace_info = m_stack_trace;
 	}
@@ -39,6 +35,8 @@ public:
 		make_trace();
 		m_vm->m_last_trace_info = m_stack_trace;
 	}
+
+	~orcaException() { }
 
 	void make_trace() {
 		if (m_vm->m_trace->top_name == NULL) {
@@ -59,13 +57,7 @@ public:
 	}
 
 	const char* what() {
-		orcaData d = m_vm->m_stack->at(m_argc-1);
-
-		if (is<TYPE_STR>(d)) {
-			return d.s().c_str();
-		}
-
-		return "";
+		return m_msg.c_str();
 	}
 
 	int argc() {
@@ -76,6 +68,7 @@ private:
 	const char* m_id;
 	int m_argc;
 	orcaVM* m_vm;
+	string m_msg;
 
 public:
 	string m_stack_trace;

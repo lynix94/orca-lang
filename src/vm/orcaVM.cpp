@@ -3221,17 +3221,15 @@ orcaData orcaVM::channel_in(orcaData d)
 
 	orcaObject* o = d.o();
 	orcaData ret;
-	if (o->has_member("<-?", ret)) {
-		if (is<TYPE_BOOL>(ret) == false || ret.b() == false) {
+	if (o->has_member("<-", ret)) {
+		if (is<TYPE_NIL>(ret)) {
 			return NIL;
 		}
+		
+		return ret.Object();
 	}
-	else {
+	else { // not exists
 		return NIL;
-	}
-
-	if (o->has_member("<-", ret)) {
-		return ret;
 	}
 
 	return NIL;
@@ -3245,19 +3243,9 @@ bool orcaVM::channel_out(orcaData d, int num)
 
 	orcaObject* o = d.o();
 	orcaData ret, fun;
-	if (o->has_member("->?", ret)) {
-		if (is<TYPE_BOOL>(ret) == false || ret.b() == false) {
-			return false;
-		}
-	}
-	else {
-		return false;
-	}
-
-
 	if (o->has_member("->", fun) == false) {
 		return false;
-	}
+	} 
 
 	if (is<TYPE_NIL>(fun)) {
 		return false;
@@ -3289,7 +3277,6 @@ bool orcaVM::channel_out(orcaData d, int num)
 		m_stack->push(ret);
 	}
 
-	m_stack->dump();
 	return true;
 }
 
@@ -3364,8 +3351,8 @@ int orca_launch_module(orcaVM* vm, char* module, int argc, char** argv)/*{{{*/
 
 		printf("uncaugted exception: %s - %s\n", e.who(), e.what());
 		cout << e.m_stack_trace << endl;
-		vm->m_stack->dump();
-		vm->m_local->dump();
+		//vm->m_stack->dump();
+		//vm->m_local->dump();
 
 		exit(-1);
 	}

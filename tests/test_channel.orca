@@ -1,0 +1,72 @@
+
+def '<-' := nil;
+def '->' := nil;
+
+def worked := false;
+
+def channel_in(msg)
+{
+	..worked = true;
+	print(msg);
+}
+
+def channel_out(num)
+{
+	..worked = true;
+
+	ret = (,);
+	a = 0;
+	
+	num times do {
+		ret.push_back(a);
+		a += 1;
+	}
+
+	return ret;
+}
+
+
+my.worked = false;
+my <- 'test';
+if .worked == true {
+	throw test.channel <- 'chanel failed';
+}
+
+my.worked = false;
+my.'<-' = my.channel_in;
+print: my.'<-';
+my <- 'test channel in worked';
+if .worked == false {
+	throw test.channel <- 'chanel failed';
+}
+
+my.worked = false;
+my -> a;
+if .worked == true {
+	throw test.channel <- 'chanel failed';
+}
+
+my.worked = false;
+my.'->' = my.channel_out;
+my -> a;
+print: 'channel out: ', a;
+if .worked == false {
+	throw test.channel <- 'chanel failed';
+}
+
+
+my.worked = false;
+my.'->' = my.channel_out;
+my -> a, b, c;
+print: 'channel out: ', a, b, c;
+if .worked == false {
+	throw test.channel <- 'chanel failed';
+}
+
+print: 'OK';
+
+
+
+
+
+
