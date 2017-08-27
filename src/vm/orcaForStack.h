@@ -37,10 +37,6 @@ public:
 		vector<orcaData>::iterator vi;
 		vector<orcaData>* vp;
 
-		// for map type
-		orcaMapIter mi;
-		orcaMap* mp;
-		
 		// for iterator type
 		orcaData next; 
 

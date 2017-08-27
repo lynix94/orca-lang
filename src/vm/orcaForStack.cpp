@@ -54,19 +54,6 @@ bool orcaForStack::push(const char* code, int lv, orcaObject* obj,
 		out = *f.vi;
 		return true;
 	}
-	else if (orcaMap* mp = dynamic_cast<orcaMap*>(obj)) {
-		f.mp = mp;
-		f.mi = f.mp->begin();
-
-		if (f.mi == f.mp->end()) {
-			return false;
-		}
-
-		m_stack.push_back(f);
-
-		out = *f.mi;
-		return true;
-	}
 	else {
 		orcaVM* vm = get_current_vm();
 
@@ -201,16 +188,6 @@ const char* orcaForStack::cont(int* lv, orcaData* data)
 		}
 		else {
 			*data  = *f->vi;
-		}
-	}
-	else if (f->mp != NULL) {
-		f->mi++;
-
-		if (f->mi == f->mp->end()) {
-			return 0;
-		}
-		else {
-			*data  = *f->mi;
 		}
 	}
 	else {
