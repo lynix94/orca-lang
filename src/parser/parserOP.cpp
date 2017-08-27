@@ -77,7 +77,7 @@ void parserOP::disable_fast_pop()
 
 void parserOP::fast_pop_stack()
 {
-	if (false && m_last_idx > 0 && g_ctl->is_once() == false) {
+	if (false && m_last_idx > 0) {
 		char op = code_top->get_char(m_last_idx);
 		code_top->set_char(op+1, m_last_idx);
 	}
@@ -156,12 +156,6 @@ void parserOP::neq()
 void parserOP::clone(int argc)		
 {
 	code_top->push_char(OP_CLONE);
-	code_top->push_char(argc);
-}
-
-void parserOP::new_(int argc)		
-{
-	code_top->push_char(OP_NEW);
 	code_top->push_char(argc);
 }
 

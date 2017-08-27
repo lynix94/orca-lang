@@ -599,42 +599,6 @@ void parserControl::parallel_for_end()
 	m_ctl.pop_back();
 }
 
-bool parserControl::is_once()
-{
-	return m_in_once;
-}
-
-void parserControl::once_start()
-{
-	if (is_once()) {
-		yyerror("once block should not be nested");
-	}
-
-	context ctx;
-
-	code_top->push_char(OP_ONCE);
-	code_top->push_int(m_once_id);
-	ctx.pass2 = code_top->size();
-	m_ctl.push_back(ctx);
-	code_top->increase(sizeof(int));
-
-	m_in_once = true;
-}
- 
-void parserControl::once_end()
-{
-	code_top->pop_back(); // pop pop_stack
-	code_top->push_char(OP_ONCE_END);
-	code_top->push_int(m_once_id++);
-
-	context& ctx = m_ctl[m_ctl.size()-1];
-	int pos_pass2 = ctx.pass2;
-	m_ctl.pop_back();
-	code_top->set_int(code_top->size(), pos_pass2);
-
-	m_in_once = false;
-}
-
 
 void parserControl::channel_in_start()
 {

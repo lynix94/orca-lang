@@ -111,7 +111,6 @@ using namespace std;
 %token STATIC 
 %token DEF 
 %token CLONE 
-%token NEW 
 %token MY
 %token OWNER
 %token CALLER
@@ -161,7 +160,6 @@ using namespace std;
 %token LEFT_ARROW
 %token PARALLEL
 %token ASSIGNMENT
-%token ONCE 
 %token EVAL
 %token LAMBDA
 %token UNDER
@@ -984,18 +982,6 @@ define_decode_stmt:/*{{{*/
 	;
 /*}}}*/
 
-once_expr:/*{{{*/
-	ONCE
-		{
-			g_ctl->once_start();
-		}
-	open_statement_block
-		{
-			g_ctl->once_end();
-		}
-	;
-/*}}}*/
-
 lambda_object:/*{{{*/
 	lambda_define_header statement_block
 		{
@@ -1352,7 +1338,6 @@ expression_list:/*{{{*/
 
 expression:/*{{{*/
 	  assign_expr
-	| once_expr
 	;
 /*}}}*/
 

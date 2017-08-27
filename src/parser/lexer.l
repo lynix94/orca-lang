@@ -68,7 +68,6 @@ lf					\n
 static				{ return STATIC; }
 def					{ return DEF; }
 clone				{ return CLONE; }
-new					{ return NEW; }
 
 my					{ return MY; }
 owner				{ return OWNER; }
@@ -389,8 +388,6 @@ b\"					{
 						
 						return '}';
 					}
-
-"%1{"				{ return ONCE; }
 
 .					{ g_shell_start = false; return yytext[0]; }
 

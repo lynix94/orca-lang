@@ -17,7 +17,7 @@
 class parserControl 
 {
 public:
-	parserControl() : m_once_id(0), m_in_once(false) { }
+	parserControl() {}
 
 	// ABOUT control
 	void if_start(bool flag=true);
@@ -68,10 +68,6 @@ public:
 	void parallel_for_start(const char* name);
 	void parallel_for_end();
 
-	bool is_once();
-	void once_start();
-	void once_end();
-
 	void channel_in_start();
 	void channel_in_end(int num);
 	void channel_out_start();
@@ -90,9 +86,6 @@ private:
 	};
 
 	vector<context> m_ctl;
-
-	int m_once_id;
-	bool m_in_once;
 };
 
 extern parserControl* g_ctl;

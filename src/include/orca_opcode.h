@@ -48,7 +48,7 @@
 #define OP_LE						0x25
 #define OP_EQ						0x26
 #define OP_NEQ						0x27
-#define OP_JMP						0x2B
+#define OP_JMP						0x28
 
 #define OP_PUSH_LVAR				0x30
 #define OP_PUSH_MVAR				0x31
@@ -60,46 +60,44 @@
 #define OP_PUSH_CALLER				0x37
 #define OP_PUSH_ROOT				0x38
 #define OP_PUSH_MODULE				0x39
-#define OP_FIND_MEMBER				0x3A
-#define OP_FIND_RESERVED			0x3B
-#define OP_PUSH_PARENT				0x3C
-#define OP_PUSH_MY					0x3D
-#define OP_PUSH_BOOLEAN				0x3E
-#define OP_PUSH_REAL				0x3F
-#define OP_PUSH_BIGNUM				0x40
-#define OP_PUSH_LONG_STR			0x41
-#define OP_PUSH_NIL					0x42
+#define OP_PUSH_PARENT				0x3A
+#define OP_PUSH_MY					0x3B
+#define OP_PUSH_BOOLEAN				0x3C
+#define OP_PUSH_REAL				0x3D
+#define OP_PUSH_BIGNUM				0x3E
+#define OP_PUSH_LONG_STR			0x3F
+#define OP_PUSH_NIL					0x40
+#define OP_FIND_MEMBER				0x41
+#define OP_FIND_RESERVED			0x42
 #define OP_FIND_MEMBER_LAST			0x43
 
-#define OP_MAKE_LIST				0x50
-#define OP_MAKE_TUPLE				0x51
-#define OP_CLONE					0x52
-#define OP_LIST_AT					0x53
-#define OP_LIST_AT_IR				0x54
+#define OP_CLONE					0x50
+#define OP_LIST_AT					0x51
+#define OP_LIST_AT_IR				0x52
+#define OP_MAKE_LIST				0x53
+#define OP_MAKE_TUPLE				0x54
 #define OP_MAKE_PAIR				0x55
 #define OP_MAKE_REGEX				0x56
 #define OP_MAKE_MAP					0x57
 #define OP_MAKE_LONG_LIST			0x58
 #define OP_MAKE_LONG_TUPLE			0x59
 #define OP_MAKE_LONG_MAP			0x5A
-#define OP_NEW						0x5B
+
 
 #define OP_RETURN					0x60
 #define OP_RETURN_NIL				0x61
 #define OP_FOR						0x62
-#define OP_FOR_END					0x63
-#define OP_FOR_POP					0x64
-#define OP_THROW					0x65
-#define OP_THROW_WITH_ARG			0x66
-#define OP_MARK_TRY					0x67
-#define OP_DONE_TRY					0x68
+#define OP_FOR_2					0x63
+#define OP_FOR_END					0x64
+#define OP_FOR_POP					0x65
+#define OP_FOR_SUB					0x66
+#define OP_MARK_STACK				0x67
+#define OP_MARK_STACK_POP			0x68
 #define OP_SCOPE_START				0x69
 #define OP_SCOPE_END				0x6A
 #define OP_PARALLEL_START			0x6B
 #define OP_PARALLEL_END				0x6C
 #define OP_PARALLEL_FOR				0x6D
-#define OP_MARK_STACK				0x6E
-#define OP_MARK_STACK_POP			0x6F
 
 #define OP_DECODE					0x70
 #define OP_DECODE_END				0x71
@@ -113,9 +111,6 @@
 #define OP_DECODE_CHECK_REMAIN		0x79
 #define OP_PARSE_INIT				0x7A
 #define OP_PARSE					0x7B
-#define OP_ONCE						0x7C
-#define OP_ONCE_END					0x7D
-#define OP_FOR_SUB					0x7E
 
 #define OP_SBF						0x80
 #define OP_SBF_LIST					0x81
@@ -126,6 +121,10 @@
 
 #define OP_RC_INC					0x90
 #define OP_RC_DEC					0x91
+#define OP_THROW					0x92
+#define OP_THROW_WITH_ARG			0x93
+#define OP_MARK_TRY					0x94
+#define OP_DONE_TRY					0x95
 
 #define OP_DUMP_STACK				0xF0
 #define OP_DUMP_LOCAL				0xF1

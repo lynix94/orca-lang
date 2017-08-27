@@ -2000,7 +2000,6 @@ do_assign_list:
 				break;
 			}
 
-			case OP_NEW: 
 			case OP_CLONE: {	
 				PRINT2("\t\t%p : clone, %d\n", c, c[1]); 
 				orcaObject* owner = NULL;
@@ -2717,32 +2716,6 @@ do_assign_list:
 				PRINT1("\t\t%p : rc dec\n", c);
 				m_stack->top().rc_dec();
 				break;
-
-			case OP_ONCE: {
-				PRINT2("\t\t%p : once start (id: %d)\n", c, TO_INT(&c[1]));
-				int id = TO_INT(&c[1]);
-				int addr = TO_INT(&c[1 + sizeof(int)]);
-				// check
-				if (m_once->find(m_module, id, d)) {
-					m_stack->push(d);
-					c = code + addr;
-					goto fast_jmp;
-				}
-
-				c += 1 + sizeof(int) + sizeof(int);
-				goto fast_jmp;
-				break;
-			  }
-
-			case OP_ONCE_END: {
-				PRINT2("\t\t%p : once end (id: %d)\n", c, TO_INT(&c[1]));
-				int id = TO_INT(&c[1]);
-				m_once->add(m_module, id, m_stack->top());
-
-				c += 1 + sizeof(int);
-				goto fast_jmp;
-				break;
-			  }
 
 			case OP_CHANNEL_IN:
 				PRINT2("\t\t%p : channel in check (jump to: %x)\n", c, TO_INT(&c[1]));
