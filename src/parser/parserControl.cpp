@@ -190,6 +190,23 @@ void parserControl::for_start(const char* name)
 	code_top->increase(sizeof(int));
 }
 
+void parserControl::for_start_2(const char* name1, const char* name2) 
+{
+	int idx1 = code_top->find_lvar(name1);
+	int idx2 = code_top->find_lvar(name2);
+	code_top->push_char(OP_FOR_2);
+	code_top->push_short(idx1);
+	code_top->push_short(idx2);
+	
+	context ctx;
+	ctx.start = code_top->size();
+	ctx.start *= -1; // mark for for_stmt
+	ctx.list_break.push_back(code_top->size());
+	m_ctl.push_back(ctx);
+
+	code_top->increase(sizeof(int));
+}
+
 void parserControl::for_start_sub(const char* name) 
 {
 	int idx = code_top->find_lvar(name);

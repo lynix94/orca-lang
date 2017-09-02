@@ -1313,6 +1313,14 @@ for_stmt:/*{{{*/
 		{
 			g_ctl->for_end();
 		}
+	| FOR lvar ',' lvar IN object 
+		{
+			g_ctl->for_start_2($2, $4);
+		}
+	statement_block
+		{
+			g_ctl->for_end();
+		}
 	;
 	/*}}}*/
 

@@ -36,6 +36,7 @@ public:
 	void while_end();
 
 	void for_start(const char* name);
+	void for_start_2(const char* key, const char* name);
 	void for_start_sub(const char* name); // for sub for of para for
 	void for_end();
 

@@ -198,5 +198,110 @@ if a != 9 {
 
 
 
+l = type.list(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+t = type.tuple(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+m = type.map(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+print: 'list for test';
+sum = 0;
+for a in l {
+	sum += a;
+	print: a;
+}
+if sum != 55 {
+	throw test.control <- 'list for fail';
+}
+
+print: 'tuple for test';
+sum = 0;
+for a in t {
+	sum += a;
+	print: a;
+}
+if sum != 55 {
+	throw test.control <- 'tuple for fail';
+}
+
+print: 'map for test';
+sum = 0;
+for k in m {
+	sum += k;
+	print: k;
+}
+if sum != 1+3+5+7+9 {
+	throw test.control <- 'map for fail';
+}
+
+print: 'list_iter for test';
+sum = 0;
+for a in l.begin() {
+	sum += a();
+	print: a();
+}
+if sum != 55 {
+	throw test.control <- 'list_iter for fail';
+}
+
+print: 'tuple_iter for test';
+sum = 0;
+for a in t.begin() {
+	sum += a();
+	print: a();
+}
+if sum != 55 {
+	throw test.control <- 'tuple_iter for fail';
+}
+
+print: 'map_iter for test';
+sum1 = 0;
+sum2 = 0;
+for a in m.begin() {
+	sum1 += a()[0];
+	sum2 += a()[1];
+	print: a();
+}
+if sum1 != 1+3+5+7+9 || sum2 != 2+4+6+8+10 {
+	throw test.control <- 'map_iter for fail';
+}
+
+print: 'list for2 test';
+sum1 = 0;
+sum2 = 0;
+for k, v in l {
+	sum1 += k;
+	sum2 += v;
+	print: k, v;
+}
+if sum1 != 0+1+2+3+4+5+6+7+8+9 || sum2 != 55 {
+	throw test.control <- 'map_iter for fail';
+}
+
+print: 'tuple for2 test';
+sum1 = 0;
+sum2 = 0;
+for k, v in t {
+	sum1 += k;
+	sum2 += v;
+	print: k, v;
+}
+if sum1 != 0+1+2+3+4+5+6+7+8+9 || sum2 != 55 {
+	throw test.control <- 'map_iter for fail';
+}
+
+print: 'map for2 test';
+sum1 = 0;
+sum2 = 0;
+for k, v in m {
+	sum1 += k;
+	sum2 += v;
+	print: k, v;
+}
+if sum1 != 1+3+5+7+9 || sum2 != 2+4+6+8+10 {
+	throw test.control <- 'map_iter for fail';
+}
+
+
+
+
 
 

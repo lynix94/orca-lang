@@ -2172,6 +2172,36 @@ do_assign_list:
 				break;
 			}
 
+			case OP_FOR_2: {
+				orcaData out1, out2;
+				PRINT4("\t\t%p : for (%d), %d, %d\n", c, TO_SHORT(&c[1]), TO_SHORT(&c[1 + sizeof(short)]), TO_INT(&c[1 + sizeof(short) + sizeof(short)]));
+				int lv1 = TO_SHORT(&c[1]);
+				int lv2 = TO_SHORT(&c[1 + sizeof(short)]);
+				int addr = TO_INT(&c[1 + sizeof(short) + sizeof(short)]);
+
+				p1 = m_stack->pop();
+				if (!is<TYPE_OBJ>(p1)) {
+					throw orcaException(this, "orca.type", 
+						string("abnormal type at for statement loop factor : ") + 
+						p1.dump_str());
+				}
+
+				if (m_for_stack->push_2(c + sizeof(short) + sizeof(short) + sizeof(int), lv1, lv2, p1.o(), out1, out2, m_curr) == false) {
+					
+					c = code + addr;
+					goto fast_jmp;
+				}
+
+				m_local->set(lv1, out1);
+				m_local->set(lv2, out2);
+				p2.mark_for();
+				m_local->push_back(p2);
+
+				c += sizeof(short) + sizeof(int) + FJ_INC;
+				goto fast_jmp;
+				break;
+			}
+
 			case OP_FOR_SUB: {
 				PRINT3("\t\t%p : for sub (%d), %d\n", c, TO_SHORT(&c[1]), TO_INT(&c[1 + sizeof(short)]));
 				int lv = TO_SHORT(&c[1]);
@@ -2203,10 +2233,15 @@ do_assign_list:
 
 			case OP_FOR_END: {		
 				PRINT1("\t\t%p : for end\n", c); 
-				int lv;
-				const char* cont = m_for_stack->cont(&lv, &d);
+				int lv1;
+				int lv2;
+				
+				const char* cont = m_for_stack->cont(&lv1, &p1, &lv2, &p2);
 				if (cont > 0) { // continue
-					m_local->set(lv, d);
+					m_local->set(lv1, p1);
+					if (lv2 > 0) {
+						m_local->set(lv2, p2);
+					}
 					c = cont;
 				}
 				else {			// end
