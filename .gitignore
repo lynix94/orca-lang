@@ -9,6 +9,21 @@ parser.output
 lexer.cpp
 *.lcf
 *.once
+config.*
+configure
+depcomp
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+libtool
+ltmain.sh
+missing
+core
+compile
+stamp-h1
+
+
 
 
 

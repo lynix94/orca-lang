@@ -51,6 +51,7 @@ test_modules = [
   'test_xml',
   'test_json',
   'test_gnuplot',
+  'test_log',
 
 
 #### not be made yet
