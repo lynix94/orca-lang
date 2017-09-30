@@ -1,0 +1,64 @@
+def name := 'log';
+def flag := {,};
+def '<-' := my.print_log;
+def header_format;
+
+def print_flag(header)
+{
+	if header == nil {
+		header = ..name;
+	}
+
+	print: '[%s - %s]' % (header, ..'<-');
+
+	for k in ..flag.begin() {
+		item = nil;
+		if ..flag.has_key(k.first()) {
+			item = k.second();
+		}
+
+		if item {
+			item.print_flag(header + '.' + k.first());
+		}
+	}
+}
+
+def init(name)
+{
+	..name = name;
+}
+
+def '.attr'(name)
+{
+	if ..flag.has_key(name) == false {
+		nlog = owner.clone(name);
+		nlog.flag = {,};
+		..flag[name] = nlog;
+	}
+
+	return ..flag[name];
+}
+
+def print_log(msg)
+{
+	print(msg);
+}
+
+def set_header(format)
+{
+	..header_format = format;
+}
+
+
+if argv != nil && argv.size() > 0 {
+	if argv[0] == true {
+		my.'<-' = my.print_log;
+	}
+	else {
+		my.'<-' = nil;
+	}
+
+	return my;
+}
+
+
