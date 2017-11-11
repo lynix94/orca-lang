@@ -55,8 +55,9 @@
 <h2> Session & Cookie variables </h2>
 <%
 	session = my.get_session(true);
-	if !session.has_key('count'):
+	if !session.has_key('count') {
 		session['count'] = 0;
+	}
 
 	session['count'] += 1;
 

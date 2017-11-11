@@ -18,6 +18,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #endif
 
 
@@ -49,6 +50,20 @@ public:
 		insert_native_function("set", (object_fp)&orcaSocket::ex_set);
 		insert_native_function("get", (object_fp)&orcaSocket::ex_get);
 		insert_native_function("gethostbyname", (object_fp)&orcaSocket::ex_gethostbyname);
+		insert_native_function("setsockopt", (object_fp)&orcaSocket::ex_setsockopt);
+		insert_native_function("getsockopt", (object_fp)&orcaSocket::ex_getsockopt);
+
+		insert_static("SOL_SOCKET", SOL_SOCKET);
+		insert_static("IPPROTO_TCP", IPPROTO_TCP);
+		insert_static("SO_BROADCAST", SO_BROADCAST);
+		insert_static("SO_DEBUG", SO_DEBUG);
+		insert_static("SO_DONTROUTE", SO_DONTROUTE);
+		insert_static("SO_OOBINLINE", SO_OOBINLINE);
+		insert_static("SO_KEEPALIVE", SO_KEEPALIVE);
+		insert_static("SO_RCVBUF", SO_RCVBUF);
+		insert_static("SO_REUSEADDR", SO_REUSEADDR);
+		insert_static("SO_SNDBUF", SO_SNDBUF);
+		insert_static("TCP_NODELAY", TCP_NODELAY);
 	}
 
 	orcaData ex_create(orcaVM* vm, int n) {/*{{{*/
@@ -57,7 +72,8 @@ public:
 		return so;
 	}
 /*}}}*/
-	
+
+
 	orcaData ex_send(orcaVM* vm, int n) {/*{{{*/
 		if (n < 1) vm->need_param();
 
@@ -305,6 +321,30 @@ public:
 		}
 
 		return lp;
+	}
+/*}}}*/
+
+	orcaData ex_setsockopt(orcaVM* vm, int n) {/*{{{*/
+		if (n < 3) vm->need_param();
+
+		int p1 = vm->get_param(0).Integer();
+		int p2 = vm->get_param(1).Integer();
+		int p3 = vm->get_param(2).Integer();
+
+		return setsockopt(m_handle, p1, p2, &p3, sizeof(int));
+	}
+/*}}}*/
+
+	orcaData ex_getsockopt(orcaVM* vm, int n) {/*{{{*/
+		if (n < 1) vm->need_param();
+
+		int p1 = vm->get_param(0).Integer();
+		int p2 = vm->get_param(1).Integer();
+
+		int out;
+		int len = sizeof(int);
+		getsockopt(m_handle, p1, p2, &out, (socklen_t*)&len);
+		return out;
 	}
 /*}}}*/
 
