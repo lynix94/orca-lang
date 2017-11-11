@@ -73,8 +73,6 @@ Content-Type: text/html; charset=UTF-8
 
 	def send_response(header, msg)
 	{
-		print('>>>>', header);
-		print('>>>>', msg);
 		res = '''HTTP/1.1 200 OK
 Server: Orca/0.4 (Unix)  (Red-Hat/Linux)
 Accept-Ranges: bytes
@@ -86,8 +84,6 @@ ${header}
 ''';
 		..send(res);
 		..send(msg);
-
-		print: 'send done';
 	}
 
 	def recv()
@@ -263,11 +259,9 @@ ${header}
 
 			orca.load(uri[:-5], httpd);
 
-			print: '##################';
 			f = httpd.MEMBERS[mod_name];
 			print: 'call f: ', f;
 			ret = f(p);
-			print: 'ret: ', ret, ret.TYPE;
 
 			if ret.TYPE == [].TYPE {
 				header = ret[0];
@@ -276,16 +270,17 @@ ${header}
 			elif ret.TYPE == ''.TYPE {
 				body = ret;
 			}
-
-			print: '>>>>>>>>>>>>';
-			print: header;
-			print: body;
 		}
 		elif uri.ends_with('.osp') {
 			ret = osp(uri, p);
 			print: 'osp ret: ', ret;
-			header = ret[0];
-			body = ret[1];
+			if ret.TYPE == [].TYPE {
+				header = ret[0];
+				body = ret[1];
+			}
+			elif ret.TYPE == ''.TYPE {
+				body = ret;
+			}
 		}
 		else {
 			try {
@@ -297,10 +292,6 @@ ${header}
 			}
 		}
 
-		print: '??????????????';
-		print: my;
-		print: owner;
-		print: owner.MEMBERS;
 		..send_response(header, body);
 	}
 }

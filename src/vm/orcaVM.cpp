@@ -2970,8 +2970,10 @@ bool orcaVM::load_orca_helper(const string& input_name, const string& mod_name,/
 	fclose(fp_kw);
 
 	// and recursively define
+	orcaObject* old_curr = m_curr;
 	orcaObject* op = exec_define(define, header.def_size, code, owner, last_write_time);
 	m_once->reg(op, once_name);
+	m_curr = old_curr;
 
 	// read once if possible
 	portFile f_once;

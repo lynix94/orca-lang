@@ -10,16 +10,16 @@ using httpd;
 def result;
 
 
-
 mod_name = argv[0].replace('/', '_');
 mod_name = mod_name.replace('.', '_');
+
 
 if fs.isexists(mod_name) {
 	mod_time = os.last_write_time(mod_name);
 	src_time = os.last_write_time(argv[0]);
 
 	if mod_time >= src_time {
-		if httpd.MEMBERS[mod_name] {
+		if httpd.MEMBERS.has_key(mod_name) {
 			return httpd.MEMBERS[mod_name](argv[1]);
 		}
 	}
@@ -102,7 +102,7 @@ do {
 	start = idx+2;
 } while true;
 
-.result += 'return (header, body);\n';
+.result += 'return [header, body];\n';
 
 fs.remove(mod_name);
 fs.write(mod_name, .result);
