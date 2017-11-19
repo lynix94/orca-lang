@@ -87,7 +87,8 @@ void parserCode::Final(string name) /*{{{*/
 }
 /*}}}*/
 
-parserCode::parserCode(const char* module_name, vector<const char*>* param, int flag_define, vector<const char*>* supers, const char* under_path) /*{{{*/
+parserCode::parserCode(const char* module_name, vector<const char*>* param, /*{{{*/
+				int flag_define, vector<const char*>* supers, const char* under_path )
 {
 	m_name = module_name;
 
@@ -148,6 +149,48 @@ parserCode::parserCode(const char* module_name, vector<const char*>* param, int 
 	m_space["os"] = "os";
 	m_space["type"] = "type";
 	m_space["sort"] = "sort";
+}
+/*}}}*/
+
+parserCode::parserCode(const char* ctx_type, const char* ctx_code, /*{{{*/
+				const char* module_name, int flag_define, const char* under_path )
+{
+	m_name = module_name;
+
+	// write object name
+	if (under_path) {
+		m_def.push_back(OP_CONTEXT_UNDER_START);
+		m_flag_under = true;
+	}
+	else {
+		m_def.push_back(OP_CONTEXT_START);
+		m_flag_under = false;
+	}
+
+	m_def.push_back(flag_define);
+
+	int len = strlen(ctx_type) + 1;
+	if (len > 255) len = 255;
+	m_def.push_back(len);
+	copy(ctx_type, ctx_type+len, back_inserter(m_def));
+
+	len = strlen(module_name) + 1;
+	if (len > 255) len = 255;
+	m_def.push_back(len);
+	copy(module_name, module_name+len, back_inserter(m_def));
+
+	len = strlen(ctx_code)+1;
+	char* cp = i2l(len);
+	copy(cp, cp+sizeof(int), back_inserter(m_def));
+	copy(ctx_code, ctx_code + len, back_inserter(m_def));
+
+	if (under_path) {
+		m_def.push_back(strlen(under_path) + 1);
+		copy(under_path, under_path + strlen(under_path), back_inserter(m_def));
+		m_def.push_back(0);
+	}
+
+	m_ctx_code = ctx_code;
 }
 /*}}}*/
 
@@ -245,11 +288,21 @@ parserCode::~parserCode() /*{{{*/
 	pop_and_process_code(g_parser->is_interactive() || g_parser->is_eval());
 	pop_and_process_init(g_parser->is_interactive() || g_parser->is_eval());
 
-	if (m_flag_under) {
-		m_def.push_back(OP_DEF_UNDER_END);
+	if (m_ctx_code == "") {
+		if (m_flag_under) {
+			m_def.push_back(OP_DEF_UNDER_END);
+		}
+		else {
+			m_def.push_back(OP_DEF_END);
+		}
 	}
 	else {
-		m_def.push_back(OP_DEF_END);
+		if (m_flag_under) {
+			m_def.push_back(OP_CONTEXT_UNDER_END);
+		}
+		else {
+			m_def.push_back(OP_CONTEXT_END);
+		}
 	}
 }
 /*}}}*/
@@ -496,6 +549,13 @@ void parserCode::reinit_code_stack_for_interpreter()/*{{{*/
 void parserCode::push_code_stack(const char* name, vector<const char*>* param, int flag_define, vector<const char*>* super_class, const char* under_path)/*{{{*/
 {
 	parserCode* c = new parserCode(name, param, flag_define, super_class, under_path);
+	parserCode::m_codeStack.push_back(c);
+}
+/*}}}*/
+
+void parserCode::push_context_stack(const char* type, const char* code, const char* name, int flag_define, const char* under_path)/*{{{*/
+{
+	parserCode* c = new parserCode(type, code, name, flag_define, under_path);
 	parserCode::m_codeStack.push_back(c);
 }
 /*}}}*/

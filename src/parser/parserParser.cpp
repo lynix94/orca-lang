@@ -13,6 +13,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h> // tolower
+#include <fstream>
+#include <streambuf>
+
+
 
 #include "parserParser.h"
 #include "parserCode.h"
@@ -69,6 +73,84 @@ void hex_dump(unsigned char* data, int len)/*{{{*/
 }
 /*}}}*/
 
+bool parser_starts_with(const char* line, const char* word)/*{{{*/
+{
+	bool ret = false;
+	for(int i=0; i<strlen(line); i++) {
+		char c = line[i];
+
+		if (strncmp(&line[i], word, strlen(word)) == 0) {
+			ret = true;
+			break;
+		}
+
+		if (c != ' ' && c != '\t' && 
+		    c != '\n' && c != '\r') 
+		{
+			break;
+		}
+	}
+
+	return ret;
+}
+/*}}}*/
+
+static int count_in(const char* line, const char* word)/*{{{*/
+{
+	int ret = 0;
+	int len = strlen(line);
+	for (int i=0; i<len; i++) {
+		if (strncmp(line + i, word, strlen(word)) == 0) {
+			if (i > 1 && line[i-1] == '\\') {
+				continue;
+			}
+
+			ret++;
+			i += strlen(word) - 1;
+			continue;
+		}
+	}
+
+	return ret;
+}
+/*}}}*/
+
+void parser_split_ctx_def(const string& src, string& ctx, string& def)/*{{{*/
+{
+	istringstream f(src);
+	string line;	
+
+	int open = 0;
+	int close = 0;
+	while (getline(f, line)) {
+		if (parser_starts_with(line.c_str(), "def")) {
+			open = close = 0;
+
+			while (true) {
+				def += line + "\n";
+				ctx += "\n";
+
+				open += count_in(line.c_str(), "{");
+				close += count_in(line.c_str(), "}");
+
+				if (open > 0 && open == close) {
+					break;
+				}
+
+				getline(f, line);
+			}
+		}
+		else {
+			ctx += line + "\n";
+			def += "\n";
+		}
+	}
+}
+/*}}}*/
+
+
+
+
 parserParser::parserParser()/*{{{*/
 {
 	curr_fp = NULL;
@@ -97,7 +179,6 @@ void parserParser::cleanup()/*{{{*/
 }
 /*}}}*/
 
-
 bool parserParser::parse(const string& filename)/*{{{*/
 {
 	// open
@@ -117,7 +198,7 @@ bool parserParser::parse(const string& filename)/*{{{*/
 
 	this->module_name = module_name;
 
-	parserCode::push_code_stack((char*)module_name.c_str(), NULL, false);
+	parserCode::push_code_stack((char*)module_name.c_str(), NULL);
 	code_top->find_lvar((char*)"argv");
 	code_top->set_argv_on();	// enable argv 
 
@@ -143,6 +224,50 @@ bool parserParser::parse(const string& filename)/*{{{*/
 
 /*}}}*/
 
+bool parserParser::parse_context_file(const string& filename, const string& mod_name, const string& sub_postfix)/*{{{*/
+{
+	this->filename = filename;
+
+	// open
+	ifstream fs(filename.c_str());
+	string source((istreambuf_iterator<char>(fs)), istreambuf_iterator<char>());
+
+	string code;
+	string def;
+	parser_split_ctx_def(source, code, def);
+
+	// init
+	parserCode::init();
+	this->module_name = mod_name;
+
+	// TODO: context to stack
+	parserCode::push_context_stack((char*)sub_postfix.c_str(), (char*)code.c_str(), (char*)mod_name.c_str());
+
+	// parse
+	init();
+	curr_fp = fmemopen((void*)def.c_str(), def.size(), "r");
+	lineno = 1;
+	if (yyparse() != 0) {
+		return false;
+	}
+
+	// make binary
+	parserCode::pop_code_stack();
+	parserCode::Final(mod_name.c_str());
+
+#ifdef _VM_DEBUG
+	parserCode::dump_final();
+#endif
+
+	// clean up
+	fclose(curr_fp);
+	free_all();
+
+	return true;
+}
+
+/*}}}*/
+
 
 
 extern orcaData g_last_pop_stack;
@@ -156,7 +281,7 @@ orcaData parserParser::eval(orcaVM* vm, const string& src)/*{{{*/
 
 	// init
 	parserCode::init();
-	parserCode::push_code_stack((char*)"eval", NULL, false);
+	parserCode::push_code_stack((char*)"eval", NULL);
 	code_top->init_current();  
 
 	// parse
@@ -194,7 +319,7 @@ bool parserParser::interpret(orcaVM* vm)/*{{{*/
 
 	// init
 	parserCode::init();
-	parserCode::push_code_stack((char*)"stdin.orca", NULL, false);
+	parserCode::push_code_stack((char*)"stdin.orca", NULL);
 	code_top->init_current();  
 
 	// parse
@@ -251,6 +376,7 @@ void parserParser::set_eval(bool flag)/*{{{*/
 	flag_eval = flag;
 }
 /*}}}*/
+
 bool parserParser::is_eval()/*{{{*/
 {
 	return flag_eval;

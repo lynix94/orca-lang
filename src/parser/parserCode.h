@@ -26,9 +26,11 @@ using namespace std;
 class parserCode 
 {
 public:
-	parserCode(const char* s, vector<const char*>* param, int flag = 0, vector<const char*>* supers = NULL, const char* under_path = NULL);
+	parserCode(const char* s, vector<const char*>* param, int flag = 0,
+			vector<const char*>* supers = NULL, const char* under_path = NULL);
+	parserCode(const char* type, const char* code, const char* s, int flag = 0,
+			const char* under_path = NULL);
 	~parserCode();
-	void pop_code();
 
 	static void init();
 
@@ -36,7 +38,8 @@ public:
 	char* find_in_space(const char* s);
 
 	void reg_object(const char* s, int flag = 0);
-	void do_context(const char* mod, const char* name, const char* code, const char* under_path = NULL, int flag = 0);
+	void do_context(const char* mod, const char* name, const char* code,
+				const char* under_path = NULL, int flag = 0);
 	void do_context_end(const char* under_path = NULL);
 
 	void init_object_start(const char* s);
@@ -65,7 +68,12 @@ public:
 	int size();
 	void pop_back();
 
-	static void push_code_stack(const char* name, vector<const char*>* param, int flag = 0, vector<const char*>* super_class = NULL, const char* under_path = NULL);
+	static void push_code_stack(const char* name, vector<const char*>* param,
+							int flag = 0, vector<const char*>* super_class = NULL,
+							const char* under_path = NULL);
+
+	static void push_context_stack(const char* type, const char* code, const char* name,
+							int flag = 0, const char* under_path = NULL);
 
 	// just case for exception in interpreter
 	static void reinit_code_stack_for_interpreter();
@@ -110,6 +118,8 @@ public:
 	static vector<int> m_debugFinal;
 	map<int, int> m_debug;
 	static int m_debug_lineno;
+
+	string m_ctx_code;
 };
 
 

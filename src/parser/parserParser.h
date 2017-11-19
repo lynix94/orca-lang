@@ -72,6 +72,9 @@ class orcaVM;
 void print(const char* fmt, ...);
 void hex_dump(unsigned char* data, int len);
 
+void parser_split_ctx_def(const string& src, string& ctx, string& def);
+bool parser_starts_with(const char* line, const char* word);
+
 
 class parserParser
 {
@@ -82,6 +85,7 @@ public:
 	void cleanup();
 
 	bool parse(const string& filename);
+	bool parse_context_file(const string& filename, const string& mod_name, const string& sub_postfix);
 	bool interpret(orcaVM* vm);
 	orcaData eval(orcaVM* vm, const string& src);
 

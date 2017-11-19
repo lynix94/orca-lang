@@ -89,7 +89,7 @@ public:
 	bool load_orca_helper(const string& input_name, const string& mod_name,
 						const string& candidate_name, const string& kw_name, orcaObject* owner);
 	bool load_context_helper(const string& mod_name, const string& candidate_name,
-					const string& sub_prefix, orcaObject* owner);
+							const string& sub_postfix, const string& kw_name, orcaObject* owner);
 	void reserve_local(); // for interactive
 	void parallel_do(const char* code, const char* offset, 
 					 int* run_count = NULL, orcaObject* op = NULL, int per = 0,

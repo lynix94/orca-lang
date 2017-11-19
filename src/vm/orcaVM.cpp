@@ -2859,7 +2859,12 @@ orcaData orcaVM::do_context(const char* mod, const char* name, const char* cp, t
 	push_param(cp);
 	call(3);
 
-	return m_stack->pop();
+	out = m_stack->pop();
+	if (is<TYPE_OBJ>(out) == false) {
+		throw orcaException(this, "orca.context", "context parser return invalid object");
+	}
+
+	return out;
 }
 /*}}}*/
 
@@ -2880,19 +2885,80 @@ static OrcaHeader read_header(FILE* fp_kw)/*{{{*/
 }
 /*}}}*/
 
+// TODO: merge with load_orca_helper
+// TODO: remove or refactoring once
 bool orcaVM::load_context_helper(const string& mod_name, const string& candidate_name,
-								const string& sub_prefix, orcaObject* owner)
+								const string& sub_postfix, const string& kw_name, orcaObject* owner)
 {
-	load(sub_prefix, g_root);
+	load(sub_postfix, g_root);
 
+/*
 	ifstream ifs(candidate_name.c_str());
 	string code;
 	code.assign(istreambuf_iterator<char>(ifs), istreambuf_iterator<char>());
 	time_t last_write_time = fs::last_write_time(candidate_name);
+*/
 
-	orcaData out = do_context(sub_prefix.c_str(), mod_name.c_str(), code.c_str(), last_write_time);
-	out.dump();
+	// check recompile
+	bool ret;
+	bool need_recompile = false;
+
+	FILE *fp_kw = fopen(kw_name.c_str(), "rb");
+	if (fp_kw == NULL)  {
+		need_recompile = true;
+	}
+	else {
+		if (fs::last_write_time(fs::path(candidate_name))			// check time
+			> fs::last_write_time(fs::path(kw_name)))
+		{
+			need_recompile = true;
+		}
+		else {												// check version
+			OrcaHeader header = read_header(fp_kw);
+			if (header.magic != MAGIC_NO || header.version != ORCA_VERSION) 
+				need_recompile = true;
+		}
+	}
+
+	if (need_recompile) {
+		if (fp_kw) fclose(fp_kw);
+
+		bool back = g_parser->is_interactive();
+		g_parser->set_interactive(false);
+
+		ret = g_parser->parse_context_file(candidate_name, mod_name, sub_postfix);
+		g_parser->set_interactive(back);
+
+		if (!ret) {
+			printf("compile error: %s\n", candidate_name.c_str());
+			return false;
+		}
+
+		fp_kw = fopen(kw_name.c_str(), "rb");
+	}
+
+/*
+	orcaData out = do_context(sub_postfix.c_str(), mod_name.c_str(), code.c_str(), last_write_time);
 	owner->insert_member(mod_name.c_str(), out);
+
+	return true;
+*/
+
+	time_t last_write_time = fs::last_write_time(fs::path(kw_name));
+
+	OrcaHeader header = read_header(fp_kw);
+	char* define = g_codes.new_define(header.def_size);
+	char* code = g_codes.new_code(header.code_size, mod_name);
+	ret = fread(define, 1, header.def_size, fp_kw);
+	ret = fread(code, 1, header.code_size, fp_kw);
+
+	fclose(fp_kw);
+
+	// and recursively define
+	orcaObject* old_curr = m_curr;
+	orcaObject* op = exec_define(define, header.def_size, code, owner, last_write_time);
+	//m_once->reg(op, once_name);
+	m_curr = old_curr;
 
 	return true;
 }
@@ -2998,8 +3064,8 @@ bool orcaVM::load(const string& input_name, orcaObject* owner) /*{{{*/
 
 	string base_name;   // file basename from inputname (without directory)
 	string mod_name;	// module name (not path) without suffix
-	string main_prefix; // should be orca
-	string sub_prefix;  // could be orca, html & others
+	string main_postfix; // should be orca
+	string sub_postfix;  // could be orca, html & others
 	string kw_name;	    // result module path with .kw suffix
 	string candidate_name;	// source file path (with or without suffix)
 
@@ -3011,37 +3077,31 @@ bool orcaVM::load(const string& input_name, orcaObject* owner) /*{{{*/
 		return true;
 	}
 
-	// #2. set main_prefix, sub_prefix & kw_name.
+	// #2. set main_postfix, sub_postfix & kw_name.
 	//     mod.orca.html -> mod.kw, mod.orca -> mod.kw, mod -> mod.kw
-	int last_idx = input_name.find_last_of('.');/*{{{*/
-	if (last_idx > 1) {
-		kw_name = input_name.substr(0, last_idx) + ".kw";
-	}
-	else {
-		kw_name = input_name + ".kw";
-	}
+	kw_name = mod_name + ".kw";/*{{{*/
 
 	vector<string> toks = kyString::split(base_name, ".");
 	switch (toks.size())
 	{
 	case 3:
-		main_prefix = toks[1];
-		sub_prefix = toks[2];
+		main_postfix = toks[1];
+		sub_postfix = toks[2];
 		break;
 	case 2:
-		main_prefix = toks[1];
-		sub_prefix = toks[1];
+		main_postfix = toks[1];
+		sub_postfix = toks[1];
 		break;
 	case 1:
-		main_prefix = "orca";
-		sub_prefix = "orca";
+		main_postfix = "orca";
+		sub_postfix = "orca";
 		break;
 	default:
 		printf("load failed abnormal name: %s\n", input_name.c_str());
 		return false;
 	}
 	
-	if (main_prefix != "orca") {
+	if (main_postfix != "orca") {
 		printf("load failed abnormal name: %s\n", input_name.c_str());
 		return false;
 	}
@@ -3105,11 +3165,11 @@ bool orcaVM::load(const string& input_name, orcaObject* owner) /*{{{*/
 			}
 		}/*}}}*/
 	}
-	else if (sub_prefix == "orca") {
+	else if (sub_postfix == "orca") {
 		load_orca_helper(input_name, mod_name, candidate_name, kw_name, owner);
 	}
 	else { // context load
-		load_context_helper(mod_name, candidate_name, sub_prefix, owner);
+		load_context_helper(mod_name, candidate_name, sub_postfix, kw_name, owner);
 	}
 
 	// #6. do init_once
