@@ -932,27 +932,24 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			}
 			break;
 
-		case OP_CONTEXT_START:    // this, flag, mode_len, mod, name_len, name, code_len, code
-		case OP_CONTEXT_UNDER_START: { // this, flag, mode_len, mod, name_len, name, code_len, code, under_len, under
+		case OP_DEF_CONTEXT_START:    // this, mode_len, mod, flag, name_len, name, code_len, code
+		case OP_DEF_CONTEXT_UNDER_START: { // this, mode_len, mod, flag, name_len, name, under_len, under, code_len, code
 			bool is_under = false;
 			if ((unsigned char)c[i] == OP_DEF_UNDER_START) {
 				is_under = true;
 			}
 
-			int mod_len = c[i+1+1];
-			const char* mod = &c[i+1+1+1];
+			int mod_len = c[i+1];
+			const char* mod = &c[i+1+1];
 
-			int name_len = c[i+1+1+mod_len+1];
-			const char* name = &c[i+1+1+mod_len+1+1];
-
-			int code_len  = TO_INT(&c[i+1+1+mod_len+1+name_len+1]);
-			const char* code = &c[i+1+1+mod_len+1+name_len+sizeof(int)+1];
+			int name_len = c[i+ 1+mod_len +1 +1];
+			const char* name = &c[i+ 1+mod_len +1 +1+1];
 
 			orcaObject* op = current;
 			int under_len = 0;
 			if (is_under) {
-				under_len  = c[i+1+1+mod_len+1+name_len+sizeof(int)+code_len+1];
-				const char* under = &c[i+1+1+mod_len+1+name_len+sizeof(int)+code_len+1+1];
+				under_len  = c[i+ 1+mod_len +1 +1+name_len +1];
+				const char* under = &c[i+ 1+mod_len +1 +1+name_len +1+1];
 				PRINT4("\t\t  context object: %s, %s, %s, '%s'\n", mod, name, under, code);
 
 				op = find_object_by_path(under);
@@ -961,9 +958,11 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 				PRINT3("\t\t  context object: %s, %s, '%s'\n", mod, name, code);
 			}
 
+			int code_len  = TO_INT(&c[i +1+mod_len +1 +1+name_len +1]);
+			const char* code = &c[i +1+mod_len +1 +1+name_len +sizeof(int)+1];
 			orcaData ctx = do_context(mod, name, code, last_write_time);
 
-			if (c[i+1] & BIT_DEFINE_STATIC) {
+			if (c[i +1+mod_len +1] & BIT_DEFINE_STATIC) {
 				op->insert_static(name, ctx.Object());
 			}
 			else {
@@ -973,32 +972,15 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			v.push_back(current);
 			if (is_under) {
 				v.push_back(op);
-				i += 1+1+mod_len + 1+name_len + sizeof(int)+code_len + 1+under_len;
+				i += 1+mod_len +1+ 1+name_len + 1+under_len + sizeof(int)+code_len;
 			}
 			else {
-				i += 1+1+mod_len + 1+name_len + sizeof(int)+code_len;
+				i += 1+mod_len +1+ 1+name_len + sizeof(int)+code_len;
 			}
 
 			current = ctx.o();
 			break;
 		  }
-
-		case OP_CONTEXT_END:
-			PRINT0("\t\t DEF CONTEXT END\n");
-			o = v[v.size()-1];
-			current = o;
-			m_curr = o;
-			v.pop_back();
-			break;
-
-		case OP_CONTEXT_UNDER_END:
-			PRINT0("\t\t DEF CONTEXT UNDER END\n");
-			o = v[v.size()-2];
-			current = o;
-			m_curr = o;
-			v.pop_back(); // under target Object
-			v.pop_back(); // real saved current
-			break;
 		} // switch
 	} // for
 

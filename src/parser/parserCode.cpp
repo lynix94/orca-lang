@@ -102,18 +102,30 @@ parserCode::parserCode(const char* module_name, vector<const char*>* param, /*{{
 		m_flag_under = false;
 	}
 
+	// flag
 	m_def.push_back(flag_define);
 
+	// name
 	m_def.push_back(m_name.length()+1);
 	copy(m_name.begin(), m_name.end(), back_inserter(m_def));
 	m_def.push_back(0);
 
+	// under
 	if (under_path) {
 		m_def.push_back(strlen(under_path) + 1);
 		copy(under_path, under_path + strlen(under_path), back_inserter(m_def));
 		m_def.push_back(0);
 	}
 
+	// param, make local variable index
+	if (param) {
+		vector<const char*>::iterator it = param->begin();
+		for(; it!=param->end(); ++it) {
+			find_lvar(*it);
+		}
+	}
+
+	// super
 	if (supers) {
 		for (int i=0; i<supers->size(); i++) {
 			m_def.push_back(OP_DEF_SUPER);
@@ -126,14 +138,6 @@ parserCode::parserCode(const char* module_name, vector<const char*>* param, /*{{
 			m_def.push_back(len + 1);
 			copy(cp, cp + len, back_inserter(m_def));
 			m_def.push_back(0);
-		}
-	}
-
-	// make local variable index
-	if (param) {
-		vector<const char*>::iterator it = param->begin();
-		for(; it!=param->end(); ++it) {
-			find_lvar(*it);
 		}
 	}
 
@@ -153,44 +157,72 @@ parserCode::parserCode(const char* module_name, vector<const char*>* param, /*{{
 /*}}}*/
 
 parserCode::parserCode(const char* ctx_type, const char* ctx_code, /*{{{*/
-				const char* module_name, int flag_define, const char* under_path )
+				const char* module_name, vector<const char*>* param,
+				int flag_define, vector<const char*>* supers, const char* under_path )
 {
 	m_name = module_name;
 
 	// write object name
 	if (under_path) {
-		m_def.push_back(OP_CONTEXT_UNDER_START);
+		m_def.push_back(OP_DEF_CONTEXT_UNDER_START);
 		m_flag_under = true;
 	}
 	else {
-		m_def.push_back(OP_CONTEXT_START);
+		m_def.push_back(OP_DEF_CONTEXT_START);
 		m_flag_under = false;
 	}
 
-	m_def.push_back(flag_define);
-
+	// type
 	int len = strlen(ctx_type) + 1;
 	if (len > 255) len = 255;
 	m_def.push_back(len);
 	copy(ctx_type, ctx_type+len, back_inserter(m_def));
 
+	// flag
+	m_def.push_back(flag_define);
+
+	// name
 	len = strlen(module_name) + 1;
 	if (len > 255) len = 255;
 	m_def.push_back(len);
 	copy(module_name, module_name+len, back_inserter(m_def));
 
-	len = strlen(ctx_code)+1;
-	char* cp = i2l(len);
-	copy(cp, cp+sizeof(int), back_inserter(m_def));
-	copy(ctx_code, ctx_code + len, back_inserter(m_def));
-
+	// under
 	if (under_path) {
 		m_def.push_back(strlen(under_path) + 1);
 		copy(under_path, under_path + strlen(under_path), back_inserter(m_def));
 		m_def.push_back(0);
 	}
 
-	m_ctx_code = ctx_code;
+	// code
+	len = strlen(ctx_code)+1;
+	char* cp = i2l(len);
+	copy(cp, cp+sizeof(int), back_inserter(m_def));
+	copy(ctx_code, ctx_code + len, back_inserter(m_def));
+
+	// param
+	if (param) {
+		vector<const char*>::iterator it = param->begin();
+		for(; it!=param->end(); ++it) {
+			//find_lvar(*it);
+		}
+	}
+
+	// super
+	if (supers) {
+		for (int i=0; i<supers->size(); i++) {
+			m_def.push_back(OP_DEF_SUPER);
+			const char* cp = (*supers)[i];
+			int len = strlen(cp);
+			if (len > 254) {
+				throw "parents name exceeds length";
+			}
+
+			m_def.push_back(len + 1);
+			copy(cp, cp + len, back_inserter(m_def));
+			m_def.push_back(0);
+		}
+	}
 }
 /*}}}*/
 
@@ -288,21 +320,11 @@ parserCode::~parserCode() /*{{{*/
 	pop_and_process_code(g_parser->is_interactive() || g_parser->is_eval());
 	pop_and_process_init(g_parser->is_interactive() || g_parser->is_eval());
 
-	if (m_ctx_code == "") {
-		if (m_flag_under) {
-			m_def.push_back(OP_DEF_UNDER_END);
-		}
-		else {
-			m_def.push_back(OP_DEF_END);
-		}
+	if (m_flag_under) {
+		m_def.push_back(OP_DEF_UNDER_END);
 	}
 	else {
-		if (m_flag_under) {
-			m_def.push_back(OP_CONTEXT_UNDER_END);
-		}
-		else {
-			m_def.push_back(OP_CONTEXT_END);
-		}
+		m_def.push_back(OP_DEF_END);
 	}
 }
 /*}}}*/
@@ -352,54 +374,6 @@ void parserCode::reg_object(const char* s, int flag_define) /*{{{*/
 
 	m_def.push_back(strlen(s)+1);
 	copy(s, s+strlen(s)+1, back_inserter(m_def));
-}
-/*}}}*/
-
-void parserCode::do_context(const char* mod, const char* name, const char* code, const char* under_path, int flag)/*{{{*/
-{
-	int len;
-
-	if (under_path) {
-		m_def.push_back(OP_CONTEXT_UNDER_START);
-	}
-	else {
-		m_def.push_back(OP_CONTEXT_START);
-	}
-
-	m_def.push_back(flag);
-
-	len = strlen(mod) + 1;
-	if (len > 255) len = 255;
-	m_def.push_back(len);
-	copy(mod, mod+len, back_inserter(m_def));
-
-	len = strlen(name) + 1;
-	if (len > 255) len = 255;
-	m_def.push_back(len);
-	copy(name, name+len, back_inserter(m_def));
-
-	len = strlen(code)+1;
-	char* cp = i2l(len);
-	copy(cp, cp+sizeof(int), back_inserter(m_def));
-	copy(code, code + len, back_inserter(m_def));
-
-	if (under_path) {
-		len = 0;
-		len = strlen(under_path)+1;
-		m_def.push_back(len);
-		copy(under_path, under_path + len, back_inserter(m_def));
-	}
-}
-/*}}}*/
-
-void parserCode::do_context_end(const char* under_path)/*{{{*/
-{
-	if (under_path) {
-		m_def.push_back(OP_CONTEXT_UNDER_END);
-	}
-	else {
-		m_def.push_back(OP_CONTEXT_END);
-	}
 }
 /*}}}*/
 
@@ -546,16 +520,19 @@ void parserCode::reinit_code_stack_for_interpreter()/*{{{*/
 }
 /*}}}*/
 
-void parserCode::push_code_stack(const char* name, vector<const char*>* param, int flag_define, vector<const char*>* super_class, const char* under_path)/*{{{*/
+void parserCode::push_code_stack(const char* name, vector<const char*>* param, int flag_define,
+								vector<const char*>* super_class, const char* under_path)/*{{{*/
 {
 	parserCode* c = new parserCode(name, param, flag_define, super_class, under_path);
 	parserCode::m_codeStack.push_back(c);
 }
 /*}}}*/
 
-void parserCode::push_context_stack(const char* type, const char* code, const char* name, int flag_define, const char* under_path)/*{{{*/
+void parserCode::push_context_stack(const char* type, const char* code,
+								const char* name, vector<const char*>* param, int flag_define,
+								vector<const char*>* super_class, const char* under_path)/*{{{*/
 {
-	parserCode* c = new parserCode(type, code, name, flag_define, under_path);
+	parserCode* c = new parserCode(type, code, name, param, flag_define, super_class, under_path);
 	parserCode::m_codeStack.push_back(c);
 }
 /*}}}*/

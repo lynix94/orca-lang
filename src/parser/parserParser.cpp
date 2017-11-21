@@ -240,8 +240,7 @@ bool parserParser::parse_context_file(const string& filename, const string& mod_
 	parserCode::init();
 	this->module_name = mod_name;
 
-	// TODO: context to stack
-	parserCode::push_context_stack((char*)sub_postfix.c_str(), (char*)code.c_str(), (char*)mod_name.c_str());
+	parserCode::push_context_stack((char*)sub_postfix.c_str(), (char*)code.c_str(), (char*)mod_name.c_str(), NULL);
 
 	// parse
 	init();

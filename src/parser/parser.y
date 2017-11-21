@@ -880,7 +880,7 @@ define_stmt:/*{{{*/
 	/*}}}*/
 
 define_context_stmt:/*{{{*/
-	def '.' name_or_string opt_name_or_string opt_under '{'
+	def '.' name_or_string opt_name_or_string opt_argument_list opt_superclass opt_under '{'
 		{
 			const char* name = $4;
 			static int count = 1;
@@ -892,12 +892,11 @@ define_context_stmt:/*{{{*/
 
 			const char* cp = lexer->get_context();
 			//print("lexer->get_context(): '%s'\n", cp);
-			code_top->do_context($3, name, cp, $5, $1);
-			//TODO: fail check
+			code_top->push_context_stack($3, cp, name, NULL, $1, NULL, $7);
 		}
 	open_statement_block
 		{
-			code_top->do_context_end($5);
+			code_top->pop_code_stack();
 		}
 	;
 /*}}}*/
@@ -989,7 +988,7 @@ lambda_object:/*{{{*/
 			g_op->push_reserved(OP_PUSH_MY);
 			g_op->find_member($1);
 		}
-	| LAMBDA '.' name_or_string  '{'
+	| LAMBDA '.' name_or_string opt_argument_list opt_superclass '{'
 		{
 			// for serial tagging
 			static int count = 1;
@@ -997,15 +996,14 @@ lambda_object:/*{{{*/
 			sprintf(name, "__%s_%d_context", g_parser->module_name.c_str(), count++);
 
 			const char* cp = lexer->get_context();
-			//print("lexer->get_context(): '%s'\n", cp);
-			code_top->do_context($3, name, cp);
+			code_top->push_context_stack($3, cp, name, NULL);
 
 			g_op->push_reserved(OP_PUSH_MY);
 			g_op->find_member(name);
 		}
 	  open_statement_block
 		{
-			code_top->do_context_end();
+			code_top->pop_code_stack();
 		}
 	| lambda_decode_header '{' decode_pattern_stmt_list '}'
 		{
