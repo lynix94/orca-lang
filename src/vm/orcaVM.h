@@ -72,6 +72,7 @@ class LIBORCA_API orcaVM
 {
 friend class orcaLocal;
 public:
+	orcaVM() { m_cptr = NULL; }
 	void init_once();
 	void init();
 	void cleanup();
@@ -106,7 +107,8 @@ public:
 	void set_caller(orcaObject* o);
 
 	orcaData do_context(const char* mod, const char* name, 
-						const char* cp, time_t last_write_time);
+						const char* cp, time_t last_write_time,
+						vector<const char*>& params);
 
 	orcaData channel_in(orcaData d);
 	bool channel_out(orcaData d, int num);

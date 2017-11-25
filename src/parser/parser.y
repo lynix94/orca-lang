@@ -72,6 +72,7 @@ using namespace std;
 %type <cp> big_number
 %type <cp> minus_big_number
 %type <cp> lambda_define_header
+%type <cp> lambda_context_header
 %type <cp> lambda_decode_header
 %type <cp> lambda_parse_header
 
@@ -884,15 +885,30 @@ define_context_stmt:/*{{{*/
 		{
 			const char* name = $4;
 			static int count = 1;
+			name_list_t* supers = (name_list_t*)$6;
+
 			char buff[1024];
 			if (name == NULL) {
 				sprintf(buff, "__%s_%d_ctx_anonymous", g_parser->module_name.c_str(), count++);
 				name = buff;
 			}
 
+			name_list_t* vp = (name_list_t*)$5;
+
+			// check argv
+			bool flag_argv = false;
+			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
+				vp->pop_back();
+				flag_argv = true;
+
+				if (vp->empty()) {	// if argv only, make vp as NULL
+					vp = NULL;
+				}
+			}
+
 			const char* cp = lexer->get_context();
 			//print("lexer->get_context(): '%s'\n", cp);
-			code_top->push_context_stack($3, cp, name, NULL, $1, NULL, $7);
+			code_top->push_context_stack($3, cp, name, vp, $1, supers, $7);
 		}
 	open_statement_block
 		{
@@ -988,22 +1004,11 @@ lambda_object:/*{{{*/
 			g_op->push_reserved(OP_PUSH_MY);
 			g_op->find_member($1);
 		}
-	| LAMBDA '.' name_or_string opt_argument_list opt_superclass '{'
-		{
-			// for serial tagging
-			static int count = 1;
-			char name[1024];
-			sprintf(name, "__%s_%d_context", g_parser->module_name.c_str(), count++);
-
-			const char* cp = lexer->get_context();
-			code_top->push_context_stack($3, cp, name, NULL);
-
-			g_op->push_reserved(OP_PUSH_MY);
-			g_op->find_member(name);
-		}
-	  open_statement_block
+	| lambda_context_header '{' open_statement_block
 		{
 			code_top->pop_code_stack();
+			g_op->push_reserved(OP_PUSH_MY);
+			g_op->find_member($1);
 		}
 	| lambda_decode_header '{' decode_pattern_stmt_list '}'
 		{
@@ -1058,6 +1063,37 @@ lambda_define_header:/*{{{*/
 				code_top->find_lvar("argv");
 				code_top->set_argv_on();
 			}
+
+			$$ = name;
+		}
+	;
+/*}}}*/
+
+lambda_context_header:/*{{{*/
+	LAMBDA '.' name_or_string opt_argument_list opt_superclass 
+		{
+			// for serial tagging
+			static int count = 1;
+			char name[1024];
+			name_list_t* supers = (name_list_t*)$5;
+
+			sprintf(name, "__%s_%d_context", g_parser->module_name.c_str(), count++);
+
+			name_list_t* vp = (name_list_t*)$4;
+
+			// check argv
+			bool flag_argv = false;
+			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
+				vp->pop_back();
+				flag_argv = true;
+
+				if (vp->empty()) {	// if argv only, make vp as NULL
+					vp = NULL;
+				}
+			}
+
+			const char* cp = lexer->get_context();
+			code_top->push_context_stack($3, cp, name, vp, 0, supers);
 
 			$$ = name;
 		}

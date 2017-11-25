@@ -773,7 +773,11 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 		case OP_DEF_INIT:
 			PRINT1("\t\t  define init code: %lld\n", TO_LONGLONG(&c[i+1]));
 			m_curr = current;
-			exec_code (code, code + TO_LONGLONG(&c[i+1]));
+			{
+				const char** cptr_back = m_cptr;
+				exec_code (code, code + TO_LONGLONG(&c[i+1]));
+				m_cptr = cptr_back;
+			}
 			m_stack->dummy_pop();
 			i += sizeof(long long);
 			break;
@@ -932,37 +936,59 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			}
 			break;
 
-		case OP_DEF_CONTEXT_START:    // this, mode_len, mod, flag, name_len, name, code_len, code
-		case OP_DEF_CONTEXT_UNDER_START: { // this, mode_len, mod, flag, name_len, name, under_len, under, code_len, code
+		case OP_DEF_CONTEXT_START:    // this, type_len, type, flag, name_len, name, code_len, code, param_n, params
+		case OP_DEF_CONTEXT_UNDER_START: { // this, type_len, type, flag, name_len, name, under_len, under, code_len, code, param_n, params
 			bool is_under = false;
 			if ((unsigned char)c[i] == OP_DEF_UNDER_START) {
 				is_under = true;
 			}
 
-			int mod_len = c[i+1];
-			const char* mod = &c[i+1+1];
+			int idx = i;
+			// type
+			int type_len = c[++idx];
+			const char* type = &c[++idx];
+			idx += type_len;
 
-			int name_len = c[i+ 1+mod_len +1 +1];
-			const char* name = &c[i+ 1+mod_len +1 +1+1];
+			// name
+			int name_len = c[++idx];
+			const char* name = &c[++idx];
+			idx += name_len-1;
 
 			orcaObject* op = current;
-			int under_len = 0;
-			if (is_under) {
-				under_len  = c[i+ 1+mod_len +1 +1+name_len +1];
-				const char* under = &c[i+ 1+mod_len +1 +1+name_len +1+1];
-				PRINT4("\t\t  context object: %s, %s, %s, '%s'\n", mod, name, under, code);
 
+			// under
+			int under_len = 0;
+			const char* under = "(null)";
+			if (is_under) {
+				under_len  = c[++idx];
+				under = &c[++idx];
+				idx += under_len-1;
 				op = find_object_by_path(under);
 			}
-			else {
-				PRINT3("\t\t  context object: %s, %s, '%s'\n", mod, name, code);
+
+			// code
+			int code_len  = TO_INT(&c[++idx]);
+			idx += sizeof(int);
+			const char* code = &c[idx];
+			idx += code_len-1;
+			
+
+			PRINT4("\t\t  context object: %s, %s, %s, '%s'\n", type, name, under, code);
+
+			// params
+			vector<const char*> params;
+			int param_n  = c[++idx];
+			for (int j=0; j<param_n; j++) {
+				int param_len = c[++idx];
+				const char* cp = &c[++idx];
+				idx += param_len-1;
+				
+				params.push_back(cp);
 			}
 
-			int code_len  = TO_INT(&c[i +1+mod_len +1 +1+name_len +1]);
-			const char* code = &c[i +1+mod_len +1 +1+name_len +sizeof(int)+1];
-			orcaData ctx = do_context(mod, name, code, last_write_time);
+			orcaData ctx = do_context(type, name, code, last_write_time, params);
 
-			if (c[i +1+mod_len +1] & BIT_DEFINE_STATIC) {
+			if (c[i +1+type_len +1] & BIT_DEFINE_STATIC) {
 				op->insert_static(name, ctx.Object());
 			}
 			else {
@@ -972,12 +998,9 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			v.push_back(current);
 			if (is_under) {
 				v.push_back(op);
-				i += 1+mod_len +1+ 1+name_len + 1+under_len + sizeof(int)+code_len;
-			}
-			else {
-				i += 1+mod_len +1+ 1+name_len + sizeof(int)+code_len;
 			}
 
+			i = idx;
 			current = ctx.o();
 			break;
 		  }
@@ -1021,7 +1044,7 @@ void orcaVM::parallel_do(const char* code, const char* offset, int* run_count, o
 
 void orcaVM::exec_code(const char* code, const char* offset)/*{{{*/
 {
-	register const char *c;
+	register const char *c = NULL;
 	m_cptr = &c;
 
 	m_trace->top_cp = &c;
@@ -2817,7 +2840,7 @@ do_assign_list:
 }
 /*}}}*/
 
-orcaData orcaVM::do_context(const char* mod, const char* name, const char* cp, time_t last_write_time)/*{{{*/
+orcaData orcaVM::do_context(const char* mod, const char* name, const char* cp, time_t last_write_time, vector<const char*>& params)/*{{{*/
 {
 	orcaData out;
 	orcaObject* modp;
@@ -2829,17 +2852,26 @@ orcaData orcaVM::do_context(const char* mod, const char* name, const char* cp, t
 		return NIL;
 	}
 
+	// set modp
 	modp = out.Object();
 
 	// set last write time
 	orcaDatetime* dp = new orcaDatetime(last_write_time);
+
+	// set params
+	orcaTuple* tp = new orcaTuple(params.size());
+	for (int i=0; i<params.size(); i++) {
+		orcaData d = params[i];
+		tp->update(i, d);
+	}
 
 	// now let's compile
 	push_stack(modp);
 	push_param(name);
 	push_param(dp);
 	push_param(cp);
-	call(3);
+	push_param(tp);
+	call(4);
 
 	out = m_stack->pop();
 	if (is<TYPE_OBJ>(out) == false) {
@@ -2873,13 +2905,6 @@ bool orcaVM::load_context_helper(const string& mod_name, const string& candidate
 								const string& sub_postfix, const string& kw_name, orcaObject* owner)
 {
 	load(sub_postfix, g_root);
-
-/*
-	ifstream ifs(candidate_name.c_str());
-	string code;
-	code.assign(istreambuf_iterator<char>(ifs), istreambuf_iterator<char>());
-	time_t last_write_time = fs::last_write_time(candidate_name);
-*/
 
 	// check recompile
 	bool ret;
@@ -2919,12 +2944,6 @@ bool orcaVM::load_context_helper(const string& mod_name, const string& candidate
 		fp_kw = fopen(kw_name.c_str(), "rb");
 	}
 
-/*
-	orcaData out = do_context(sub_postfix.c_str(), mod_name.c_str(), code.c_str(), last_write_time);
-	owner->insert_member(mod_name.c_str(), out);
-
-	return true;
-*/
 
 	time_t last_write_time = fs::last_write_time(fs::path(kw_name));
 

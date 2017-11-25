@@ -202,10 +202,22 @@ parserCode::parserCode(const char* ctx_type, const char* ctx_code, /*{{{*/
 
 	// param
 	if (param) {
-		vector<const char*>::iterator it = param->begin();
-		for(; it!=param->end(); ++it) {
-			//find_lvar(*it);
+		int param_n = param->size();
+		if (param_n > 255) {
+			throw "parameter count exceeds 255";
 		}
+
+		m_def.push_back(param_n);
+		for (int i=0; i<param_n; i++) {
+			const char* cp = (*param)[i];
+			int len = strlen(cp) + 1;
+			if (len > 255) len = 255;
+			m_def.push_back(len);
+			copy(cp, cp+len, back_inserter(m_def));
+		}
+	}
+	else {
+		m_def.push_back(0);
 	}
 
 	// super
