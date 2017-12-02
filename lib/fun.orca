@@ -6,7 +6,7 @@ def apply(f, list)
 	return __fun.apply(f, list);
 }
 
-def bind_result(...)
+def bind_result(...argv)
 {
 	if argv == nil {
 		argv = type.tuple();

@@ -47,19 +47,19 @@ def window
 
 		members = owner.MEMBERS.values();
 
-		alg.remove_if: members.begin(), members.end(), def(a){
+		alg.remove_if: members.begin(), members.end(), lambda(a){
 			return !(a.TYPE < window);
 		};
 
-		members.sort(def(a, b){ return a.order < b.order; });
+		members.sort(lambda(a, b){ return a.order < b.order; });
 
-		alg.for_each: members.begin(), members.end(), def(a){
+		alg.for_each: members.begin(), members.end(), lambda(a){
 			a.make();
 			..owner.handle.put(a.handle);
 		};
 	}
 
-	def table_put(...)
+	def table_put(...argv)
 	{
 		argv[0].make();
 		argv[0] = argv[0].handle;
@@ -351,7 +351,7 @@ def tree : window
 		return owner.handle.get_data(k);
 	}
 
-	def branch(...)
+	def branch(...argv)
 	{
 		return owner.handle.get_data('branch', argv);
 	}

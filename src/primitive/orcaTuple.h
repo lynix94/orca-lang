@@ -69,6 +69,8 @@ public:
 	orcaData ex_find(orcaVM* vm, int n);
 	orcaData ex_empty(orcaVM* vm, int n);
 	orcaData ex_clear(orcaVM* vm, int n);
+	orcaData ex_channel_out(orcaVM* vm, int n);
+	orcaData ex_channel_in(orcaVM* vm, int n);
 
 	// operator
 	virtual orcaData operator_add(orcaVM* vm, orcaData& p);

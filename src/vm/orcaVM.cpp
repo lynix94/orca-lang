@@ -635,7 +635,7 @@ orcaData& orcaVM::handle_throw(const char* name)/*{{{*/
 }
 /*}}}*/
 
-orcaObject* orcaVM::find_object_by_path(const char* path)
+orcaObject* orcaVM::find_object_by_path(const char* path)/*{{{*/
 {
 	orcaObject* op = g_root;
 	orcaData out;
@@ -667,6 +667,7 @@ orcaObject* orcaVM::find_object_by_path(const char* path)
 
 	return op;
 }
+/*}}}*/
 
 orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaObject* owner, time_t last_write_time)/*{{{*/
 {
@@ -2901,7 +2902,7 @@ static OrcaHeader read_header(FILE* fp_kw)/*{{{*/
 
 // TODO: merge with load_orca_helper
 // TODO: remove or refactoring once
-bool orcaVM::load_context_helper(const string& mod_name, const string& candidate_name,
+bool orcaVM::load_context_helper(const string& mod_name, const string& candidate_name,/*{{{*/
 								const string& sub_postfix, const string& kw_name, orcaObject* owner)
 {
 	load(sub_postfix, g_root);
@@ -2963,7 +2964,7 @@ bool orcaVM::load_context_helper(const string& mod_name, const string& candidate
 
 	return true;
 }
-
+/*}}}*/
 
 bool orcaVM::load_orca_helper(const string& input_name, const string& mod_name,/*{{{*/
 							const string& candidate_name, const string& kw_name, orcaObject* owner)
@@ -3284,7 +3285,7 @@ void orcaVM::set_caller(orcaObject* o)/*{{{*/
 }
 /*}}}*/
 
-orcaData orcaVM::channel_in(orcaData d)
+orcaData orcaVM::channel_in(orcaData d)/*{{{*/
 {
 	if (is<TYPE_OBJ>(d) == false) {
 		return NIL;
@@ -3297,7 +3298,7 @@ orcaData orcaVM::channel_in(orcaData d)
 			return NIL;
 		}
 		
-		return ret.Object();
+		return ret;
 	}
 	else { // not exists
 		return NIL;
@@ -3305,8 +3306,9 @@ orcaData orcaVM::channel_in(orcaData d)
 
 	return NIL;
 }
+/*}}}*/
 
-bool orcaVM::channel_out(orcaData d, int num)
+bool orcaVM::channel_out(orcaData d, int num)/*{{{*/
 {
 	if (is<TYPE_OBJ>(d) == false) {
 		return false;
@@ -3322,14 +3324,36 @@ bool orcaVM::channel_out(orcaData d, int num)
 		return false;
 	}
 
+	bool flag_argv = false;
+	int param = num;
+	if (num <= 0) { // indicate argv exists
+		flag_argv = true;
+		num *= -1;
+		param = 0;
+	}
+
 	m_stack->push(fun);
-	m_stack->push(num);
+	m_stack->push(param);
 	call(1);
 	ret = m_stack->pop();
 
 	if (isobj<orcaTuple>(ret)) {
 		orcaTuple* tp = TO_TUPLE(ret.o());
 		int tsize = tp->size();
+
+		if (flag_argv == true) { // make argv
+			int argc = tsize - num;
+			if (argc < 0) {
+				argc = 0;
+			}
+
+			orcaTuple* argv = new orcaTuple(argc);
+			for(int i=0; i<argc; i++) {
+				argv->update(i, tp->at(num+i));
+			}
+
+			m_stack->push(argv);
+		}
 
 		for (int i=num-1; i>=0; i--) {
 			if (i<tsize) {
@@ -3341,6 +3365,11 @@ bool orcaVM::channel_out(orcaData d, int num)
 		}
 	}
 	else {
+		if (flag_argv == true) {
+			orcaTuple* argv = new orcaTuple();
+			m_stack->push(argv); // empty tuple for argv, num not include argv
+		}
+
 		for (int i=0; i<num-1; i++) {
 			m_stack->push(NIL);
 		}
@@ -3350,8 +3379,7 @@ bool orcaVM::channel_out(orcaData d, int num)
 
 	return true;
 }
-
-
+/*}}}*/
 
 int orca_launch_module(orcaVM* vm, char* module, int argc, char** argv)/*{{{*/
 {

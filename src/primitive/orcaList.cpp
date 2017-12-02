@@ -55,6 +55,8 @@ orcaList::orcaList()
 	insert_native_function("sort", (object_fp)&orcaList::ex_sort);
 	insert_native_function("empty", (object_fp)&orcaList::ex_empty);
 	insert_native_function("clear", (object_fp)&orcaList::ex_clear);
+	insert_native_function("->", (object_fp)&orcaList::ex_channel_out);
+	insert_native_function("<-", (object_fp)&orcaList::ex_channel_in);
 }
 
 orcaList::orcaList(void* vp) 
@@ -571,6 +573,37 @@ orcaListIter orcaList::end()
 	orcaListIter it(this, m_value.end());
 	return it;
 }
+
+orcaData orcaList::ex_channel_out(orcaVM* vm, int n) 
+{
+	if (n<1) vm->need_param();
+
+	int count = vm->get_param(0).Integer();
+	if (count == 0) { // argv
+		count = m_value.size();
+	}
+
+	orcaTuple* tup = new orcaTuple();
+	int i=0;
+	list<orcaData>::iterator it;
+	for (it=m_value.begin(); it!=m_value.end() && i<count; ++it, i++) {
+		tup->push_back(*it);
+	}
+
+	return tup;
+}
+
+orcaData orcaList::ex_channel_in(orcaVM* vm, int n) 
+{
+	for (int i=0; i<n; i++) {
+		orcaData val = vm->get_param(i);
+		push_back(val);
+	}
+
+	return this;
+}
+
+
 
 
 

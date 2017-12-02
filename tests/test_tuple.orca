@@ -54,6 +54,44 @@ if (10..1 : 2) != (10,8,6,4,2) {
 	throw test.tuple <- 'tuple generate fail';
 }
 
+(1, 2, 3) -> a, b, c, d;
+print: (a,b,c,d);
+if (a, b, c, d) != (1, 2, 3, nil) {
+	throw test.tuple <- 'tuple channel fail';
+}
+
+(1, 2, 3, 4) -> a, b;
+print: (a,b);
+if (a, b) != (1, 2) {
+	throw test.tuple <- 'tuple channel fail';
+}
+
+(1, 2, 3, 4) -> ...a;
+print: a;
+if a != (1, 2, 3, 4) {
+	throw test.tuple <- 'tuple channel fail';
+}
+
+
+(1, 2, 3, 4) -> a, b, ...c;
+print: a, b, c;
+if (a, b, c) != (1, 2, (3, 4)) {
+	throw test.tuple <- 'tuple channel fail';
+}
+
+
+(1, 2, 3, 4) -> a, b, c, d, e, ...f;
+print: a, b, c, d, e, f;
+if (a, b, c, d, e, f) != (1, 2, 3, 4, nil, (,)) {
+	throw test.tuple <- 'tuple channel fail';
+}
+
+a = (1, 2, 3, 4);
+a <- 4, 5, 6;
+print: a;
+if a != (1,2,3,4,4,5,6) {
+	throw test.tuple <- 'tuple channel fail';
+}
 
 print: 'OK';
 return true;

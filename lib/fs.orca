@@ -110,7 +110,7 @@ def shutdown(path)
 	..unmount(path, true);
 }
 
-def mount_dist_dir(path, ...)
+def mount_dist_dir(path, ...argv)
 {
 	if path[-1] == '/' {
 		p = path[:-1];

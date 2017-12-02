@@ -198,8 +198,9 @@ bool parserParser::parse(const string& filename)/*{{{*/
 
 	this->module_name = module_name;
 
-	parserCode::push_code_stack((char*)module_name.c_str(), NULL);
-	code_top->find_lvar((char*)"argv");
+	name_list_t* vs = g_parser->new_name_list();
+	vs->push_back("...argv");
+	parserCode::push_code_stack((char*)module_name.c_str(), vs);
 	code_top->set_argv_on();	// enable argv 
 
 	// parse

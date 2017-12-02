@@ -121,7 +121,12 @@ parserCode::parserCode(const char* module_name, vector<const char*>* param, /*{{
 	if (param) {
 		vector<const char*>::iterator it = param->begin();
 		for(; it!=param->end(); ++it) {
-			find_lvar(*it);
+			const char *cp = *it;
+			if (strncmp(cp, "...", 3) == 0) { // ...argv
+				cp = cp + 3;
+			}
+
+			find_lvar(cp);
 		}
 	}
 
@@ -532,17 +537,17 @@ void parserCode::reinit_code_stack_for_interpreter()/*{{{*/
 }
 /*}}}*/
 
-void parserCode::push_code_stack(const char* name, vector<const char*>* param, int flag_define,
-								vector<const char*>* super_class, const char* under_path)/*{{{*/
+void parserCode::push_code_stack(const char* name, vector<const char*>* param, int flag_define,/*{{{*/
+								vector<const char*>* super_class, const char* under_path)
 {
 	parserCode* c = new parserCode(name, param, flag_define, super_class, under_path);
 	parserCode::m_codeStack.push_back(c);
 }
 /*}}}*/
 
-void parserCode::push_context_stack(const char* type, const char* code,
+void parserCode::push_context_stack(const char* type, const char* code,/*{{{*/
 								const char* name, vector<const char*>* param, int flag_define,
-								vector<const char*>* super_class, const char* under_path)/*{{{*/
+								vector<const char*>* super_class, const char* under_path)
 {
 	parserCode* c = new parserCode(type, code, name, param, flag_define, super_class, under_path);
 	parserCode::m_codeStack.push_back(c);

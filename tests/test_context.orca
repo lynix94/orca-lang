@@ -1,6 +1,6 @@
 
 
-def foo(...) under root
+def foo(...argv) under root
 {
 	#print: argv;
 

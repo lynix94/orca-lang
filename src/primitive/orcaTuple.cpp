@@ -30,6 +30,8 @@ orcaTuple::orcaTuple()
 	insert_native_function("find", (object_fp)&orcaTuple::ex_find);
 	insert_native_function("empty", (object_fp)&orcaTuple::ex_empty);
 	insert_native_function("clear", (object_fp)&orcaTuple::ex_clear);
+	insert_native_function("->", (object_fp)&orcaTuple::ex_channel_out);
+	insert_native_function("<-", (object_fp)&orcaTuple::ex_channel_in);
 
 	m_timestamp = 0;
 }
@@ -52,6 +54,8 @@ orcaTuple::orcaTuple(int n)
 	insert_native_function("find", (object_fp)&orcaTuple::ex_find);
 	insert_native_function("empty", (object_fp)&orcaTuple::ex_empty);
 	insert_native_function("clear", (object_fp)&orcaTuple::ex_clear);
+	insert_native_function("->", (object_fp)&orcaTuple::ex_channel_out);
+	insert_native_function("<-", (object_fp)&orcaTuple::ex_channel_in);
 
 	m_value.resize(n);
 	m_timestamp = 0;
@@ -389,5 +393,36 @@ orcaData orcaTuple::ex_clear(orcaVM* vm, int n)
 	m_value.clear();
 	return this;
 }
+
+
+orcaData orcaTuple::ex_channel_out(orcaVM* vm, int n) 
+{
+	if (n<1) vm->need_param();
+
+	int count = vm->get_param(0).Integer();
+	if (count == 0) { // argv
+		count = m_value.size();
+	}
+
+	orcaTuple* tup = new orcaTuple();
+	int i=0;
+	vector<orcaData>::iterator it;
+	for (it=m_value.begin(); it!=m_value.end() && i<count; ++it, i++) {
+		tup->push_back(*it);
+	}
+
+	return tup;
+}
+
+orcaData orcaTuple::ex_channel_in(orcaVM* vm, int n) 
+{
+	for (int i=0; i<n; i++) {
+		orcaData val = vm->get_param(i);
+		push_back(val);
+	}
+
+	return this;
+}
+
 
 

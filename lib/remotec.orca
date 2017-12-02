@@ -38,7 +38,7 @@ else {
 }
 
 
-def log(...)
+def log(...argv)
 {
 	#print: argv;
 }
@@ -266,7 +266,7 @@ def '.attr='(name, data)
 	return 'done';
 }
 
-def remote_do(...)
+def remote_do(...argv)
 {
 	f = argv[-1];
 	..push_obj(f);

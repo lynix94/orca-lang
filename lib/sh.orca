@@ -3,7 +3,7 @@ using os;
 
 return my.script.clone(argv[2]); 
 
-def script(...)
+def script(...argv)
 {
   new_cmd = .cmd;
   for i in [0..argv.size()-1] {

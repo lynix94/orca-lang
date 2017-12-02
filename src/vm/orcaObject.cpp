@@ -150,6 +150,10 @@ orcaData orcaObject::operator()(orcaVM* vm, int param_n)
 	}
 	
 	int as = get_argument_size();
+	if (get_flag_argv()) {
+		as--; // uncount argv
+	}
+
 	if (param_n > as) {
 		if (get_flag_argv()) {	// if object use argv
 			orcaTuple* tp = new orcaTuple(param_n-as);
@@ -566,8 +570,8 @@ void orcaObject::string_(orcaVM* vm, string& str)
 		str += vm->m_stack->pop().String();
 	}
 	else {
-		char buff[32];
-		sprintf(buff, "<%p>", this);
+		char buff[1024];
+		snprintf(buff, 1024, "<%p>", this);
 		str += m_name;
 		str += " ";
 		str += buff;
@@ -882,8 +886,9 @@ bool orcaObject::isinstanceof(orcaObject* o)
 
 int orcaObject::get_frame_size()
 {
-	if (m_code == NULL)
+	if (m_code == NULL) {
 		return 0;
+	}
 
 	CodeHeader* cp = (CodeHeader*)m_code;
 	return ltohs(cp->frame_size);
@@ -891,8 +896,9 @@ int orcaObject::get_frame_size()
 
 int orcaObject::get_argument_size()
 {
-	if (m_code == NULL)
+	if (m_code == NULL) {
 		return 0;
+	}
 
 	CodeHeader* cp = (CodeHeader*)m_code;
 	return ltohs(cp->argument_size);
@@ -900,8 +906,9 @@ int orcaObject::get_argument_size()
 
 char orcaObject::get_flag_argv()
 {
-	if (m_code == NULL)
+	if (m_code == NULL) {
 		return 0;
+	}
 
 	CodeHeader* cp = (CodeHeader*)m_code;
 	return (char)ltohs(cp->flag_argv);

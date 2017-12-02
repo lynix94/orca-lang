@@ -228,7 +228,7 @@ if r != math.sin(1) {
 }
 
 
-def mul(...)
+def mul(...argv)
 {
 	print: argv;
 	return 3*4;

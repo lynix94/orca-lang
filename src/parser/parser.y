@@ -63,6 +63,7 @@ using namespace std;
 
 // type define/*{{{*/
 %type <cp> name
+%type <cp> argv_name
 %type <cp> name_or_string
 %type <cp> opt_name_or_string
 %type <cp> lvar
@@ -92,8 +93,9 @@ using namespace std;
 %type <integer> reserved_object			// reserved object enum value
 %type <integer> calling_body			// num of arguemnts
 %type <integer> def						// flag
-%type <integer> assign_type				// '=', '+'...
+%type <integer> assign_type				// '=', '+' ...
 %type <integer> pattern_list			// num of pattern
+%type <integer> assign_target_list_with_argv
 %type <integer> assign_target_list
 
 %type <real> real
@@ -255,9 +257,33 @@ channel_stmt:/*{{{*/
 		{
 			g_ctl->channel_out_start();
 		}
-	assign_target_list ';'
+	assign_target_list_with_argv ';'
 		{
 			g_ctl->channel_out_end($4);
+		}
+	;
+/*}}}*/
+
+assign_target_list_with_argv:/*{{{*/
+	assign_target_list
+		{
+			$$ = $1;
+		}
+	| assign_target_list ',' argv_name
+		{
+			const char* cp = $3;
+			cp += 3; // skip ...
+			g_op->assign_local(cp); // already made as tuple
+			g_op->pop_stack();
+			$$ = -($1);
+		}
+	| argv_name
+		{
+			const char* cp = $1;
+			cp += 3; // skip ...
+			g_op->assign_local(cp); // already made as tuple
+			g_op->pop_stack();
+			$$ = 0;
 		}
 	;
 /*}}}*/
@@ -290,12 +316,12 @@ assign_target:/*{{{*/
 			g_op->assign_reserved($3);
 			g_op->pop_stack();
 		}
-	| postfix_object '[' slice_expression ']' assign_type 
+	| postfix_object '[' slice_expression ']'
 		{
 			g_op->assign_list(false);
 			g_op->pop_stack();
 		}
-	| postfix_object '[' slice_expression ')' assign_type 
+	| postfix_object '[' slice_expression ')'
 		{
 			g_op->assign_list(true);
 			g_op->pop_stack();
@@ -523,7 +549,7 @@ object_path:/*{{{*/
 	object_path '.' name_or_string
 		{
 			char buff[1024];
-			sprintf(buff, "%s.%s", $1, $3);
+			snprintf(buff, 1024, "%s.%s", $1, $3);
 			$$ = g_parser->strdup(buff);
 		}
 	| name_or_string
@@ -846,27 +872,15 @@ define_stmt:/*{{{*/
 			name_list_t* supers = (name_list_t*)$4;
 			char buff[1024];
 			if (name == NULL) {
-				sprintf(buff, "__%s_%d_anonymous", g_parser->module_name.c_str(), count++);
+				snprintf(buff, 1024, "__%s_%d_anonymous", g_parser->module_name.c_str(), count++);
 				name = buff;
 			}
 
 			name_list_t* vp = (name_list_t*)$3;
-
-			// check argv
-			bool flag_argv = false;
-			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
-				vp->pop_back();
-				flag_argv = true;
-
-				if (vp->empty()) {	// if argv only, make vp as NULL
-					vp = NULL;
-				}
-			}
-
 			parserCode::push_code_stack(name, vp, $1, supers, $5);
 
-			if (flag_argv == true) {
-				code_top->find_lvar("argv");
+			// check argv
+			if (vp && strncmp((*vp)[vp->size()-1], "...", 3) == 0) {
 				code_top->set_argv_on();
 			}
 		}
@@ -889,26 +903,19 @@ define_context_stmt:/*{{{*/
 
 			char buff[1024];
 			if (name == NULL) {
-				sprintf(buff, "__%s_%d_ctx_anonymous", g_parser->module_name.c_str(), count++);
+				snprintf(buff, 1024, "__%s_%d_ctx_anonymous", g_parser->module_name.c_str(), count++);
 				name = buff;
-			}
-
-			name_list_t* vp = (name_list_t*)$5;
-
-			// check argv
-			bool flag_argv = false;
-			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
-				vp->pop_back();
-				flag_argv = true;
-
-				if (vp->empty()) {	// if argv only, make vp as NULL
-					vp = NULL;
-				}
 			}
 
 			const char* cp = lexer->get_context();
 			//print("lexer->get_context(): '%s'\n", cp);
+
+			name_list_t* vp = (name_list_t*)$5;
 			code_top->push_context_stack($3, cp, name, vp, $1, supers, $7);
+
+			if (vp && strncmp((*vp)[vp->size()-1], "...", 3) == 0) {
+				code_top->set_argv_on();
+			}
 		}
 	open_statement_block
 		{
@@ -924,14 +931,14 @@ define_parse_stmt:/*{{{*/
 			static int count = 1;
 			char buff[1024];
 			if (name == NULL) {
-				sprintf(buff, "__%s_%d_parse_anonymous", g_parser->module_name.c_str(), count++);
+				snprintf(buff, 1024, "__%s_%d_parse_anonymous", g_parser->module_name.c_str(), count++);
 				name = buff;
 			}
 
 			name_list_t* vp = (name_list_t*)$5;
 
 			// check argv
-			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
+			if (vp && strncmp((*vp)[vp->size()-1], "...", 3) == 0) {
 				yyerror("argv not allowed in parse object");
 			}
 
@@ -963,27 +970,15 @@ define_decode_stmt:/*{{{*/
 			static int count = 1;
 			char buff[1024];
 			if (name == NULL) {
-				sprintf(buff, "__%s_%d_decode_anonymous", g_parser->module_name.c_str(), count++);
+				snprintf(buff, 1024, "__%s_%d_decode_anonymous", g_parser->module_name.c_str(), count++);
 				name = buff;
 			}
 
 			name_list_t* vp = (name_list_t*)$5;
-
-			// check argv
-			bool flag_argv = false;
-			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
-				vp->pop_back();
-				flag_argv = true;
-
-				if (vp->empty()) {	// if argv only, make vp as NULL
-					vp = NULL;
-				}
-			}
-
 			parserCode::push_code_stack(name, vp, $1, NULL, $6);
 
-			if (flag_argv == true) {
-				code_top->find_lvar("argv");
+			// check argv
+			if (vp && strncmp((*vp)[vp->size()-1], "...", 3) == 0) {
 				code_top->set_argv_on();
 			}
 			
@@ -1041,26 +1036,15 @@ lambda_define_header:/*{{{*/
 			name_list_t* params = (name_list_t*)$2;
 			name_list_t* supers = (name_list_t*)$3;
 
-			// check argv
-			bool flag_argv = false;
-			if (params && strcmp((*params)[params->size()-1], "...") == 0) {
-				params->pop_back();
-				flag_argv = true;
-
-				if (params->empty()) {	// if argv only, make params as NULL
-					params = NULL;
-				}
-			}
-
 			static int count = 1;
 			char buff[1024];
-			sprintf(buff, "#%d_lambda", count++);
+			snprintf(buff, 1024, "#%d_lambda", count++);
 			const char* name = g_parser->strdup(buff);
 
 			parserCode::push_code_stack(name, params, 0, supers);
 
-			if (flag_argv == true) {
-				code_top->find_lvar("argv");
+			// check argv
+			if (params && strncmp((*params)[params->size()-1], "...", 3) == 0) {
 				code_top->set_argv_on();
 			}
 
@@ -1077,23 +1061,16 @@ lambda_context_header:/*{{{*/
 			char name[1024];
 			name_list_t* supers = (name_list_t*)$5;
 
-			sprintf(name, "__%s_%d_context", g_parser->module_name.c_str(), count++);
+			snprintf(name, 1024, "__%s_%d_context", g_parser->module_name.c_str(), count++);
 
 			name_list_t* vp = (name_list_t*)$4;
-
-			// check argv
-			bool flag_argv = false;
-			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
-				vp->pop_back();
-				flag_argv = true;
-
-				if (vp->empty()) {	// if argv only, make vp as NULL
-					vp = NULL;
-				}
-			}
-
 			const char* cp = lexer->get_context();
 			code_top->push_context_stack($3, cp, name, vp, 0, supers);
+
+			// check argv
+			if (vp && strncmp((*vp)[vp->size()-1], "...", 3) == 0) {
+				code_top->set_argv_on();
+			}
 
 			$$ = name;
 		}
@@ -1105,25 +1082,14 @@ lambda_decode_header:/*{{{*/
 		{
 			name_list_t* vp = (name_list_t*)$4;
 
-			// check argv
-			bool flag_argv = false;
-			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
-				vp->pop_back();
-				flag_argv = true;
-
-				if (vp->empty()) {	// if argv only, make vp as NULL
-					vp = NULL;
-				}
-			}
-
 			static int count = 1;
 			char buff[1024];
-			sprintf(buff, "#%d_decode_lambda", count++);
+			snprintf(buff, 1024, "#%d_decode_lambda", count++);
 			const char* name = g_parser->strdup(buff);
 			parserCode::push_code_stack(name, vp);
 
-			if (flag_argv == true) {
-				code_top->find_lvar("argv");
+			// check argv
+			if (vp && strncmp((*vp)[vp->size()-1], "...", 3) == 0) {
 				code_top->set_argv_on();
 			}
 			
@@ -1140,7 +1106,7 @@ lambda_parse_header:/*{{{*/
 			name_list_t* vp = (name_list_t*)$4;
 
 			// check argv
-			if (vp && strcmp((*vp)[vp->size()-1], "...") == 0) {
+			if (vp && strncmp((*vp)[vp->size()-1], "...", 3) == 0) {
 				yyerror("argv not allowed in parse object");
 			}
 
@@ -1150,7 +1116,7 @@ lambda_parse_header:/*{{{*/
 
 			static int count = 1;
 			char buff[1024];
-			sprintf(buff, "#%d_parse_lambda", count++);
+			snprintf(buff, 1024, "#%d_parse_lambda", count++);
 			const char* name = g_parser->strdup(buff);
 			parserCode::push_code_stack(name, vp);
 			g_parse->do_parse_init();
@@ -1172,7 +1138,7 @@ opt_superclass:/*{{{*/
 	;
 /*}}}*/
 
-object_path_list:
+object_path_list:/*{{{*/
 	  object_path_list ',' object_path
 		{
 			name_list_t* vs = (name_list_t*)$1;
@@ -1186,6 +1152,7 @@ object_path_list:
 			$$ = vs;
 		}
 	;
+/*}}}*/
 
 opt_argument_list:/*{{{*/
 	  // empty
@@ -1196,24 +1163,34 @@ opt_argument_list:/*{{{*/
 		{
 			$$ = 0;
 		}
-	| '(' TRIPLE_DOT ')'	
+	| '(' argv_name ')'	
 		{
 			name_list_t* vs = g_parser->new_name_list();
-			vs->push_back("...");
+			vs->push_back($2);
 			$$ = vs;
 		}
 	| '(' name_list ')'
 		{
 			$$ = $2;
 		}
-	| '(' name_list ',' TRIPLE_DOT ')'
+	| '(' name_list ',' argv_name ')'
 		{
 			name_list_t* vs = (name_list_t*)$2;
-			vs->push_back("...");
+			vs->push_back($4);
 			$$ = vs;
 		}
 	;
 /*}}}*/
+
+argv_name:/*{{{*/
+	TRIPLE_DOT name
+		{
+			char buff[1024];
+			snprintf(buff, 1024, "...%s", $2);
+			$$ = g_parser->strdup(buff);
+		}
+	;
+	/*}}}*/
 
 name_list:/*{{{*/
 	name_list ',' name
