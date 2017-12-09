@@ -51,6 +51,7 @@ struct OrcaHeader
 	OrcaHeader(int d, int c, int dbg);
 
 	char name[5];
+	char dummy[3];
 	unsigned int magic;
 	unsigned int version;
 	int def_size;

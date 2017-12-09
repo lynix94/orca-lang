@@ -419,7 +419,7 @@ void orcaVM::call(int param_n)/*{{{*/
 #endif
 		int inc_size=param_size;
 		if (f.o()->m_code != NULL) {
-			int frame_size = l2s(f.o()->m_code);
+			int frame_size = ((CodeHeader*)(f.o()->m_code))->frame_size;
 			if (frame_size > param_n) 
 				inc_size = frame_size;
 		}
@@ -3445,7 +3445,7 @@ int orca_launch_module(orcaVM* vm, char* module, int argc, char** argv)/*{{{*/
 		const char* cp = vm->m_module->get_code();
 		int cursize = 1;
 		if (cp != NULL) {
-			cursize = l2s(cp);
+			cursize = ((CodeHeader*)(cp))->frame_size;
 		}
 
 		vm->m_local->set(IDX_CURSIZE, cursize);
@@ -3503,6 +3503,7 @@ int orca_launch_interpreter(orcaVM* vm)/*{{{*/
 
 OrcaHeader::OrcaHeader(int d, int c, int debug) /*{{{*/
 {
+	memset(this, 0x00, sizeof(OrcaHeader));
 	strcpy(name, "orca");
 	magic = htonl(MAGIC_NO);
 	version = htonl(ORCA_VERSION);
