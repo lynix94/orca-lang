@@ -925,11 +925,6 @@ char orcaObject::get_flag()
 	return m_flag;
 }
 
-bool orcaObject::is_pure()
-{
-	return m_flag & BIT_DEFINE_PURE;
-}
-
 bool orcaObject::is_init()
 {
 	return m_flag & BIT_DEFINE_INIT;

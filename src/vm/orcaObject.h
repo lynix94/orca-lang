@@ -56,7 +56,6 @@ public:
 	orcaObject* make_super(orcaObject* o);
 	void set_flag(char flag);
 	char get_flag();
-	bool is_pure();
 	bool is_init();
 	bool is_native();
 

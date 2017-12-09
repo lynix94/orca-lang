@@ -23,11 +23,9 @@ namespace fs = boost::filesystem;
 class orcaTrace;
 class orcaForStack;
 class orcaDecodeStack;
-class orcaPure;
 class orcaStack;
 class orcaLocal;
 class orcaList;
-class orcaOnce;
 
 
 using namespace std;
@@ -123,8 +121,6 @@ public:
 	orcaObject* m_curr;
 	orcaStack* m_stack;
 	orcaLocal* m_local;
-	orcaPure* m_pure;
-	orcaOnce* m_once;
 
 	orcaTrace* m_trace;
 	const char** m_cptr;

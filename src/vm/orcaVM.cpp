@@ -62,8 +62,6 @@ namespace fs = boost::filesystem;
 #include "orcaForStack.h"
 #include "orcaDecodeStack.h"
 #include "orcaException.h"
-#include "orcaPure.h"
-#include "orcaOnce.h"
 #include "orcaParserObject.h"
 #include "orcaObjectMembers.h"
 #include "orcaObjectParents.h"
@@ -195,8 +193,6 @@ void orcaVM::init()/*{{{*/
 	m_decode_stack = new orcaDecodeStack(this);
 	m_stack = new orcaStack(m_local);
 	m_trace = new orcaTrace(this);
-	m_pure = new orcaPure(this);
-	m_once = new orcaOnce();
 
 	m_cptr = NULL;
 }
@@ -209,8 +205,6 @@ void orcaVM::cleanup()/*{{{*/
 	delete m_stack;
 	delete m_local;
 	delete m_trace;
-	delete m_pure;
-	delete m_once;
 }
 /*}}}*/
 
@@ -430,52 +424,20 @@ void orcaVM::call(int param_n)/*{{{*/
 				inc_size = frame_size;
 		}
 
-		if (!f.o()->is_pure()) {
-			{{	auto_local al(inc_size, m_local);
+		{{	auto_local al(inc_size, m_local);
 
-				m_local->copy_from_stack(m_stack, param_n);
-				set_caller(m_curr);
-				m_stack->pop();
+			m_local->copy_from_stack(m_stack, param_n);
+			set_caller(m_curr);
+			m_stack->pop();
 
-				{{	
-					auto_trace at(this);
-					m_trace->top_name = m_curr->get_name();
-					orcaData ret = (*f.o())(this, param_size);
-					m_local->mark_return(ret);
-					m_stack->push(ret);
-				}}
+			{{	
+				auto_trace at(this);
+				m_trace->top_name = m_curr->get_name();
+				orcaData ret = (*f.o())(this, param_size);
+				m_local->mark_return(ret);
+				m_stack->push(ret);
 			}}
-		}
-		else {
-			orcaData d;
-			vector<orcaData> params;
-			if (m_pure->find(f.o(), m_stack, param_n, d) == false) {
-				{{	auto_local al(inc_size, m_local);
-
-					for (int i=0; i<param_n; i++) params.push_back(m_stack->at(i));
-
-					m_local->copy_from_stack(m_stack, param_n);
-					set_caller(m_curr);
-					m_stack->pop();
-
-					{{	auto_trace at(this);
-						m_trace->top_name = f.o()->get_name();
-						orcaData ret = (*f.o())(this, param_size);
-						m_local->mark_return(ret);
-						m_stack->push(ret);
-					}}
-
-					m_pure->add(f.o(), params, m_stack->top());
-				}}
-			}
-			else {	// use stored
-				for (int i=0; i<param_n+1; i++) {
-					m_stack->pop();
-				}
-
-				m_stack->push(d);
-			}
-		}
+		}}
 	}
 	else if (is<TYPE_TYPE>(f)) {
 		{{	auto_local al(param_size, m_local);
@@ -2976,7 +2938,6 @@ static OrcaHeader read_header(FILE* fp_kw)/*{{{*/
 /*}}}*/
 
 // TODO: merge with load_orca_helper
-// TODO: remove or refactoring once
 bool orcaVM::load_context_helper(const string& mod_name, const string& candidate_name,/*{{{*/
 								const string& sub_postfix, const string& kw_name, orcaObject* owner)
 {
@@ -3034,7 +2995,6 @@ bool orcaVM::load_context_helper(const string& mod_name, const string& candidate
 	// and recursively define
 	orcaObject* old_curr = m_curr;
 	orcaObject* op = exec_define(define, header.def_size, code, owner, last_write_time);
-	//m_once->reg(op, once_name);
 	m_curr = old_curr;
 
 	return true;
@@ -3088,8 +3048,6 @@ bool orcaVM::load_orca_helper(const string& input_name, const string& mod_name,/
 
 	time_t last_write_time = fs::last_write_time(fs::path(kw_name));
 		
-	string once_name = fs::complete(candidate_name).string() + ".once";
-
 	OrcaHeader header = read_header(fp_kw);
 	char* define = g_codes.new_define(header.def_size);
 	char* code = g_codes.new_code(header.code_size, mod_name);
@@ -3115,20 +3073,7 @@ bool orcaVM::load_orca_helper(const string& input_name, const string& mod_name,/
 	// and recursively define
 	orcaObject* old_curr = m_curr;
 	orcaObject* op = exec_define(define, header.def_size, code, owner, last_write_time);
-	m_once->reg(op, once_name);
 	m_curr = old_curr;
-
-	// read once if possible
-	portFile f_once;
-	if (!need_recompile && f_once.open(once_name)) {
-		char* buff = f_once.read();
-		char* src = buff;
-		orcaData d = g_pack->load(&buff);
-		m_once->load(op, (orcaMap*)d.Object());
-
-		delete[] src;
-		f_once.close();
-	}
 
 	return true;
 }

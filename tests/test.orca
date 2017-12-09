@@ -17,7 +17,6 @@ test_vectors = [
   'test_iter',
   'test_lambda',
   'test_thread',
-#  'test_pure',  ### disable until decorate
   'test_scope',
   'test_decode',
   'test_sbf',
