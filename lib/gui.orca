@@ -1,6 +1,5 @@
 
 using gtk;
-using fun;
 using alg;
 
 using gui;
@@ -63,7 +62,7 @@ def window
 	{
 		argv[0].make();
 		argv[0] = argv[0].handle;
-		fun.apply(..handle.put, argv);
+		..handle.put(argv...);
 	}
 
 	def show

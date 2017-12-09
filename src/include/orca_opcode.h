@@ -118,6 +118,7 @@
 #define OP_SIMPLE_RETURN			0x83
 #define OP_CHANNEL_IN				0x84
 #define OP_CHANNEL_OUT				0x85
+#define OP_EXTRACT					0x86
 
 #define OP_RC_INC					0x90
 #define OP_RC_DEC					0x91
@@ -125,6 +126,7 @@
 #define OP_THROW_WITH_ARG			0x93
 #define OP_MARK_TRY					0x94
 #define OP_DONE_TRY					0x95
+
 
 #define OP_DUMP_STACK				0xF0
 #define OP_DUMP_LOCAL				0xF1

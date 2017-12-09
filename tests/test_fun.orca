@@ -7,18 +7,18 @@ def foo(a,b,c)
 	return a - b - c;
 }
 
-ret = fun.apply(.foo, [1,2,3]);
-print: 'apply: ', ret;
+ret = my.foo((1,2,3)...);
+print: ret;
 
 if ret != -4 {
-	throw test.fun <- 'apply fail';
+	throw test.fun <- 'function call extract fail';
 }
 
-ret = fun.apply(.foo, (1,2,3));
-print: 'apply: ', ret;
+ret = my.foo([1,2,3]...);
+print: ret;
 
 if ret != -4 {
-	throw test.fun <- 'apply fail';
+	throw test.fun <- 'function call extract fail';
 }
 
 b = fun.bind_1st(.foo, 10);

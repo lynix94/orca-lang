@@ -62,6 +62,7 @@ public:
 	orcaData get_mark(mark_e t);
 	void clean_mark(mark_e t);
 
+	int recount_extract_from_stack(orcaStack* st, int count);
 	void copy_from_stack(orcaStack* st, int count);
 
 	void increase(int size);

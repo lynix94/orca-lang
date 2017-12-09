@@ -107,6 +107,18 @@ if a != [1,2,3,4,4,5,6] {
 	throw test.list <- 'list channel fail';
 }
 
+a = [1,2,3, (4,5,6)..., 7];
+print: a;
+if a != [1..7] {
+	throw test.list <- 'list extract fail';
+}
+
+a = [1,2,3, [4,5,6]..., 7];
+print: a;
+if a != [1..7] {
+	throw test.list <- 'list extract fail';
+}
+
 
 print: 'OK';
 return true;

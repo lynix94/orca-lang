@@ -61,6 +61,7 @@ public:
 	void do_scope_end();
 	void do_rc_inc();
 	void do_rc_dec();
+	void extract();
 
 	// about make
 	void make_list(int n);

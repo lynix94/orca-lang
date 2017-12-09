@@ -1,10 +1,4 @@
 
-using __fun;
-
-def apply(f, list)
-{
-	return __fun.apply(f, list);
-}
 
 def bind_result(...argv)
 {
@@ -23,7 +17,7 @@ def bind_result(...argv)
 		list += argv[my.order-1:].list();
 	}
 
-	return root.fun.apply(my.f, list);
+	return my.f(list...);
 
 	def f;
 	def a;

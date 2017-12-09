@@ -58,8 +58,9 @@ public:
 	}
 
 	void dummy_pop(int c) {
-		for (int i=0; i<c; i++)
+		for (int i=0; i<c; i++) {
 			dummy_pop();
+		}
 	}
 
 	void set_pointer(int i) {

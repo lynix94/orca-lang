@@ -390,11 +390,13 @@ void orcaVM::call(int param_n)/*{{{*/
 #ifdef _VM_DEBUG_
 	char buff[1024]; // for debug message
 #endif
+	int param_size = m_local->recount_extract_from_stack(m_stack, param_n);
+
 	orcaData f = m_stack->at(param_n);
 	orcaData r;
 	if (is<TYPE_INTERNAL>(f)) {
 		PRINT1("\t\t  internal function called: %x\n", f.i());
-		{{	auto_local al(param_n, m_local);
+		{{	auto_local al(param_size, m_local);
 
 			m_local->copy_from_stack(m_stack, param_n);
 			set_caller(m_curr);
@@ -406,13 +408,13 @@ void orcaVM::call(int param_n)/*{{{*/
 	}
 	else if (is<TYPE_NATIVE>(f)) {
 		PRINT0("\t\t  native code called\n");
-		{{	auto_local al(param_n, m_local);
+		{{	auto_local al(param_size, m_local);
 
 			m_local->copy_from_stack(m_stack, param_n);
 			set_caller(m_curr);
 			m_stack->pop();
 
-			r = f.native_call(this, param_n);
+			r = f.native_call(this, param_size);
 			m_stack->push(r);
 		}}
 	}
@@ -421,7 +423,7 @@ void orcaVM::call(int param_n)/*{{{*/
 		char buff[1024];
 		PRINT1("\t\t  object called: %s\n", f.o()->dump(buff));
 #endif
-		int inc_size=param_n;
+		int inc_size=param_size;
 		if (f.o()->m_code != NULL) {
 			int frame_size = l2s(f.o()->m_code);
 			if (frame_size > param_n) 
@@ -438,7 +440,7 @@ void orcaVM::call(int param_n)/*{{{*/
 				{{	
 					auto_trace at(this);
 					m_trace->top_name = m_curr->get_name();
-					orcaData ret = (*f.o())(this, param_n);
+					orcaData ret = (*f.o())(this, param_size);
 					m_local->mark_return(ret);
 					m_stack->push(ret);
 				}}
@@ -458,7 +460,7 @@ void orcaVM::call(int param_n)/*{{{*/
 
 					{{	auto_trace at(this);
 						m_trace->top_name = f.o()->get_name();
-						orcaData ret = (*f.o())(this, param_n);
+						orcaData ret = (*f.o())(this, param_size);
 						m_local->mark_return(ret);
 						m_stack->push(ret);
 					}}
@@ -476,7 +478,7 @@ void orcaVM::call(int param_n)/*{{{*/
 		}
 	}
 	else if (is<TYPE_TYPE>(f)) {
-		{{	auto_local al(param_n, m_local);
+		{{	auto_local al(param_size, m_local);
 			m_local->copy_from_stack(m_stack, param_n);
 
 			orcaData d;
@@ -574,7 +576,7 @@ void orcaVM::call(int param_n)/*{{{*/
 		}}
 	}
 	else {
-		{{	auto_local al(param_n, m_local);
+		{{	auto_local al(param_size, m_local);
 
 			m_local->copy_from_stack(m_stack, param_n);
 			//m_stack->pop();	// return itself
@@ -1895,29 +1897,44 @@ do_assign_list:
 				orcaList* lp = new orcaList();
 
 				if (len > 0) {
-					for(j=0; j<len; j++) 
-						lp->push_front(m_stack->pop());
+					for(j=0; j<len; j++) {
+						d = m_stack->pop();
+						if (is<TYPE_EXTRACT>(d)) {
+							orcaTuple* tp = TO_TUPLE(d.o());
+							for(int k=tp->size()-1; k>=0; k--) {
+								lp->push_front(tp->at(k));
+							}
+						}
+						else {
+							lp->push_front(d);
+						}
+					}
 				}
 				else if (len < 0) {
-					if (len == -3)
+					if (len == -3) {
 						p3 = m_stack->pop();
-					else
+					}
+					else {
 						p3 = 1;
+					}
 
 					p2 = m_stack->pop();
 					p1 = m_stack->pop();
 
 					d = 0;
-					if (p3 <= d)
+					if (p3 <= d) {
 						throw orcaException(this, "orca.list", "list step is invalid (plus value required)");
+					}
 
 					if (p1 < p2) {
-						for(d=p1; d<=p2; d = d + p3) 
+						for(d=p1; d<=p2; d = d + p3) {
 							lp->push_back(d);
+						}
 					}
 					else {
-						for(d=p1; d>=p2; d = d - p3) 
+						for(d=p1; d>=p2; d = d - p3) {
 							lp->push_back(d);
+						}
 					}
 				}
 
@@ -1940,36 +1957,49 @@ do_assign_list:
 
 				PRINT2("\t\t%p : make tuple (%d)\n", c, len); 
 
-				orcaTuple* tp;
+				orcaTuple* tp = new orcaTuple();
+
 				if (len >= 0) {
-					tp = new orcaTuple(len);
 					for (j=len-1; j>=0; j--) {
-						orcaData d = m_stack->top();
-						tp->update(j, d);
-						m_stack->pop();
+						d = m_stack->at(j);
+						if (is<TYPE_EXTRACT>(d)) {
+							orcaTuple* tp2 = TO_TUPLE(d.o());
+							for(int k=0; k<tp2->size(); k++) {
+								tp->push_back(tp2->at(k));
+							}
+						}
+						else {
+							tp->push_back(d);
+						}
 					}
+
+					m_stack->dummy_pop(len);
 				}
 				else if (len < 0) {
-					tp = new orcaTuple();
-					if (len == -3)
+					if (len == -3) {
 						p3 = m_stack->pop();
-					else
+					}
+					else {
 						p3 = 1;
+					}
 
 					p2 = m_stack->pop();
 					p1 = m_stack->pop();
 
 					d = 0;
-					if (p3 <= d)
+					if (p3 <= d) {
 						throw orcaException(this, "orca.tuple", "tuple step is invalid (plus value required)");
+					}
 
 					if (p1 < p2) {
-						for(d=p1; d<=p2; d = d + p3)
+						for(d=p1; d<=p2; d = d + p3) {
 							tp->push_back(d);
+						}
 					}
 					else {
-						for(d=p1; d>=p2; d = d - p3)
+						for(d=p1; d>=p2; d = d - p3) {
 							tp->push_back(d);
+						}
 					}
 				}
 
@@ -2039,10 +2069,12 @@ do_assign_list:
 
 			case OP_LIST_AT:	
 			case OP_LIST_AT_IR:	
-				if ((unsigned char)*c == OP_LIST_AT_IR)
+				if ((unsigned char)*c == OP_LIST_AT_IR) {
 					flag = true;
-				else
+				}
+				else {
 					flag = false;
+				}
 
 				PRINT2("\t\t%p : list at (include right?: %d)\n", c, flag); 
 
@@ -2060,9 +2092,9 @@ do_assign_list:
 						}
 						p3.s_set(p1.s().substr(idx, 1));
 					}
-					else if (is<TYPE_PAIR>(p2))
-					
+					else if (is<TYPE_PAIR>(p2)) {
 						p3.s_set(orcaString::slice(p1.s(), p2.sl().from, p2.sl().to, flag));
+					}
 					else {
 						m_stack->pop();
 						m_stack->pop();
@@ -2071,10 +2103,12 @@ do_assign_list:
 					}
 				}
 				else if (isobj<orcaList>(p1)) {
-					if (is<TYPE_INT>(p2))
+					if (is<TYPE_INT>(p2)) {
 						p3 = TO_LIST(p1.o())->at(p2.i());
-					else if (is<TYPE_PAIR>(p2))
+					}
+					else if (is<TYPE_PAIR>(p2)) {
 						p3 = TO_LIST(p1.o())->slice(p2.sl().from, p2.sl().to, flag);
+					}
 					else {
 						m_stack->pop();
 						m_stack->pop();
@@ -2083,10 +2117,12 @@ do_assign_list:
 					}
 				}
 				else if (isobj<orcaTuple>(p1)) {
-					if (is<TYPE_INT>(p2))
+					if (is<TYPE_INT>(p2)) {
 						p3 = TO_TUPLE(p1.o())->at(p2.i());
-					else if (is<TYPE_PAIR>(p2))
+					}
+					else if (is<TYPE_PAIR>(p2)) {
 						p3 = TO_TUPLE(p1.o())->slice(p2.sl().from, p2.sl().to, flag);
+					}
 					else {
 						m_stack->pop();
 						m_stack->pop();
@@ -2786,6 +2822,45 @@ do_assign_list:
 					c = code + TO_INT(&c[1]);
 					goto fast_jmp;
 				}
+				break;
+			  }
+
+			case OP_EXTRACT: {
+				PRINT1("\t\t%p : extract\n", c);
+				p1 = m_stack->pop();
+				orcaObject* o = p1.Object();
+
+				if (isobj<orcaList>(p1) == true) {
+					p2 = TO_LIST(p1.o())->ex_tuple(this, 0);
+					o = p2.o();
+				}
+				else if (isobj<orcaTuple>(p1) == false) {
+					o = p1.o();
+					if (o->has_member("->", p2) == false) {
+						throw orcaException(this, "orca.type", "not extractable type");
+					}
+
+					if (is<TYPE_NIL>(p2)) {
+						throw orcaException(this, "orca.type", "not extractable type");
+					}
+
+					m_stack->push(p2);
+					m_stack->push(0);
+					call(1);
+					orcaData ret = m_stack->pop();
+
+					if (isobj<orcaTuple>(ret)) {
+						o = ret.o();
+					}
+					else {
+						orcaTuple* tp = new orcaTuple();
+						tp->push_back(ret);
+						o = tp;
+					}
+				}
+
+				d.extract_set(o);
+				m_stack->push(d);
 				break;
 			  }
 

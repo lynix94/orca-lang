@@ -42,6 +42,7 @@ enum orcaType
 	TYPE_INTERNAL,
 	TYPE_NATIVE,
 	TYPE_TYPE,
+	TYPE_EXTRACT,
 
 	TYPE_MARK,
 };
@@ -314,6 +315,7 @@ struct LIBORCA_API orcaData
 	void bn_set(const char* s)		{ t=TYPE_BIGNUM; v.bo = new BnObject(s); }
 	void bn_set(long long ll)		{ t=TYPE_BIGNUM; v.bo = new BnObject(ll); }
 	void pair_set(int i, int j)		{ t=TYPE_PAIR; v.sl.from=i; v.sl.to=j; }
+	void extract_set(orcaObject* o)	{ t=TYPE_EXTRACT; v.o = o; }
 
 	void type_set(orcaData d);
 	type_t& type_get();

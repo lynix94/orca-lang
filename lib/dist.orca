@@ -5,7 +5,6 @@ using time;
 using remotec;
 using dist;
 using util.lock;
-using fun;
 
 def clients;
 
@@ -52,7 +51,7 @@ def push_one(r)
 def dist_do(...argv)
 {
 	r = ..pop_one();
-	fun.apply(r.remote_do, argv.list());
+	r.remote_do(argv...);
 	return r;
 }
 

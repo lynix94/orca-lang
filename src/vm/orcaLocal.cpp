@@ -15,6 +15,7 @@
 #include "orcaForStack.h"
 #include "orcaDecodeStack.h"
 #include "orcaException.h"
+#include "orcaTuple.h"
 
 orcaLocal::orcaLocal(int size) 
 { 
@@ -72,11 +73,37 @@ void orcaLocal::save_gc(orcaData d)
 	vp->push_back(d);
 }
 
+int orcaLocal::recount_extract_from_stack(orcaStack* st, int count) 
+{
+	int ret = 0;
+	orcaData* op = &st->at(count-1);
+	for (int i=0, j=0; i < count; i++) {
+		orcaData d = op[i];
+		if (is<TYPE_EXTRACT>(d)) {
+			orcaTuple* tp = TO_TUPLE(d.o());
+			ret += tp->size();
+		} else {
+			ret++;
+		}
+	}
+
+	return ret;
+}
+
+
 void orcaLocal::copy_from_stack(orcaStack* st, int count) 
 {
 	orcaData* op = &st->at(count-1);
-	for (int i=0; i < count; i++) {
-		set(i, op[i]);
+	for (int i=0, j=0; i < count; i++) {
+		orcaData d = op[i];
+		if (is<TYPE_EXTRACT>(d)) {
+			orcaTuple* tp = TO_TUPLE(d.o());
+			for(int k=0; k<tp->size(); k++) {
+				set(j++, tp->at(k));
+			}
+		} else {
+			set(j++, d);
+		}
 	}
 
 	st->set_pointer(-count);

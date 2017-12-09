@@ -2,7 +2,6 @@ using socket;
 using thread;
 using time;
 using pack;
-using fun;
 using remoted;
 
 print: '## dist server start';
@@ -264,7 +263,7 @@ def client
 
 					obj = ..pop_obj();
 					..send: '<ok:call start>';
-					obj = fun.apply(obj, param);
+					obj = obj(param...);
 					..push_obj(obj);
 					..send: '<ok:call done>';
 				}

@@ -1,5 +1,3 @@
-using fun;
-
 if argv.TYPENAME != 'tuple' {
 	return nil;
 }
@@ -12,7 +10,7 @@ for a in mod {
 	f = f.MEMBERS[a];
 }
 
-print: fun.apply(f, argv[1:].list());
+print: f(argv[1:]...);
 
 
 

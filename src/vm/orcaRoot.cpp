@@ -26,7 +26,6 @@
 #include "orcaPack.h"
 #include "orcaStopWatch.h"
 #include "orcaBase64.h"
-#include "orcaFun.h"
 #include "orcaType.h"
 #include "orcaOrca.h"
 #include "orcaRandom.h"
@@ -72,7 +71,6 @@ orcaRoot::orcaRoot()
 	insert_static("pack", g_pack = new orcaPack());
 	insert_static("stopwatch", new orcaStopWatch());
 	insert_static("base64", new orcaBase64());
-	insert_static("__fun", new orcaFun());
 	insert_static("type", new orcaTypes());
 	insert_static("orca", new orcaOrca());
 	insert_static("random", new orcaRandom());

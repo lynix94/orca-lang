@@ -87,6 +87,7 @@ using namespace std;
 %type <integer> minus_number			// integer
 %type <integer> expression_stmt			// num of expr
 %type <integer> expression_list			// num of expr
+%type <integer> expr_extract_list		// num of expr
 %type <integer> pair_list				// num of expr
 %type <integer> opt_expr_list			// num of expr
 %type <integer> elif_stmt_list			// num of elif stmt
@@ -1719,11 +1720,15 @@ unary_expr:/*{{{*/
 /*}}}*/
 
 list:/*{{{*/
-	'[' opt_expr_list ']'
+	'[' ']'
+		{
+			g_op->make_list(0);
+		}
+	| '[' expr_extract_list ']'
 		{
 			g_op->make_list($2);
 		}
-	| '[' expression_list ','']'
+	| '[' expr_extract_list ','']'
 		{
 			g_op->make_list($2);
 		}
@@ -1744,11 +1749,11 @@ list:/*{{{*/
 /*}}}*/
 
 tuple:/*{{{*/
-	'(' expression_list ',' expression ')'
+	'(' expr_extract_list ',' expr_or_extract ')'
 		{
 			g_op->make_tuple($2 + 1);
 		}
-	| '(' expression_list ',' ')'
+	| '(' expr_extract_list ',' ')'
 		{
 			g_op->make_tuple($2);
 		}
@@ -2059,12 +2064,37 @@ calling_body:/*{{{*/
 		{
 			$$ = 0;
 		}
-	| '(' expression_list ')'
+	| '(' expr_extract_list ')'
 		{
 			$$ = $2;
 		}
 	;
 /*}}}*/
+
+expr_extract_list:/*{{{*/
+	expr_extract_list ',' expr_or_extract
+		{
+			$$ = $1 + 1;
+		}
+	| expr_or_extract
+		{
+			$$ = 1;
+		}
+	;
+/*}}}*/
+
+expr_or_extract:
+	expression
+	| extract
+	;
+
+extract:
+	expression TRIPLE_DOT
+		{
+			g_op->extract();
+		}
+	;
+
 
 object:/*{{{*/
 	postfix_object

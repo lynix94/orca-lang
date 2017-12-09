@@ -202,6 +202,11 @@ void parserOP::eval()
 	code_top->push_char(OP_EVAL);
 }
 
+void parserOP::extract()
+{
+	code_top->push_char(OP_EXTRACT);
+}
+
 void parserOP::do_rc_inc()		
 {
 	code_top->push_char(OP_RC_INC); 
