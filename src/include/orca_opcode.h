@@ -136,19 +136,20 @@
 
 
 // define code
-#define OP_DEF_START				0xC1
-#define OP_DEF_END					0xC3
-#define OP_REG						0xC4		
-#define OP_DEF_CODE					0xC6
-#define OP_DEF_SUPER				0xC7
-#define OP_USING					0xC8
-#define OP_USING_EXT				0xC9
-#define OP_DEF_START_PARSER			0xCA
-#define OP_DEF_INIT					0xCB
-#define OP_DEF_UNDER_START			0xCD
-#define OP_DEF_UNDER_END			0xCE
-#define OP_DEF_CONTEXT_START		0xD0
-#define OP_DEF_CONTEXT_UNDER_START	0xD1
+#define OP_DEF_START				0xC0
+#define OP_DEF_END					0xC1
+#define OP_REG						0xC2		
+#define OP_DEF_CODE					0xC3
+#define OP_DEF_SUPER				0xC4
+#define OP_USING					0xC5
+#define OP_USING_EXT				0xC6
+#define OP_DEF_START_PARSER			0xC7
+#define OP_DEF_INIT					0xC8
+#define OP_DEF_UNDER_START			0xC9
+#define OP_DEF_UNDER_END			0xCA
+//#define Code header tag reserved	0xCD
+#define OP_DEF_CONTEXT_START		0xDC
+#define OP_DEF_CONTEXT_UNDER_START	0xDD
 
 #endif
 

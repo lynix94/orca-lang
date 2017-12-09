@@ -60,14 +60,17 @@ struct OrcaHeader
 
 struct CodeHeader
 {
-	CodeHeader() : frame_size(0), 
-				   argument_size(0),
-				   flag_argv(0) {}
-
+	CodeHeader() :	frame_size(0),
+					argument_size(0),
+					flag_argv(0),
+					dummy(0) {}
+					
 	unsigned short frame_size;
 	unsigned short argument_size;
 	char  flag_argv;
+	char  dummy;
 };
+
 
 // impl at parserParser.cpp
 char* ll2l(long long i);
