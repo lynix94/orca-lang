@@ -55,6 +55,12 @@ public:
 	void decode_match_and_assign(const char* name);
 	void decode_cut_list(const char* head, const char* tail);
 
+	void switch_start();
+	void switch_end();
+	void switch_pattern_start();
+	void switch_pattern_shift();
+	void switch_pattern_end();
+
 	void sbf_start();
 	void sbf_end();
 	void sbf_rule_start();

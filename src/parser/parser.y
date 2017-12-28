@@ -127,8 +127,12 @@ using namespace std;
 %token DO
 %token WHILE
 %token TIMES
+%token SELECT
 %token SWITCH
 %token DECODE
+%token CASE
+%token DEFAULT
+%token FALLTHROUGH
 %token PARSE
 %token FOR
 %token IN
@@ -603,8 +607,71 @@ opt_expr_list:/*{{{*/
 selection_stmt:/*{{{*/
 	  if_elif_else_stmt
 	| decode_stmt
+	| switch_stmt
+	| select_stmt
 	;
 /*}}}*/
+
+select_stmt:
+	SELECT
+		{
+
+		}
+	'{' select_pattern_stmt_list '}'
+		{
+
+		}
+	;
+
+select_pattern_stmt_list:
+	  select_pattern_stmt_list select_pattern_stmt
+	| select_pattern_stmt
+	;
+
+
+select_pattern_stmt:
+		{
+		}
+	CASE expression RIGHT_ARROW assign_target_list_with_argv ':'
+		{
+		}
+	statement_list
+		{
+		}
+	;
+
+switch_stmt:
+	SWITCH expression
+		{
+			g_ctl->switch_start();
+		}
+	'{' switch_pattern_stmt_list '}'
+		{
+			g_ctl->switch_end();
+		}
+	;
+
+switch_pattern_stmt_list:
+	  switch_pattern_stmt_list switch_pattern_stmt
+	| switch_pattern_stmt
+	;
+
+
+switch_pattern_stmt:
+	CASE
+		{
+			g_ctl->switch_pattern_start();
+		}
+	expression ':'
+		{
+			g_ctl->switch_pattern_shift();
+		}
+	statement_list
+		{
+			g_ctl->switch_pattern_end();
+		}
+	;
+
 
 decode_stmt:/*{{{*/
 	DECODE expression 
@@ -2083,18 +2150,19 @@ expr_extract_list:/*{{{*/
 	;
 /*}}}*/
 
-expr_or_extract:
+expr_or_extract:/*{{{*/
 	expression
 	| extract
 	;
+/*}}}*/
 
-extract:
+extract:/*{{{*/
 	expression TRIPLE_DOT
 		{
 			g_op->extract();
 		}
 	;
-
+/*}}}*/
 
 object:/*{{{*/
 	postfix_object

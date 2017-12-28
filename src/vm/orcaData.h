@@ -189,6 +189,7 @@ enum mark_e
 	MARK_FOR,
 	MARK_DECODE,
 	MARK_STACK,
+	MARK_SWITCH,
 };
 
 struct mark_t 
@@ -349,6 +350,13 @@ struct LIBORCA_API orcaData
 		v.mark.type = MARK_STACK;
 		v.mark.vp = NULL;
 	}
+
+	void mark_switch() {
+		t=TYPE_MARK;
+		v.mark.type = MARK_SWITCH;
+		v.mark.vp = NULL;
+	}
+
 
 	// native call
 	orcaData native_call(orcaVM* vm, int param_n);

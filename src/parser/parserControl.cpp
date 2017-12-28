@@ -394,6 +394,76 @@ void parserControl::decode_cut_list(const char* head_name, const char* tail_name
 	g_shift_idx = -1;
 }
 
+void parserControl::switch_start()
+{
+	code_top->push_char(OP_SWITCH);
+
+	context ctx;
+	m_ctl.push_back(ctx);
+}
+
+void parserControl::switch_end()
+{
+	context& ctx = m_ctl[m_ctl.size()-1];
+
+	if (!ctx.list_break.empty()) {
+		vector<int>::iterator vi = ctx.list_break.begin();
+		for (; vi != ctx.list_break.end(); ++vi) {
+			code_top->set_int(code_top->size(), *vi);
+		}
+
+		ctx.list_break.clear();
+	}
+
+	// fix last fallthrough address
+	if (!ctx.list_cont.empty()) {
+		vector<int>::iterator vi = ctx.list_cont.begin();
+		for (; vi != ctx.list_cont.end(); ++vi) {
+			code_top->set_int(code_top->size(), *vi);
+		}
+
+		ctx.list_cont.clear();
+	}
+
+	m_ctl.pop_back();
+	code_top->push_char(OP_SWITCH_END);
+}
+
+void parserControl::switch_pattern_start()
+{
+	// fix previous pattern address
+	context& ctx = m_ctl[m_ctl.size()-1];
+	if (!ctx.list_cont.empty()) {
+		vector<int>::iterator vi = ctx.list_cont.begin();
+		for (; vi != ctx.list_cont.end(); ++vi) {
+			code_top->set_int(code_top->size(), *vi);
+		}
+
+		ctx.list_cont.clear();
+	}
+}
+
+
+void parserControl::switch_pattern_shift()
+{
+	context& ctx = m_ctl[m_ctl.size()-1];
+
+	code_top->push_char(OP_CASE);
+	// continues are used for go to next pattern start
+	ctx.list_cont.push_back(code_top->size());
+	code_top->increase(sizeof(int));
+}
+
+void parserControl::switch_pattern_end()
+{
+	context& ctx = m_ctl[m_ctl.size()-1];
+
+	// breaks are used for go to end
+	code_top->push_char(OP_JMP);
+	ctx.list_break.push_back(code_top->size());
+	code_top->increase(sizeof(int));
+}
+
 void parserControl::do_return(int i) 
 {
 	if (i == 0) {

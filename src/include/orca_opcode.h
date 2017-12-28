@@ -111,6 +111,9 @@
 #define OP_DECODE_CHECK_REMAIN		0x79
 #define OP_PARSE_INIT				0x7A
 #define OP_PARSE					0x7B
+#define OP_SWITCH					0x7C
+#define OP_SWITCH_END				0x7D
+#define OP_CASE						0x7E
 
 #define OP_SBF						0x80
 #define OP_SBF_LIST					0x81

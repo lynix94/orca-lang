@@ -1,10 +1,8 @@
-/* vim: set fdc=2 foldmethod=marker ts=4 tabstop=4 sw=4 sts=4 : */
-
 /**********************************************************************
 
   orcaLocal.cpp - impl. of orca local variable stack frame
 
-  Copyright (C) 2009-2011 Lee, Ki-Yeul
+  Copyright (C) 2009- Lee, Ki-Yeul
 
 **********************************************************************/
 
@@ -14,6 +12,7 @@
 #include "orcaStack.h"
 #include "orcaForStack.h"
 #include "orcaDecodeStack.h"
+#include "orcaSwitchStack.h"
 #include "orcaException.h"
 #include "orcaTuple.h"
 
@@ -220,6 +219,12 @@ void orcaLocal::decrease(bool clean_mark)
 			  {
 				orcaVM* vm = get_current_vm();
                 vm->m_stack->pop();
+				break;
+              }
+            case MARK_SWITCH: 
+			  {
+				orcaVM* vm = get_current_vm();
+                vm->m_switch_stack->pop();
 				break;
               }
 			}

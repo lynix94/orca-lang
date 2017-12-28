@@ -60,6 +60,7 @@ namespace fs = boost::filesystem;
 #include "orcaLocal.h"
 #include "orcaStack.h"
 #include "orcaForStack.h"
+#include "orcaSwitchStack.h"
 #include "orcaDecodeStack.h"
 #include "orcaException.h"
 #include "orcaParserObject.h"
@@ -191,6 +192,7 @@ void orcaVM::init()/*{{{*/
 	m_for_stack = new orcaForStack();
 	m_local = new orcaLocal();
 	m_decode_stack = new orcaDecodeStack(this);
+	m_switch_stack = new orcaSwitchStack(this);
 	m_stack = new orcaStack(m_local);
 	m_trace = new orcaTrace(this);
 
@@ -2511,6 +2513,33 @@ do_assign_list:
 
 				break;
 
+			case OP_SWITCH: 
+				PRINT1("\t\t%p : switch start\n", c);
+				p1 = m_stack->pop();
+				m_switch_stack->push(p1);
+
+				p2.mark_switch();
+				m_local->push_back(p2);
+				break;
+
+			case OP_SWITCH_END: 
+				PRINT1("\t\t%p : switch end\n", c); 
+				m_switch_stack->pop();
+				m_local->clean_mark(MARK_SWITCH);
+				break;
+
+			case OP_CASE:
+				PRINT1("\t\t%p : case pattern start\n", c); 
+				p1 = m_stack->pop();
+				if (m_switch_stack->compare(p1) == false) {
+					c = code + TO_INT(&c[1]);
+					goto fast_jmp;
+				} else {
+					c += sizeof(int) + FJ_INC;
+					goto fast_jmp;
+				}
+				break;
+
 			case OP_SBF: 
 			  {
 				PRINT4("\t\t%p : sbf: code: %d, gen: %d, rule: %d\n", 
@@ -2827,7 +2856,7 @@ do_assign_list:
 			  }
 
 			default:
-				PRINT2("\t\t%p : UNKNOWN: %x\n", c, *c); 
+				throw orcaException(this, "orca.lang", "unknown opcode");
 				break;
 			}
 		}
