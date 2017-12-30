@@ -410,7 +410,7 @@ void parserControl::switch_end()
 		ctx.list_break.clear();
 	}
 
-	// fix last fallthrough address
+	// fix last cont. address
 	if (!ctx.list_cont.empty()) {
 		vector<int>::iterator vi = ctx.list_cont.begin();
 		for (; vi != ctx.list_cont.end(); ++vi) {
@@ -420,13 +420,23 @@ void parserControl::switch_end()
 		ctx.list_cont.clear();
 	}
 
+	// fix last fallthroubh. address
+	if (!ctx.list_etc.empty()) {
+		vector<int>::iterator vi = ctx.list_etc.begin();
+		for (; vi != ctx.list_etc.end(); ++vi) {
+			code_top->set_int(code_top->size(), *vi);
+		}
+
+		ctx.list_etc.clear();
+	}
+
 	m_ctl.pop_back();
 	code_top->push_char(OP_SWITCH_END);
 }
 
 void parserControl::switch_pattern_start()
 {
-	// fix previous pattern address
+	// fix previous cont. address
 	context& ctx = m_ctl[m_ctl.size()-1];
 	if (!ctx.list_cont.empty()) {
 		vector<int>::iterator vi = ctx.list_cont.begin();
@@ -447,6 +457,16 @@ void parserControl::switch_pattern_shift()
 	// continues are used for go to next pattern start
 	ctx.list_cont.push_back(code_top->size());
 	code_top->increase(sizeof(int));
+
+	// fix previous fallthroubh. address
+	if (!ctx.list_etc.empty()) {
+		vector<int>::iterator vi = ctx.list_etc.begin();
+		for (; vi != ctx.list_etc.end(); ++vi) {
+			code_top->set_int(code_top->size(), *vi);
+		}
+
+		ctx.list_etc.clear();
+	}
 }
 
 void parserControl::switch_pattern_end()
@@ -479,8 +499,9 @@ void parserControl::do_continue()
 {
 	int idx;
 	for (idx = m_ctl.size()-1; idx >= 0; idx--) {
-		if (m_ctl[idx].start != 0)
+		if (is_continuable(m_ctl[idx])) {
 			break;
+		}
 	}
 	if (idx < 0) {
 		// TODO: catch this
@@ -491,7 +512,12 @@ void parserControl::do_continue()
 	int offset = m_ctl[idx].start;
 	control_type_e type = m_ctl[idx].type;
 
-	if (type == CONTROL_PARALLEL_FOR) { // para for
+
+	if (type == CONTROL_SWITCH) {
+		printf("switch statement not allow continue\n");
+		throw "switch statement not allow continue";
+	}
+	else if (type == CONTROL_PARALLEL_FOR) { // para for
 		code_top->push_char(OP_PARALLEL_END);
 
 		// break when for items are empty
@@ -499,7 +525,7 @@ void parserControl::do_continue()
 		m_ctl[idx].list_break.push_back(code_top->size());
 		code_top->increase(sizeof(int));
 	}
-	else if (type == CONTROL_FOR || type == CONTROL_FOR_2 || type == CONTROL_FOR_SUB) {  // for
+	else if (is_for(m_ctl[idx])) { // for
 		code_top->push_char(OP_FOR_END);
 
 		// break when for items are empty
@@ -517,8 +543,9 @@ void parserControl::do_break()
 {
 	int idx;
 	for (idx = m_ctl.size()-1; idx >= 0; idx--) {
-		if (m_ctl[idx].start != 0)
+		if (is_breakable(m_ctl[idx])) {
 			break;
+		}
 	}
 	if (idx < 0) {
 		// TODO: catch this
@@ -530,8 +557,7 @@ void parserControl::do_break()
 		code_top->push_char(OP_PARALLEL_END);
 	}
 	else {
-		control_type_e type = m_ctl[idx].type;
-		if (type == CONTROL_FOR || type == CONTROL_FOR_2 || type == CONTROL_FOR_SUB) { // remove for stack
+		if (is_for(m_ctl[idx])) { // remove for stack
 			code_top->push_char(OP_FOR_POP);
 		}
 
@@ -539,6 +565,20 @@ void parserControl::do_break()
 		m_ctl[idx].list_break.push_back(code_top->size());
 		code_top->increase(sizeof(int));
 	}
+}
+
+
+void parserControl::do_fallthrough()
+{
+	int idx = m_ctl.size()-1;
+	if (m_ctl[idx].type != CONTROL_SWITCH) {
+		printf("falltough should be used in switch statement\n");
+		throw "falltough should be used in switch statement";
+	}
+
+	code_top->push_char(OP_JMP);
+	m_ctl[idx].list_etc.push_back(code_top->size());
+	code_top->increase(sizeof(int));
 }
 
 
@@ -726,3 +766,53 @@ void parserControl::channel_out_end(int num)
 }
  
 
+bool parserControl::is_breakable(context& ctx) 
+{
+	control_type_e type = ctx.type;
+
+	switch (type) {
+	case CONTROL_DO: 
+	case CONTROL_TIMES: 
+	case CONTROL_WHILE: 
+	case CONTROL_FOR: 
+	case CONTROL_FOR_2: 
+	case CONTROL_FOR_SUB: 
+	case CONTROL_SWITCH: 
+		return true;
+	}
+
+	return false;
+}
+
+bool parserControl::is_continuable(context& ctx) 
+{
+	control_type_e type = ctx.type;
+
+	switch (type) {
+	case CONTROL_DO: 
+	case CONTROL_TIMES: 
+	case CONTROL_WHILE: 
+	case CONTROL_FOR: 
+	case CONTROL_FOR_2: 
+	case CONTROL_FOR_SUB: 
+	case CONTROL_SWITCH:  // return true, but will make error
+		return true;
+	}
+
+	return false;
+}
+
+
+bool parserControl::is_for(context& ctx) 
+{
+	control_type_e type = ctx.type;
+
+	switch (type) {
+	case CONTROL_FOR: 
+	case CONTROL_FOR_2: 
+	case CONTROL_FOR_SUB: 
+		return true;
+	}
+
+	return false;
+}

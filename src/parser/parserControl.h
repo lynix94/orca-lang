@@ -64,6 +64,7 @@ public:
 	void do_return(int i);
 	void do_continue();
 	void do_break();
+	void do_fallthrough();
 
 	void decode_start();
 	void decode_func_start();
@@ -118,6 +119,12 @@ private:
 	};
 
 	vector<context> m_ctl;
+
+
+private:
+	bool is_breakable(context& ctx);
+	bool is_continuable(context& ctx);
+	bool is_for(context& ctx);
 };
 
 

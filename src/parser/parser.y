@@ -589,6 +589,10 @@ control_stmt:/*{{{*/
 		{
 			g_ctl->do_break();
 		}
+	| FALLTHROUGH ';'
+		{
+			g_ctl->do_fallthrough();
+		}
 	;
 /*}}}*/
 
