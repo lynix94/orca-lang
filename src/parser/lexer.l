@@ -81,7 +81,6 @@ else				{ return ELSE; }
 
 for					{ return FOR; }
 in					{ return IN; }
-select				{ return SELECT; }
 switch				{ return SWITCH; }
 decode				{ return DECODE; }
 case				{ return CASE; }

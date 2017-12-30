@@ -16,8 +16,6 @@
 
 #pragma warning (disable : 4309)  // 0xf2 to push_char
 
-#define MARK_PARALLEL_FOR 1000000000
-
 void yyerror(const char* msg);
 
 parserControl s_ctl;
@@ -30,7 +28,7 @@ void parserControl::if_start(bool flag)
 	else
 		code_top->push_char(OP_JMP_TRUE);
 
-	context ctx;
+	context ctx(CONTROL_IF);
 	ctx.pass2 = code_top->size();
 	m_ctl.push_back(ctx);
 	
@@ -53,7 +51,7 @@ void parserControl::else_start()
 
 	code_top->push_char(OP_JMP);
 
-	context ctx;
+	context ctx(CONTROL_ELSE);
 	ctx.pass2 = code_top->size();
 	m_ctl.push_back(ctx);
 
@@ -72,7 +70,7 @@ void parserControl::else_end()
 
 void parserControl::do_start() 
 {
-	context ctx;
+	context ctx(CONTROL_DO);
 	ctx.start = code_top->size();
 	m_ctl.push_back(ctx);
 }
@@ -102,7 +100,7 @@ void parserControl::times_start()
 {
 	code_top->push_char(OP_MARK_STACK);
 
-	context ctx;
+	context ctx(CONTROL_TIMES);
 	ctx.start = code_top->size();
 	m_ctl.push_back(ctx);
 }
@@ -139,7 +137,7 @@ void parserControl::times_end()
 
 void parserControl::while_start_1() 
 {
-	context ctx;
+	context ctx(CONTROL_WHILE);
 	ctx.start = code_top->size();
 	m_ctl.push_back(ctx);
 }
@@ -181,9 +179,8 @@ void parserControl::for_start(const char* name)
 	code_top->push_char(OP_FOR);
 	code_top->push_short(idx);
 	
-	context ctx;
+	context ctx(CONTROL_FOR);
 	ctx.start = code_top->size();
-	ctx.start *= -1; // mark for for_stmt
 	ctx.list_break.push_back(code_top->size());
 	m_ctl.push_back(ctx);
 
@@ -198,9 +195,8 @@ void parserControl::for_start_2(const char* name1, const char* name2)
 	code_top->push_short(idx1);
 	code_top->push_short(idx2);
 	
-	context ctx;
+	context ctx(CONTROL_FOR_2);
 	ctx.start = code_top->size();
-	ctx.start *= -1; // mark for for_stmt
 	ctx.list_break.push_back(code_top->size());
 	m_ctl.push_back(ctx);
 
@@ -213,9 +209,8 @@ void parserControl::for_start_sub(const char* name)
 	code_top->push_char(OP_FOR_SUB);
 	code_top->push_short(idx);
 	
-	context ctx;
+	context ctx(CONTROL_FOR_SUB);
 	ctx.start = code_top->size();
-	ctx.start *= -1; // mark for for_stmt
 	ctx.list_break.push_back(code_top->size());
 	m_ctl.push_back(ctx);
 
@@ -244,7 +239,7 @@ void parserControl::decode_start()
 {
 	code_top->push_char(OP_DECODE);
 
-	context ctx;
+	context ctx(CONTROL_DECODE);
 	m_ctl.push_back(ctx);
 }
 
@@ -255,7 +250,7 @@ void parserControl::decode_func_start()
 
 	code_top->push_char(OP_DECODE);
 
-	context ctx;
+	context ctx(CONTROL_DECODE);
 	m_ctl.push_back(ctx);
 }
 
@@ -398,7 +393,7 @@ void parserControl::switch_start()
 {
 	code_top->push_char(OP_SWITCH);
 
-	context ctx;
+	context ctx(CONTROL_SWITCH);
 	m_ctl.push_back(ctx);
 }
 
@@ -488,13 +483,15 @@ void parserControl::do_continue()
 			break;
 	}
 	if (idx < 0) {
-		printf("abnormal continue");
-		return;
+		// TODO: catch this
+		printf("abnormal continue\n");
+		throw "abnormal continue";
 	}
 
 	int offset = m_ctl[idx].start;
+	control_type_e type = m_ctl[idx].type;
 
-	if (offset == MARK_PARALLEL_FOR) { // para for
+	if (type == CONTROL_PARALLEL_FOR) { // para for
 		code_top->push_char(OP_PARALLEL_END);
 
 		// break when for items are empty
@@ -502,11 +499,7 @@ void parserControl::do_continue()
 		m_ctl[idx].list_break.push_back(code_top->size());
 		code_top->increase(sizeof(int));
 	}
-	else if (offset > 0) {
-		code_top->push_char(OP_JMP);
-		code_top->push_int(offset);
-	}
-	else {  // for
+	else if (type == CONTROL_FOR || type == CONTROL_FOR_2 || type == CONTROL_FOR_SUB) {  // for
 		code_top->push_char(OP_FOR_END);
 
 		// break when for items are empty
@@ -514,7 +507,10 @@ void parserControl::do_continue()
 		m_ctl[idx].list_break.push_back(code_top->size());
 		code_top->increase(sizeof(int));
 	}
-
+	else {
+		code_top->push_char(OP_JMP);
+		code_top->push_int(offset);
+	}
 }
 
 void parserControl::do_break()
@@ -525,15 +521,17 @@ void parserControl::do_break()
 			break;
 	}
 	if (idx < 0) {
-		printf("abnormal break");
-		return;
+		// TODO: catch this
+		printf("abnormal break\n");
+		throw "abnormal break";
 	}
 
-	if (m_ctl[idx].start == MARK_PARALLEL_FOR) { // para for
+	if (m_ctl[idx].type == CONTROL_PARALLEL_FOR) { // para for
 		code_top->push_char(OP_PARALLEL_END);
 	}
 	else {
-		if (m_ctl[idx].start < 0) { // remove for stack
+		control_type_e type = m_ctl[idx].type;
+		if (type == CONTROL_FOR || type == CONTROL_FOR_2 || type == CONTROL_FOR_SUB) { // remove for stack
 			code_top->push_char(OP_FOR_POP);
 		}
 
@@ -546,7 +544,7 @@ void parserControl::do_break()
 
 void parserControl::sbf_start()
 {
-	context ctx;
+	context ctx(CONTROL_SBF);
 
 	code_top->push_char(OP_JMP);
 	ctx.start = code_top->size();
@@ -626,7 +624,7 @@ void parserControl::sbf_range_gen(const char* name)
 
 void parserControl::parallel_start()
 {
-	context ctx;
+	context ctx(CONTROL_PARALLEL);
 
 	code_top->push_char(OP_PARALLEL_START);
 	ctx.pass2 = code_top->size();
@@ -651,8 +649,7 @@ void parserControl::parallel_for_start(const char* name)
 	code_top->push_char(OP_PARALLEL_FOR);
 	code_top->push_short(idx);
 
-	context ctx;
-	ctx.start = MARK_PARALLEL_FOR;
+	context ctx(CONTROL_PARALLEL_FOR);
 	ctx.pass2 = code_top->size();
 	m_ctl.push_back(ctx);
 	code_top->increase(sizeof(int));
@@ -691,7 +688,7 @@ void parserControl::channel_in_start()
 {
 	code_top->push_char(OP_CHANNEL_IN);
 
-	context ctx;
+	context ctx(CONTROL_CHANNEL_IN);
 	ctx.pass2 = code_top->size();
 	m_ctl.push_back(ctx);
 	
@@ -713,7 +710,7 @@ void parserControl::channel_out_start()
 {
 	code_top->push_char(OP_CHANNEL_OUT);
 
-	context ctx;
+	context ctx(CONTROL_CHANNEL_OUT);
 	ctx.pass2 = code_top->size();
 	m_ctl.push_back(ctx);
 	

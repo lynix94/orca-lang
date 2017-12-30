@@ -14,6 +14,27 @@
 
 #include "parserCode.h"
 
+
+enum control_type_e
+{
+	CONTROL_NULL = 0,
+	CONTROL_IF, 
+	CONTROL_ELSE, 
+	CONTROL_DO, 
+	CONTROL_TIMES, 
+	CONTROL_WHILE, 
+	CONTROL_FOR, 
+	CONTROL_FOR_2, 
+	CONTROL_FOR_SUB, 
+	CONTROL_DECODE, 
+	CONTROL_SWITCH, 
+	CONTROL_SBF, 
+	CONTROL_PARALLEL, 
+	CONTROL_PARALLEL_FOR, 
+	CONTROL_CHANNEL_IN, 
+	CONTROL_CHANNEL_OUT, 
+};
+
 class parserControl 
 {
 public:
@@ -82,7 +103,10 @@ public:
 
 private:
 	struct context {
-		context() : start(0), end(0), pass2(0) { }
+		context(control_type_e t)
+			: type(t), start(0), end(0), pass2(0) { }
+
+		control_type_e type;
 
 		int pass2;
 		int start;					// start of control statement
@@ -90,10 +114,13 @@ private:
 		vector<int> list_cont;		
 		vector<int> list_break;	
 		vector<int> list_etc;	
+
 	};
 
 	vector<context> m_ctl;
 };
+
+
 
 extern parserControl* g_ctl;
 

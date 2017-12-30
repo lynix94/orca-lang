@@ -608,10 +608,11 @@ selection_stmt:/*{{{*/
 	  if_elif_else_stmt
 	| decode_stmt
 	| switch_stmt
-	| select_stmt
 	;
 /*}}}*/
 
+
+/*
 select_stmt:
 	SELECT
 		{
@@ -639,6 +640,7 @@ select_pattern_stmt:
 		{
 		}
 	;
+*/
 
 switch_stmt:
 	SWITCH expression
