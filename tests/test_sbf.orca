@@ -3,14 +3,10 @@ print: 'quick sort 10~-10';
 
 def.decode qsort(a)
 {
-	[] -> 
-	{
+	case []:
 		return [];
-	}
-	%x:%xs -> 
-	{
+	case %x[%xs]: 
 		return qsort(%[a|a<-xs, a<=x]) + [x] +  qsort(%[b|b<-xs, b>x]);
-	}
 }
 
 print: result = .qsort([10..-10]);

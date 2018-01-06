@@ -122,27 +122,24 @@ def client
 	{
 		def obj;
 
-		decode(path)
+		decode path
 		{
-		%head, '.', %tail -> 
-			{ 
-				if head == 'root' {
-					.obj = root;
-				}
-				else {
-					.obj = .obj.MEMBERS[head];
-				}
-
-				return find_obj(tail);
+		case %head, '.', %tail:
+			if head == 'root' {
+				.obj = root;
 			}
-		%head -> 
-			{ 
-				if head == 'root' {
-					.obj = root;
-				}
-				else {
-					.obj = .obj.MEMBERS[head];
-				}
+			else {
+				.obj = .obj.MEMBERS[head];
+			}
+
+			return find_obj(tail);
+
+		case %head:
+			if head == 'root' {
+				.obj = root;
+			}
+			else {
+				.obj = .obj.MEMBERS[head];
 			}
 		}
 
@@ -191,92 +188,81 @@ def client
 	{
 		decode(msg)
 		{
-			'<push>', %tail  -> 
-				{ 
-					cl = pack.check_code(tail);
-					for a in cl {
-						..send('<req_code>'+a);
-						rcv = ..recv();
-						do_what(rcv);
-					}
+			case '<push>', %tail:
+				cl = pack.check_code(tail);
+				for a in cl {
+					..send('<req_code>'+a);
+					rcv = ..recv();
+					do_what(rcv);
+				}
 
-					obj = pack.load(tail);
-					..push_obj(obj);
-					..send: '<ok:push>';
-				}
-			'<pop>' -> 
-				{ 
-					obj = ..pop_obj();
-					str = pack.save(obj);
-					..send('<ok:pop>'+str);
-				}
-			'<get>', %idx -> 
-				{ 
-					obj = ..get_obj(idx.integer());
-					str = pack.save(obj);
-					..send('<ok:get>'+str);
-				}
-			'<clean>' -> 
-				{ 
-					..clean_obj();
-					..send('<ok:clean>');
-				}
-			'<assign>', %name  ->
-				{
-					obj = ..pop_obj();
-					..assign_obj(name, obj);
-					..send: '<ok:assign>';
-				}
-			'<find>', %name -> 
-				{ 
-					try {
-						obj = ..find_obj(name);
-						if obj.ID != root.ID {
-							..pop_obj();
-						}
-		
-						..push_obj(obj);
-						..send: '<ok:find>';
-					}
-					catch {
-						..send: '<nok:1>${name} not found';
-					}
-				}
-			'<code>', %name, ',', %tail -> 
-				{
-					try {
-						pack.load_code(name, tail);
-					}
-					catch orca.lang {
-						remoted.log: name, ' already exists';
-					}
-				}
-			'<call>', %tail ->
-				{
-					n = tail.integer();
-					param = [];
-					if (n>0) {
-						for i in [1..n] {
-							param .push_front(..pop_obj());
-						}
-					}
+				obj = pack.load(tail);
+				..push_obj(obj);
+				..send: '<ok:push>';
 
-					obj = ..pop_obj();
-					..send: '<ok:call start>';
-					obj = obj(param...);
+			case '<pop>':
+				obj = ..pop_obj();
+				str = pack.save(obj);
+				..send('<ok:pop>'+str);
+
+			case '<get>', %idx:
+				obj = ..get_obj(idx.integer());
+				str = pack.save(obj);
+				..send('<ok:get>'+str);
+				
+			case '<clean>':
+				..clean_obj();
+				..send('<ok:clean>');
+
+			case '<assign>', %name:
+				obj = ..pop_obj();
+				..assign_obj(name, obj);
+				..send: '<ok:assign>';
+
+			case '<find>', %name:
+				try {
+					obj = ..find_obj(name);
+					if obj.ID != root.ID {
+						..pop_obj();
+					}
+	
 					..push_obj(obj);
-					..send: '<ok:call done>';
+					..send: '<ok:find>';
 				}
-			'<ping>' ->
-				{
-					..send: '<ack>';
+				catch {
+					..send: '<nok:1>${name} not found';
 				}
-			'<shutdown>' ->
-				{
-					..send: '<ack>';
-					time.msleep(200);
-					return '<shutdown>';
+
+			case '<code>', %name, ',', %tail:
+				try {
+					pack.load_code(name, tail);
 				}
+				catch orca.lang {
+					remoted.log: name, ' already exists';
+				}
+
+			case '<call>', %tail:
+				n = tail.integer();
+				param = [];
+				if (n>0) {
+					for i in [1..n] {
+						param .push_front(..pop_obj());
+					}
+				}
+
+				obj = ..pop_obj();
+				..send: '<ok:call start>';
+				obj = obj(param...);
+				..push_obj(obj);
+				..send: '<ok:call done>';
+
+			case '<ping>':
+				..send: '<ack>';
+
+			case '<shutdown>':
+				..send: '<ack>';
+				time.msleep(200);
+				return '<shutdown>';
 		}
 	}
 }

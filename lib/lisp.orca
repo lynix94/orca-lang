@@ -97,10 +97,8 @@ def cdr(list)
 {
 	decode list
 	{
-	[]		  -> return nil;
-	%head:%tail -> { 
-					return tail;
-				}
+	case []		: return nil;
+	case %head[%tail] : return tail;
 	}
 }
 

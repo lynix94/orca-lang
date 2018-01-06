@@ -13,16 +13,14 @@ def decoding(str)
 	#print: '# ', str;
 	decode str.strip()
 	{
-	'<?', %info, '?>', %remain ->
-		{
-			ret = decoding(remain);
-			ret['$info'] = info.strip();
-			return ret;
-		}
+	case '<?', %info, '?>', %remain:
+		ret = decoding(remain);
+		ret['$info'] = info.strip();
+		return ret;
 
-	'<', %name = r'[a-zA-Z_][a-zA-Z_0-9]*', %attrs, '>', 
-	%one_tag = match.match_one_tag,
-	'</${name}>', %remain ->
+	case '<', %name = r'[a-zA-Z_][a-zA-Z_0-9]*', %attrs, '>', 
+		%one_tag = match.match_one_tag,
+		'</${name}>', %remain:
 		{
 			head = decoding(one_tag);
 
@@ -59,7 +57,7 @@ def decoding(str)
 			return { name:tag };
 		}
 
-	'<', %name = r'[a-zA-Z_][a-zA-Z_0-9]*', %attrs, '/>', %remain ->
+	case '<', %name = r'[a-zA-Z_][a-zA-Z_0-9]*', %attrs, '/>', %remain:
 		{
 			tag = type.map();
 			if attrs.TYPE == type.string && attrs.strip().length() > 0 {
@@ -87,7 +85,7 @@ def decoding(str)
 			return { name:tag };
 		}
 
-	%key, '=', %value=r'(\'[^\']*\')|("[^"]*")|([^ ]*)', %remain ->
+	case %key, '=', %value=r'(\'[^\']*\')|("[^"]*")|([^ ]*)', %remain:
 		{
 			value = decoding(value);
 			tail = type.map();
@@ -99,11 +97,16 @@ def decoding(str)
 			return tail;
 		}
 
-	%value = r'[0-9]+' -> return value.integer();
-	%value = r'"[^"]*"' -> return value[1:-1];
-	%value = r"'[^']*'" -> return value[1:-1];
-	%text = ..match_plain_text-> return text;
-	%error -> print: 'not matched';
+	case %value = r'[0-9]+':
+		return value.integer();
+	case %value = r'"[^"]*"':
+		return value[1:-1];
+	case %value = r"'[^']*'":
+		return value[1:-1];
+	case %text = ..match_plain_text:
+		return text;
+	case %error:
+		print: 'not matched';
 	}
 }
 

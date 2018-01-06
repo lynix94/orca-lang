@@ -23,9 +23,9 @@ def pure_str(str)
 	ret = '';
 	decode str
 	{
-	'"', %value = match.dq_string, '"' -> ret = value;
-	"'", %value = match.sq_string, "'" -> ret = value;
-	%etc -> ret = str;
+	case '"', %value = match.dq_string, '"': ret = value;
+	case "'", %value = match.sq_string, "'": ret = value;
+	case %etc: ret = str;
 	}
 
 	return match.string_unescaping(ret);
@@ -36,78 +36,68 @@ def decoding(str)
 	#print: '# ', str;
 	decode str.strip()
 	{
-	'"', %value = match.dq_string, '"' -> 
-		{
-			return match.string_unescaping(value);
+	case '"', %value = match.dq_string, '"':
+		return match.string_unescaping(value);
+
+	case "'", %value = match.sq_string, "'":
+		return match.string_unescaping(value);
+
+	case %value = r'[0-9]+':
+		return value.integer();
+
+	case '[', %value = ..match_array, ']':
+		if value == '' {
+			return [];
 		}
 
-	"'", %value = match.sq_string, "'" -> 
-		{
-			return match.string_unescaping(value);
+		tp = decoding(value);
+		if tp.TYPE == ..dummy_list {
+			return tp.list;
+		}
+		return [tp];
+
+	case '{', %value = ..match_brace, '}':
+		if value == '' {
+			return type.map();
 		}
 
-	%value = r'[0-9]+' -> return value.integer();
-
-	'[', %value = ..match_array, ']' ->
-		{
-			if value == '' {
-				return [];
-			}
-
-			tp = decoding(value);
-			if tp.TYPE == ..dummy_list {
-				return tp.list;
-			}
-			return [tp];
-		}
-	'{', %value = ..match_brace, '}' ->
-		{
-			if value == '' {
-				return type.map();
-			}
-
-			tp = decoding(value);
-			if tp.TYPE == ..dummy_list {
-				map = type.map();
-				for a in tp.list {
-					if map.has_key(a[0]) {
-						if map[a[0]].TYPE == type.tuple {
-							map[a[0]].push_back(a[1]);
-						}
-						else {
-							map[a[0]] = (map[a[0]], a[1]);
-						}
+		tp = decoding(value);
+		if tp.TYPE == ..dummy_list {
+			map = type.map();
+			for a in tp.list {
+				if map.has_key(a[0]) {
+					if map[a[0]].TYPE == type.tuple {
+						map[a[0]].push_back(a[1]);
 					}
 					else {
-						map[a[0]] = a[1];
+						map[a[0]] = (map[a[0]], a[1]);
 					}
 				}
-
-				return map;
+				else {
+					map[a[0]] = a[1];
+				}
 			}
 
-			return { tp[0]:tp[1] };
+			return map;
 		}
 
-	%head = match.comma, ',', %tail -> 
-		{
-			item  = decoding(head);
-			remain = decoding(tail);
+		return { tp[0]:tp[1] };
 
-			if remain.TYPE == ..dummy_list {
-				remain.list.push_front(item);
-				return remain;
-			}
-				
-			dl = ..dummy_list.clone();
-			dl.list = [item, remain];
-			return dl;
-		}
+	case %head = match.comma, ',', %tail:
+		item  = decoding(head);
+		remain = decoding(tail);
 
-	%key, ':', %value ->
-		{
-			 return (..pure_str(key), decoding(value));
+		if remain.TYPE == ..dummy_list {
+			remain.list.push_front(item);
+			return remain;
 		}
+			
+		dl = ..dummy_list.clone();
+		dl.list = [item, remain];
+		return dl;
+
+	case %key, ':', %value:
+		 return (..pure_str(key), decoding(value));
 	}
 }
 

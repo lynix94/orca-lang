@@ -116,62 +116,54 @@ def client
 
 	def do_what(msg)
 	{
-		decode(msg)
+		decode msg
 		{
 			# mkdir, ls, remove, file_size, isexists, isfile, isdir
-			'<fs1>', %cmd, ',', %path  -> 
-				{ 
-					obj = nil;
-					
-					if cmd == 'ping' {
-						obj = true;
-					}
-					elif cmd == 'shutdown' {
-						obj = true;
-						..send: pack.save(obj);
-						time.msleep(200);
-						return '<shutdown>';
-					}
-					elif fs.MEMBERS.has_key(cmd) {
-						obj = fs.MEMBERS[cmd](..dfs_root + path);
-					}
-
+			case '<fs1>', %cmd, ',', %path:
+				obj = nil;
+				
+				if cmd == 'ping' {
+					obj = true;
+				}
+				elif cmd == 'shutdown' {
+					obj = true;
 					..send: pack.save(obj);
+					time.msleep(200);
+					return '<shutdown>';
+				}
+				elif fs.MEMBERS.has_key(cmd) {
+					obj = fs.MEMBERS[cmd](..dfs_root + path);
 				}
 
-			'<read>', %path, ',', %size, ',', %offset -> 
-				{ 
-					if size == 'nil' {
-						size = nil;
-					}
+				..send: pack.save(obj);
 
-					if offset == 'nil' {
-						offset = nil;
-					}
-
-					obj = fs.read(..dfs_root + path, size, offset);
-					..send: pack.save(obj);
+			case '<read>', %path, ',', %size, ',', %offset:
+				if size == 'nil' {
+					size = nil;
 				}
 
-			'<write>', %path, ',', %offset, ',', %data -> 
-				{ 
-					if data == 'nil' {
-						data = nil;
-					}
-
-					if offset == 'nil' {
-						offset = nil;
-					}
-
-					obj = fs.write(..dfs_root + path, data, offset);
-					..send: pack.save(obj);
+				if offset == 'nil' {
+					offset = nil;
 				}
 
-			'<rename>', %src, ',', %dest ->
-				{ 
-					obj = fs.rename(..dfs_root + src, ..dfs_root + dest);
-					..send: pack.save(obj);
+				obj = fs.read(..dfs_root + path, size, offset);
+				..send: pack.save(obj);
+
+			case '<write>', %path, ',', %offset, ',', %data:
+				if data == 'nil' {
+					data = nil;
 				}
+
+				if offset == 'nil' {
+					offset = nil;
+				}
+
+				obj = fs.write(..dfs_root + path, data, offset);
+				..send: pack.save(obj);
+
+			case '<rename>', %src, ',', %dest:
+				obj = fs.rename(..dfs_root + src, ..dfs_root + dest);
+				..send: pack.save(obj);
 
 		}
 	}

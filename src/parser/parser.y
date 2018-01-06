@@ -194,13 +194,8 @@ using namespace std;
 statement_list:/*{{{*/
 	statement_list statement
 	| statement_list statement_block
-	| statement
-	;
-/*}}}*/
-
-statement_or_block/*{{{*/
-	: statement 
 	| statement_block
+	| statement
 	;
 /*}}}*/
 
@@ -813,11 +808,11 @@ decode_pattern_stmt:/*{{{*/
 		{
 			g_ctl->decode_pattern_start();
 		}
-	decode_pattern RIGHT_ARROW
+	CASE decode_pattern ':'
 		{
 			g_ctl->decode_pattern_shift();
 		}
-	statement_or_block 
+	statement_list
 		{
 			g_ctl->decode_pattern_end();
 		}
@@ -831,7 +826,7 @@ decode_pattern:/*{{{*/
 /*}}}*/
 
 list_pattern:/*{{{*/
-	p_var ':' p_var
+	p_var  '[' p_var ']'
 		{
 			g_ctl->decode_cut_list($1, $3);
 		}

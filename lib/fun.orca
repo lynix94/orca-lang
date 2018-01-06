@@ -94,8 +94,7 @@ def reduce(a, b, c)
 
 		decode list
 		{
-			%head:%tail ->
-			{
+			case %head[%tail]:
 				if tail == [] {
 					result = f(result, nil);
 				}
@@ -104,7 +103,6 @@ def reduce(a, b, c)
 						result = f(result, a());
 					}
 				}
-			}
 		}
 	}
 	else {

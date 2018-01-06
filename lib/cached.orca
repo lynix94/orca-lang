@@ -158,81 +158,65 @@ def client
 
 	def do_what(msg)
 	{
-		decode(msg)
+		decode msg
 		{
-			'<fs1>', 'remove', ',', %path  -> 
-				{ 
-					ret = ..remove_val(path);
-					..send: pack.save(ret);
+			case '<fs1>', 'remove', ',', %path:
+				ret = ..remove_val(path);
+				..send: pack.save(ret);
+
+			case '<fs1>', 'file_size', ',', %path:
+				value = ..find_val(path);
+				..send: pack.save(value.length());
+
+			case '<fs1>', 'isexists', ',', %path:
+				result = false;
+				value = ..find_val(path);
+				if value != nil {
+					result = true;
 				}
 
-			'<fs1>', 'file_size', ',', %path  -> 
-				{ 
-					value = ..find_val(path);
-					..send: pack.save(value.length());
-				}
-
-			'<fs1>', 'isexists', ',', %path  -> 
-				{ 
-					result = false;
-					value = ..find_val(path);
-					if value != nil {
-						result = true;
-					}
-
-					..send: pack.save(result);
-				}
+				..send: pack.save(result);
 
 			# mkdir, ls, isfile, isdir
-			'<fs1>', %cmd, ',', %path  -> 
-				{ 
-					print: '## invalid command';
-					..send: pack.save(nil);
+			case '<fs1>', %cmd, ',', %path:
+				print: '## invalid command';
+				..send: pack.save(nil);
+
+			case '<read>', %path, ',', %size, ',', %offset:
+				if size == 'nil' {
+					size = '1000000000';
 				}
 
-			'<read>', %path, ',', %size, ',', %offset -> 
-				{ 
-					if size == 'nil' {
-						size = '1000000000';
-					}
-
-					if offset == 'nil' {
-						offset = '0';
-					}
-
-					size = size.integer();
-					offset = offset.integer();
-
-					value = ..find_val(path);
-					if value == nil {
-						..send: pack.save(value); 
-						return;
-					}
-
-					..send: pack.save(value[offset:offset+size]);
+				if offset == 'nil' {
+					offset = '0';
 				}
 
-			'<write>', %path, ',', %offset, ',', %data -> 
-				{ 
-					if offset == 'nil' {
-						offset = '0';
-					}
+				size = size.integer();
+				offset = offset.integer();
 
-					offset = offset.integer();
-					obj = ..add_val(path, data, offset);
-					..send: pack.save(obj);
+				value = ..find_val(path);
+				if value == nil {
+					..send: pack.save(value); 
+					return;
 				}
 
-			'<rename>', %src, ',', %dest ->
-				{ 
-					print: '## invalid command';
-					..send: pack.save(nil);
+				..send: pack.save(value[offset:offset+size]);
+
+			case '<write>', %path, ',', %offset, ',', %data:
+				if offset == 'nil' {
+					offset = '0';
 				}
 
-			'<ping>' ->
-				{
-					..send: '<ack>';
-				}
+				offset = offset.integer();
+				obj = ..add_val(path, data, offset);
+				..send: pack.save(obj);
+
+			case '<rename>', %src, ',', %dest:
+				print: '## invalid command';
+				..send: pack.save(nil);
+
+			case '<ping>':
+				..send: '<ack>';
 		}
 	}
 }

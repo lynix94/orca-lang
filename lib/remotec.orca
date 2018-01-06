@@ -130,12 +130,11 @@ def push_obj(obj)
 
 		decode (msg)
 		{
-		'<ok:push>' -> break;
-		'<req_code>', %name  ->
-			{
-				str = pack.dump_code(name);
-				..server.send('<code>'+name+','+str);
-			}
+		case '<ok:push>':
+			break;
+		case '<req_code>', %name:
+			str = pack.dump_code(name);
+			..server.send('<code>'+name+','+str);
 		}
 	} 
 }

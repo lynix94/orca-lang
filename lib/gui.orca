@@ -81,8 +81,10 @@ def window
 		{
 			decode k
 			{
-			'text' ->  ..owner.handle.set_text(v);
-			%default ->  ..owner.handle.set_attr(k, v);
+			case 'text':
+				..owner.handle.set_text(v);
+			case %default:
+				..owner.handle.set_attr(k, v);
 			}
 
 			..attr[k] = v;
@@ -224,8 +226,10 @@ def entry : window
 		{
 			decode k
 			{
-			'text' ->  ..owner.handle.set_text(v);
-			%default ->  ..owner.handle.set_attr(k, v);
+			case 'text':
+				..owner.handle.set_text(v);
+			case %default:
+				..owner.handle.set_attr(k, v);
 			}
 
 			..attr[k] = v;
