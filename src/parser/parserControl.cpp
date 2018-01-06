@@ -434,7 +434,7 @@ void parserControl::switch_end()
 	code_top->push_char(OP_SWITCH_END);
 }
 
-void parserControl::switch_pattern_start()
+void parserControl::switch_case_start()
 {
 	// fix previous cont. address
 	context& ctx = m_ctl[m_ctl.size()-1];
@@ -449,7 +449,7 @@ void parserControl::switch_pattern_start()
 }
 
 
-void parserControl::switch_pattern_shift()
+void parserControl::switch_case_shift()
 {
 	context& ctx = m_ctl[m_ctl.size()-1];
 
@@ -469,7 +469,7 @@ void parserControl::switch_pattern_shift()
 	}
 }
 
-void parserControl::switch_pattern_end()
+void parserControl::switch_case_end()
 {
 	context& ctx = m_ctl[m_ctl.size()-1];
 
@@ -580,7 +580,6 @@ void parserControl::do_fallthrough()
 	m_ctl[idx].list_etc.push_back(code_top->size());
 	code_top->increase(sizeof(int));
 }
-
 
 void parserControl::sbf_start()
 {

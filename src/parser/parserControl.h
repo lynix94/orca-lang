@@ -79,9 +79,9 @@ public:
 
 	void switch_start();
 	void switch_end();
-	void switch_pattern_start();
-	void switch_pattern_shift();
-	void switch_pattern_end();
+	void switch_case_start();
+	void switch_case_shift();
+	void switch_case_end();
 
 	void sbf_start();
 	void sbf_end();

@@ -651,30 +651,43 @@ switch_stmt:
 		{
 			g_ctl->switch_start();
 		}
-	'{' switch_pattern_stmt_list '}'
+	'{' switch_pattern_stmt_list opt_default_pattern_stmt '}'
 		{
 			g_ctl->switch_end();
 		}
 	;
+
 
 switch_pattern_stmt_list:
 	  switch_pattern_stmt_list switch_pattern_stmt
 	| switch_pattern_stmt
 	;
 
+opt_default_pattern_stmt:
+	 /* empty */
+	| DEFAULT ':' 
+		{
+			g_ctl->switch_case_start();
+		}
+	statement_list
+		{
+			g_ctl->switch_case_end();
+		}
+	;
+
 
 switch_pattern_stmt:
 	CASE
 		{
-			g_ctl->switch_pattern_start();
+			g_ctl->switch_case_start();
 		}
 	expression ':'
 		{
-			g_ctl->switch_pattern_shift();
+			g_ctl->switch_case_shift();
 		}
 	statement_list
 		{
-			g_ctl->switch_pattern_end();
+			g_ctl->switch_case_end();
 		}
 	;
 
