@@ -288,6 +288,32 @@ void port_msleep(int msec)/*{{{*/
 }
 /*}}}*/
 
+void port_nsleep(long long nsec)
+{
+#ifdef WINDOWS
+	HANDLE timer = CreateWaitableTimer(NULL, TRUE, NULL);
+	if (timer == NULL) {
+		return;
+	}
+
+	LARGE_INTEGER li;
+	li.QuadPart = -ns;
+	if (!SetWaitableTimer(timer, &li, 0, NULL, NULL, FALSE)) {
+		CloseHandle(timer);
+		return;
+	}
+
+	WaitForSingleObject(timer, INFINITE);
+	CloseHandle(timer);
+#else
+	struct timespec wait;
+	wait.tv_sec = nsec / (1000*1000*1000);
+	wait.tv_nsec = nsec % (1000*1000*1000);
+	nanosleep(&wait, NULL);
+#endif
+}
+
+
 // WINDOWS gettimeosday/*{{{*/
 #ifdef WINDOWS
 
@@ -496,9 +522,9 @@ portCond::~portCond() /*{{{*/
 }
 /*}}}*/
 
-bool portCond::wait(int msec) // true : signaled, false : timeout/*{{{*/
+bool portCond::wait(long long nsec) // true : signaled, false : timeout/*{{{*/
 { 
-	if (msec < 0) {
+	if (nsec < 0) {
 		pthread_mutex_lock(&m_cond_mutex);
 		pthread_cond_wait(&m_cond, &m_cond_mutex);
 	}
@@ -506,11 +532,10 @@ bool portCond::wait(int msec) // true : signaled, false : timeout/*{{{*/
 		struct timespec to;
 		struct timeval now;
 		gettimeofday(&now, NULL);
-		int sec = msec / 1000;
-		msec %= 1000;
 
-		to.tv_sec = now.tv_sec + sec;
-		to.tv_nsec = (now.tv_usec * 1000) + (msec*1000*1000);
+		long long to_ts = now.tv_sec * (1000*1000*1000) + now.tv_usec * 1000 + nsec;
+		to.tv_sec = to_ts / (1000*1000*1000);
+		to.tv_nsec = to_ts % (1000*1000*1000);
 
 		pthread_mutex_lock(&m_cond_mutex);
 		int ret = pthread_cond_timedwait(&m_cond, &m_cond_mutex, &to);
@@ -523,21 +548,20 @@ bool portCond::wait(int msec) // true : signaled, false : timeout/*{{{*/
 }
 /*}}}*/
 
-bool portCond::wait(portMutex* mutex, int msec) // true : signaled, false : timeout/*{{{*/
+bool portCond::wait(portMutex* mutex, long long nsec) // true : signaled, false : timeout/*{{{*/
 { 
-	if (msec < 0) {
+	if (nsec < 0) {
 		pthread_cond_wait(&m_cond, mutex->handle());
 	}
 	else {
 		struct timespec to;
 		struct timeval now;
 		gettimeofday(&now, NULL);
-		int sec = msec / 1000;
-		msec %= 1000;
 
-		to.tv_sec = now.tv_sec + sec;
-		to.tv_nsec = (now.tv_usec * 1000) + (msec*1000*1000);
-
+		long long to_ts = now.tv_sec * (1000*1000*1000) + now.tv_usec * 1000 + nsec;
+		to.tv_sec = to_ts / (1000*1000*1000);
+		to.tv_nsec = to_ts % (1000*1000*1000);
+		
 		int ret = pthread_cond_timedwait(&m_cond, mutex->handle(), &to);
 		if (ret == -1) {
 			return false;

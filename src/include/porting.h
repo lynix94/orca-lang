@@ -181,6 +181,7 @@ typedef void* (*thread_fp)(void* vp);
 /********************************************************************/
 
 LIBORCA_API void port_msleep(int msec);
+LIBORCA_API void port_nsleep(long long nsec);
 LIBORCA_API int port_cpu_num();
 LIBORCA_API long long port_memory();
 LIBORCA_API long long port_free();
@@ -221,8 +222,8 @@ class LIBORCA_API portCond
 public:
 	portCond();
 	~portCond();
-	bool wait(int msec = -1); // true : signaled, false : timeout
-	bool wait(portMutex* mutex, int msec = -1); // true : signaled, false : timeout
+	bool wait(long long nsec = -1); // true : signaled, false : timeout
+	bool wait(portMutex* mutex, long long nsec = -1); // true : signaled, false : timeout
 	void signal();
 
 private:

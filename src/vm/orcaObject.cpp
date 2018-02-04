@@ -744,6 +744,9 @@ orcaData orcaObject::operator_eq(orcaVM* vm, orcaData& p)
 		vm->call(1);
 		return vm->m_stack->pop();
 	}
+	else if (is<TYPE_OBJ>(p) && this == p.o()){
+		return true;
+	}
 	else {
 		return NIL;
 	}

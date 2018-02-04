@@ -29,13 +29,13 @@ parallel do {
 	server2('dir2', port+1);
 }
 
-time.msleep(100);
+time.sleep(0.1);
 
 try {
 	fs.mount('/mnt/dfs1', '127.0.0.1', port);
 }
 catch {
-	time.msleep(1000);
+	time.sleep(1);
 	fs.mount('/mnt/dfs1', '127.0.0.1', port);
 }
 
@@ -43,7 +43,7 @@ try {
 	fs.mount('/mnt/dfs2', '127.0.0.1', port+1);
 }
 catch {
-	time.msleep(1000);
+	time.sleep(1);
 	fs.mount('/mnt/dfs2', '127.0.0.1', port+1);
 }
 

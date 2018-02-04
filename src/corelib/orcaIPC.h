@@ -93,33 +93,40 @@ public:
 		// true : signaled, false : timeout
 		orcaData ex_wait(orcaVM* vm, int n) 
 		{
-			int msec = -1;
+			double tmout = -1;
+			orcaMutex* mp = NULL;
 
+			orcaData d = vm->get_param(0);
 			if (n >= 2) {
-				orcaMutex* mp = castobj<orcaMutex>(vm->get_param(1));
+				mp = castobj<orcaMutex>(vm->get_param(1));
+				if (mp == NULL) {
+					throw orcaException(vm, "orca.param", "mutex type is required");
+				}
+			}
+
+			switch(d.get_type())
+			{
+			case TYPE_INT:
+			case TYPE_REAL:
+			case TYPE_BIGNUM:
+				tmout = d.Double();
+				break;
+
+			default:
+				if (mp != NULL) { // 2 param case(wait(&mutex, tmout)) : should be number
+					throw orcaException(NULL, "orca.type", "number type needed");
+				}
+
+				// wait(&mutex)
+				mp = castobj<orcaMutex>(d);
 				if (mp == NULL) {
 					throw orcaException(vm, "orca.param", "mutex type is required");
 				}
 
-				msec = vm->get_param(0).Integer();
-				return m_cond.wait(mp->handle(), msec);
-			}
-			else if (n >= 1) {
-				orcaData p = vm->get_param(0);
-				if (is<TYPE_INT>(p)) {
-					msec = p.Integer();
-				}
-				else {
-					orcaMutex* mp = castobj<orcaMutex>(vm->get_param(1));
-					if (mp == NULL) {
-						throw orcaException(vm, "orca.param", "mutex type is required");
-					}
-		
-					return m_cond.wait(mp->handle());
-				}
+				return m_cond.wait(mp->handle());
 			}
 
-			return m_cond.wait(msec);
+			return m_cond.wait(tmout * (1000*1000*1000));
 		}
 
 		orcaData ex_signal(orcaVM* vm, int n) 

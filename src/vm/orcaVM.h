@@ -112,6 +112,7 @@ public:
 
 	orcaData channel_in(orcaData d);
 	bool channel_out(orcaData d, int num);
+	void channel_signal(orcaObject* op);
 
 private:
 	orcaData& handle_throw(const char* name);

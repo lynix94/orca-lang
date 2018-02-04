@@ -1,7 +1,6 @@
 # TODO
-timer
-str, repr to common function
-add time.sleep(1.2)
+size, repr to common function
+*.TEXT
 
 # bug
 hex diff
@@ -11,35 +10,18 @@ hex diff
 -- test_oo failed
 
 # now thinking 
-decode to switch
-html lib
-** select
 root, cloud (depend zookeeper or etcd)
 
 #channel
 channel assert
-channel log
 channel queue
 channel dist queue
 
-
-# modlue
-type.XXX.make(...)
-  ex) type.tuple.make(1,2,3) => (1,2,3)
 
 # storage
 sqlite
 memcached
 leveldb
-
-# test
-channel
-eval
-under
-anonymous
-assert
-log
-
 
 # refactoring
 length check & change code to unsigned
@@ -47,6 +29,9 @@ move parse to vm & parse, interpret lock
 
 
 ### done
+timer
+channel log
+add time.sleep(1.2)
 select
 fd select
 fix trace.orca trace

@@ -45,7 +45,7 @@ def client {
 
 
 th1 = thread.run(my.server);
-time.msleep(10);
+time.sleep(0.01);
 th2 = thread.run(my.client);
 
 th1.join();

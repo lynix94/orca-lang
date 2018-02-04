@@ -2960,13 +2960,7 @@ do_assign_list:
 				PRINT1("\t\t%p : channel signal\n", c);
 				orcaObject* op = m_channel_stack[m_channel_stack.size() - 1];
 				m_channel_stack.pop_back();
-				SELECT* sp = g_select.find_select(op);
-				if (sp != NULL) {
-					sp->mutex.lock();
-					sp->cond.signal();
-					sp->mutex.unlock();
-				}
-
+				channel_signal(op);
 				break;
 			  }
 
@@ -3542,6 +3536,17 @@ bool orcaVM::channel_out(orcaData d, int num)/*{{{*/
 	}
 
 	return true;
+}
+/*}}}*/
+
+void orcaVM::channel_signal(orcaObject* op)/*{{{*/
+{
+	SELECT* sp = g_select.find_select(op);
+	if (sp != NULL) {
+		sp->mutex.lock();
+		sp->cond.signal();
+		sp->mutex.unlock();
+	}
 }
 /*}}}*/
 

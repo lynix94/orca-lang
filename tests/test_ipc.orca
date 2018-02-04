@@ -1,6 +1,6 @@
 using ipc;
 using thread;
-using time.msleep;
+using time.sleep;
 
 
 # cond var
@@ -11,7 +11,7 @@ def wait_thread(cond) {
 }
 
 def signal_thread(cond) {
-	msleep(10);
+	sleep(0.01);
 	cond.signal();
 }
 
@@ -30,7 +30,7 @@ def inc_thread(key) {
 	for a in [1..10] {
 		print: 'produced...';
 		sem.inc();
-		msleep(1);
+		sleep(0.001);
 	}
 }
 
@@ -44,7 +44,7 @@ def dec_thread(key) {
 }
 
 th1 = thread.run(my.inc_thread, 1000);
-msleep(10);
+sleep(0.01);
 th2 = thread.run(my.dec_thread, 1000);
 th1.join();
 th2.join();

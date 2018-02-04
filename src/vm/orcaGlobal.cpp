@@ -18,6 +18,7 @@
 #include "orcaVM.h"
 #include "orcaLocal.h"
 #include "orcaException.h"
+#include "orcaTime.h"
 
 using namespace std;
 
@@ -32,12 +33,14 @@ struct init_once
 	{
 		pthread_mutex_init(&g_rc_mutex, NULL);
 		pthread_key_create(&g_thread_context, NULL);
+		g_timer.start();
 	}
 
 	~init_once()
 	{
 		pthread_mutex_destroy(&g_rc_mutex);
 		pthread_key_delete(g_thread_context);
+		g_timer.quit();
 	}
 };
 

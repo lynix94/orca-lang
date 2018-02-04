@@ -25,7 +25,7 @@ parallel do {
 	server(port+2);
 }
 
-time.msleep(400);
+time.sleep(0.4);
 
 dist.add('127.0.0.1', port);
 dist.add('127.0.0.1', port+1);

@@ -29,6 +29,7 @@ test_vectors = [
   'test_context',
   'test_channel',
   'test_select',
+  'test_timer',
 ];
 
 test_modules = [

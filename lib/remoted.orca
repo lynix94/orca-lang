@@ -261,7 +261,7 @@ def client
 
 			case '<shutdown>':
 				..send: '<ack>';
-				time.msleep(200);
+				time.sleep(0.2);
 				return '<shutdown>';
 		}
 	}

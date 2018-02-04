@@ -1,0 +1,60 @@
+
+
+
+
+using time;
+
+t1 = time.timer(0.3);
+t2 = time.timer(0.4);
+t3 = time.timer(1);
+t4 = time.timer(2);
+
+t1.reset(1.8);
+t2.stop();
+t3.reset(0.3);
+
+result = nil;
+select {
+case t1 -> ret: 
+	result = t1;
+case t2 -> ret: 
+	result = t2;
+case t3 -> ret: 
+	result = t3;
+case t4 -> ret: 
+	result = t4;
+}
+
+print: t1, t2, t3, t4, result;
+
+if result != t3 {
+	throw test.timer <- 'test timer failed';
+}
+
+
+tk = time.ticker(0.01);
+print: tk;
+print: tk.MEMBERS;
+
+result = [];
+select {
+case tk-> ret:
+	result.push_back(ret);
+	if result.size() > 30 {
+		break;
+	}
+
+	continue;
+}
+
+term = (result[-1] - result[0])/1000000;
+print(result, term);
+
+if term > 350 || term <250 {
+	throw test.ticker <- 'test ticker failed';
+}
+
+print: '## OK', my;
+
+
+

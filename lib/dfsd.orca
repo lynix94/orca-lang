@@ -128,7 +128,7 @@ def client
 				elif cmd == 'shutdown' {
 					obj = true;
 					..send: pack.save(obj);
-					time.msleep(200);
+					time.sleep(0.2);
 					return '<shutdown>';
 				}
 				elif fs.MEMBERS.has_key(cmd) {
