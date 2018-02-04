@@ -24,8 +24,9 @@ using namespace std;
 
 pthread_mutex_t g_rc_mutex;
 pthread_key_t g_thread_context;
-thread_pool g_thread_pool;
-orcaCodeContainer g_codes;
+
+thread_pool *g_thread_pool;
+orcaCodeContainer *g_codes;
 
 struct init_once
 {
@@ -33,14 +34,24 @@ struct init_once
 	{
 		pthread_mutex_init(&g_rc_mutex, NULL);
 		pthread_key_create(&g_thread_context, NULL);
-		g_timer.start();
+
+		g_thread_pool = new thread_pool();
+		g_codes = new orcaCodeContainer();
+
+		g_timer = new orcaGlobalTimer();
+		g_timer->start();
 	}
 
 	~init_once()
 	{
 		pthread_mutex_destroy(&g_rc_mutex);
 		pthread_key_delete(g_thread_context);
-		g_timer.quit();
+
+		delete g_thread_pool;
+		delete g_codes;
+
+		g_timer->quit();
+		delete g_timer;
 	}
 };
 

@@ -50,8 +50,8 @@ public:
 
 		string mod = vm->get_param(0).String();
 		op->remove_member(mod.c_str());
-		g_codes.remove_code(mod);
-		g_codes.remove_define(mod);
+		g_codes->remove_code(mod);
+		g_codes->remove_define(mod);
 		return NIL;
 	}
 

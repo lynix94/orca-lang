@@ -159,8 +159,8 @@ string orcaPack::save(orcaData d)/*{{{*/
 		// dump codes
 		if (op->get_code() != NULL) {
 			const char* code = op->get_code();
-			string name = g_codes.get_name(code);
-			int offset = code - g_codes.get_base(code);
+			string name = g_codes->get_name(code);
+			int offset = code - g_codes->get_base(code);
 			str += "C";
 			str += name;
 			str += "\n";
@@ -352,7 +352,7 @@ orcaData orcaPack::load(char** cp)/*{{{*/
 
 			case 'C': {
 				name = &line[1];
-				const char* addr = g_codes.get_addr(name);
+				const char* addr = g_codes->get_addr(name);
 				if (addr == NULL) {
 					throw orcaException(NULL, "orca.pack", "code not exists");
 				}
@@ -403,7 +403,7 @@ orcaData orcaPack::ex_dump_code(orcaVM* vm, int n) /*{{{*/
 	string str = vm->get_param(0).String();
 
 	int size;
-	const char* cp = g_codes.get_addr(str, &size);
+	const char* cp = g_codes->get_addr(str, &size);
 
 	string b64 = base64_encode((unsigned char*)cp, size);
 
@@ -421,7 +421,7 @@ orcaData orcaPack::ex_load_code(orcaVM* vm, int n) /*{{{*/
 	string code = base64_decode(b64);
 	int size = code.length();
 
-	char* cp = const_cast<char*>(g_codes.new_code(size, name));
+	char* cp = const_cast<char*>(g_codes->new_code(size, name));
 	if (cp == NULL) {
 		throw orcaException(vm, "orca.lang", "code already exists");
 	}
@@ -472,7 +472,7 @@ orcaData orcaPack::ex_check_code(orcaVM* vm, int n) /*{{{*/
 	orcaList* clist = static_cast<orcaList*>(ex_list_code(vm, n).o());
 	orcaList* lp = new orcaList();
 	for(orcaListIter it = clist->begin(); it!=clist->end(); ++it) {
-		if (g_codes.get_addr((*it).s()) == NULL)
+		if (g_codes->get_addr((*it).s()) == NULL)
 			lp->push_back(*it);
 	}
 

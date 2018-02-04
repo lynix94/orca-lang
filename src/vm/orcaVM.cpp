@@ -997,14 +997,14 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 THREAD_RET parallel_thread_entry(void* ap)/*{{{*/
 {
 	thread_arg_t arg = *(thread_arg_t*)ap;
-	g_thread_pool.work(arg);
+	g_thread_pool->work(arg);
 	return 0;
 }
 /*}}}*/
 
 void orcaVM::parallel_do(const char* code, const char* offset, int* run_count, orcaObject* op, int per, bool is_iterator)/*{{{*/
 {
-	g_thread_pool.m_mutex_pool.lock();
+	g_thread_pool->m_mutex_pool.lock();
 
 	static thread_arg_t arg;
 	arg.vm_main = this;
@@ -1015,13 +1015,13 @@ void orcaVM::parallel_do(const char* code, const char* offset, int* run_count, o
 	arg.per = per;
 	arg.is_iterator = is_iterator;
 
-	bool ret = g_thread_pool.signal_restart(arg);
+	bool ret = g_thread_pool->signal_restart(arg);
 	if (ret == false) {
 		pthread_create(&arg.tid, NULL, parallel_thread_entry, &arg); 
 	}
 
-	g_thread_pool.m_cond_start.wait(&g_thread_pool.m_mutex_pool);
-	g_thread_pool.m_mutex_pool.unlock();
+	g_thread_pool->m_cond_start.wait(&g_thread_pool->m_mutex_pool);
+	g_thread_pool->m_mutex_pool.unlock();
 }
 /*}}}*/
 
@@ -2570,7 +2570,7 @@ do_assign_list:
 				char* new_code = const_cast<char*>(code);
 				if (g_parser->is_interactive() || g_parser->is_eval()) {
 					int size = c - code;
-					new_code = g_codes.new_code(size);
+					new_code = g_codes->new_code(size);
 					memcpy(new_code, code, size);
 				}
 
@@ -2679,21 +2679,21 @@ do_assign_list:
 
 				int run_count = 0;
 				do {
-					g_thread_pool.m_mutex_pool.lock();
+					g_thread_pool->m_mutex_pool.lock();
 					while (run_count >= cpu_num) {
-						g_thread_pool.m_cond_done.wait(&g_thread_pool.m_mutex_pool);
+						g_thread_pool->m_cond_done.wait(&g_thread_pool->m_mutex_pool);
 					}
-					g_thread_pool.m_mutex_pool.unlock();
+					g_thread_pool->m_mutex_pool.unlock();
 
 					if (tit && tit->get_iter() == tp->end() ||
 						lit && lit->get_iter() == lp->end() ||
 						iterator_done == true)
 					{
-						g_thread_pool.m_mutex_pool.lock();
+						g_thread_pool->m_mutex_pool.lock();
 						while (run_count > 0) {
-							g_thread_pool.m_cond_done.wait(&g_thread_pool.m_mutex_pool);
+							g_thread_pool->m_cond_done.wait(&g_thread_pool->m_mutex_pool);
 						}
-						g_thread_pool.m_mutex_pool.unlock();
+						g_thread_pool->m_mutex_pool.unlock();
 
 						if (tit) delete tit;
 						if (lit) delete lit;
@@ -3123,8 +3123,8 @@ bool orcaVM::load_context_helper(const string& mod_name, const string& candidate
 	time_t last_write_time = fs::last_write_time(fs::path(kw_name));
 
 	OrcaHeader header = read_header(fp_kw);
-	char* define = g_codes.new_define(header.def_size);
-	char* code = g_codes.new_code(header.code_size, mod_name);
+	char* define = g_codes->new_define(header.def_size);
+	char* code = g_codes->new_code(header.code_size, mod_name);
 	ret = fread(define, 1, header.def_size, fp_kw);
 	ret = fread(code, 1, header.code_size, fp_kw);
 
@@ -3187,8 +3187,8 @@ bool orcaVM::load_orca_helper(const string& input_name, const string& mod_name,/
 	time_t last_write_time = fs::last_write_time(fs::path(kw_name));
 		
 	OrcaHeader header = read_header(fp_kw);
-	char* define = g_codes.new_define(header.def_size);
-	char* code = g_codes.new_code(header.code_size, mod_name);
+	char* define = g_codes->new_define(header.def_size);
+	char* code = g_codes->new_code(header.code_size, mod_name);
 	ret = fread(define, 1, header.def_size, fp_kw);
 	ret = fread(code, 1, header.code_size, fp_kw);
 

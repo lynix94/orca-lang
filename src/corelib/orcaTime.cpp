@@ -10,7 +10,7 @@
 
 #include "orcaTime.h"
 
-orcaGlobalTimer g_timer;
+orcaGlobalTimer* g_timer;
 
 void orcaGlobalTimer::quit()
 {
@@ -23,12 +23,13 @@ void orcaGlobalTimer::quit()
 	pthread_join(tid, (void**)&status);
 }
 
-
 void orcaGlobalTimer::do_timer()
 {
+	mutex.lock();
+	cond.signal(); // to launcher (start())
+
 	long long nsec = -1;
 	while(flag_quit == false) {
-		mutex.lock();
 		cond.wait(&mutex, nsec);
 		if (flag_quit == true) {
 			break;
@@ -57,21 +58,17 @@ void orcaGlobalTimer::do_timer()
 		if (timers.empty() == false) {
 			nsec = timers.begin()->first - cns;
 		}
-		mutex.unlock();
 	}
+
+	mutex.unlock();
 }
+
 
 void orcaGlobalTimer::push_timer(double time, orcaTimer* to)
 {
 	mutex.lock();
-	long long rel = time * (1000*1000*1000);
-	long long now = current_ns();
-	long long abs = now + rel;
-
-	if (abs > now) {
-		timers.insert(make_pair(abs, to));
-		cond.signal();
-	}
+	push_timer_wo_lock(time, to);
+	cond.signal();
 	mutex.unlock();
 }
 

@@ -84,9 +84,9 @@ private:
 
 
 #ifdef WINDOWS
-__declspec(dllimport) thread_pool g_thread_pool;
+__declspec(dllimport) thread_pool *g_thread_pool;
 #else
-extern thread_pool g_thread_pool;
+extern thread_pool *g_thread_pool;
 #endif
 
 
@@ -118,9 +118,9 @@ private:
 };
 
 #ifdef WINDOWS
-__declspec(dllimport) orcaCodeContainer g_codes;
+__declspec(dllimport) orcaCodeContainer *g_codes;
 #else
-extern orcaCodeContainer g_codes;
+extern orcaCodeContainer *g_codes;
 #endif
 
 

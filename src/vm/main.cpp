@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 			vm.m_stack->dump();
 		}
 	#endif
-		g_thread_pool.join_all();
+		g_thread_pool->join_all();
 		orcaThread::join_remains();
 
 		vm.m_local->decrease();

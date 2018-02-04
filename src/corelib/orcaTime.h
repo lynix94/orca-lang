@@ -34,7 +34,10 @@ public:
 
 	void start()
 	{
+		mutex.lock();
 		pthread_create(&tid, NULL, entry_point, this);
+		cond.wait(&mutex);
+		mutex.unlock();
 	}
 
 	void quit();
@@ -66,10 +69,9 @@ private:
 	portMutex mutex;
 	pthread_t tid;
 	bool flag_quit;
-
 };
 
-extern orcaGlobalTimer g_timer;
+extern orcaGlobalTimer* g_timer;
 
 
 
@@ -80,7 +82,7 @@ public:
 
 	virtual ~orcaTimer() 
 	{
-		g_timer.pop_timer(this);
+		g_timer->pop_timer(this);
 	}
 
 	orcaObject* v_clone() {
@@ -90,7 +92,7 @@ public:
 	orcaTimer(double tm)
 	{
 		__init();
-		g_timer.push_timer(tm, this);
+		g_timer->push_timer(tm, this);
 	}
 
 	void __init()
@@ -106,7 +108,7 @@ public:
 
 	orcaData ex_stop(orcaVM* vm, int n) 
 	{
-		g_timer.pop_timer(this);
+		g_timer->pop_timer(this);
 		return NIL;
 	}
 
@@ -114,8 +116,8 @@ public:
 	{
 		double tmout = vm->get_param(0).Double();
 
-		g_timer.pop_timer(this);
-		g_timer.push_timer(tmout, this);
+		g_timer->pop_timer(this);
+		g_timer->push_timer(tmout, this);
 		return NIL;
 	}
 
@@ -148,7 +150,7 @@ public:
 
 	virtual ~orcaTicker() 
 	{
-		g_timer.pop_timer(this);
+		g_timer->pop_timer(this);
 	}
 
 	orcaObject* v_clone() {
@@ -159,7 +161,7 @@ public:
 	{
 		__init();
 		interval = tm;
-		g_timer.push_timer(tm, this);
+		g_timer->push_timer(tm, this);
 	}
 
 	void __init()
