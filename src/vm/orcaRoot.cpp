@@ -63,7 +63,7 @@ orcaRoot::orcaRoot()
 	insert_static("dl", new orcaDL());
 	insert_static("thread", new orcaThread());
 	insert_static("socket", new orcaSocket());
-	insert_static("select", new orcaSelect());
+	insert_static("fdselect", new orcaSelect());
 	insert_static("ipc", new orcaIPC());
 	insert_static("time", new orcaTime());
 	insert_static("date", new orcaDate());

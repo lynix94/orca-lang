@@ -82,6 +82,7 @@ else				{ return ELSE; }
 for					{ return FOR; }
 in					{ return IN; }
 switch				{ return SWITCH; }
+select				{ return SELECT; }
 decode				{ return DECODE; }
 case				{ return CASE; }
 default				{ return DEFAULT; }

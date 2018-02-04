@@ -4,7 +4,7 @@
 
   orcaVM.cpp - main orcaVM routine
 
-  Copyright (C) 2009-2011 Lee, Ki-Yeul
+  Copyright (C) 2009~ Lee, Ki-Yeul
 
 **********************************************************************/
 
@@ -61,6 +61,7 @@ namespace fs = boost::filesystem;
 #include "orcaStack.h"
 #include "orcaForStack.h"
 #include "orcaSwitchStack.h"
+#include "orcaSelectStack.h"
 #include "orcaDecodeStack.h"
 #include "orcaException.h"
 #include "orcaParserObject.h"
@@ -193,6 +194,7 @@ void orcaVM::init()/*{{{*/
 	m_local = new orcaLocal();
 	m_decode_stack = new orcaDecodeStack(this);
 	m_switch_stack = new orcaSwitchStack(this);
+	m_select_stack = new orcaSelectStack(this);
 	m_stack = new orcaStack(m_local);
 	m_trace = new orcaTrace(this);
 
@@ -588,6 +590,20 @@ orcaData& orcaVM::handle_throw(const char* name)/*{{{*/
 				m_local->clean_mark(MARK_STACK);
 				break;
 			  }
+			case MARK_SWITCH: 
+			  {
+				m_stack->pop();
+				m_local->clean_mark(MARK_SWITCH);
+				break;
+			  }
+			case MARK_SELECT: 
+			  {
+				m_stack->pop();
+				m_local->clean_mark(MARK_SELECT);
+				break;
+			  }
+			default:
+				orca_error("fatal.. invalid mark\n");
 			}
 		}
 		else if (is<TYPE_NIL>(ret)) {
@@ -1035,7 +1051,7 @@ void orcaVM::exec_code(const char* code, const char* offset)/*{{{*/
 	for(;;c++) {
 fast_jmp:
 		try {
-			PRINT2("%u[%02x] ", c - sp, (unsigned char)*c);
+			PRINT2("%ld[%02x] ", c - sp, (unsigned char)*c);
 			switch((unsigned char)*c)
 			{
 			case OP_NOP:	
@@ -2528,7 +2544,7 @@ do_assign_list:
 				m_local->clean_mark(MARK_SWITCH);
 				break;
 
-			case OP_CASE:
+			case OP_SWITCH_CASE:
 				PRINT1("\t\t%p : case pattern start\n", c); 
 				p1 = m_stack->pop();
 				if (m_switch_stack->compare(p1) == false) {
@@ -2788,10 +2804,12 @@ do_assign_list:
 			case OP_CHANNEL_IN:
 				PRINT2("\t\t%p : channel in check (jump to: %x)\n", c, TO_INT(&c[1]));
 				d = m_stack->pop();
-				d = channel_in(d);
+				p1 = channel_in(d);
 
-				if (is<TYPE_NIL>(d) == false) {
-					m_stack->push(d); // "<-" function
+				if (is<TYPE_NIL>(p1) == false) { // this ensure d is Object
+					m_channel_stack.push_back(d.o());
+					
+					m_stack->push(p1); // "<-" function
 					c += sizeof(int) + FJ_INC;
 					goto fast_jmp;
 				}
@@ -2852,6 +2870,103 @@ do_assign_list:
 
 				d.extract_set(o);
 				m_stack->push(d);
+				break;
+			  }
+
+			case OP_SELECT_PREPARE: 
+				PRINT1("\t\t%p : select prepare\n", c);
+				m_select_stack->push();
+
+				p2.mark_select();
+				m_local->push_back(p2);
+				break;
+
+			case OP_SELECT_START: {
+				PRINT1("\t\t%p : select start\n", c);
+				SELECT *sp = m_select_stack->top();
+
+				do {
+					sp->mutex.lock();
+					for (int i=0; i<sp->cases.size(); i++) {
+						CASE *ca = &sp->cases[i];
+						if (ca->src == NULL) { // default
+							c = ca->code;
+							sp->mutex.unlock();
+							goto fast_jmp; // out from this loop
+						}
+
+						if (ca->src->has_member("size", d) == false) {
+							sp->mutex.unlock();
+							throw orcaException(this, "orca.select", string("unselectable item: ")
+								+ ca->src->dump_str());
+						}
+
+						m_stack->push(d);
+						call(0);
+						if (m_stack->pop().Integer() <= 0) { // not ready yet
+							continue;
+						}
+
+						if (channel_out(ca->src, ca->out_num)) {
+							c = ca->code;
+							sp->mutex.unlock();
+							goto fast_jmp; // out from this loop
+						}
+						else {
+							sp->mutex.unlock();
+							throw orcaException(this, "orca.select", string("channel out failed: ")
+								+ ca->src->dump_str());
+						}
+					}
+
+					g_select.regist(sp);
+					sp->cond.wait(&sp->mutex);
+					g_select.regist(sp);
+					sp->mutex.unlock();
+				} while(true);
+
+				break;
+			  }
+
+			case OP_SELECT_END: 
+				PRINT1("\t\t%p : select end\n", c); 
+				m_select_stack->pop();
+				m_local->clean_mark(MARK_SELECT);
+				break;
+
+			case OP_SELECT_CASE: {
+				p1 = m_stack->pop();
+				const char *nc = code + TO_INT(&c[1]);
+				const char *ac = c + 1 + sizeof(int) + sizeof(char);
+				unsigned char num = (unsigned char)c[1+sizeof(int)];
+				PRINT4("\t\t%p : select case start: %p, %p, %d\n", c, nc, ac, num); 
+				m_select_stack->push_case(p1.Object(), num, ac);
+				c = nc;
+				goto fast_jmp;
+				break;
+			  }
+
+			case OP_SELECT_DEFAULT: {
+				PRINT1("\t\t%p : select default start\n", c);
+				const char *nc = code + TO_INT(&c[1]);
+				const char *ac = c + 1 + sizeof(int);
+				m_select_stack->push_case(NULL, 0, ac);
+				c = nc;
+				goto fast_jmp;
+				break;
+			  }
+
+			case OP_SELECT_SIGNAL: {
+				PRINT1("\t\t%p : channel signal\n", c);
+				orcaObject* op = m_channel_stack[m_channel_stack.size() - 1];
+				m_channel_stack.pop_back();
+				SELECT* sp = g_select.find_select(op);
+				if (sp != NULL) {
+					sp->mutex.lock();
+					sp->cond.signal();
+					sp->mutex.unlock();
+				}
+
 				break;
 			  }
 

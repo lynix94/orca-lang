@@ -1,6 +1,6 @@
 using socket;
 using pack;
-using select;
+using fdselect;
 using time;
 
 using remotec;
@@ -284,7 +284,7 @@ def is_done(timeout)
 		return true;
 	}
 
-	if select.readable(..server.sock.get(), timeout) {
+	if fdselect.readable(..server.sock.get(), timeout) {
 		..flag_running = false;
 		..server.recv();
 		return true;

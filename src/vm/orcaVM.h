@@ -23,6 +23,7 @@ namespace fs = boost::filesystem;
 class orcaTrace;
 class orcaForStack;
 class orcaSwitchStack;
+class orcaSelectStack;
 class orcaDecodeStack;
 class orcaStack;
 class orcaLocal;
@@ -117,6 +118,8 @@ private:
 	orcaForStack* m_for_stack;
 	orcaSwitchStack* m_switch_stack;
 	orcaDecodeStack* m_decode_stack;
+	orcaSelectStack* m_select_stack;
+	vector<orcaObject*> m_channel_stack;
 
 public:
 	orcaObject* m_module;

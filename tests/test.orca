@@ -28,13 +28,14 @@ test_vectors = [
   'test_parse',
   'test_context',
   'test_channel',
+  'test_select',
 ];
 
 test_modules = [
   'test_file',
   'test_ipc',
   'test_socket',
-  'test_select',
+#  'test_fdselect',
 #  'test_os',  ## disable temp.
   'test_fun',
   'test_date',

@@ -21,7 +21,7 @@ void yyerror(const char* msg);
 parserControl s_ctl;
 parserControl* g_ctl = &s_ctl;
 
-void parserControl::if_start(bool flag)	
+void parserControl::if_start(bool flag)	/*{{{*/
 { 
 	if (flag) 
 		code_top->push_char(OP_JMP_FALSE);
@@ -34,17 +34,17 @@ void parserControl::if_start(bool flag)
 	
 	code_top->increase(sizeof(int));
 }
+/*}}}*/
 
-
-void parserControl::if_end() 
+void parserControl::if_end() /*{{{*/
 {
 	int pos_if_false = m_ctl[m_ctl.size()-1].pass2;
 	m_ctl.pop_back();
 	code_top->set_int(code_top->size(), pos_if_false);
 }
+/*}}}*/
 
-
-void parserControl::else_start() 
+void parserControl::else_start() /*{{{*/
 {
 	int pos_if_false = m_ctl[m_ctl.size()-1].pass2;
 	m_ctl.pop_back();
@@ -58,25 +58,25 @@ void parserControl::else_start()
 	code_top->increase(sizeof(int));
 	code_top->set_int(code_top->size(), pos_if_false); 
 }
+/*}}}*/
 
-
-void parserControl::else_end() 
+void parserControl::else_end() /*{{{*/
 {
 	int pos_end = m_ctl[m_ctl.size()-1].pass2;
 	m_ctl.pop_back();
 	code_top->set_int(code_top->size(), pos_end); 
 }
+/*}}}*/
 
-
-void parserControl::do_start() 
+void parserControl::do_start() /*{{{*/
 {
 	context ctx(CONTROL_DO);
 	ctx.start = code_top->size();
 	m_ctl.push_back(ctx);
 }
+/*}}}*/
 
-
-void parserControl::do_end() 
+void parserControl::do_end() /*{{{*/
 {
 	context& ctx = m_ctl[m_ctl.size()-1];
 	int pos_cont = ctx.start;
@@ -84,19 +84,16 @@ void parserControl::do_end()
 	code_top->push_char(OP_JMP_TRUE);
 	code_top->push_int(pos_cont);
 
-	if (!ctx.list_break.empty()) {
-		vector<int>::iterator vi = ctx.list_break.begin();
-
-		for(;vi != ctx.list_break.end(); ++vi) {
-			code_top->set_int(code_top->size(), *vi);
-		}
+	vector<int>::iterator vi = ctx.list_break.begin();
+	for(;vi != ctx.list_break.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
 	}
 
 	m_ctl.pop_back();
 }
+/*}}}*/
 
-
-void parserControl::times_start() 
+void parserControl::times_start() /*{{{*/
 {
 	code_top->push_char(OP_MARK_STACK);
 
@@ -104,9 +101,9 @@ void parserControl::times_start()
 	ctx.start = code_top->size();
 	m_ctl.push_back(ctx);
 }
+/*}}}*/
 
-
-void parserControl::times_end() 
+void parserControl::times_end() /*{{{*/
 {
 	context& ctx = m_ctl[m_ctl.size()-1];
 	int pos_cont = ctx.start;
@@ -121,37 +118,34 @@ void parserControl::times_end()
 	code_top->push_char(OP_JMP_TRUE);
 	code_top->push_int(pos_cont);
 
-	if (!ctx.list_break.empty()) {
-		vector<int>::iterator vi = ctx.list_break.begin();
-
-		for(;vi != ctx.list_break.end(); ++vi) {
-			code_top->set_int(code_top->size(), *vi);
-		}
+	vector<int>::iterator vi = ctx.list_break.begin();
+	for(;vi != ctx.list_break.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
 	}
 
 	code_top->push_char(OP_MARK_STACK_POP);
 
 	m_ctl.pop_back();
 }
+/*}}}*/
 
-
-void parserControl::while_start_1() 
+void parserControl::while_start_1() /*{{{*/
 {
 	context ctx(CONTROL_WHILE);
 	ctx.start = code_top->size();
 	m_ctl.push_back(ctx);
 }
+/*}}}*/
 
-
-void parserControl::while_start_2() 
+void parserControl::while_start_2() /*{{{*/
 {
 	code_top->push_char(OP_JMP_FALSE);
 	m_ctl[m_ctl.size()-1].pass2 = code_top->size();
 	code_top->increase(sizeof(int));
 }
+/*}}}*/
 
-
-void parserControl::while_end() 
+void parserControl::while_end() /*{{{*/
 {
 	context& ctx = m_ctl[m_ctl.size()-1];
 	int pass2 = ctx.pass2;
@@ -161,19 +155,16 @@ void parserControl::while_end()
 	code_top->push_int(pos_start);
 	code_top->set_int(code_top->size(), pass2);
 
-	if (!ctx.list_break.empty()) {
-		vector<int>::iterator vi = ctx.list_break.begin();
-
-		for (; vi!= ctx.list_break.end(); ++vi) {
-			code_top->set_int(code_top->size(), *vi);
-		}
+	vector<int>::iterator vi = ctx.list_break.begin();
+	for (; vi!= ctx.list_break.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
 	}
 
 	m_ctl.pop_back();
 }
+/*}}}*/
 
-
-void parserControl::for_start(const char* name) 
+void parserControl::for_start(const char* name) /*{{{*/
 {
 	int idx = code_top->find_lvar(name);
 	code_top->push_char(OP_FOR);
@@ -186,8 +177,9 @@ void parserControl::for_start(const char* name)
 
 	code_top->increase(sizeof(int));
 }
+/*}}}*/
 
-void parserControl::for_start_2(const char* name1, const char* name2) 
+void parserControl::for_start_2(const char* name1, const char* name2) /*{{{*/
 {
 	int idx1 = code_top->find_lvar(name1);
 	int idx2 = code_top->find_lvar(name2);
@@ -202,8 +194,9 @@ void parserControl::for_start_2(const char* name1, const char* name2)
 
 	code_top->increase(sizeof(int));
 }
+/*}}}*/
 
-void parserControl::for_start_sub(const char* name) 
+void parserControl::for_start_sub(const char* name) /*{{{*/
 {
 	int idx = code_top->find_lvar(name);
 	code_top->push_char(OP_FOR_SUB);
@@ -216,34 +209,33 @@ void parserControl::for_start_sub(const char* name)
 
 	code_top->increase(sizeof(int));
 }
+/*}}}*/
 
-void parserControl::for_end() 
+void parserControl::for_end() /*{{{*/
 {
 	code_top->push_char(OP_FOR_END);
 
 	context& ctx = m_ctl[m_ctl.size()-1];
 
-	if (!ctx.list_break.empty()) {
-		vector<int>::iterator vi = ctx.list_break.begin();
-
-		for (; vi != ctx.list_break.end(); ++vi) {
-			code_top->set_int(code_top->size(), *vi);
-		}
+	vector<int>::iterator vi = ctx.list_break.begin();
+	for (; vi != ctx.list_break.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
 	}
 
 	m_ctl.pop_back();
 }
+/*}}}*/
 
-
-void parserControl::decode_start()
+void parserControl::decode_start()/*{{{*/
 {
 	code_top->push_char(OP_DECODE);
 
 	context ctx(CONTROL_DECODE);
 	m_ctl.push_back(ctx);
 }
+/*}}}*/
 
-void parserControl::decode_func_start()
+void parserControl::decode_func_start()/*{{{*/
 {
 	code_top->push_char(OP_PUSH_LVAR);
 	code_top->push_short(0);
@@ -253,60 +245,53 @@ void parserControl::decode_func_start()
 	context ctx(CONTROL_DECODE);
 	m_ctl.push_back(ctx);
 }
+/*}}}*/
 
-
-void parserControl::decode_end()
+void parserControl::decode_end()/*{{{*/
 {
 	context& ctx = m_ctl[m_ctl.size()-1];
 
-	if (!ctx.list_break.empty()) {
-		vector<int>::iterator vi = ctx.list_break.begin();
-		for (; vi != ctx.list_break.end(); ++vi) {
-			code_top->set_int(code_top->size(), *vi);
-		}
-
-		ctx.list_break.clear();
+	vector<int>::iterator vi = ctx.list_break.begin();
+	for (; vi != ctx.list_break.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
 	}
+	ctx.list_break.clear();
 
 	// fix last pattern address
-	if (!ctx.list_cont.empty()) {
-		vector<int>::iterator vi = ctx.list_cont.begin();
-		for (; vi != ctx.list_cont.end(); ++vi) {
-			code_top->set_int(code_top->size(), *vi);
-		}
-
-		ctx.list_cont.clear();
+	vi = ctx.list_cont.begin();
+	for (; vi != ctx.list_cont.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
 	}
+	ctx.list_cont.clear();
 
 	m_ctl.pop_back();
 	code_top->push_char(OP_DECODE_END);
 }
+/*}}}*/
 
 static bool g_flag_pattern_shifted = false;
 static int g_shift_idx = 0;
 
-void parserControl::decode_pattern_start()
+void parserControl::decode_pattern_start()/*{{{*/
 {
 	g_flag_pattern_shifted = false;
 
 	// fix previous pattern address
 	context& ctx = m_ctl[m_ctl.size()-1];
-	if (!ctx.list_cont.empty()) {
-		vector<int>::iterator vi = ctx.list_cont.begin();
-		for (; vi != ctx.list_cont.end(); ++vi) {
-			code_top->set_int(code_top->size(), *vi);
-		}
-
-		ctx.list_cont.clear();
+	vector<int>::iterator vi = ctx.list_cont.begin();
+	for (; vi != ctx.list_cont.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
 	}
+	ctx.list_cont.clear();
 
 	code_top->push_char(OP_PATTERN_START);
 	// continues are used for go to next pattern start
 	ctx.list_cont.push_back(code_top->size());
 	code_top->increase(sizeof(int));
 }
+/*}}}*/
 
-void parserControl::decode_pattern_shift()
+void parserControl::decode_pattern_shift()/*{{{*/
 {
 	if (g_flag_pattern_shifted) {
 		if (g_shift_idx < 0) { // cut list case
@@ -320,8 +305,9 @@ void parserControl::decode_pattern_shift()
 		code_top->push_char(OP_DECODE_CHECK_REMAIN); 
 	}
 }
+/*}}}*/
 
-void parserControl::decode_pattern_end()
+void parserControl::decode_pattern_end()/*{{{*/
 {
 	context& ctx = m_ctl[m_ctl.size()-1];
 
@@ -330,8 +316,9 @@ void parserControl::decode_pattern_end()
 	ctx.list_break.push_back(code_top->size());
 	code_top->increase(sizeof(int));
 }
+/*}}}*/
 
-void parserControl::decode_match_expr()
+void parserControl::decode_match_expr()/*{{{*/
 {
 	if (g_flag_pattern_shifted) {
 		if (g_shift_idx < 0) { // cut list case
@@ -346,8 +333,9 @@ void parserControl::decode_match_expr()
 		code_top->push_char(OP_MATCH_EXPR);
 	}
 }
+/*}}}*/
 
-void parserControl::decode_match_and_assign(const char* name)
+void parserControl::decode_match_and_assign(const char* name)/*{{{*/
 {
 	if (g_flag_pattern_shifted) {
 		if (g_shift_idx < 0) { // cut list case
@@ -365,8 +353,9 @@ void parserControl::decode_match_and_assign(const char* name)
 	int idx = code_top->find_lvar(name);
 	code_top->push_short(idx);
 }
+/*}}}*/
 
-void parserControl::decode_shift(const char* name)
+void parserControl::decode_shift(const char* name)/*{{{*/
 {
 	if (g_flag_pattern_shifted) {
 		// error
@@ -375,8 +364,9 @@ void parserControl::decode_shift(const char* name)
 	g_flag_pattern_shifted = true;
 	g_shift_idx = code_top->find_lvar(name);
 }
+/*}}}*/
 
-void parserControl::decode_cut_list(const char* head_name, const char* tail_name)
+void parserControl::decode_cut_list(const char* head_name, const char* tail_name)/*{{{*/
 {
 	int head = code_top->find_lvar(head_name);
 	int tail = code_top->find_lvar(tail_name);
@@ -388,88 +378,79 @@ void parserControl::decode_cut_list(const char* head_name, const char* tail_name
 	g_flag_pattern_shifted = true;
 	g_shift_idx = -1;
 }
+/*}}}*/
 
-void parserControl::switch_start()
+void parserControl::switch_start()/*{{{*/
 {
 	code_top->push_char(OP_SWITCH);
 
 	context ctx(CONTROL_SWITCH);
 	m_ctl.push_back(ctx);
 }
+/*}}}*/
 
-void parserControl::switch_end()
+void parserControl::switch_end()/*{{{*/
 {
 	context& ctx = m_ctl[m_ctl.size()-1];
 
-	if (!ctx.list_break.empty()) {
-		vector<int>::iterator vi = ctx.list_break.begin();
-		for (; vi != ctx.list_break.end(); ++vi) {
-			code_top->set_int(code_top->size(), *vi);
-		}
-
-		ctx.list_break.clear();
+	// fix last break. address
+	vector<int>::iterator vi = ctx.list_break.begin();
+	for (; vi != ctx.list_break.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
 	}
+	ctx.list_break.clear();
 
 	// fix last cont. address
-	if (!ctx.list_cont.empty()) {
-		vector<int>::iterator vi = ctx.list_cont.begin();
-		for (; vi != ctx.list_cont.end(); ++vi) {
-			code_top->set_int(code_top->size(), *vi);
-		}
-
-		ctx.list_cont.clear();
+	vi = ctx.list_cont.begin();
+	for (; vi != ctx.list_cont.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
 	}
+	ctx.list_cont.clear();
 
 	// fix last fallthroubh. address
-	if (!ctx.list_etc.empty()) {
-		vector<int>::iterator vi = ctx.list_etc.begin();
-		for (; vi != ctx.list_etc.end(); ++vi) {
-			code_top->set_int(code_top->size(), *vi);
-		}
-
-		ctx.list_etc.clear();
+	vi = ctx.list_etc.begin();
+	for (; vi != ctx.list_etc.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
 	}
+	ctx.list_etc.clear();
 
 	m_ctl.pop_back();
 	code_top->push_char(OP_SWITCH_END);
 }
+/*}}}*/
 
-void parserControl::switch_case_start()
+void parserControl::switch_case_start()/*{{{*/
 {
 	// fix previous cont. address
 	context& ctx = m_ctl[m_ctl.size()-1];
-	if (!ctx.list_cont.empty()) {
-		vector<int>::iterator vi = ctx.list_cont.begin();
-		for (; vi != ctx.list_cont.end(); ++vi) {
-			code_top->set_int(code_top->size(), *vi);
-		}
-
-		ctx.list_cont.clear();
+	vector<int>::iterator vi = ctx.list_cont.begin();
+	for (; vi != ctx.list_cont.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
 	}
+	ctx.list_cont.clear();
 }
+/*}}}*/
 
-
-void parserControl::switch_case_shift()
+void parserControl::switch_case_shift()/*{{{*/
 {
 	context& ctx = m_ctl[m_ctl.size()-1];
 
-	code_top->push_char(OP_CASE);
+	code_top->push_char(OP_SWITCH_CASE);
 	// continues are used for go to next pattern start
 	ctx.list_cont.push_back(code_top->size());
 	code_top->increase(sizeof(int));
 
 	// fix previous fallthroubh. address
-	if (!ctx.list_etc.empty()) {
-		vector<int>::iterator vi = ctx.list_etc.begin();
-		for (; vi != ctx.list_etc.end(); ++vi) {
-			code_top->set_int(code_top->size(), *vi);
-		}
-
-		ctx.list_etc.clear();
+	vector<int>::iterator vi = ctx.list_etc.begin();
+	for (; vi != ctx.list_etc.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
 	}
-}
 
-void parserControl::switch_case_end()
+	ctx.list_etc.clear();
+}
+/*}}}*/
+
+void parserControl::switch_case_end()/*{{{*/
 {
 	context& ctx = m_ctl[m_ctl.size()-1];
 
@@ -478,8 +459,108 @@ void parserControl::switch_case_end()
 	ctx.list_break.push_back(code_top->size());
 	code_top->increase(sizeof(int));
 }
+/*}}}*/
 
-void parserControl::do_return(int i) 
+void parserControl::select_start()
+{
+	code_top->push_char(OP_SELECT_PREPARE);
+
+	context ctx(CONTROL_SELECT);
+	m_ctl.push_back(ctx);
+}
+
+
+void parserControl::select_end()
+{
+	context& ctx = m_ctl[m_ctl.size()-1];
+
+	// set continues to OP_SELECT_START
+	vector<int>::iterator vi = ctx.list_cont.begin();
+	for (; vi != ctx.list_cont.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
+	}
+	ctx.list_cont.clear();
+	code_top->push_char(OP_SELECT_START);
+
+	// set break to OP_SELECT_END
+	vi = ctx.list_break.begin();
+	for (; vi != ctx.list_break.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
+	}
+	ctx.list_break.clear();
+	code_top->push_char(OP_SELECT_END);
+
+	m_ctl.pop_back();
+}
+
+
+void parserControl::select_case_start()
+{
+	// fix previous etc. address
+	context& ctx = m_ctl[m_ctl.size()-1];
+
+	// set address to next pattern
+	vector<int>::iterator vi = ctx.list_etc.begin();
+	for (; vi != ctx.list_etc.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
+	}
+	ctx.list_etc.clear();
+}
+
+
+void parserControl::select_case_shift()
+{
+	context& ctx = m_ctl[m_ctl.size()-1];
+
+	code_top->push_char(OP_SELECT_CASE);
+
+	// etc are used for go to next pattern start
+	ctx.list_etc.push_back(code_top->size());
+	code_top->increase(sizeof(int)); // to next case
+
+	// pass2 are used to mark out param number
+	ctx.pass2 = code_top->size();
+	code_top->increase(sizeof(char));
+}
+
+void parserControl::select_default_shift()
+{
+	context& ctx = m_ctl[m_ctl.size()-1];
+
+	code_top->push_char(OP_SELECT_DEFAULT);
+
+	// etc are used for go to next pattern start
+	ctx.list_etc.push_back(code_top->size());
+	code_top->increase(sizeof(int)); // to next case
+}
+
+
+void parserControl::select_case_end(int out_num)
+{
+	if (out_num > 255) {
+		throw "select output parameter exceeds max";
+	}
+
+	context& ctx = m_ctl[m_ctl.size()-1];
+
+	// breaks are used for go to end
+	code_top->push_char(OP_JMP);
+	ctx.list_break.push_back(code_top->size());
+	code_top->increase(sizeof(int));
+
+	// set next pattern addr
+	vector<int>::iterator vi = ctx.list_etc.begin();
+	for (; vi != ctx.list_etc.end(); ++vi) {
+		code_top->set_int(code_top->size(), *vi);
+	}
+	ctx.list_etc.clear();
+
+	// set param num
+	code_top->set_char(out_num, ctx.pass2);
+}
+
+
+void parserControl::do_return(int i) /*{{{*/
 {
 	if (i == 0) {
 		code_top->push_char(OP_RETURN_NIL);
@@ -494,8 +575,9 @@ void parserControl::do_return(int i)
 
 	code_top->push_char(OP_RETURN);
 }
+/*}}}*/
 
-void parserControl::do_continue() 
+void parserControl::do_continue() /*{{{*/
 {
 	int idx;
 	for (idx = m_ctl.size()-1; idx >= 0; idx--) {
@@ -533,13 +615,19 @@ void parserControl::do_continue()
 		m_ctl[idx].list_break.push_back(code_top->size());
 		code_top->increase(sizeof(int));
 	}
+	else if (type == CONTROL_SELECT) {
+		code_top->push_char(OP_JMP);
+		m_ctl[idx].list_cont.push_back(code_top->size());
+		code_top->increase(sizeof(int));
+	}
 	else {
 		code_top->push_char(OP_JMP);
 		code_top->push_int(offset);
 	}
 }
+/*}}}*/
 
-void parserControl::do_break()
+void parserControl::do_break()/*{{{*/
 {
 	int idx;
 	for (idx = m_ctl.size()-1; idx >= 0; idx--) {
@@ -548,8 +636,6 @@ void parserControl::do_break()
 		}
 	}
 	if (idx < 0) {
-		// TODO: catch this
-		printf("abnormal break\n");
 		throw "abnormal break";
 	}
 
@@ -566,9 +652,9 @@ void parserControl::do_break()
 		code_top->increase(sizeof(int));
 	}
 }
+/*}}}*/
 
-
-void parserControl::do_fallthrough()
+void parserControl::do_fallthrough()/*{{{*/
 {
 	int idx = m_ctl.size()-1;
 	if (m_ctl[idx].type != CONTROL_SWITCH) {
@@ -580,8 +666,9 @@ void parserControl::do_fallthrough()
 	m_ctl[idx].list_etc.push_back(code_top->size());
 	code_top->increase(sizeof(int));
 }
+/*}}}*/
 
-void parserControl::sbf_start()
+void parserControl::sbf_start()/*{{{*/
 {
 	context ctx(CONTROL_SBF);
 
@@ -592,8 +679,9 @@ void parserControl::sbf_start()
 
 	m_ctl.push_back(ctx);
 }
+/*}}}*/
 
-void parserControl::sbf_end() 
+void parserControl::sbf_end() /*{{{*/
 {
 	// fix start jmp
 	context& ctx = m_ctl[m_ctl.size()-1];
@@ -618,9 +706,9 @@ void parserControl::sbf_end()
 
 	m_ctl.pop_back();
 }
+/*}}}*/
 
-
-void parserControl::sbf_rule_start() // result end
+void parserControl::sbf_rule_start() // result end/*{{{*/
 {
 	// return of result code
 	code_top->push_char(OP_RETURN);
@@ -628,8 +716,9 @@ void parserControl::sbf_rule_start() // result end
 	context& ctx = m_ctl[m_ctl.size()-1];
 	ctx.pass2 = code_top->size();
 }
+/*}}}*/
 
-void parserControl::sbf_rule() 
+void parserControl::sbf_rule() /*{{{*/
 {
 	context& ctx = m_ctl[m_ctl.size()-1];
 	ctx.list_cont.push_back(ctx.pass2);
@@ -637,8 +726,9 @@ void parserControl::sbf_rule()
 
 	ctx.pass2 = code_top->size();
 }
+/*}}}*/
 
-void parserControl::sbf_in() 
+void parserControl::sbf_in() /*{{{*/
 {
 	context& ctx = m_ctl[m_ctl.size()-1];
 	ctx.list_break.push_back(ctx.pass2);
@@ -646,22 +736,23 @@ void parserControl::sbf_in()
 
 	ctx.pass2 = code_top->size();
 }
+/*}}}*/
 
-void parserControl::sbf_list_gen(const char* name) 
+void parserControl::sbf_list_gen(const char* name) /*{{{*/
 {
 	g_op->push_integer(code_top->find_lvar(name));
 	g_op->push_integer(2);
 }
+/*}}}*/
 
-
-void parserControl::sbf_range_gen(const char* name) 
+void parserControl::sbf_range_gen(const char* name) /*{{{*/
 {
 	g_op->push_integer(code_top->find_lvar(name));
 	g_op->push_integer(1);
 }
+/*}}}*/
 
-
-void parserControl::parallel_start()
+void parserControl::parallel_start()/*{{{*/
 {
 	context ctx(CONTROL_PARALLEL);
 
@@ -670,8 +761,9 @@ void parserControl::parallel_start()
 	m_ctl.push_back(ctx);
 	code_top->increase(sizeof(int));
 }
- 
-void parserControl::parallel_end()
+ /*}}}*/
+
+void parserControl::parallel_end()/*{{{*/
 {
 	code_top->push_char(OP_PARALLEL_END);
 
@@ -681,8 +773,9 @@ void parserControl::parallel_end()
 
 	code_top->set_int(code_top->size(), pos_pass2);
 }
+/*}}}*/
 
-void parserControl::parallel_for_start(const char* name)
+void parserControl::parallel_for_start(const char* name)/*{{{*/
 {
 	int idx = code_top->find_lvar(name);
 	code_top->push_char(OP_PARALLEL_FOR);
@@ -695,8 +788,9 @@ void parserControl::parallel_for_start(const char* name)
 
 	for_start_sub(name);
 }
- 
-void parserControl::parallel_for_end()
+ /*}}}*/
+
+void parserControl::parallel_for_end()/*{{{*/
 {
 	for_end();
 
@@ -721,9 +815,9 @@ void parserControl::parallel_for_end()
 
 	m_ctl.pop_back();
 }
+/*}}}*/
 
-
-void parserControl::channel_in_start()
+void parserControl::channel_in_start()/*{{{*/
 {
 	code_top->push_char(OP_CHANNEL_IN);
 
@@ -733,19 +827,22 @@ void parserControl::channel_in_start()
 	
 	code_top->increase(sizeof(int));
 }
- 
-void parserControl::channel_in_end(int num)
+ /*}}}*/
+
+void parserControl::channel_in_end(int num)/*{{{*/
 {
 	// call if check ok
 	g_op->call(num);
+	code_top->push_char(OP_SELECT_SIGNAL);
 
 	// 2pass set
 	int pos_if_false = m_ctl[m_ctl.size()-1].pass2;
 	m_ctl.pop_back();
 	code_top->set_int(code_top->size(), pos_if_false);
 }
- 
-void parserControl::channel_out_start()
+ /*}}}*/
+
+void parserControl::channel_out_start()/*{{{*/
 {
 	code_top->push_char(OP_CHANNEL_OUT);
 
@@ -755,17 +852,18 @@ void parserControl::channel_out_start()
 	
 	code_top->increase(sizeof(int) * 2); // jump address, out num
 }
- 
-void parserControl::channel_out_end(int num)
+ /*}}}*/
+
+void parserControl::channel_out_end(int num)/*{{{*/
 {
 	int pos_if_false = m_ctl[m_ctl.size()-1].pass2;
 	m_ctl.pop_back();
 	code_top->set_int(code_top->size(), pos_if_false);
 	code_top->set_int(num, pos_if_false + sizeof(int));
 }
- 
+ /*}}}*/
 
-bool parserControl::is_breakable(context& ctx) 
+bool parserControl::is_breakable(context& ctx) /*{{{*/
 {
 	control_type_e type = ctx.type;
 
@@ -777,13 +875,15 @@ bool parserControl::is_breakable(context& ctx)
 	case CONTROL_FOR_2: 
 	case CONTROL_FOR_SUB: 
 	case CONTROL_SWITCH: 
+	case CONTROL_SELECT: 
 		return true;
 	}
 
 	return false;
 }
+/*}}}*/
 
-bool parserControl::is_continuable(context& ctx) 
+bool parserControl::is_continuable(context& ctx) /*{{{*/
 {
 	control_type_e type = ctx.type;
 
@@ -794,15 +894,16 @@ bool parserControl::is_continuable(context& ctx)
 	case CONTROL_FOR: 
 	case CONTROL_FOR_2: 
 	case CONTROL_FOR_SUB: 
+	case CONTROL_SELECT: 
 	case CONTROL_SWITCH:  // return true, but will make error
 		return true;
 	}
 
 	return false;
 }
+/*}}}*/
 
-
-bool parserControl::is_for(context& ctx) 
+bool parserControl::is_for(context& ctx) /*{{{*/
 {
 	control_type_e type = ctx.type;
 
@@ -815,3 +916,4 @@ bool parserControl::is_for(context& ctx)
 
 	return false;
 }
+/*}}}*/

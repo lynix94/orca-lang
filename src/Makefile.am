@@ -67,6 +67,7 @@ liborca_la_SOURCES = \
 		$(VM_DIR)/orcaVM.cpp \
 		$(VM_DIR)/orcaGlobal.cpp \
 		$(VM_DIR)/orcaParserObject.cpp \
+		$(VM_DIR)/orcaSelectStack.cpp \
 		$(INCLUDE_DIR)/porting.cpp \
 		$(CORELIB_DIR)/base64.cpp \
 		$(CORELIB_DIR)/orcaDatetime.cpp \

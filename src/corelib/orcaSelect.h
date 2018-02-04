@@ -22,8 +22,8 @@ class orcaSelect : public orcaObject
 public:
 	orcaSelect()
 	{
-		set_name("select");
-		insert_native_function("select", (object_fp)&orcaSelect::ex_select);
+		set_name("fdselect");
+		insert_native_function("fdselect", (object_fp)&orcaSelect::ex_select);
 		insert_native_function("readable", (object_fp)&orcaSelect::ex_readable);
 	}
 

@@ -9,12 +9,7 @@
 #ifndef _DEF_ORCA_SWITCH_STACK
 #define _DEF_ORCA_SWITCH_STACK
 
-class orcaList;
-class orcaMap;
 class orcaVM;
-
-#include "orcaListIter.h"
-#include "orcaMapIter.h"
 
 class orcaSwitchStack
 {

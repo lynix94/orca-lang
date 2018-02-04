@@ -1,59 +1,65 @@
-using select;
-using socket;
-using random;
+
 using thread;
 using time;
 
-def port;
+def a := [,];
+def b := (,);
 
-random.seed();
-my.port = random.integer(1000) + 10000;
-print: 'port: ', my.port;
 
-def server {
-	sock = socket.create();
 
-	sock.bind(..port);
-	sock.listen();
+select {
+case .a -> ret:
+	print(ret);
+	print: 'case 1';
 
-	while true {
-		fd = select.select([sock.get()], [], [], 1000);
+case .b -> ...ret:
+	print(ret);
+	print: 'case 2';
 
-		if fd[0] == [sock.get()] {
-			new_cl = sock.accept();
-
-			str = new_cl.recv();
-			new_cl.send(str);
-
-			sock.close();
-			new_cl.close();
-			return;
-		}
-	}
+default: ret = 'default';
 }
 
-def client {
-	sock = socket.create();
-	sock.connect('127.0.0.1', ..port);
-	sock.send('hello, socket');
-	msg = sock.recv();
-
-	print: 'recv: ', msg;
-	if msg.strip() != 'hello, socket' {
-		throw test.socket <- 'socket abnormal';
-	}
-
-	sock.close();
+if ret != 'default' {
+	throw test.'select' <- 'select default failed';
 }
 
 
-th1 = thread.run(my.server);
-time.msleep(100);
-th2 = thread.run(my.client);
+def alarm {
+	for i in (0, 3) {
+		time.msleep(100);
+		print('signal...');
+		..b <- 100, 200, 300;
+	}
+}
 
-th1.join();
-th2.join();
-
-print: my, ' OK';
 
 
+thread.run(my.alarm);
+
+
+
+result = [];
+select {
+case .a -> ret:
+	print(ret);
+	print: 'case 1';
+
+case .b -> ret:
+	print(ret);
+	print: 'case 2';
+
+	result.push_back(ret);
+
+	if result.size() >= 6 {
+		break;
+	}
+
+	continue;
+}
+
+print: result;
+if result != [300, 200, 100, 300, 200, 100] {
+	throw test.'select' <- 'select tuple failed';
+}
+
+print: '# OK';

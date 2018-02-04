@@ -607,58 +607,76 @@ selection_stmt:/*{{{*/
 	  if_elif_else_stmt
 	| decode_stmt
 	| switch_stmt
+	| select_stmt
 	;
 /*}}}*/
 
-
-/*
 select_stmt:
 	SELECT
 		{
-
+			g_ctl->select_start();	
 		}
-	'{' select_pattern_stmt_list '}'
+	'{' select_case_stmt_list opt_select_default_stmt '}'
 		{
-
+			g_ctl->select_end();	
 		}
 	;
 
-select_pattern_stmt_list:
-	  select_pattern_stmt_list select_pattern_stmt
-	| select_pattern_stmt
+
+select_case_stmt_list:
+	  select_case_stmt_list select_case_stmt
+	| select_case_stmt
 	;
 
 
-select_pattern_stmt:
+opt_select_default_stmt:
+	 /* empty */
+	| DEFAULT ':' 
 		{
-		}
-	CASE expression RIGHT_ARROW assign_target_list_with_argv ':'
-		{
+			g_ctl->select_case_start();
+			g_ctl->select_default_shift();
 		}
 	statement_list
 		{
+			g_ctl->select_case_end(0);
 		}
 	;
-*/
 
-switch_stmt:
+
+select_case_stmt:
+		{
+			g_ctl->select_case_start();
+		}
+	CASE expression RIGHT_ARROW 
+		{
+			g_ctl->select_case_shift();
+		}
+	assign_target_list_with_argv ':' statement_list
+		{
+			g_ctl->select_case_end($6);
+		}
+	;
+
+
+switch_stmt:/*{{{*/
 	SWITCH expression
 		{
 			g_ctl->switch_start();
 		}
-	'{' switch_pattern_stmt_list opt_default_pattern_stmt '}'
+	'{' switch_pattern_stmt_list opt_switch_default_stmt '}'
 		{
 			g_ctl->switch_end();
 		}
 	;
+/*}}}*/
 
-
-switch_pattern_stmt_list:
+switch_pattern_stmt_list:/*{{{*/
 	  switch_pattern_stmt_list switch_pattern_stmt
 	| switch_pattern_stmt
 	;
+/*}}}*/
 
-opt_default_pattern_stmt:
+opt_switch_default_stmt:/*{{{*/
 	 /* empty */
 	| DEFAULT ':' 
 		{
@@ -669,9 +687,9 @@ opt_default_pattern_stmt:
 			g_ctl->switch_case_end();
 		}
 	;
+/*}}}*/
 
-
-switch_pattern_stmt:
+switch_pattern_stmt:/*{{{*/
 	CASE
 		{
 			g_ctl->switch_case_start();
@@ -685,7 +703,7 @@ switch_pattern_stmt:
 			g_ctl->switch_case_end();
 		}
 	;
-
+/*}}}*/
 
 decode_stmt:/*{{{*/
 	DECODE expression 

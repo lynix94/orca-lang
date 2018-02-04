@@ -56,33 +56,33 @@ if (10..1 : 2) != (10,8,6,4,2) {
 
 (1, 2, 3) -> a, b, c, d;
 print: (a,b,c,d);
-if (a, b, c, d) != (1, 2, 3, nil) {
+if (a, b, c, d) != (3, 2, 1, nil) {
 	throw test.tuple <- 'tuple channel fail';
 }
 
 (1, 2, 3, 4) -> a, b;
 print: (a,b);
-if (a, b) != (1, 2) {
+if (a, b) != (4, 3) {
 	throw test.tuple <- 'tuple channel fail';
 }
 
 (1, 2, 3, 4) -> ...a;
 print: a;
-if a != (1, 2, 3, 4) {
+if a != (4, 3, 2, 1) {
 	throw test.tuple <- 'tuple channel fail';
 }
 
 
 (1, 2, 3, 4) -> a, b, ...c;
 print: a, b, c;
-if (a, b, c) != (1, 2, (3, 4)) {
+if (a, b, c) != (4, 3, (2, 1)) {
 	throw test.tuple <- 'tuple channel fail';
 }
 
 
 (1, 2, 3, 4) -> a, b, c, d, e, ...f;
 print: a, b, c, d, e, f;
-if (a, b, c, d, e, f) != (1, 2, 3, 4, nil, (,)) {
+if (a, b, c, d, e, f) != (4, 3, 2, 1, nil, (,)) {
 	throw test.tuple <- 'tuple channel fail';
 }
 

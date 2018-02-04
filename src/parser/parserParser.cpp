@@ -205,7 +205,13 @@ bool parserParser::parse(const string& filename)/*{{{*/
 
 	// parse
 	init();
-	if (yyparse() != 0) {
+	try {
+		if (yyparse() != 0) {
+			return false;
+		}
+	}
+	catch(const char* cp) {
+		printf("%s\n", cp);
 		return false;
 	}
 	
@@ -247,7 +253,13 @@ bool parserParser::parse_context_file(const string& filename, const string& mod_
 	init();
 	curr_fp = fmemopen((void*)def.c_str(), def.size(), "r");
 	lineno = 1;
-	if (yyparse() != 0) {
+	try {
+		if (yyparse() != 0) {
+			return false;
+		}
+	}
+	catch(const char* cp) {
+		printf("%s\n", cp);
 		return false;
 	}
 
@@ -288,7 +300,13 @@ orcaData parserParser::eval(orcaVM* vm, const string& src)/*{{{*/
 	int rv;
 	try {
 		init();
-		rv = yyparse();
+		try {
+			rv = yyparse();
+		}
+		catch(const char* cp) {
+			printf("%s\n", cp);
+			rv = -1;
+		}
 
 		if (rv == 0) {
 			code_top->push_char(OP_RETURN);
@@ -328,7 +346,13 @@ bool parserParser::interpret(orcaVM* vm)/*{{{*/
 		try {
 			init();
 
-			rv = yyparse();
+			try {
+				rv = yyparse();
+			}
+			catch(const char* cp) {
+				printf("%s\n", cp);
+				rv = -1;
+			}
 
 			if (rv == 0) {
 				code_top->push_char(OP_RETURN);

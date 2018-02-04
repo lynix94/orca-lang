@@ -190,6 +190,7 @@ enum mark_e
 	MARK_DECODE,
 	MARK_STACK,
 	MARK_SWITCH,
+	MARK_SELECT,
 };
 
 struct mark_t 
@@ -354,6 +355,12 @@ struct LIBORCA_API orcaData
 	void mark_switch() {
 		t=TYPE_MARK;
 		v.mark.type = MARK_SWITCH;
+		v.mark.vp = NULL;
+	}
+
+	void mark_select() {
+		t=TYPE_MARK;
+		v.mark.type = MARK_SELECT;
 		v.mark.vp = NULL;
 	}
 

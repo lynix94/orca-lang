@@ -33,6 +33,7 @@ enum control_type_e
 	CONTROL_PARALLEL_FOR, 
 	CONTROL_CHANNEL_IN, 
 	CONTROL_CHANNEL_OUT, 
+	CONTROL_SELECT, 
 };
 
 class parserControl 
@@ -82,6 +83,13 @@ public:
 	void switch_case_start();
 	void switch_case_shift();
 	void switch_case_end();
+
+	void select_start();
+	void select_end();
+	void select_case_start();
+	void select_case_shift();
+	void select_default_shift();
+	void select_case_end(int out_num);
 
 	void sbf_start();
 	void sbf_end();

@@ -584,10 +584,9 @@ orcaData orcaList::ex_channel_out(orcaVM* vm, int n)
 	}
 
 	orcaTuple* tup = new orcaTuple();
-	int i=0;
-	list<orcaData>::iterator it;
-	for (it=m_value.begin(); it!=m_value.end() && i<count; ++it, i++) {
-		tup->push_back(*it);
+	for (int i=0; i<count && !m_value.empty(); i++) {
+		tup->push_back(at(0));
+		pop_front();
 	}
 
 	return tup;

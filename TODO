@@ -1,7 +1,7 @@
 # TODO
-channel opt_assign
-switch
-sqlite
+timer
+str, repr to common function
+add time.sleep(1.2)
 
 # bug
 hex diff
@@ -11,11 +11,7 @@ hex diff
 -- test_oo failed
 
 # now thinking 
-*** .new (vs .clone)
 decode to switch
-*** fix trace.orca trace
-*** support directory parsing (name.orca)
-*** support main.orca.html
 html lib
 ** select
 root, cloud (depend zookeeper or etcd)
@@ -51,6 +47,13 @@ move parse to vm & parse, interpret lock
 
 
 ### done
+select
+fd select
+fix trace.orca trace
+support directory parsing (name.orca)
+support main.orca.html
+channel opt_assign
+switch
 change to lambda
 add eval (interpret, parse)
 improve catch statement

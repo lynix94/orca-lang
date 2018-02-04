@@ -113,7 +113,7 @@
 #define OP_PARSE					0x7B
 #define OP_SWITCH					0x7C
 #define OP_SWITCH_END				0x7D
-#define OP_CASE						0x7E
+#define OP_SWITCH_CASE				0x7E
 
 #define OP_SBF						0x80
 #define OP_SBF_LIST					0x81
@@ -122,6 +122,12 @@
 #define OP_CHANNEL_IN				0x84
 #define OP_CHANNEL_OUT				0x85
 #define OP_EXTRACT					0x86
+#define OP_SELECT_PREPARE			0x87
+#define OP_SELECT_START				0x88
+#define OP_SELECT_END				0x89
+#define OP_SELECT_CASE				0x8A
+#define OP_SELECT_DEFAULT			0x8B
+#define OP_SELECT_SIGNAL			0x8C
 
 #define OP_RC_INC					0x90
 #define OP_RC_DEC					0x91

@@ -1,0 +1,59 @@
+using select;
+using socket;
+using random;
+using thread;
+using time;
+
+def port;
+
+random.seed();
+my.port = random.integer(1000) + 10000;
+print: 'port: ', my.port;
+
+def server {
+	sock = socket.create();
+
+	sock.bind(..port);
+	sock.listen();
+
+	while true {
+		fd = select.select([sock.get()], [], [], 1000);
+
+		if fd[0] == [sock.get()] {
+			new_cl = sock.accept();
+
+			str = new_cl.recv();
+			new_cl.send(str);
+
+			sock.close();
+			new_cl.close();
+			return;
+		}
+	}
+}
+
+def client {
+	sock = socket.create();
+	sock.connect('127.0.0.1', ..port);
+	sock.send('hello, socket');
+	msg = sock.recv();
+
+	print: 'recv: ', msg;
+	if msg.strip() != 'hello, socket' {
+		throw test.socket <- 'socket abnormal';
+	}
+
+	sock.close();
+}
+
+
+th1 = thread.run(my.server);
+time.msleep(100);
+th2 = thread.run(my.client);
+
+th1.join();
+th2.join();
+
+print: my, ' OK';
+
+
