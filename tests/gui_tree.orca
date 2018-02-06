@@ -24,7 +24,7 @@ def main : window
 		{
 			def current := nil;
 
-			def handle_toggle(...)
+			def handle_toggle(...argv)
 			{
 				# argv: ( toggled, tree_iterator )
 				# argv[1]: tree_iterator 
@@ -36,8 +36,9 @@ def main : window
 				def toggle_child(it, toggle)
 				{
 					if it.child_size() > 0 {
-						for a in it.child_begin(): 
+						for a in it.child_begin() {
 							toggle_child(a, toggle);
+						}
 					}
 
 					cur = it();
@@ -63,9 +64,9 @@ def main : window
 			b.push_child([false, 'ruby']);
 			b.push_child([false, 'lisp']);
 
-			my.event['changed'] = def(a){
+			my.event['changed'] = lambda(...argv){
 				upper('box').change.attr['text'] = argv[0].string() + argv[0]();
-				..current = a;
+				..current = argv;
 			};
 		}
 
@@ -78,7 +79,7 @@ def main : window
 				my.attr['wh'] = (100, 20);
 				my.attr['text'] = 'submit sibling';
 
-				my.event['clicked'] = def(){
+				my.event['clicked'] = lambda(){
 					it = upper('box').items.current;
 					new = upper('input_sibling').new.attr['text'];
 					if new.length() <= 0 {
@@ -104,10 +105,12 @@ def main : window
 				my.attr['wh'] = (100, 20);
 				my.attr['text'] = 'submit child';
 
-				my.event['clicked'] = def(){
+				my.event['clicked'] = lambda(){
 					it = upper('box').items.current;
 					new = upper('input_child').new.attr['text'];
-					if new.length() <= 0: return;
+					if new.length() <= 0 {
+						return;
+					}
 
 					if it == nil {
 						upper('box').items.push_back([false, new]);
@@ -128,4 +131,7 @@ def main : window
 	}
 }
 
+
+my.main.make();
+my.main.show();
 

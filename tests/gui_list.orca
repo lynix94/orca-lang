@@ -22,7 +22,7 @@ def main : window
 
 		def items : list
 		{
-			def handle_toggle(...)
+			def handle_toggle(...argv)
 			{
 				def selected := type.map();
 
@@ -42,7 +42,7 @@ def main : window
 
 
 				result = '[ Your selections ]\n';
-				for a in .selected.begin(): {
+				for a in .selected.begin() {
 					result += '%s\n' % a.first();
 				}
 	
@@ -57,8 +57,8 @@ def main : window
 			my.push_back([false, 'classic guiar']);
 			my.push_back([false, 'programming']);
 
-			my.event['changed'] = def(a){
-				upper('box').change.attr['text'] = argv[0].string() + a();
+			my.event['changed'] = lambda(...argv){
+				upper('box').change.attr['text'] = argv[0].string() + argv[0]();
 			};
 		}
 
@@ -73,7 +73,7 @@ def main : window
 			{
 				my.attr['wh'] = (100, 20);
 				my.attr['text'] = 'submit';
-				my.event['clicked'] = def(){
+				my.event['clicked'] = lambda(){
 					new = upper('input').new.attr['text'];
 					upper('box').items.push_back([false, new]);
 				};

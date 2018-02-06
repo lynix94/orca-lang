@@ -16,17 +16,17 @@ def main : window
 	{
 		def menu : menubar
 		{
-			file = [ 'open', def(){ 
+			file = [ 'open', lambda(){ 
 								name = dialog.fileopen(upper('main'));
 								str= os.read(name);
 								upper('box').hs.edit.attr['text'] = str;
 							},
-					'save', def(){ 
+					'save', lambda(){ 
 								str= upper('box').hs.edit.attr['text'];
 								name = dialog.filesave(upper('main'));
 								os.write(name, str);
 							},
-					'exit', def(){ 
+					'exit', lambda(){ 
 								upper('main').quit(); 
 							}
 					];
@@ -42,4 +42,7 @@ def main : window
 		}
 	}
 }
+
+my.main.make();
+my.main.show();
 

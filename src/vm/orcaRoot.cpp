@@ -37,7 +37,7 @@
 #include "orcaSystem.h"
 
 
-//#define USE_GTK
+#define USE_GTK
 
 #if defined(LINUX)
 #if defined(USE_GTK)
@@ -83,7 +83,11 @@ orcaRoot::orcaRoot()
 
 #if defined(LINUX)
 #if defined(USE_GTK)
-	insert_static("gtk", new orcaGtk());
+	if (gtk_init_check(NULL, NULL) == false) {
+		printf("[WARNING] Can't open gtk display.\n");
+	} else {
+		insert_static("gtk", new orcaGtk());
+	}
 #endif
 
 #endif

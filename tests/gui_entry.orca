@@ -26,10 +26,13 @@ def main : window
 		{
 			my.attr['text'] = 'ok';
 			my.event['clicked'] = 
-				def(){ 
+				lambda(){ 
 					upper('box').print.attr['text'] = upper('box').input.attr['text'];
 				};
 		}
 	}
 }
+
+my.main.make();
+my.main.show();
 

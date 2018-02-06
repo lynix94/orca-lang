@@ -1,13 +1,14 @@
 # TODO
 size, repr to common function
 *.TEXT
+decorator
 
 # bug
 hex diff
 
 # bug fixed
--- using namespace conflict
--- test_oo failed
+using namespace conflict
+test_oo failed
 
 # now thinking 
 root, cloud (depend zookeeper or etcd)

@@ -23,8 +23,11 @@ def main : window
 			my.push_back: 'windows';
 			my.push_back: 'solaris';
 
-			my.event['changed'] = def(a) { upper('box').print.attr['text'] = a; };
+			my.event['changed'] = lambda(a) { upper('box').print.attr['text'] = a; };
 		}
 	}
 }
+
+my.main.make();
+my.main.show();
 

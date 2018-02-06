@@ -83,7 +83,7 @@ def window
 			{
 			case 'text':
 				..owner.handle.set_text(v);
-			case %default:
+			case %remain:
 				..owner.handle.set_attr(k, v);
 			}
 
@@ -228,7 +228,7 @@ def entry : window
 			{
 			case 'text':
 				..owner.handle.set_text(v);
-			case %default:
+			case %remain:
 				..owner.handle.set_attr(k, v);
 			}
 

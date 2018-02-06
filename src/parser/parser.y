@@ -69,6 +69,7 @@ using namespace std;
 %type <cp> lvar
 %type <cp> p_var
 %type <cp> object_path
+%type <cp> superclass_path
 %type <cp> opt_under
 %type <cp> big_number
 %type <cp> minus_big_number
@@ -104,7 +105,7 @@ using namespace std;
 
 %type <vector_cp> name_list
 %type <vector_cp> opt_argument_list
-%type <vector_cp> object_path_list
+%type <vector_cp> superclass_path_list
 %type <vector_cp> opt_superclass
 
 
@@ -1231,25 +1232,46 @@ opt_superclass:/*{{{*/
 		{
 			$$ = 0;
 		}
-	| ':' object_path_list
+	| ':' superclass_path_list
 		{
 			$$ = $2;
 		}
 	;
 /*}}}*/
 
-object_path_list:/*{{{*/
-	  object_path_list ',' object_path
+superclass_path_list:/*{{{*/
+	  superclass_path_list ',' superclass_path
 		{
 			name_list_t* vs = (name_list_t*)$1;
 			vs->push_back($3);
 			$$ = vs;
 		}
-	| object_path
+	| superclass_path
 		{
 			name_list_t* vs = g_parser->new_name_list();
 			vs->push_back($1);
 			$$ = vs;
+		}
+	;
+/*}}}*/
+
+superclass_path:/*{{{*/
+	superclass_path '.' name_or_string
+		{
+			char buff[1024];
+			snprintf(buff, 1024, "%s.%s", $1, $3);
+			$$ = g_parser->strdup(buff);
+		}
+	| name_or_string
+		{
+			char* cp = code_top->find_in_space($1);
+			if (cp == NULL) {
+				char buff[1024];
+				snprintf(buff, 1024, "can't find parent module %s in line: %d", $1, g_parser->lineno);
+				throw g_parser->strdup(buff);
+			}
+
+			$$ = cp;
 		}
 	;
 /*}}}*/

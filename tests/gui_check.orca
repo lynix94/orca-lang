@@ -19,10 +19,13 @@ def main : window
 		def toggle : check
 		{
 			my.attr['text'] = 'check me';
-			my.event['toggled'] = def(a) { 
+			my.event['toggled'] = lambda(a) { 
 					upper('box').print.attr['text'] = 'check result: %s' % a;
 				};
 		}
 	}
 }
+
+my.main.make();
+my.main.show();
 

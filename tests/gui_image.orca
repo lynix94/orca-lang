@@ -17,3 +17,6 @@ def main : window
 	}
 }
 
+my.main.make();
+my.main.show();
+

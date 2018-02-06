@@ -17,7 +17,7 @@ def main : window
 			def count := 0;
 
 			my.attr['text'] = 'click';
-			my.event['clicked'] = def(){ 
+			my.event['clicked'] = lambda(){ 
 				..count += 1;
 				upper('box').info.attr['text'] = ..count.string() + ' times';
 			};
@@ -29,4 +29,7 @@ def main : window
 		}
 	}
 }
+
+my.main.make();
+my.main.show();
 

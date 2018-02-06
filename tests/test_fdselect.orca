@@ -1,4 +1,4 @@
-using select;
+using fdselect;
 using socket;
 using random;
 using thread;
@@ -17,7 +17,7 @@ def server {
 	sock.listen();
 
 	while true {
-		fd = select.select([sock.get()], [], [], 1000);
+		fd = fdselect.fdselect([sock.get()], [], [], 1000);
 
 		if fd[0] == [sock.get()] {
 			new_cl = sock.accept();
@@ -48,7 +48,7 @@ def client {
 
 
 th1 = thread.run(my.server);
-time.msleep(100);
+time.sleep(0.1);
 th2 = thread.run(my.client);
 
 th1.join();

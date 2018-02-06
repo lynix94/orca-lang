@@ -5,7 +5,7 @@ using dist;
 using fs;
 using fun;
 using gnuplot;
-#using gui;
+using gui;
 using httpd;
 using httplib;
 using json;

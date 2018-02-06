@@ -141,8 +141,6 @@ static void gui_tree_changed_callback(GtkWidget* widget, gpointer param)/*{{{*/
 
 orcaGtk::orcaGtk()/*{{{*/
 {
-	gtk_init(NULL, NULL);
-
 	set_name("gtk");
 	insert_native_function("init", (object_fp)&orcaGtk::ex_init);
 	insert_native_function("put", (object_fp)&orcaGtk::ex_put);
