@@ -35,6 +35,7 @@
 #include "orcaSort.h"
 #include "orcaCPP.h"
 #include "orcaSystem.h"
+#include "orcaQueue.h"
 
 
 #define USE_GTK
@@ -80,6 +81,7 @@ orcaRoot::orcaRoot()
 	insert_static("sort", new orcaSort());
 	insert_static("cpp", new orcaCPP());
 	insert_static("system", new orcaSystem());
+	insert_static("queue", new orcaQueue());
 
 #if defined(LINUX)
 #if defined(USE_GTK)

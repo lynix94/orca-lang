@@ -8,6 +8,8 @@
 
 **********************************************************************/
 
+#include <errno.h>
+
 #include "porting.h"
 
 #ifdef WINDOWS
@@ -539,7 +541,11 @@ bool portCond::wait(long long nsec) // true : signaled, false : timeout/*{{{*/
 
 		pthread_mutex_lock(&m_cond_mutex);
 		int ret = pthread_cond_timedwait(&m_cond, &m_cond_mutex, &to);
-		if (ret == -1) {
+		if (ret == ETIMEDOUT) {
+			return false;
+		}
+
+		if (ret == EINVAL) {
 			return false;
 		}
 	}
@@ -563,7 +569,11 @@ bool portCond::wait(portMutex* mutex, long long nsec) // true : signaled, false 
 		to.tv_nsec = to_ts % (1000*1000*1000);
 		
 		int ret = pthread_cond_timedwait(&m_cond, mutex->handle(), &to);
-		if (ret == -1) {
+		if (ret == ETIMEDOUT) {
+			return false;
+		}
+
+		if (ret == EINVAL) {
 			return false;
 		}
 	}

@@ -1,0 +1,87 @@
+
+using thread;
+using time;
+using queue;
+
+
+# queu test
+
+q = queue.clone(1);
+ret = q.push(1);
+if (ret != true) {
+	throw test.queue <- 'test queue failed';
+}
+
+ret = q.push(2, 0.001);
+if (ret != false) {
+	throw test.queue <- 'test queue failed';
+}
+
+
+
+
+
+
+print: 'queue select test';
+
+
+def a := queue.clone();
+def b := queue.clone();
+
+select {
+case .a -> ret:
+	print(ret);
+	print: 'case 1';
+
+case .b -> ...ret:
+	print(ret);
+	print: 'case 2';
+
+default: ret = 'default';
+}
+
+if ret != 'default' {
+	throw test.queue <- 'select queue failed';
+}
+
+
+def alarm {
+	for i in (0, 3) {
+		time.sleep(0.1);
+		print('signal...');
+		..b <- 100, 200, 300;
+	}
+}
+
+thread.run(my.alarm);
+
+
+
+result = [];
+select {
+case .a -> ret:
+	print(ret);
+	print: 'case 1';
+
+case .b -> ret:
+	print(ret);
+	print: 'case 2';
+
+	result.push_back(ret);
+
+	if result.size() >= 6 {
+		break;
+	}
+
+	continue;
+}
+
+print: result;
+if result != [100, 200, 300, 100, 200, 300] {
+	throw test.queue <- 'select queue failed';
+}
+
+print: '# OK: ', my;
+
+
+
