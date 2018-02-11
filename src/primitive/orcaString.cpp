@@ -406,7 +406,7 @@ orcaData orcaString::integer(orcaVM* vm, string& s) /*{{{*/
 	string str = kyString::strip(s);;
 	if (str.length() > 9)  {
 		d.bn_set(str.c_str());
-		if (d.operator_eq(vm, zero)) {
+		if (d.operator_eq(vm, zero).Boolean()) {
 			for (int i=0; i<str.length(); i++) {
 				if (!isdigit(str[i])) {
 					if (i == 0 && str[0] == '-') continue;

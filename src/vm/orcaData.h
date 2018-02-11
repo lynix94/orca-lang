@@ -378,14 +378,14 @@ struct LIBORCA_API orcaData
 	orcaData operator_div(orcaVM* vm, orcaData& rhs);
 	orcaData operator_mod(orcaVM* vm, orcaData& rhs);
 
-	bool operator_and(orcaVM* vm, orcaData& rhs);
-	bool operator_or(orcaVM* vm, orcaData& rhs);
-	bool operator_lt(orcaVM* vm, orcaData& rhs);
-	bool operator_le(orcaVM* vm, orcaData& rhs);
-	bool operator_gt(orcaVM* vm, orcaData& rhs);
-	bool operator_ge(orcaVM* vm, orcaData& rhs);
-	bool operator_eq(orcaVM* vm, orcaData& rhs);
-	bool operator_neq(orcaVM* vm, orcaData& rhs);
+	orcaData operator_and(orcaVM* vm, orcaData& rhs);
+	orcaData operator_or(orcaVM* vm, orcaData& rhs);
+	orcaData operator_lt(orcaVM* vm, orcaData& rhs);
+	orcaData operator_le(orcaVM* vm, orcaData& rhs);
+	orcaData operator_gt(orcaVM* vm, orcaData& rhs);
+	orcaData operator_ge(orcaVM* vm, orcaData& rhs);
+	orcaData operator_eq(orcaVM* vm, orcaData& rhs);
+	orcaData operator_neq(orcaVM* vm, orcaData& rhs);
 
 	orcaData operator+(orcaData& rhs);
 	orcaData operator-(orcaData& rhs);

@@ -735,7 +735,66 @@ orcaData orcaObject::operator_lt(orcaVM* vm, orcaData& p)
 	}
 }
 
+orcaData orcaObject::operator_le(orcaVM* vm, orcaData& p)
+{
+	orcaData d;
+	if (has_member("<=", d)) {
+		vm->push_param(d);
+		vm->push_param(p);
+		vm->call(1);
+		return vm->m_stack->pop();
+	}
+	else {
+		return NIL;
+	}
+}
+
+orcaData orcaObject::operator_gt(orcaVM* vm, orcaData& p)
+{
+	orcaData d;
+	if (has_member(">", d)) {
+		vm->push_param(d);
+		vm->push_param(p);
+		vm->call(1);
+		return vm->m_stack->pop();
+	}
+	else {
+		return NIL;
+	}
+}
+
+orcaData orcaObject::operator_ge(orcaVM* vm, orcaData& p)
+{
+	orcaData d;
+	if (has_member(">=", d)) {
+		vm->push_param(d);
+		vm->push_param(p);
+		vm->call(1);
+		return vm->m_stack->pop();
+	}
+	else {
+		return NIL;
+	}
+}
+
 orcaData orcaObject::operator_eq(orcaVM* vm, orcaData& p)
+{
+	orcaData d;
+	if (has_member("==", d)) {
+		vm->push_param(d);
+		vm->push_param(p);
+		vm->call(1);
+		return vm->m_stack->pop();
+	}
+	else if (is<TYPE_OBJ>(p) && this == p.o()){
+		return true;
+	}
+	else {
+		return NIL;
+	}
+}
+
+orcaData orcaObject::operator_neq(orcaVM* vm, orcaData& p)
 {
 	orcaData d;
 	if (has_member("==", d)) {

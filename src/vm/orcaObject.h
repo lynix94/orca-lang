@@ -86,7 +86,11 @@ public:
 	virtual orcaData operator_div(orcaVM* vm, orcaData& p);
 	virtual orcaData operator_div_rev(orcaVM* vm, orcaData& p);
 	virtual orcaData operator_lt(orcaVM* vm, orcaData& p);
+	virtual orcaData operator_le(orcaVM* vm, orcaData& p);
+	virtual orcaData operator_gt(orcaVM* vm, orcaData& p);
+	virtual orcaData operator_ge(orcaVM* vm, orcaData& p);
 	virtual orcaData operator_eq(orcaVM* vm, orcaData& p);
+	virtual orcaData operator_neq(orcaVM* vm, orcaData& p);
 	virtual orcaData operator_and(orcaVM* vm, orcaData& p);
 	virtual orcaData operator_or(orcaVM* vm, orcaData& p);
 

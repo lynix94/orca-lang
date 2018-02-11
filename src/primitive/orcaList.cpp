@@ -351,7 +351,7 @@ orcaData orcaList::ex_find(orcaVM* vm, int n)
 	orcaListIter it = begin();
 	orcaListIter it_end = end();
 	for (; it!=it_end; ++it) {
-		if ((*it).operator_eq(vm, val)) {
+		if ((*it).operator_eq(vm, val).Boolean()) {
 			return new orcaListIterator(it, begin(), it_end);
 		}
 	}
@@ -469,7 +469,7 @@ orcaData orcaList::operator_eq(orcaVM* vm, orcaData& p)
 	orcaListIter rhs = lo->begin();
 
 	for(; lhs != end() && rhs != lo->end(); ++lhs, ++rhs) {
-		if ((*lhs).operator_neq(vm, *rhs)) return false;
+		if ((*lhs).operator_neq(vm, *rhs).Boolean()) return false;
 	}
 
 	if (lhs == end() && rhs == lo->end()) 
@@ -483,7 +483,7 @@ bool orcaList::compare(orcaVM* vm, orcaList* lo, int len, orcaListIter lhs)
 {
 	orcaListIter rhs = lo->begin();
 	for(int i=0; lhs != end() && i<len; ++lhs, ++rhs, i++) {
-		if ((*lhs).operator_neq(vm, *rhs)) return false;
+		if ((*lhs).operator_neq(vm, *rhs).Boolean()) return false;
 	}
 
 	return true;
@@ -499,7 +499,7 @@ orcaListIter orcaList::search(orcaVM* vm, orcaList* lo, orcaListIter lhs)
 		lhs = start;
 		orcaListIter rhs = lo->begin();
 		for(; rhs != lo->end(); ++rhs, ++lhs) {
-			if ((*lhs).operator_neq(vm, *rhs)) break;
+			if ((*lhs).operator_neq(vm, *rhs).Boolean()) break;
 		}
 
 		if (rhs == lo->end()) {

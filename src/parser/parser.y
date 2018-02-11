@@ -612,7 +612,7 @@ selection_stmt:/*{{{*/
 	;
 /*}}}*/
 
-select_stmt:
+select_stmt:/*{{{*/
 	SELECT
 		{
 			g_ctl->select_start();	
@@ -622,15 +622,15 @@ select_stmt:
 			g_ctl->select_end();	
 		}
 	;
+/*}}}*/
 
-
-select_case_stmt_list:
+select_case_stmt_list:/*{{{*/
 	  select_case_stmt_list select_case_stmt
 	| select_case_stmt
 	;
+/*}}}*/
 
-
-opt_select_default_stmt:
+opt_select_default_stmt:/*{{{*/
 	 /* empty */
 	| DEFAULT ':' 
 		{
@@ -642,9 +642,9 @@ opt_select_default_stmt:
 			g_ctl->select_case_end(0);
 		}
 	;
+/*}}}*/
 
-
-select_case_stmt:
+select_case_stmt:/*{{{*/
 		{
 			g_ctl->select_case_start();
 		}
@@ -657,7 +657,7 @@ select_case_stmt:
 			g_ctl->select_case_end($6);
 		}
 	;
-
+/*}}}*/
 
 switch_stmt:/*{{{*/
 	SWITCH expression

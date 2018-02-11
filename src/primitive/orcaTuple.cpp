@@ -355,7 +355,7 @@ orcaData orcaTuple::operator_eq(orcaVM* vm, orcaData& p)
 	vector<orcaData>::iterator lhs = m_value.begin();
 	vector<orcaData>::iterator rhs = lo->m_value.begin();
 	for(; lhs != m_value.end(); ++lhs, ++rhs) {
-		if (lhs->operator_neq(vm, *rhs)) return false;
+		if (lhs->operator_neq(vm, *rhs).Boolean()) return false;
 	}
 
 	if (rhs == lo->m_value.end()) 
@@ -372,7 +372,7 @@ orcaData orcaTuple::ex_find(orcaVM* vm, int n)
 
 	orcatuple_iterator it = begin();
 	for(; it != end(); ++it) {
-		if (it->operator_eq(vm, val)) break;
+		if (it->operator_eq(vm, val).Boolean()) break;
 	}
 
 	return new orcaTupleIter(it, this);

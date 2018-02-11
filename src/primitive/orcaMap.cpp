@@ -16,10 +16,10 @@
 bool data_cmp::operator()(orcaData l, orcaData r) const
 {
 	if (is<TYPE_OBJ>(l) || is<TYPE_OBJ>(r)) {
-		return l.operator_lt(get_current_vm(), r); // for user made operator..
+		return l.operator_lt(get_current_vm(), r).Boolean(); // for user made operator..
 	}
 
-	return l.operator_lt(NULL, r);
+	return l.operator_lt(NULL, r).Boolean();
 }
 
 
@@ -107,7 +107,7 @@ struct RC_INC : public unary_function<orcaData, void>
 
 orcaData orcaMap::slice(orcaData& start, orcaData& end, bool include_right) 
 {
-	if ( start.operator_gt(NULL, end)) {
+	if (start.operator_gt(NULL, end).Boolean()) {
 		std::swap(start, end);
 	}
 
@@ -298,12 +298,12 @@ orcaData orcaMap::operator_eq(orcaVM* vm, orcaData& p)
 		orcaData t1, t2;
 		t1 = it1->first;
 		t2 = it2->first;
-		if (!t1.operator_eq(vm, t2))
+		if (!t1.operator_eq(vm, t2).Boolean())
 			return false;
 
 		t1 = it1->second;
 		t2 = it2->second;
-		if (!t1.operator_eq(vm, t2))
+		if (!t1.operator_eq(vm, t2).Boolean())
 			return false;
 	}
 
