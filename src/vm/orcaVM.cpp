@@ -3022,9 +3022,20 @@ orcaData orcaVM::do_context(const char* mod, const char* name, const char* cp, t
 	orcaObject* modp;
 	bool ret;
 
-	ret = g_root->has_member(mod, out);
+	char main_mod[1024];
+	int i=0;
+	for (; i<strlen(mod); i++) {
+		if (mod[i] == '.') {
+			break;
+		}
+		main_mod[i] = mod[i];
+	}
+	main_mod[i] = 0;
+
+
+	ret = g_root->has_member(main_mod, out);
 	if (ret == false) {
-		printf("ERROR: module %s (for context) not found\n", mod);
+		printf("ERROR: module %s (for context) not found\n", main_mod);
 		return NIL;
 	}
 
@@ -3047,7 +3058,8 @@ orcaData orcaVM::do_context(const char* mod, const char* name, const char* cp, t
 	push_param(dp);
 	push_param(cp);
 	push_param(tp);
-	call(4);
+	push_param(mod);
+	call(5);
 
 	out = m_stack->pop();
 	if (is<TYPE_OBJ>(out) == false) {

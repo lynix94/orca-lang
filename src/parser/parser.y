@@ -996,7 +996,7 @@ define_stmt:/*{{{*/
 	/*}}}*/
 
 define_context_stmt:/*{{{*/
-	def '.' name_or_string opt_name_or_string opt_argument_list opt_superclass opt_under '{'
+	def '.' object_path opt_name_or_string opt_argument_list opt_superclass opt_under '{'
 		{
 			const char* name = $4;
 			static int count = 1;
@@ -1155,7 +1155,7 @@ lambda_define_header:/*{{{*/
 /*}}}*/
 
 lambda_context_header:/*{{{*/
-	LAMBDA '.' name_or_string opt_argument_list opt_superclass 
+	LAMBDA '.' object_path opt_argument_list opt_superclass 
 		{
 			// for serial tagging
 			static int count = 1;
