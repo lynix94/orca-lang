@@ -12,6 +12,7 @@
 #include <boost/regex.hpp>
 
 #include "porting.h"
+#include "kyString.h"
 
 #include "orcaGlobal.h"
 #include "orcaData.h"
@@ -359,6 +360,26 @@ void orcaData::string_(orcaVM* vm, string& str) const/*{{{*/
 
 	default:
 		orca_error("unknown type(%d)...\n", t);
+	}
+}
+/*}}}*/
+
+void orcaData::repr(orcaVM* vm, string& str) const/*{{{*/
+{
+	char buff[20];
+
+	switch(t)
+	{
+	case TYPE_STR:
+		str += string("\"") + kyString::to_escape(s()) + "\"";
+		break;
+
+	case TYPE_OBJ:
+		v.o->repr(vm, str);
+		break;
+
+	default:
+		string_(vm, str);
 	}
 }
 /*}}}*/

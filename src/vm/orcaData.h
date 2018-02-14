@@ -262,6 +262,7 @@ struct LIBORCA_API orcaData
 	// printing & debugging
 	void string_(orcaVM* vm, string& str) const;
 	string string_(orcaVM* vm) const;
+	void repr(orcaVM* vm, string& str) const;
 	void dump() const;
 	char* dump(char* buff) const;
 	string dump_str() const;

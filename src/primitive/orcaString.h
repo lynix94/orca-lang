@@ -32,6 +32,7 @@ public:
 	orcaData integer(orcaVM* vm, string& str);
 	orcaData float_(orcaVM* vm, string& str);
 	orcaData to_string(orcaVM* vm, string& str);
+	orcaData to_repr(orcaVM* vm, string& str);
 	orcaData replace(orcaVM* vm, string& str);
 	orcaData starts_with(orcaVM* vm, string& str);
 	orcaData ends_with(orcaVM* vm, string& str);

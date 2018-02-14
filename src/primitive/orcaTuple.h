@@ -77,7 +77,8 @@ public:
 	virtual orcaData operator_eq(orcaVM* vm, orcaData& p);
 
 	// etc
-	void string_(orcaVM* vm, string& str);
+	virtual void string_(orcaVM* vm, string& str);
+	virtual void repr(orcaVM* vm, string& str);
 	void dump();
 
 	orcatuple_iterator begin() 

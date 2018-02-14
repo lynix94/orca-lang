@@ -157,6 +157,24 @@ void orcaMap::string_(orcaVM* vm, string& str)
 	str += " }";
 }
 
+void orcaMap::repr(orcaVM* vm, string& str) 
+{
+	orcamap_iterator mi = m_value.begin();
+
+	str += "{ ";
+	while(mi!=m_value.end()) {
+		(mi->first).repr(vm, str);
+		str += ":";
+		(mi->second).repr(vm, str);
+
+		++mi;
+		if (mi!=m_value.end()) str+= ",";
+	}
+
+	str += " }";
+}
+
+
 orcaData orcaMap::ex_size(orcaVM* vm, int n) 
 {
 	return m_value.size();

@@ -317,6 +317,13 @@ orcaData orcaObject::operator_string(orcaVM* vm, orcaData& p)
 	return str;
 }
 
+orcaData orcaObject::operator_repr(orcaVM* vm, orcaData& p)
+{
+	string str;
+	repr(vm, str);
+	return str;
+}
+
 orcaData orcaObject::get_member_sub(const char* name, bool last) 
 { 
 	PRINT3("\t\t  get %s from %s, (parent: %p)\n", name, dump(buff), m_parent);
@@ -337,6 +344,10 @@ orcaData orcaObject::get_member_sub(const char* name, bool last)
 	// try virtual member
 	if (strcmp(name, "string") == 0) {
 		orcaData d(this, (object_fp)&orcaObject::operator_string, "string");
+		return d;
+	}
+	else if (strcmp(name, "repr") == 0) {
+		orcaData d(this, (object_fp)&orcaObject::operator_repr, "repr");
 		return d;
 	}
 	else if (strcmp(name, "TYPE") == 0) {
@@ -571,10 +582,23 @@ void orcaObject::string_(orcaVM* vm, string& str)
 	}
 	else {
 		char buff[1024];
-		snprintf(buff, 1024, "<%p>", this);
-		str += m_name;
-		str += " ";
-		str += buff;
+		snprintf(buff, 1024, "<%s - %p>", m_name, this);
+		str = buff;
+	}
+}
+
+void orcaObject::repr(orcaVM* vm, string& str) 
+{ 
+	orcaData d;
+	if (has_member("repr", d)) {
+		vm->push_stack(d);
+		vm->call(0);
+		str += vm->m_stack->pop().String();
+	}
+	else {
+		char buff[1024];
+		snprintf(buff, 1024, "<%s - %p>", m_name, this);
+		str = buff;
 	}
 }
 

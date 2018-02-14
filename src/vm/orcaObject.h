@@ -105,7 +105,9 @@ public:
 
 	// printing & debugging
 	orcaData operator_string(orcaVM* vm, orcaData& p);
+	orcaData operator_repr(orcaVM* vm, orcaData& p);
 	virtual void string_(orcaVM* vm, string& str);
+	virtual void repr(orcaVM* vm, string& str);
 	void dump();
 	string dump_str();
 	virtual char* dump(char* buff);

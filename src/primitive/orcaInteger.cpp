@@ -31,6 +31,9 @@ orcaInteger::orcaInteger()
 	d.internal(FI_INT_TO_STR, "string"); 
 	insert_static("string", d);
 
+	d.internal(FI_INT_TO_STR, "repr"); 
+	insert_static("repr", d);
+
 	d.internal(FI_INT_TO_FLOAT, "float"); 
 	insert_static("float", d);
 

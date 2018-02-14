@@ -50,6 +50,7 @@ orcaString::orcaString() /*{{{*/
 	d.internal(FI_STR_TO_INT,"integer");				insert_static("integer", d); 
 	d.internal(FI_STR_TO_FLOAT,"float");				insert_static("float", d); 
 	d.internal(FI_STR_TO_STR,"string");					insert_static("string", d); 
+	d.internal(FI_STR_TO_REPR,"repr");					insert_static("repr", d); 
 	d.internal(FI_STR_UPPER,"upper");					insert_static("upper", d); 
 	d.internal(FI_STR_LOWER,"lower");					insert_static("lower", d); 
 }
@@ -449,6 +450,12 @@ orcaData orcaString::float_(orcaVM* vm, string& s) /*{{{*/
 orcaData orcaString::to_string(orcaVM* vm, string& s) /*{{{*/
 {
 	return s;
+}
+/*}}}*/
+
+orcaData orcaString::to_repr(orcaVM* vm, string& s) /*{{{*/
+{
+	return string("\"") + kyString::to_escape(s) + "\"";
 }
 /*}}}*/
 

@@ -280,6 +280,10 @@ orcaData orcaVM::invoke_internal_func(InternalFunction& in) /*{{{*/
 		r = g_string.to_string(this, d.so->s); 
 		break;
 
+	case FI_STR_TO_REPR:	
+		r = g_string.to_repr(this, d.so->s); 
+		break;
+
 	case FI_STR_STARTSWITH:	
 		r = g_string.starts_with(this, d.so->s); 
 		break;

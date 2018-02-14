@@ -298,6 +298,8 @@ string kyString::strip(const string& s)/*{{{*/
 string kyString::to_escape(const string& s)/*{{{*/
 {
 	string src = s;
+	src = replace(src, "'", "\\'");
+	src = replace(src, "\"", "\\\"");
 	src = replace(src, "\t", "\\t");
 	src = replace(src, "\n", "\\n");
 	src = replace(src, "\r", "\\r");
@@ -310,6 +312,9 @@ string kyString::to_escape(const string& s)/*{{{*/
 string kyString::from_escape(const string& s)/*{{{*/
 {
 	string src = s;
+	src = replace(src, "\\'", "'");
+	src = replace(src, "\\\"", "\"");
+	src = replace(src, "\\\"", "\"");
 	src = replace(src, "\\t", "\t");
 	src = replace(src, "\\n", "\n");
 	src = replace(src, "\\r", "\r");

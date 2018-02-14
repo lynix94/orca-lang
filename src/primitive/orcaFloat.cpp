@@ -28,6 +28,9 @@ orcaFloat::orcaFloat()
 	d.internal(FI_FLOAT_TO_STR, "string"); 
 	insert_static("string", d);
 
+	d.internal(FI_FLOAT_TO_STR, "repr"); 
+	insert_static("repr", d);
+
 	d.internal(FI_FLOAT_TO_INT, "integer"); 
 	insert_static("integer", d);
 

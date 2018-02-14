@@ -297,6 +297,20 @@ void orcaList::string_(orcaVM* vm, string& str)
 	str += " ]";
 }
 
+void orcaList::repr(orcaVM* vm, string& str) 
+{
+	orcaListIter li = begin();
+
+	str += "[ ";
+	while(li!=end()) {
+		(*li).repr(vm, str);
+		++li;
+		if (li!=end()) str+= ",";
+	}
+
+	str += " ]";
+}
+
 orcaData orcaList::ex_size(orcaVM* vm, int n) 
 {
 	return size();

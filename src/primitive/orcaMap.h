@@ -46,7 +46,8 @@ public:
 	void update(orcaData& key, orcaData& val);
 	bool has_key(orcaData& key);
 
-	void string_(orcaVM* vm, string& str);
+	virtual void string_(orcaVM* vm, string& str);
+	virtual void repr(orcaVM* vm, string& str);
 	void dump(); 
 
 	// static

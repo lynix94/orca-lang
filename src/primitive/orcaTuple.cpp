@@ -256,6 +256,20 @@ void orcaTuple::string_(orcaVM* vm, string& str)
 	str += " )";
 }
 
+void orcaTuple::repr(orcaVM* vm, string& str) 
+{
+	vector<orcaData>::iterator vi = m_value.begin();
+
+	str += "( ";
+	while(vi!=m_value.end()) {
+		(*vi).repr(vm, str);
+		++vi;
+		if (vi!=m_value.end()) str+= ",";
+	}
+
+	str += " )";
+}
+
 orcaData orcaTuple::ex_size(orcaVM* vm, int n) 
 {
 	return m_value.size();

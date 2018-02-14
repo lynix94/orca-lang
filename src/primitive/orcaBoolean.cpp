@@ -26,6 +26,9 @@ orcaBoolean::orcaBoolean()
 	d.internal(FI_BOOL_TO_STR, "string");
 	insert_static("string", d);
 
+	d.internal(FI_BOOL_TO_STR, "repr");
+	insert_static("repr", d);
+
 	d.internal(FI_BOOL_TO_INT, "integer");
 	insert_static("integer", d);
 
@@ -36,7 +39,7 @@ orcaBoolean::orcaBoolean()
 orcaData orcaBoolean::string_(orcaVM* vm, int b)
 {
 	orcaData d;
-	b ? d.s_set("True") : d.s_set("False");
+	b ? d.s_set("true") : d.s_set("false");
 
 	return d;
 }
