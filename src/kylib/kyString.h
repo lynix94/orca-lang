@@ -13,6 +13,7 @@
 
 #include <string>
 #include <boost/regex.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace boost;
@@ -58,6 +59,9 @@ public:
 
 	static string to_escape(const string& src);
 	static string from_escape(const string& src);
+
+	static string to_upper(const string& src);
+	static string to_lower(const string& src);
 };
 
 #endif

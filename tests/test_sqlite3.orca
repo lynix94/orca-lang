@@ -1,0 +1,40 @@
+
+using os;
+using sqlite3;
+
+
+os.remove('tmp.db');
+
+conn = sqlite3.connect('tmp.db');
+print: conn;
+
+try {
+	res = conn.execute('create table t1 (a int, b string, c double)');
+	print: res();
+
+	for i in [0..10] {
+		query = "insert into t1 values(%d, 'str_%d', %f)" % (i, i, i + 0.1);
+		res = conn.execute(query);
+		print: res();
+	}
+
+	res = conn.execute('select * from t1;');
+	i = 0;
+	for r in res {
+		print: r();
+		v = r();
+		if v[0] != i || v[1] != 'str_%d' % i || v[2] != (i + 0.1) {
+			throw test.db <- 'select result is wrong';
+		}
+
+		i += 1;
+	}
+}
+catch db -> msg {
+	print: msg;
+}
+
+os.remove('tmp.db');
+
+print: 'OK: ', my;
+

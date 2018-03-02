@@ -75,6 +75,7 @@ liborca_la_SOURCES = \
 		$(CORELIB_DIR)/orcaGtk.cpp \
 		$(CORELIB_DIR)/orcaTime.cpp \
 		$(CORELIB_DIR)/orcaQueue.cpp \
+		$(CORELIB_DIR)/orcaSqlite3.cpp \
 		$(KYLIB_DIR)/kyString.cpp 
 
 liborca_la_LDFLAGS = -version-number 0:5:0

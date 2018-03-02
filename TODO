@@ -1,32 +1,23 @@
 # TODO
-size, repr to common function
+make repr
+orm
+check name of object (def a:= foo.clone())
 *.TEXT
 decorator
+fix: hex string diff
 
-# bug
-hex diff
-
-# bug fixed
-using namespace conflict
-test_oo failed
 
 # now thinking 
 root, cloud (depend zookeeper or etcd)
 
 #channel
 channel assert
-channel queue
 channel dist queue
 
-
 # storage
-sqlite
-memcached
+cache
 leveldb
 
-# refactoring
-length check & change code to unsigned
-move parse to vm & parse, interpret lock
 
 
 ### done
@@ -47,18 +38,16 @@ channel
 def foo(...) under path
 make anonymous def
 id, members -> ID, MEMBERS (upper)
-
-
+fix: using namespace conflict
+fix: test_oo failed
+channel queue
+sqlite
 
 # remove
 windows build
 once
 pure
 dfsd
-
-
-# add
-cache
 
 
 

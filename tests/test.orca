@@ -53,6 +53,7 @@ test_modules = [
   'test_json',
   'test_gnuplot',
   'test_log',
+  'test_sqlite3',
 
 
 #### not be made yet

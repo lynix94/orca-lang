@@ -36,6 +36,7 @@
 #include "orcaCPP.h"
 #include "orcaSystem.h"
 #include "orcaQueue.h"
+#include "orcaSqlite3.h"
 
 
 #define USE_GTK
@@ -82,6 +83,7 @@ orcaRoot::orcaRoot()
 	insert_static("cpp", new orcaCPP());
 	insert_static("system", new orcaSystem());
 	insert_static("queue", new orcaQueue());
+	insert_static("sqlite3", new orcaSqlite3());
 
 #if defined(LINUX)
 #if defined(USE_GTK)

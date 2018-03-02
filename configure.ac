@@ -45,6 +45,7 @@ AC_CHECK_LIB([boost_date_time], [main])
 AC_CHECK_LIB([boost_system], [main])
 AC_CHECK_LIB([gmp], [main])
 AC_CHECK_LIB([gtk], [main])
+AC_CHECK_LIB([sqlite3], [main])
 
 # Install dir
 DIR_DEFS="-DORCA_PREFIXDIR=\\\"\$(prefix)\\\" -DORCA_BINDIR=\\\"\$(bindir)\\\" -DORCA_LIBDIR=\\\"\$(libdir)\\\""

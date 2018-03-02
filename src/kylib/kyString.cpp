@@ -324,3 +324,15 @@ string kyString::from_escape(const string& s)/*{{{*/
 }
 /*}}}*/
 
+string kyString::to_upper(const string& s)/*{{{*/
+{
+	return boost::to_upper_copy<string>(s);
+}
+/*}}}*/
+
+string kyString::to_lower(const string& s)/*{{{*/
+{
+	return boost::to_lower_copy<string>(s);
+}
+/*}}}*/
+
