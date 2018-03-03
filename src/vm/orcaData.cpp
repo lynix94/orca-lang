@@ -364,6 +364,15 @@ void orcaData::string_(orcaVM* vm, string& str) const/*{{{*/
 }
 /*}}}*/
 
+string orcaData::repr(orcaVM* vm) const/*{{{*/
+{
+	string ret;
+	repr(vm, ret);
+
+	return ret;
+}
+/*}}}*/
+
 void orcaData::repr(orcaVM* vm, string& str) const/*{{{*/
 {
 	char buff[20];
@@ -1712,51 +1721,6 @@ orcaObject* orcaData::Object()/*{{{*/
 	}
 
 	return o();
-}
-/*}}}*/
-
-bool orcaData::has_member(const char* c)/*{{{*/
-{
-	const string name = c;
-	switch(get_type())
-	{
-	case TYPE_BOOL:
-		if (name == "string")
-			return true;
-		break;
-
-	case TYPE_BIGNUM:
-	case TYPE_INT:
-		if (name == "string" ||
-			name == "float")
-			return true;
-		break;
-
-	case TYPE_REAL:
-		if (name == "string" ||
-			name == "integer")
-			return true;
-		break;
-
-	case TYPE_STR:
-		if (name == "length" ||
-			name == "find" ||
-			name == "find_all" ||
-			name == "strip" ||
-			name == "lstrip" ||
-			name == "rstrip" ||
-			name == "integer" ||
-			name == "float" ||
-			name == "replace" ||
-			name == "startWith")
-			return true;
-		break;
-
-	case TYPE_OBJ:
-		return o()->has_member(c);
-	}
-
-	return false;
 }
 /*}}}*/
 

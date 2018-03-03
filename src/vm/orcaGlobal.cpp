@@ -120,7 +120,7 @@ void thread_pool::work(thread_arg_t arg)
 			vm->m_local->decrease();
 		}
 		catch (orcaException& e) {
-			printf("uncaugted exception: %s - %s\n", e.who(), e.what());
+			printf("uncaught exception: %s - %s\n", e.who(), e.what());
 			cout << e.m_stack_trace << endl;
 			vm->m_stack->dump();
 			vm->m_local->dump();

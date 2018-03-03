@@ -19,13 +19,11 @@
 class orcaException
 {
 public:
-	orcaException(orcaVM* vm, const char* id, string msg = "") : m_id(id), m_argc(0) { 
+	orcaException(orcaVM* vm, const char* id, string msg = "") : m_id(id) { 
 		if (vm == NULL) vm = get_current_vm();
 		m_vm = vm;
 
 		if (msg != "") {
-			m_vm->push_param(msg);
-			m_argc++;
 			m_msg = msg;
 		}
 
@@ -33,15 +31,28 @@ public:
 		m_vm->m_last_trace_info = m_stack_trace;
 	}
 
-	orcaException(orcaVM* vm, const char* id, int argc) : m_id(id), m_argc(argc) { 
+	orcaException(orcaVM* vm, const char* id, int argc) : m_id(id) { 
 		if (vm == NULL) vm = get_current_vm();
 		m_vm = vm;
+
+		for (int i=0; i<argc; i++) {
+			orcaData d = vm->m_stack->pop();
+			d.rc_inc();
+			params.push_front(d);
+		}
 
 		make_trace();
 		m_vm->m_last_trace_info = m_stack_trace;
 	}
 
 	~orcaException() { }
+
+	void clear()
+	{
+		for (int i=0; i<params.size(); i++) {
+			params[i].rc_dec();
+		}
+	}
 
 	void make_trace() {
 		if (m_vm->m_trace->top_name == NULL) {
@@ -66,16 +77,16 @@ public:
 	}
 
 	int argc() {
-		return m_argc;
+		return params.size();
 	}
 
 private:
 	const char* m_id;
-	int m_argc;
 	orcaVM* m_vm;
 	string m_msg;
 
 public:
+	deque<orcaData> params;
 	string m_stack_trace;
 };
 

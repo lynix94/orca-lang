@@ -8,6 +8,8 @@
 
 **********************************************************************/
 
+#include <sstream>
+
 #include "orcaList.h"
 #include "orcaSbf.h"
 #include "orcaVirtList.h"
@@ -284,31 +286,37 @@ void orcaList::string_(orcaVM* vm, string& str)
 {
 	orcaListIter li = begin();
 
-	str += "[ ";
+	stringstream ss;
+	ss << str;
+	ss << "[ ";
 	while(li!=end()) {
-		if (is<TYPE_STR>(*li)) str += "'";
-		(*li).string_(vm, str);
-		if (is<TYPE_STR>(*li)) str += "'";
+		if (is<TYPE_STR>(*li)) ss << "'";
+		ss << (*li).string_(vm);
+		if (is<TYPE_STR>(*li)) ss << "'";
 
 		++li;
-		if (li!=end()) str+= ",";
+		if (li!=end()) ss << ",";
 	}
 
-	str += " ]";
+	ss << " ]";
+	str = ss.str();
 }
 
 void orcaList::repr(orcaVM* vm, string& str) 
 {
 	orcaListIter li = begin();
 
-	str += "[ ";
+	stringstream ss;
+	ss << str;
+	ss << "[ ";
 	while(li!=end()) {
-		(*li).repr(vm, str);
+		ss << (*li).repr(vm);
 		++li;
-		if (li!=end()) str+= ",";
+		if (li!=end()) ss << ",";
 	}
 
-	str += " ]";
+	ss << " ]";
+	str = ss.str();
 }
 
 orcaData orcaList::ex_size(orcaVM* vm, int n) 

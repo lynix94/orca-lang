@@ -8,6 +8,8 @@
 
 **********************************************************************/
 
+#include <sstream>
+
 #include "orcaMap.h"
 #include "orcaMapIter.h"
 #include "orcaList.h"
@@ -138,40 +140,46 @@ void orcaMap::string_(orcaVM* vm, string& str)
 {
 	orcamap_iterator mi = m_value.begin();
 
-	str += "{ ";
+	stringstream ss;
+	ss << str;
+	ss << "{ ";
 	while(mi!=m_value.end()) {
-		if (is<TYPE_STR>(mi->first)) str += "'";
-		(mi->first).string_(vm, str);
-		if (is<TYPE_STR>(mi->first)) str += "'";
+		if (is<TYPE_STR>(mi->first)) ss << "'";
+		ss << (mi->first).string_(vm);
+		if (is<TYPE_STR>(mi->first)) ss << "'";
 
-		str += ":";
+		ss << ":";
 
-		if (is<TYPE_STR>(mi->second)) str += "'";
-		(mi->second).string_(vm, str);
-		if (is<TYPE_STR>(mi->second)) str += "'";
+		if (is<TYPE_STR>(mi->second)) ss << "'";
+		ss << (mi->second).string_(vm);
+		if (is<TYPE_STR>(mi->second)) ss << "'";
 
 		++mi;
-		if (mi!=m_value.end()) str+= ",";
+		if (mi!=m_value.end()) ss << ",";
 	}
 
-	str += " }";
+	ss << " }";
+	str = ss.str();
 }
 
 void orcaMap::repr(orcaVM* vm, string& str) 
 {
 	orcamap_iterator mi = m_value.begin();
 
-	str += "{ ";
+	stringstream ss;
+	ss << str;
+	ss << "{ ";
 	while(mi!=m_value.end()) {
-		(mi->first).repr(vm, str);
-		str += ":";
-		(mi->second).repr(vm, str);
+		ss << (mi->first).repr(vm);
+		ss << ":";
+		ss << (mi->second).repr(vm);
 
 		++mi;
-		if (mi!=m_value.end()) str+= ",";
+		if (mi!=m_value.end()) ss << ",";
 	}
 
-	str += " }";
+	ss << " }";
+	str = ss.str();
 }
 
 

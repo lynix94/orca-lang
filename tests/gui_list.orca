@@ -37,7 +37,7 @@ def main : window
 					.selected.erase_key(name);
 				}
 
-				print: .selected.string();
+				print: string(.selected);
 				print: upper('box').result;
 
 
@@ -58,7 +58,7 @@ def main : window
 			my.push_back([false, 'programming']);
 
 			my.event['changed'] = lambda(...argv){
-				upper('box').change.attr['text'] = argv[0].string() + argv[0]();
+				upper('box').change.attr['text'] = string(argv[0]) + argv[0]();
 			};
 		}
 

@@ -18,6 +18,10 @@ class orcaRoot : public orcaObject
 public:
 	orcaRoot();
 	~orcaRoot();
+
+	orcaData ex_string(orcaVM* vm, int n);
+	orcaData ex_repr(orcaVM* vm, int n);
+	orcaData ex_range(orcaVM* vm, int n);
 };
 
 

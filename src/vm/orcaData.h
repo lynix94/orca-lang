@@ -263,6 +263,7 @@ struct LIBORCA_API orcaData
 	void string_(orcaVM* vm, string& str) const;
 	string string_(orcaVM* vm) const;
 	void repr(orcaVM* vm, string& str) const;
+	string repr(orcaVM* vm) const;
 	void dump() const;
 	char* dump(char* buff) const;
 	string dump_str() const;
@@ -402,7 +403,6 @@ struct LIBORCA_API orcaData
 	bool operator==(orcaData& rhs);
 	bool operator!=(orcaData& rhs);
 
-	bool has_member(const char* name);
 	// for interface
 	int Integer();
 	double Double();

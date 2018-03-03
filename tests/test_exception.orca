@@ -3,10 +3,10 @@ try {
 	throw aaa;
 }
 catch aaa {
-	print: 'ok, aaa catched';
+	print: 'ok, aaa caught';
 }
 catch bbb {
-	print: 'bbb catched';
+	print: 'bbb caught';
 	throw test.ex <- 'invalid catch';
 }
 
@@ -22,11 +22,11 @@ try {
 	my.foo(10);
 }
 catch {
-	print: 'my.foo catched';
+	print: 'my.foo caught';
 	a = 0;
 }
 finally {
-	print: 'fainally catched';
+	print: 'fainally caught';
 	a += 1;
 }
 
@@ -43,21 +43,21 @@ try {
 			a = 10;
 			throw ccc;
 		} catch aaa {
-			print: 'aaa catched';
+			print: 'aaa caught';
 			throw test.ex <- 'invalid catch';
 		}
 	}
 	catch bbb {
-		print: 'bbb catched';
+		print: 'bbb caught';
 		throw test.ex <- 'invalid catch';
 	}
 }
 catch ccc {
-	print: 'ccc catched';
+	print: 'ccc caught';
 
 }
 finally {
-	print: 'fainally catched';
+	print: 'fainally caught';
 }
 
 
@@ -79,6 +79,28 @@ catch aaa -> a, b, c {
 		throw test.ex <- 'exception param fail';
 	}
 }
+
+def nested() {
+	try {
+		a = 'test';
+		throw foo <- a, 'test2';
+	}
+	catch bar -> msg {
+		print: msg;
+	}
+}
+
+try {
+	.nested();
+}
+catch foo -> msg, msg2 {
+	print: msg, msg2;
+}
+
+if msg != 'test' || msg2 != 'test2' {
+	throw test.ex <- 'nested exception fail';
+}
+
 
 print: 'OK';
 

@@ -8,6 +8,7 @@
 
 **********************************************************************/
 
+#include <sstream>
 #include <boost/lexical_cast.hpp>
 
 #include "orcaTuple.h"
@@ -243,31 +244,37 @@ void orcaTuple::string_(orcaVM* vm, string& str)
 {
 	vector<orcaData>::iterator vi = m_value.begin();
 
-	str += "( ";
+	stringstream ss;
+	ss << str;
+	ss << "( ";
 	while(vi!=m_value.end()) {
-		if (is<TYPE_STR>(*vi)) str += "'";
-		(*vi).string_(vm, str);
-		if (is<TYPE_STR>(*vi)) str += "'";
+		if (is<TYPE_STR>(*vi)) ss << "'";
+		ss << (*vi).string_(vm);
+		if (is<TYPE_STR>(*vi)) ss << "'";
 
 		++vi;
-		if (vi!=m_value.end()) str+= ",";
+		if (vi!=m_value.end()) ss << ",";
 	}
 
-	str += " )";
+	ss << " )";
+	str = ss.str();
 }
 
 void orcaTuple::repr(orcaVM* vm, string& str) 
 {
 	vector<orcaData>::iterator vi = m_value.begin();
 
-	str += "( ";
+	stringstream ss;
+	ss << str;
+	ss << "( ";
 	while(vi!=m_value.end()) {
-		(*vi).repr(vm, str);
+		ss << (*vi).repr(vm);
 		++vi;
-		if (vi!=m_value.end()) str+= ",";
+		if (vi!=m_value.end()) ss << ",";
 	}
 
-	str += " )";
+	ss << " )";
+	str = ss.str();
 }
 
 orcaData orcaTuple::ex_size(orcaVM* vm, int n) 

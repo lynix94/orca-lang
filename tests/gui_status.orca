@@ -19,7 +19,7 @@ def main : window
 			my.attr['text'] = 'click';
 			my.event['clicked'] = lambda(){ 
 				..count += 1;
-				upper('box').info.attr['text'] = ..count.string() + ' times';
+				upper('box').info.attr['text'] = string(..count) + ' times';
 			};
 		}
 

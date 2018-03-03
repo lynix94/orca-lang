@@ -8,6 +8,8 @@
 
 **********************************************************************/
 
+//#define _VM_DEBUG_
+
 
 #ifdef WIN32
 #include <winsock2.h>
@@ -54,6 +56,7 @@ namespace fs = boost::filesystem;
 #include "orcaVirtList.h"
 #include "orcaMap.h"
 #include "orcaBoolean.h"
+#include "orcaNil.h"
 #include "orcaRoot.h"
 
 // vm
@@ -199,6 +202,7 @@ void orcaVM::init()/*{{{*/
 	m_trace = new orcaTrace(this);
 
 	m_cptr = NULL;
+	m_cp = NULL;
 }
 /*}}}*/
 
@@ -219,6 +223,9 @@ struct auto_trace/*{{{*/
 		const char* cp = NULL;
 		if (vm->m_cptr != NULL) {
 			cp = *vm->m_cptr;
+		}
+		else if (vm->m_cp != NULL) {
+			cp = vm->m_cp;
 		}
 
 		vp->m_trace->push(vm->m_curr->get_name(), cp);
@@ -363,6 +370,10 @@ orcaData orcaVM::invoke_internal_func(InternalFunction& in) /*{{{*/
 
 	case FI_BOOL_TO_FLOAT:	
 		r = g_boolean.float_(this, d.i); 
+		break;
+
+	case FI_NIL_TO_STR:	
+		r = g_nil.string_();
 		break;
 
 	default:
@@ -1033,6 +1044,7 @@ void orcaVM::exec_code(const char* code, const char* offset)/*{{{*/
 {
 	register const char *c = NULL;
 	m_cptr = &c;
+	m_cp = NULL;
 
 	m_trace->top_cp = &c;
 
@@ -1815,9 +1827,11 @@ do_assign_list:
 							break;
 
 						case TYPE_NIL:
-									throw orcaException(this, "orca.type",
-														string("find member (") +
-														&c[2] + ") from nil ");
+							PRINT2("\t\t%p : find nil member (%s)\n", c, &c[2]);
+							d = g_nil.get_member(&c[2]);
+							d.internal().owner.i = 0;
+							break;
+
 						default:
 							d = NIL;
 							break;
@@ -2322,6 +2336,8 @@ do_assign_list:
 
 			case OP_THROW: 
 				PRINT2("\t\t  throw: %s (%d)\n", &c[3], c[1]);
+				m_cptr = NULL;
+				m_cp = c;
 				throw orcaException(this, &c[3], (int)c[1]);
 				break;
 
@@ -2984,24 +3000,26 @@ do_assign_list:
 				catch_t* ct;
 				ct = cl->compare(e.who());
 				if (ct != NULL) {
-					for(int i=e.argc()-1; i>=0; i--) {
-						if (i >= ct->lv.size()) {
-							m_stack->pop();
-							continue;
+					for(int i=0 ; i<ct->lv.size(); i++) {
+						if (i >= e.params.size()) {
+							m_local->set(ct->lv[i], NIL);
 						}
-						m_local->set(ct->lv[i], m_stack->pop());
+						else {
+							m_local->set(ct->lv[i], e.params[i]);
+						}
+					}
+
+					// internal exception (made by c++)
+					if (strlen(e.what()) != 0 && ct->lv.size() > 0) {
+						m_local->set(ct->lv[0], e.what());
 					}
 
 					m_curr = cl->m_my;
 					c = code + ct->address;
 					cl->clear();	// to avoid re-catch in same block
+					e.clear();
 	
 					goto fast_jmp;
-				}
-				else {
-					for(int i=e.argc()-1; i>=0; i--) {
-						m_stack->pop();
-					}
 				}
 
 				// delete push_backed exception (by mark try)
@@ -3362,7 +3380,7 @@ bool orcaVM::load(const string& input_name, orcaObject* owner) /*{{{*/
 			init_once.set_rc(init_once.get_rc()-1);
 		}
 		catch(orcaException& e) {
-			printf("uncaugted exception while module loading (at init_once): %s - %s\n", e.who(), e.what());
+			printf("uncaught exception while module loading (at init_once): %s - %s\n", e.who(), e.what());
 			cout << e.m_stack_trace << endl;
 			m_stack->dump();
 			m_local->dump();
@@ -3633,7 +3651,7 @@ int orca_launch_module(orcaVM* vm, char* module, int argc, char** argv)/*{{{*/
 			ret = chdir(cwd.string().c_str());
 		}
 
-		printf("uncaugted exception: %s - %s\n", e.who(), e.what());
+		printf("uncaught exception: %s - %s\n", e.who(), e.what());
 		cout << e.m_stack_trace << endl;
 		//vm->m_stack->dump();
 		//vm->m_local->dump();

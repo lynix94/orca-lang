@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 		//parse_cleanup();
 	}
 	catch (orcaException& e) {
-		printf("uncaugted exception: %s - %s\n", e.who(), e.what());
+		printf("uncaught exception: %s - %s\n", e.who(), e.what());
 		cout << e.m_stack_trace << endl;
 	}
 }

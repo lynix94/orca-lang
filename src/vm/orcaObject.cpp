@@ -310,20 +310,6 @@ orcaData orcaObject::get_member(const char* name)
 	return get_member_sub(name, false);
 }
 
-orcaData orcaObject::operator_string(orcaVM* vm, orcaData& p)
-{
-	string str;
-	string_(vm, str);
-	return str;
-}
-
-orcaData orcaObject::operator_repr(orcaVM* vm, orcaData& p)
-{
-	string str;
-	repr(vm, str);
-	return str;
-}
-
 orcaData orcaObject::get_member_sub(const char* name, bool last) 
 { 
 	PRINT3("\t\t  get %s from %s, (parent: %p)\n", name, dump(buff), m_parent);
@@ -342,15 +328,7 @@ orcaData orcaObject::get_member_sub(const char* name, bool last)
 		return mi->second;
 
 	// try virtual member
-	if (strcmp(name, "string") == 0) {
-		orcaData d(this, (object_fp)&orcaObject::operator_string, "string");
-		return d;
-	}
-	else if (strcmp(name, "repr") == 0) {
-		orcaData d(this, (object_fp)&orcaObject::operator_repr, "repr");
-		return d;
-	}
-	else if (strcmp(name, "TYPE") == 0) {
+	if (strcmp(name, "TYPE") == 0) {
 		orcaData d;
 		d.type_set(this);
 		return d;
@@ -583,7 +561,7 @@ void orcaObject::string_(orcaVM* vm, string& str)
 	else {
 		char buff[1024];
 		snprintf(buff, 1024, "<%s - %p>", m_name, this);
-		str = buff;
+		str += buff;
 	}
 }
 
@@ -598,7 +576,7 @@ void orcaObject::repr(orcaVM* vm, string& str)
 	else {
 		char buff[1024];
 		snprintf(buff, 1024, "<%s - %p>", m_name, this);
-		str = buff;
+		str += buff;
 	}
 }
 
@@ -867,9 +845,15 @@ orcaData orcaObject::operator_get(orcaVM* vm, orcaData& p)
 {
 	orcaData d;
 	if (has_member(".attr", d)) {
+		if (m_flag & BIT_IN_ATTR) {
+			throw orcaException(vm, "orca.object", "operator .attr nested");
+		}
+
+		m_flag |= BIT_IN_ATTR;
 		vm->push_param(d);
 		vm->push_param(p);
 		vm->call(1);
+		m_flag ^= BIT_IN_ATTR;
 		return vm->m_stack->pop();
 	}
 
@@ -880,9 +864,15 @@ orcaData orcaObject::operator_get_last(orcaVM* vm, orcaData& p)
 {
 	orcaData d;
 	if (has_member(".attr_last", d)) {
+		if (m_flag & BIT_IN_ATTR) {
+			throw orcaException(vm, "orca.object", "operator .attr nested");
+		}
+
+		m_flag |= BIT_IN_ATTR;
 		vm->push_param(d);
 		vm->push_param(p);
 		vm->call(1);
+		m_flag ^= BIT_IN_ATTR;
 		return vm->m_stack->pop();
 	}
 
@@ -893,10 +883,16 @@ orcaData orcaObject::operator_set(orcaVM* vm, const char* name, orcaData& p)
 {
 	orcaData d;
 	if (has_member(".attr=", d)) {
+		if (m_flag & BIT_IN_ATTR) {
+			throw orcaException(vm, "orca.object", "operator .attr nested");
+		}
+
+		m_flag |= BIT_IN_ATTR;
 		vm->push_param(d);
 		vm->push_param(name);
 		vm->push_param(p);
 		vm->call(2);
+		m_flag ^= BIT_IN_ATTR;
 		return vm->m_stack->pop();
 	}
 

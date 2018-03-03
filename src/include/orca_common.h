@@ -44,6 +44,7 @@ using namespace std;
 #define BIT_DEFINE_STATIC	0x00000001
 #define BIT_DEFINE_INIT		0x00000004
 #define BIT_DEFINE_NAME_CHANGED		0x00000008
+#define BIT_IN_ATTR			0x10000000
 
 struct OrcaHeader
 {

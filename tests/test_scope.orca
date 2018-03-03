@@ -52,7 +52,7 @@ try {
 	}
 }
 catch scope -> msg {
-	print: 'catched', msg;
+	print: 'caught: ', msg;
 }
 
 

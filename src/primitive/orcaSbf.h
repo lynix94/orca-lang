@@ -59,6 +59,7 @@ public:
 
 	// internal
 	virtual void string_(orcaVM* vm, string& str);
+	virtual void repr(orcaVM* vm, string& str);
 	virtual orcaData slice(int start, int end, bool include_right);
 	virtual orcaData& at(int idx);
 	virtual orcaListIter begin();

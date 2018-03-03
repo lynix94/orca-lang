@@ -224,7 +224,7 @@ if r != '0000000001, 0.000000' {
 
 
 i = 1000000000000000000000000000000000000;
-print: r = i.string();
+print: r = string(i);
 if r != '1000000000000000000000000000000000000' {
 	throw test.format <- 'string format failed';
 }

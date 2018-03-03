@@ -104,8 +104,6 @@ public:
 	virtual void pack_load(string& str);
 
 	// printing & debugging
-	orcaData operator_string(orcaVM* vm, orcaData& p);
-	orcaData operator_repr(orcaVM* vm, orcaData& p);
 	virtual void string_(orcaVM* vm, string& str);
 	virtual void repr(orcaVM* vm, string& str);
 	void dump();
@@ -149,7 +147,7 @@ private:
 	const char* m_name;
 	const char* m_code;
 	orcaObject* m_original;
-	char m_flag;
+	int m_flag;
 
 public: // for pack
 	cp_map<orcaData>::Type* get_static() 

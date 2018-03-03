@@ -157,7 +157,7 @@ if 10.float() != 10.0 {
   throw test.arith <- 'integer to float fail';
 }
 
-if 10.string() != '10' {
+if string(10) != '10' {
   throw test.arith <- 'integer to string fail';
 }
 

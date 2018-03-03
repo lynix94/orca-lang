@@ -1,9 +1,9 @@
 
 using ipc;
-using __util;
+using cutil;
 
 
-def lru := __util.lru.clone();
+def lru := cutil.lru.clone();
 
 
 def lock(obj)

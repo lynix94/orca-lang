@@ -37,6 +37,7 @@
 #include "orcaSystem.h"
 #include "orcaQueue.h"
 #include "orcaSqlite3.h"
+#include "orcaStrings.h"
 
 
 #define USE_GTK
@@ -76,7 +77,7 @@ orcaRoot::orcaRoot()
 	insert_static("type", new orcaTypes());
 	insert_static("orca", new orcaOrca());
 	insert_static("random", new orcaRandom());
-	insert_static("__util", new orcaUtil());
+	insert_static("cutil", new orcaUtil());
 	insert_static("math", new orcaMath());
 	insert_static("operator", new orcaOperator());
 	insert_static("sort", new orcaSort());
@@ -84,6 +85,10 @@ orcaRoot::orcaRoot()
 	insert_static("system", new orcaSystem());
 	insert_static("queue", new orcaQueue());
 	insert_static("sqlite3", new orcaSqlite3());
+	insert_static("strings", new orcaStrings());
+	insert_native_function("string", (object_fp)&orcaRoot::ex_string);
+	insert_native_function("repr", (object_fp)&orcaRoot::ex_repr);
+	insert_native_function("range", (object_fp)&orcaRoot::ex_range);
 
 #if defined(LINUX)
 #if defined(USE_GTK)
@@ -98,4 +103,116 @@ orcaRoot::orcaRoot()
 }
 
 orcaRoot::~orcaRoot() { }
+
+orcaData orcaRoot::ex_string(orcaVM* vm, int n)
+{
+	if (n < 1) vm->need_param();
+	orcaData d = vm->get_param(0);
+
+	if (is<TYPE_OBJ>(d)) {
+		orcaData out;
+		if (d.o()->has_member("string", out)) {
+			vm->push_stack(out);
+			vm->call(0);
+			return vm->m_stack->pop().String();
+		}
+	}
+
+	return d.string_(vm);
+}
+
+orcaData orcaRoot::ex_repr(orcaVM* vm, int n)
+{
+	if (n < 1) vm->need_param();
+	orcaData d = vm->get_param(0);
+
+	if (is<TYPE_OBJ>(d)) {
+		orcaData out;
+		if (d.o()->has_member("repr", out)) {
+			vm->push_stack(out);
+			vm->call(0);
+			return vm->m_stack->pop().String();
+		}
+	}
+
+	return d.repr(vm);
+}
+
+class orcaRange : public orcaObject
+{
+public:
+	DEFAULT_NATIVE_DEFINE(orcaRange);
+
+	orcaRange()
+	{
+		set_name("range");
+		from = 0;
+		to = 0;
+		curr = 0;
+		interval = 1;
+
+		insert_native_function("next", (object_fp)&orcaRange::ex_next);
+	}
+
+	orcaData ex_next(orcaVM* vm, int n)
+	{
+		curr += interval;
+
+		if (to >= from) {
+			if (curr >= to) {
+				throw orcaException(vm, "orca.iter", "out of range");
+			}
+		}
+		else { // descending
+			if (curr <= to) {
+				throw orcaException(vm, "orca.iter", "out of range");
+			}
+		}
+
+		return this;
+	}
+
+	orcaData operator()(orcaVM* vm, int n)
+	{
+		if (n > 0) {
+			throw orcaException(vm, "orca.param", "unmodifiable iterator");
+		}
+
+		return curr;
+	}
+
+public:
+	int from;
+	int to;
+	int interval;
+	int curr;
+};
+
+orcaData orcaRoot::ex_range(orcaVM* vm, int n)
+{
+	if (n < 2) vm->need_param();
+	orcaRange* rp = new orcaRange();
+	rp->from = vm->get_param(0).Integer();
+	rp->to = vm->get_param(1).Integer();
+	rp->curr = rp->from;
+
+	if (n >= 3) {
+		rp->interval = vm->get_param(2).Integer();
+	}
+
+	if (rp->to >= rp->from) {
+		if (rp->interval <= 0) {
+			throw orcaException(vm, "orca.range", "invalid range");
+		}
+	}
+	else { // descending
+		if (rp->interval >= 0) {
+			throw orcaException(vm, "orca.range", "invalid range");
+		}
+	}
+	
+	return rp;
+}
+
+
 

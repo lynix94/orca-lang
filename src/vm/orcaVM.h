@@ -67,13 +67,14 @@ enum FUNCTION_INDEX
 	FI_BOOL_TO_INT,	
 	FI_BOOL_TO_FLOAT,	
 	FI_BOOL_TO_STR,	
+	FI_NIL_TO_STR,	
 };
 
 class LIBORCA_API orcaVM
 {
 friend class orcaLocal;
 public:
-	orcaVM() { m_cptr = NULL; }
+	orcaVM() { m_cptr = NULL; m_cp = NULL; }
 	void init_once();
 	void init();
 	void cleanup();
@@ -131,6 +132,7 @@ public:
 
 	orcaTrace* m_trace;
 	const char** m_cptr;
+	const char* m_cp;
 	string m_last_trace_info;
 
 	static map<const char*, int> m_debug;

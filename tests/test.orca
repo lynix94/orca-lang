@@ -12,7 +12,7 @@ test_vectors = [
   'test_oo',
   'test_gc',
   'test_operator',
-  'test_shell',
+  #'test_shell',
   'test_iter',
   'test_lambda',
   'test_thread',

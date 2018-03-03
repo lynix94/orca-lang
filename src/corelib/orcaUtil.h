@@ -119,7 +119,7 @@ class orcaUtil : public orcaObject
 public:
 	orcaUtil()
 	{
-		set_name("__util");
+		set_name("cutil");
 		insert_member("lru", new ex_lru());
 	}
 

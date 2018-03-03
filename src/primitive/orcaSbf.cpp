@@ -8,6 +8,8 @@
 
 **********************************************************************/
 
+#include <sstream>
+
 #include "orcaSbf.h"
 #include "orcaException.h"
 
@@ -380,24 +382,57 @@ bool orcaSbf::next()
 
 void orcaSbf::string_(orcaVM* vm, string& str) 
 {
+	stringstream ss;
+	ss << str;
+
 	for (int i=0; i<m_range.size(); i++) {
 		if (is<TYPE_NIL>(m_range[i].start) || 
 			is<TYPE_NIL>(m_range[i].end)) 
 		{
 			evaluate(10);
 			orcaListIter li = begin();
-			str += "[ ";
+			ss << "[ ";
 
 			for (int j=0; j<m_eval; j++) {
-				if (is<TYPE_STR>(*li)) str += "'";
-				(*li).string_(vm, str);
-				if (is<TYPE_STR>(*li)) str += "'";
+				if (is<TYPE_STR>(*li)) ss << "'";
+				ss << (*li).string_(vm);
+				if (is<TYPE_STR>(*li)) ss << "'";
 
 				++li;
-				if (li!=end()) str+= ",";
+				if (li!=end()) ss << ",";
 			}
 
-			str += " ... ]";
+			ss << " ... ]";
+			str = ss.str();
+			return;
+		} 
+	}
+
+	size();
+	orcaList::string_(vm, str);
+}
+
+void orcaSbf::repr(orcaVM* vm, string& str) 
+{
+	stringstream ss;
+	ss << str;
+
+	for (int i=0; i<m_range.size(); i++) {
+		if (is<TYPE_NIL>(m_range[i].start) || 
+			is<TYPE_NIL>(m_range[i].end)) 
+		{
+			evaluate(10);
+			orcaListIter li = begin();
+			ss << "[ ";
+
+			for (int j=0; j<m_eval; j++) {
+				ss << (*li).repr(vm);
+				++li;
+				if (li!=end()) ss << ",";
+			}
+
+			ss << " ... ]";
+			str = ss.str();
 			return;
 		} 
 	}

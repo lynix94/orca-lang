@@ -65,7 +65,7 @@ def main : window
 			b.push_child([false, 'lisp']);
 
 			my.event['changed'] = lambda(...argv){
-				upper('box').change.attr['text'] = argv[0].string() + argv[0]();
+				upper('box').change.attr['text'] = string(argv[0]) + argv[0]();
 				..current = argv;
 			};
 		}
