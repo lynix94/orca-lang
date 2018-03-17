@@ -98,23 +98,20 @@ public:
 	~orcaCodeContainer();
 
 	char* new_define(int size);
-	char* new_define(int size, const string& name);
 	char* new_code(int size);
-	char* new_code(int size, const string& name);
+	void regist_define(const string& name, char* code);
+	void regist_code(const string& name, char* code, int size);
 	void remove_code(const string& name);
 	void remove_define(const string& name);
 	const char* get_base(const char* code, int* size = NULL);
 	string get_name(const char* code);
-	const char* get_addr(string name, int* size = NULL);
+	const char* get_addr(const string& name, int* size = NULL);
 	int get_size(const char* code);
 
 private:
-	typedef map<const char*, string> code_name_t;
-	typedef map<string, const char*> name_code_t;
-
-	code_name_t m_code_name;
-	name_code_t m_code;
-	name_code_t m_define;
+	map<const char*, string> m_code_name;
+	map<string, const char*> m_codes;
+	map<string, const char*> m_defines;
 };
 
 #ifdef WINDOWS

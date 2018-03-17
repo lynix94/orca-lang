@@ -230,66 +230,65 @@ void thread_pool::dec_run(pthread_t tid)
 orcaCodeContainer::orcaCodeContainer() {}
 orcaCodeContainer::~orcaCodeContainer()
 {
-	name_code_t::iterator mi = m_code.begin();
-	for(; mi!=m_code.end(); ++mi) {
+	map<string, const char*>::iterator mi = m_codes.begin();
+	for(; mi!=m_codes.end(); ++mi) {
 		delete[] mi->second;
 	}
 
-	mi = m_define.begin();
-	for(; mi!=m_define.end(); ++mi) {
+	mi = m_defines.begin();
+	for(; mi!=m_defines.end(); ++mi) {
 		delete[] mi->second;
 	}
 }
 
 char* orcaCodeContainer::new_define(int size)
 {
-	string name = string("$__define__") + boost::lexical_cast<string>(m_define.size());
-	return new_define(size, name);
-}
-
-char* orcaCodeContainer::new_define(int size, const string& name)
-{
-	if (m_define.find(name) != m_define.end()) {
-		return NULL;
-	}
-
 	char* define = new char[size];
-	m_define[name] = define;
 	return define;
 }
 
-char* orcaCodeContainer::new_code(int size)
+void orcaCodeContainer::regist_define(const string& name, char* code)
 {
-	string name = string("$__code__") + boost::lexical_cast<string>(m_code.size());
-	return new_code(size, name);
-}
-
-char* orcaCodeContainer::new_code(int size, const string& name)
-{
-	if (m_code.find(name) != m_code.end()) {
-		return NULL;
+	if (m_defines.find(name) != m_defines.end()) {
+		throw orcaException(NULL, "orca.lang", string("duplicated define - ") + name.c_str());
 	}
 
+	m_defines[name] = code;
+}
+
+
+char* orcaCodeContainer::new_code(int size)
+{
 	char* code = new char[size];
-	m_code_name[code] = name;
-	m_code_name[code + size] = name;
-	m_code[name] = code;
 	return code;
 }
 
+void orcaCodeContainer::regist_code(const string& name, char* code, int size)
+{
+	if (m_codes.find(name) != m_codes.end()) {
+		throw orcaException(NULL, "orca.lang", string("duplicated code - ") + name.c_str());
+	}
+
+	m_code_name[code] = name;
+	m_code_name[code + size] = name;
+	m_codes[name] = code;
+}
+
+
+
 void orcaCodeContainer::remove_code(const string& name)
 {
-	name_code_t::iterator mi = m_code.find(name);
-	if (mi == m_code.end()) {
-		return;
+	map<string, const char*>::iterator mi = m_codes.find(name);
+	if (mi == m_codes.end()) {
+		throw orcaException(NULL, "orca.lang", "remove code failed");
 	}
 
 	const char* code = mi->second;
-	code_name_t::iterator mi1 = m_code_name.lower_bound(code);
-	code_name_t::iterator mi2 = m_code_name.upper_bound(code);
+	map<const char*, string>::iterator mi1 = m_code_name.lower_bound(code);
+	map<const char*, string>::iterator mi2 = m_code_name.upper_bound(code);
 
 	delete[] code;
-	m_code.erase(mi);
+	m_codes.erase(mi);
 	m_code_name.erase(mi1);
 	m_code_name.erase(mi2);
 	return;
@@ -297,21 +296,21 @@ void orcaCodeContainer::remove_code(const string& name)
 
 void orcaCodeContainer::remove_define(const string& name)
 {
-	name_code_t::iterator mi = m_define.find(name);
-	if (mi == m_define.end()) {
-		return;
+	map<string, const char*>::iterator mi = m_defines.find(name);
+	if (mi == m_defines.end()) {
+		throw orcaException(NULL, "orca.lang", "remove define failed");
 	}
 
 	const char* define = mi->second;
 	delete[] define;
-	m_define.erase(mi);
+	m_defines.erase(mi);
 	return;
 }
 
 const char* orcaCodeContainer::get_base(const char* code, int* size)
 {
 	const char* ll = code;
-	code_name_t::iterator mi = m_code_name.lower_bound(ll);
+	map<const char*, string>::iterator mi = m_code_name.lower_bound(ll);
 	string name = mi->second;
 	
 	if (size) {
@@ -330,20 +329,20 @@ const char* orcaCodeContainer::get_base(const char* code, int* size)
 		*size = end - base;
 	}
 
-	return m_code[name];
+	return m_codes[name];
 }
 
 string orcaCodeContainer::get_name(const char* code)
 {
 	const char* ll = code;
-	code_name_t::iterator mi = m_code_name.lower_bound(ll);
+	map<const char*, string>::iterator mi = m_code_name.lower_bound(ll);
 	return mi->second;
 }
 
-const char* orcaCodeContainer::get_addr(string name, int* size)
+const char* orcaCodeContainer::get_addr(const string& name, int* size)
 {
-	name_code_t::iterator mi = m_code.find(name);
-	if (mi == m_code.end()) {
+	map<string, const char*>::iterator mi = m_codes.find(name);
+	if (mi == m_codes.end()) {
 		return NULL;
 	}
 
@@ -356,8 +355,8 @@ const char* orcaCodeContainer::get_addr(string name, int* size)
 
 int orcaCodeContainer::get_size(const char* code)
 {
-	code_name_t::iterator mi1 = m_code_name.lower_bound(code);
-	code_name_t::iterator mi2 = m_code_name.upper_bound(code);
+	map<const char*, string>::iterator mi1 = m_code_name.lower_bound(code);
+	map<const char*, string>::iterator mi2 = m_code_name.upper_bound(code);
 
 	const char* end = mi2->first;
 	const char* base = mi1->first;

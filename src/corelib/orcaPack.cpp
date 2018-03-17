@@ -421,7 +421,7 @@ orcaData orcaPack::ex_load_code(orcaVM* vm, int n) /*{{{*/
 	string code = base64_decode(b64);
 	int size = code.length();
 
-	char* cp = const_cast<char*>(g_codes->new_code(size, name));
+	char* cp = const_cast<char*>(g_codes->new_code(size));
 	if (cp == NULL) {
 		throw orcaException(vm, "orca.lang", "code already exists");
 	}

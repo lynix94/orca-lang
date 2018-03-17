@@ -188,6 +188,10 @@ orcaData orcaObject::operator()(orcaVM* vm, int param_n)
 bool orcaObject::insert_member(const char* name, orcaData d) 
 { 
 	PRINT3("\t\t  insert %s(%s) in %s\n", name, d.dump(buff), m_name);
+	if ((m_static && m_static->find(name) != m_static->end()) ||
+		 m_member.find(name) != m_member.end()) {
+		return false;
+	}
 
 	m_member[name] = d;
 	d.rc_inc();
@@ -202,7 +206,6 @@ bool orcaObject::insert_member(const char* name, orcaData d)
 bool orcaObject::remove_member(const char* name)
 { 
 	PRINT2("\t\t  remove %s from %s\n", name, m_name);
-
 	cp_map<orcaData>::Type::iterator mi;
 	if (m_static) {
 		mi = m_static->find(name);
@@ -226,6 +229,10 @@ bool orcaObject::remove_member(const char* name)
 bool orcaObject::insert_static(const char* name, orcaData d) 
 { 
 	PRINT3("\t\t  insert static %s(%s) in %s\n", name, d.dump(buff), m_name);
+	if ((m_static && m_static->find(name) != m_static->end()) ||
+		 m_member.find(name) != m_member.end()) {
+		return false;
+	}
 
 	if (m_static == NULL) {
 		m_static = new cp_map<orcaData>::Type;

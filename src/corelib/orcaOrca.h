@@ -49,9 +49,16 @@ public:
 		}
 
 		string mod = vm->get_param(0).String();
-		op->remove_member(mod.c_str());
-		g_codes->remove_code(mod);
-		g_codes->remove_define(mod);
+		orcaData out;
+		if (op->has_member(mod.c_str(), out) == false) {
+			throw orcaException(vm, "orca.lang", "unload failsed");
+		}
+
+		if (is<TYPE_OBJ>(out)) {
+			g_codes->remove_code(mod);
+			g_codes->remove_define(mod);
+		}
+
 		return NIL;
 	}
 

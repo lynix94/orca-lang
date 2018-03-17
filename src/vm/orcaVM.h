@@ -87,12 +87,11 @@ public:
 							orcaObject* owner, time_t last_write_time);
 
 	void exec_code(const char* c, const char* offset=NULL);
-	bool load(const string& module_name, orcaObject* owner = NULL);
+	bool load(const string& module_name, orcaObject* owner = NULL, string owner_path = "");
 	bool load_cpp(const string& mod_name);
-	bool load_orca_helper(const string& input_name, const string& mod_name,
-						const string& candidate_name, const string& kw_name, orcaObject* owner);
-	bool load_context_helper(const string& mod_name, const string& candidate_name,
-							const string& sub_postfix, const string& kw_name, orcaObject* owner);
+	bool load_helper(const string& mod_name, const string& candidate_name,
+					 const string& sub_postfix, const string& kw_name,
+					 orcaObject* owner, string owner_path);
 	void reserve_local(); // for interactive
 	void parallel_do(const char* code, const char* offset, 
 					 int* run_count = NULL, orcaObject* op = NULL, int per = 0,

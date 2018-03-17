@@ -1,5 +1,4 @@
 # TODO
-make repr
 orm
 check name of object (def a:= foo.clone())
 *.TEXT
@@ -20,6 +19,7 @@ leveldb
 
 
 ### done
+make repr
 timer
 channel log
 add time.sleep(1.2)

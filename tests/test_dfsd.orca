@@ -31,21 +31,8 @@ parallel do {
 
 time.sleep(0.1);
 
-try {
-	fs.mount('/mnt/dfs1', '127.0.0.1', port);
-}
-catch {
-	time.sleep(1);
-	fs.mount('/mnt/dfs1', '127.0.0.1', port);
-}
-
-try {
-	fs.mount('/mnt/dfs2', '127.0.0.1', port+1);
-}
-catch {
-	time.sleep(1);
-	fs.mount('/mnt/dfs2', '127.0.0.1', port+1);
-}
+fs.mount('/mnt/dfs1', '127.0.0.1', port);
+fs.mount('/mnt/dfs2', '127.0.0.1', port+1);
 
 fs.write('/mnt/dfs1/file1', 'file1');
 print: ret1 = fs.read('/mnt/dfs1/file1');
