@@ -535,7 +535,11 @@ const char* orcaFlexLexer::get_string(char end)/*{{{*/
 
 		if (c == '$') {
 			c = lexer->yyinput();
-			if (c != '{') {
+			if (c == end) {
+				str += '$';
+				break;
+			}
+			else if (c != '{') {
 				str += '$';
 				str += c;
 				continue;
@@ -548,8 +552,9 @@ const char* orcaFlexLexer::get_string(char end)/*{{{*/
 				break;
 			}
 		}
-
-		str += c;
+		else {
+			str += c;
+		}
 	}
 
 	if (c == end && g_format_string == c) {
