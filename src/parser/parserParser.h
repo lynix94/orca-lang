@@ -110,6 +110,8 @@ public:
 	bool flag_interactive;
 	bool flag_eval;
 
+	int n_tok;
+
 private:
 	vector<const char*> s_pool;
 	vector<name_list_t*> s_pool_nl;

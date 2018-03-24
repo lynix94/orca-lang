@@ -248,7 +248,7 @@ parserCode::parserCode(const char* ctx_type, const char* ctx_code, /*{{{*/
 
 void parserCode::pop_and_process_code(bool interpret_or_eval)/*{{{*/
 {
-	if (m_code.empty()) {
+	if (m_code.empty()) { // in case of context
 		return;
 	}
 

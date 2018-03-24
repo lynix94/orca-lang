@@ -65,87 +65,89 @@ lf					\n
 {crlf}				{ g_parser->lineno++; }
 {lf}				{ g_parser->lineno++; }
 
-static				{ return STATIC; }
-def					{ return DEF; }
-clone				{ return CLONE; }
+static				{ g_parser->n_tok++; return STATIC; }
+def					{ g_parser->n_tok++; return DEF; }
+clone				{ g_parser->n_tok++; return CLONE; }
 
-my					{ return MY; }
-owner				{ return OWNER; }
-caller				{ return CALLER; }
-root				{ return ROOT; }
-module				{ return MODULE; }
+my					{ g_parser->n_tok++; return MY; }
+owner				{ g_parser->n_tok++; return OWNER; }
+caller				{ g_parser->n_tok++; return CALLER; }
+root				{ g_parser->n_tok++; return ROOT; }
+module				{ g_parser->n_tok++; return MODULE; }
 
-if					{ return IF; }
-elif				{ return ELIF; }
-else				{ return ELSE; }
+if					{ g_parser->n_tok++; return IF; }
+elif				{ g_parser->n_tok++; return ELIF; }
+else				{ g_parser->n_tok++; return ELSE; }
 
-for					{ return FOR; }
-in					{ return IN; }
-switch				{ return SWITCH; }
-select				{ return SELECT; }
-decode				{ return DECODE; }
-case				{ return CASE; }
-default				{ return DEFAULT; }
-fallthrough			{ return FALLTHROUGH; }
-do					{ return DO; }
-while				{ return WHILE; }
-times				{ return TIMES; }
-parse				{ return PARSE; }
+for					{ g_parser->n_tok++; return FOR; }
+in					{ g_parser->n_tok++; return IN; }
+switch				{ g_parser->n_tok++; return SWITCH; }
+select				{ g_parser->n_tok++; return SELECT; }
+decode				{ g_parser->n_tok++; return DECODE; }
+case				{ g_parser->n_tok++; return CASE; }
+default				{ g_parser->n_tok++; return DEFAULT; }
+fallthrough			{ g_parser->n_tok++; return FALLTHROUGH; }
+do					{ g_parser->n_tok++; return DO; }
+while				{ g_parser->n_tok++; return WHILE; }
+times				{ g_parser->n_tok++; return TIMES; }
+parse				{ g_parser->n_tok++; return PARSE; }
 
-continue			{ return CONTINUE; }
-break				{ return BREAK; }
-return 				{ return RETURN_; }
+continue			{ g_parser->n_tok++; return CONTINUE; }
+break				{ g_parser->n_tok++; return BREAK; }
+return 				{ g_parser->n_tok++; return RETURN_; }
 
-"?stack"			{ return STACK; }
-"?local"			{ return LOCAL; }
+"?stack"			{ g_parser->n_tok++; return STACK; }
+"?local"			{ g_parser->n_tok++; return LOCAL; }
 
-using				{ return USING; }
+using				{ g_parser->n_tok++; return USING; }
 
-true				{ return TRUE; }
-false				{ return FALSE; }
+true				{ g_parser->n_tok++; return TRUE; }
+false				{ g_parser->n_tok++; return FALSE; }
 
-try					{ return TRY; }
-catch				{ return CATCH; }
-finally				{ return FINALLY; }
-throw				{ return THROW; }
+try					{ g_parser->n_tok++; return TRY; }
+catch				{ g_parser->n_tok++; return CATCH; }
+finally				{ g_parser->n_tok++; return FINALLY; }
+throw				{ g_parser->n_tok++; return THROW; }
 
-nil					{ return NIL_; }
-parallel			{ return PARALLEL; }
+nil					{ g_parser->n_tok++; return NIL_; }
+parallel			{ g_parser->n_tok++; return PARALLEL; }
 
-eval				{ return EVAL; }
-lambda				{ return LAMBDA; }
-under				{ return UNDER; }
+eval				{ g_parser->n_tok++; return EVAL; }
+lambda				{ g_parser->n_tok++; return LAMBDA; }
+under				{ g_parser->n_tok++; return UNDER; }
 
 
 
-"||"				{ return OR; }
-"&&"				{ return AND; }
-">="				{ return GE; }
-"<="				{ return LE; }
-">"					{ return GT; }
-"<"					{ return LT; }
-"=="				{ return EQ; }
-"!="				{ return NEQ; }
-".."				{ return DOUBLE_DOT; }
-"..."				{ return TRIPLE_DOT; }
+"||"				{ g_parser->n_tok++; return OR; }
+"&&"				{ g_parser->n_tok++; return AND; }
+">="				{ g_parser->n_tok++; return GE; }
+"<="				{ g_parser->n_tok++; return LE; }
+">"					{ g_parser->n_tok++; return GT; }
+"<"					{ g_parser->n_tok++; return LT; }
+"=="				{ g_parser->n_tok++; return EQ; }
+"!="				{ g_parser->n_tok++; return NEQ; }
+".."				{ g_parser->n_tok++; return DOUBLE_DOT; }
+"..."				{ g_parser->n_tok++; return TRIPLE_DOT; }
 
-"+="				{ return ADD_ASSIGN; }
-"-="				{ return SUB_ASSIGN; }
-"*="				{ return MUL_ASSIGN; }
-"/="				{ return DIV_ASSIGN; }
-":="				{ return ASSIGNMENT; }
+"+="				{ g_parser->n_tok++; return ADD_ASSIGN; }
+"-="				{ g_parser->n_tok++; return SUB_ASSIGN; }
+"*="				{ g_parser->n_tok++; return MUL_ASSIGN; }
+"/="				{ g_parser->n_tok++; return DIV_ASSIGN; }
+":="				{ g_parser->n_tok++; return ASSIGNMENT; }
 
-"->"				{ return RIGHT_ARROW; }
-"<-"				{ return LEFT_ARROW; }
+"->"				{ g_parser->n_tok++; return RIGHT_ARROW; }
+"<-"				{ g_parser->n_tok++; return LEFT_ARROW; }
 
 
 
 [a-zA-Z_][a-zA-Z0-9_]*	{
+						g_parser->n_tok++;
 						yylval.cp = g_parser->strdup(yytext);
 						return NAME; 
 					}
 
 -?[0-9]+			{
+						g_parser->n_tok++;
 						bool minus = false;
 						if (yytext[0] == '-') {
 							minus = true;
@@ -183,6 +185,7 @@ under				{ return UNDER; }
 					}
 
 -?0x[0-9a-fA-F]+	{
+						g_parser->n_tok++;
 						bool minus = false;
 						if (yytext[0] == '-') {
 							minus = true;
@@ -221,6 +224,7 @@ under				{ return UNDER; }
 					}
 
 -?0b[01]+				{
+						g_parser->n_tok++;
 						bool minus = false;
 						if (yytext[0] == '-') {
 							minus = true;
@@ -254,6 +258,7 @@ under				{ return UNDER; }
 					}
 
 (-?[0-9]+[Ee][\+\-]?[0-9]+)|(-?[0-9]*\.[0-9]+([Ee][\+\-]?[0-9]+)?)  {
+						g_parser->n_tok++;
 						bool minus = false;
 						if (yytext[0] == '-') {
 							minus = true;
@@ -269,11 +274,13 @@ under				{ return UNDER; }
 					}
 
 \"\"\"				{ 
+						g_parser->n_tok++;
 						yylval.cp = lexer->get_comment('\"');
 						return STRING;
 					}
 
 \'\'\'				{ 
+						g_parser->n_tok++;
 						yylval.cp = lexer->get_comment('\'');
 
 						if (g_format_string) {
@@ -295,6 +302,7 @@ under				{ return UNDER; }
 					}
 
 \"					{ 
+						g_parser->n_tok++;
 						yylval.cp = lexer->get_string('\"');
 
 						if (g_format_string) {
@@ -305,6 +313,7 @@ under				{ return UNDER; }
 					}
 
 r'					{ 
+						g_parser->n_tok++;
 						yylval.cp = lexer->get_string('\'');
 
 						if (g_format_string) {
@@ -315,6 +324,7 @@ r'					{
 					}
 
 r\"					{ 
+						g_parser->n_tok++;
 						yylval.cp = lexer->get_string('\"');
 
 						if (g_format_string) {
@@ -325,6 +335,7 @@ r\"					{
 					}
 
 h'					{ 
+						g_parser->n_tok++;
 						yylval.cp = lexer->get_hex_string('\'');
 						if (yylval.cp == NULL) {
 							yyerror("invalid hex string format");
@@ -334,6 +345,7 @@ h'					{
 					}
 
 h\"					{ 
+						g_parser->n_tok++;
 						yylval.cp = lexer->get_hex_string('\"');
 						if (yylval.cp == NULL) {
 							yyerror("invalid hex string format");
@@ -343,6 +355,7 @@ h\"					{
 					}
 
 b'					{ 
+						g_parser->n_tok++;
 						yylval.cp = lexer->get_bin_string('\'');
 						if (yylval.cp == NULL) {
 							yyerror("invalid hex string format");
@@ -352,6 +365,7 @@ b'					{
 					}
 
 b\"					{ 
+						g_parser->n_tok++;
 						yylval.cp = lexer->get_bin_string('\"');
 						if (yylval.cp == NULL) {
 							yyerror("invalid hex string format");
@@ -361,6 +375,7 @@ b\"					{
 					}
 
 ;					{ 
+						g_parser->n_tok++;
 						if (g_shell_start) {
 							yylval.cp = lexer->get_string('\n');
 							bool null_flag = true;
@@ -381,6 +396,7 @@ b\"					{
 					}
 
 \}					{
+						g_parser->n_tok++;
 						if (g_format_string) {
 							if (g_comment) 
 								yylval.cp = lexer->get_comment(g_format_string);
@@ -393,7 +409,7 @@ b\"					{
 						return '}';
 					}
 
-.					{ g_shell_start = false; return yytext[0]; }
+.					{ g_parser->n_tok++; g_shell_start = false; return yytext[0]; }
 
 %%
 

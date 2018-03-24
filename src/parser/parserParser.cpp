@@ -41,6 +41,10 @@ int yyFlexLexer::yywrap()/*{{{*/
 
 void yyerror(const char* s)/*{{{*/
 {
+	if (g_parser->n_tok == 0) { // empty file
+		return;
+	}
+
 	print("[%s - %d]%s, nearby('%s')\n", g_parser->filename.c_str(), g_parser->lineno, s, lexer->YYText());
 	if (!g_parser->is_interactive() and !g_parser->is_eval()) {
 		exit(0);
@@ -159,6 +163,7 @@ parserParser::parserParser()/*{{{*/
 	module_name = "";
 	flag_interactive = false;
 	flag_eval = false;
+	n_tok = 0;
 }
 
 /*}}}*/
@@ -168,6 +173,8 @@ void parserParser::init()/*{{{*/
 	if (lexer != NULL) delete lexer;
 	lexer = new orcaFlexLexer;
 	free_all();
+
+	n_tok = 0;
 }
 /*}}}*/
 
@@ -206,7 +213,7 @@ bool parserParser::parse(const string& filename)/*{{{*/
 	// parse
 	init();
 	try {
-		if (yyparse() != 0) {
+		if (yyparse() != 0 && g_parser->n_tok != 0) {
 			return false;
 		}
 	}
