@@ -412,6 +412,64 @@ if caugted == false {
 }
 
 
+result = 0;
+switch 1
+{
+case 1:
+	result = 1;
+	print: 'switch case 1 ok';
+case 2:
+	throw test.control <- 'test switch failed';
+case '3':
+	throw test.control <- 'test switch failed';
+default:
+	throw test.control <- 'test switch failed';
+}
+	
+if result != 1 {
+	throw test.control <- 'test switch failed';
+}
+
+result = 0;
+switch 1
+{
+case 1:
+	result += 1;
+	fallthrough;
+case 2:
+	result += 1;
+	fallthrough;
+case '3':
+	result += 1;
+default:
+	result += 1;
+}
+	
+if result != 3 {
+	throw test.control <- 'test switch failed';
+}
+
+
+result = 0;
+switch '2'
+{
+case 1:
+	result += 1;
+	fallthrough;
+case 2:
+	result += 1;
+	fallthrough;
+case '3':
+	result += 1;
+default:
+	result = 'default';
+}
+	
+if result != 'default' {
+	throw test.control <- 'test switch failed';
+}
+
+
 
 
 

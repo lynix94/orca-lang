@@ -683,7 +683,7 @@ opt_switch_default_stmt:/*{{{*/
 		{
 			g_ctl->switch_case_start();
 		}
-	statement_list
+	opt_statement_list
 		{
 			g_ctl->switch_case_end();
 		}
@@ -699,12 +699,18 @@ switch_pattern_stmt:/*{{{*/
 		{
 			g_ctl->switch_case_shift();
 		}
-	statement_list
+	opt_statement_list
 		{
 			g_ctl->switch_case_end();
 		}
 	;
 /*}}}*/
+
+opt_statement_list:
+	/* empty */
+	| statement_list
+	;
+
 
 decode_stmt:/*{{{*/
 	DECODE expression 
