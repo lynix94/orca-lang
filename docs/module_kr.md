@@ -66,16 +66,19 @@ print와 같지만 개행을 하지 않는다.
 
 input 멤버는 콘솔로부터 입력을 받는다.
 
+```
 $ name=io.input();
 KY Lee
 $ print: 'hello, ', name;
 hello, KY Lee
+```
 
 file
 ====
 
 read, write, close 인터페이스를 통해 파일 입출력을 수행할 수 있다. 간단한 예는 아래와 같다.
 
+```
 input = 'hello, file';
 fh = open('test.txt', 'w');
 fh.write(input);
@@ -84,6 +87,7 @@ fh.close();
 fh = open('test.txt', 'r');
 output = fh.read();
 fh.close();
+```
 
 이 프로그램은 test.txt에 input을 기록한 후, 이를 다시 읽어오는 예이다. seek(offset, base) 멤버는 파일 포인터를 옮기는 역할을 한다. offset 은 이동할 크기이며, base는 스트링으로 'SEEK\_SET', 'SEEK\_CUR', 'SEEK_END'인데, 각각 파일의 앞, 파일 포인터의 현재, 파일의 뒤를 기준으로 한다.
 
@@ -94,6 +98,7 @@ thread
 
 쓰레드를 지원하기 위한 모듈이다. run 인터페이스로 thread를 띄우고 이 때 리턴받은 쓰레드 객체의 join 인터페이스로 기다릴 수 있다.
 
+```
 using thread;
 
 def foo(param) {
@@ -102,6 +107,7 @@ def foo(param) {
 
 hd = thread.run(my.foo, ‘hello, thread’);
 hd.join();
+```
 
 과 같이 할 수 있다.
 
@@ -117,6 +123,7 @@ mutex
 
 lock을 통해 잠기고, unlock을 통해 뮤텍스를 해제한다. 아래와 같은 예제를 실행하면,
 
+```
 using ipc;
 using thread;
 using time;
@@ -156,6 +163,7 @@ a = mutex.clone();
 a {
   fh.write('exclusive write'); 
 }
+```
 
 cond
 ----
@@ -170,6 +178,7 @@ wait는 critical section과 연계된 mutex를 받을 수 있고, 기다리는 �
 
 아래의 예제를 실행하면 wait_thread가 1초후에 깨어나게 된다.
 
+```
 using time;
 
 def wait_thread(cond) {
@@ -189,6 +198,7 @@ th1 = thread.run(my.wait_thread, c);
 th2 = thread.run(my.signal_thread, c);
 th1.join();
 th2.join();
+```
 
 semaphore
 ---------
@@ -197,6 +207,7 @@ semaphore
 
 아래의 간단한 예제를 실행시키면,
 
+```
 using ipc;
 using thread;
 using time;
@@ -204,7 +215,7 @@ using time;
 def inc_thread(key) {
     sem = clone ipc.semaphore;
     sem.set(key, 10);
-    for a in \[1..10\]: {
+    for a in [1..10]: {
         print: 'produced...';
         sem.inc();
         time.msleep(1000);
@@ -214,7 +225,7 @@ def inc_thread(key) {
 def dec_thread(key) {
     sem = clone ipc.semaphore;
     sem.set(key, 10);
-    for a in \[1..10\]: {
+    for a in [1..10]: {
         sem.dec();
         print: 'consumed...';
     }
@@ -225,9 +236,11 @@ time.msleep(3000);
 th2 = thread.run(my.dec_thread, 1000);
 th1.join();
 th2.join();
+```
 
 아래와 같은 결과를 얻는다. Produce 된 뒤에 consume 되는 것을 알 수 있다.
 
+```
 produced...
 produced...
 produced...
@@ -248,6 +261,7 @@ produced...
 consumed...
 produced...
 consumed...
+```
 
 socket
 ======
@@ -258,54 +272,71 @@ socket
 
 소켓을 생성하여 리턴한다.
 
+```
 $ sock = socket.create();
+```
 
 ### send(data)
 
 소켓을 통해 (현재는 스트링만) 데이터를 전송한다.
 
+```
 $ sock.send(‘hello, world’);
+```
 
 ### recv(\[len, \[timeout\]\])
 
 소켓을 통해 데이터를 수신한다.
 
+```
 $ msg = sock.recv()
+```
 
 ### close()
 
 소켓을 닫는다.
 
+```
 $ sock.close();
+```
 
 ### connect(ip, port)
 
 소켓을 통해 특정 주소로 연결한다. 파라미터는 IP와 por이다.
 
+```
 $ sock = socket.create();
 
 $ sock.connect(‘127.0.0.1’, 8080);
+```
 
 ### bind(port)
 
 말그대로 bind
 
+```
 $ sock.bind(80);
+```
 
 ### listen()
 
 bind 후 listen한다.
 
+```
 $ sock.listen();
+```
 
 ### accept()
 
 소켓을 통해 클라이언트 접속을 받는다. 리턴되는 값은 클라이언트 소켓이다.
 
+```
 $ client = sock.accept();
+```
 
 하나씩 본다면 의미가 없고, 전반적인 예제를 보자면 80포트로 수신대기한 후 수신받은 것을 그대로 되돌려주는 서버프로그램은 이와 같이 구성한다.
 
+```
 svr = socket.create();
 svr.bind(80);
 svr.listen();
@@ -320,9 +351,11 @@ do {
         # 끊기면 다음 클라이언트를 받는다.
     }
 } while(true);
+```
 
 차례대로 소켓을 생성해서 80으로 리슨한 후 수신 받은 것을 되돌렸다. 위의 스크립트를 실행한 후, 다른 창에서 시험해보면
 
+```
 $ using socket;
 $ sock = socket.create();
 $ msg = io.input();
@@ -330,6 +363,7 @@ Hello, socket
 $ sock.send(msg);
 $ print: sock.recv();
 Hello, socket
+```
 
 와 같이 동작할 수 있다. select 모듈이나 thread 모듈을 이용해서 간단한 multiplexing, multithread 서버를 구성할 수도 있다. IOCP, async socket, epoll server등은 차차 추가될 예정이다.
 
@@ -344,6 +378,7 @@ posix select API와 유사하게 위와같이 같이 구성할 수 있되, read_
 
 리턴값으로 상태에 변화가 생긴 핸들들의 리스트를 돌려준다. 아래의 server 객체는 서버소켓을 만들고 해당 소켓에서 접속이 올때까지 기다리는 예이다. 테스트용이니 본격적으로 동작하기까지 바라진 말기 바란다.
 
+```
 def server {
     sock = socket.create();
 
@@ -351,9 +386,9 @@ def server {
     sock.listen();
 
     while true: {
-        fd = select.select(\[sock.get()\], \[\], \[\], 1000);
+        fd = select.select([sock.get()], [], [], 1000);
 
-        if fd\[0\] == \[sock.get()\]: {
+        if fd[0] == [sock.get()]: {
             new_cl = sock.accept();
 
             str = new_cl.recv();
@@ -365,6 +400,7 @@ def server {
         }
     }
 }
+```
 
 alg
 ===
@@ -375,10 +411,11 @@ alg 모듈은 앞의 이터레이터 기반으로 기본 알고리즘들을 적�
 
 입력받은 obj 에 대해 fun을 실행한다.
 
+```
 $ using alg;
-$ a = \[1,2,3, {4:5, 6:7}, (8,0)\];
-$ alg.traverse(a, %c{print: argv\[0\];});
-\[ 1,2,3,{ 4:5,6:7 },( 8,0 ) \]
+$ a = [1,2,3, {4:5, 6:7}, (8,0)];
+$ alg.traverse(a, def.lambda(...argv) {print: argv[0];});
+[ 1,2,3,{ 4:5,6:7 },( 8,0 ) ]
 1
 2
 3
@@ -393,6 +430,7 @@ $ alg.traverse(a, %c{print: argv\[0\];});
 8
 0
 $
+```
 
 ### for_each (begin, end, function)
 
@@ -400,17 +438,20 @@ $
 
 의미상,
 
+```
 for a in a.begin():
 {
 	function(a());
 }
+```
 
 과 같으나, for문과는 달리 end 반복자를 지정할 수 있다는 점이 좀 더 유연하다.
 
+```
 $ using alg;
-$ a = \[1..10\];
-\[ 1,2,3,4,5,6,7,8,9,10 \]
-$ alg.for_each(a.begin(), a.end(), %c{ print: argv\[0\]; });
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ alg.for_each(a.begin(), a.end(), def.lambda(...argv) { print: argv[0]; });
 1
 2
 3
@@ -422,25 +463,29 @@ $ alg.for_each(a.begin(), a.end(), %c{ print: argv\[0\]; });
 9
 10
 $ 
+```
 
 ### for\_each\_iterator(begin, end, function)
 
 for\_each 인터페이스는, value 기반으로 작동하기 때문에 컨테이너의 객체를 변경시키는데 사용하기에는 적당하지 않다. for\_each\_iterator는 for\_each와 유사하나 function으로 넘겨니는 것이 iterator 라는 점이 다르다.
 
-$ a = \[1..10\];
-\[ 1,2,3,4,5,6,7,8,9,10 \]
-$ alg.for\_each\_iterator(a.begin(), a.end(), %c{ argv\[0\](argv\[0\]()*2); });
+```
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ alg.for_each_iterator(a.begin(), a.end(), def.lambda (...argv) { argv[0](argv[0]()*2); });
 $ print: a;
-\[ 2,4,6,8,10,12,14,16,18,20 \]
+[ 2,4,6,8,10,12,14,16,18,20 ]
 $ 
+```
 
 ### find (begin, end, value)
 
 find 는 begin 반복자로부터 end 반복자까지 탐색하며 value와 같은 값이 있으면 그 위치의 반복자를 리턴한다. 찾는 반복자가 없는경우 end 를 리턴한다.
 
+```
 $ using alg;
-$ a = \[1..10\];
-\[ 1,2,3,4,5,6,7,8,9,10 \]
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
 $ b = alg.find(a.begin(), a.end(), 5);
 listiter <0x98acc38>
 $ print: b();
@@ -450,18 +495,21 @@ listiter <0x98ad2e8>
 $ print: b();
 uncaugted exception: orca.iter out of range
 recent call-stack trace
->\> root (/usr/local/lib/orca/alg.orca 237)              return true;
+>> root (/usr/local/lib/orca/alg.orca 237)              return true;
+```
 
 ### find_if (begin, end, function)
 
 find_if는 find와 유사하나 반복자가 탐색을 하면서 해당 반복자의 값을 function에 넣은 결과가 true일 때 리턴된다. 예를 들어 앞의 예제를 7의 배수를 찾는 것으로 변경해보면,
 
-$ a = \[11..20\];
-\[ 11,12,13,14,15,16,17,18,19,20 \]
-$ b = alg.find_if(a.begin(), a.end(), %c{ return argv\[0\] % 7 == 0; });
+```
+$ a = [11..20];
+[ 11,12,13,14,15,16,17,18,19,20 ]
+$ b = alg.find_if(a.begin(), a.end(), def.lambda(...argv) { return argv[0] % 7 == 0; });
 listiter <0x98ae668>
 $ print: b();
 14
+```
 
 와 같이 작성할 수 있다. 각 원소가 function으로 전달되며 function의 실행결과가 true인 이터레이터가 리턴된다.
 
@@ -469,8 +517,9 @@ $ print: b();
 
 erase (begin, end) 는 컨테이너로부터 begin부터 end이전까지의 범위를 삭제한다.
 
-$ a = \[1..10\];
-\[ 1,2,3,4,5,6,7,8,9,10 \]
+```
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
 $ s = a.begin().next(3);
 listiter <0x98afc60>
 $ e = a.end().prev(2);
@@ -479,64 +528,75 @@ $ print: s(), ':', e();
 4:9
 $ alg.erase(s, e);
 $ print: a;
-\[ 1,2,3,9,10 \]
+[ 1,2,3,9,10 ]
+```
 
 ### remove (begin, end, val)
 
 remove (begin, end, val) 은 begin 부터, end까지의 반복자중에 값이 val인 원소를 삭제한다.
 
-$ a = \[1,2,3,2,7,2\];
-\[ 1,2,3,2,7,2 \]
+```
+$ a = [1,2,3,2,7,2];
+[ 1,2,3,2,7,2 ]
 $ alg.remove(a.begin(), a.end(), 2);
 $ print: a;
-\[ 1,3,7 \]
+[ 1,3,7 ]
+```
 
 ### remove_if (begin, end, function)
 
 remove_if (begin, end, function) 는 역시 remove와 유사하나, 각 원소 a 에 대해 function(a) 를 실행한 결과가 true인 것을 삭제한다. 앞의 예제에서 10보다 작은 원소를 삭제하고 싶으면,
 
-$ a = \[10, 3, 2, 20, 32\];
-\[ 10,3,2,20,32 \]
-$ alg.remove_if(a.begin(), a.end(), %c{ argv\[0\] < 10; } );
+```
+$ a = [10, 3, 2, 20, 32];
+[ 10,3,2,20,32 ]
+$ alg.remove_if(a.begin(), a.end(), def.lambda(...argv){ argv[0] < 10; } );
 $ print: a;
-\[ 10,3,2,20,32 \]
+[ 10,3,2,20,32 ]
+```
 
 ### copy(begin, end, target)
 
 copy 는 begin~end까지의 원소를 target iterator에 복사한다.
 
-$ a = \[1..10\];
-\[ 1,2,3,4,5,6,7,8,9,10 \]
-$ b = \[\];
-\[  \]
+```
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ b = [];
+[  ]
 $ alg.copy(a.begin(), a.end(), b.begin());
 $ print: b;
-\[ 1,2,3,4,5,6,7,8,9,10 \]
+[ 1,2,3,4,5,6,7,8,9,10 ]
 $ alg.copy(a.begin(), a.end(), alg.find(b.begin(), b.end(), 5));
 $ print: b;
-\[ 1,2,3,4,1,2,3,4,5,6,7,8,9,10,5,6,7,8,9,10 \]
+[ 1,2,3,4,1,2,3,4,5,6,7,8,9,10,5,6,7,8,9,10 ]
 $ 
+```
 
 ### copy_n(begin, n, target)
 
 copy_n은 copy와 유사하나, begin으로부터 n개의 원소를 target 이터레이터로 복사한다.
 
-$ a = \[1..10\];
-\[ 1,2,3,4,5,6,7,8,9,10 \]
-$ b = \[\];
-\[  \]
+```
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ b = [];
+[  ]
 $ alg.copy_n(alg.find(a.begin(), a.end(), 5), 3, b.begin());
 $ print: b;
-\[ 5,6,7 \]
+[ 5,6,7 ]
+```
 
 ### count(begin, end, val)
 
 count는 begin~end까지의 범위중, 값이 val인 것의 갯수를 리턴한다.
 
-$ a = \[2, 3, 3, 3, 2, 7, 4\];
-\[ 2,3,3,3,2,7,4 \]
+```
+$ a = [2, 3, 3, 3, 2, 7, 4];
+[ 2,3,3,3,2,7,4 ]
 $ alg.count(a.begin(), a.end(), 3);
 3
+```
 
 ### count_if(begin, end, function)
 
@@ -544,10 +604,12 @@ $ alg.count(a.begin(), a.end(), 3);
 
 앞의 예제에서 짝수의 갯수만 세고 싶으면
 
-$ a = \[2,3,3,3,2,7,4\];
-\[ 2,3,3,3,2,7,4 \]
-$ alg.count_if(a.begin(), a.end(), %c{ return argv\[0\] % 2 == 0; });
+```
+$ a = [2,3,3,3,2,7,4];
+[ 2,3,3,3,2,7,4 ]
+$ alg.count_if(a.begin(), a.end(), def.lambda(...argv){ return argv[0] % 2 == 0; });
 3
+```
 
 와 갈이 할 수 있다.
 
@@ -557,44 +619,52 @@ equal은 begin~end까지의 원소와 begin2~ 의 원소들을 function(a, b)에
 
 예를 들어 설명하면, 아래의 두 리스트는 정수, 실수 타입이 달라 그냥 == 연산을 수행하면 false이지만, equal 을 사용하여 아래와 같이 비교할 수 있다.
 
-$ a = \[1, 2, 3, 2, 2\];
-\[ 1,2,3,2,2 \]
-$ b = \['1', '2', '3', '2', '2'\];
-\[ '1','2','3','2','2' \]
-$ alg.equal(a.begin(), a.end(), b.begin(), %c{ return argv\[0\] == argv\[1\].integer(); });
+```
+$ a = [1, 2, 3, 2, 2];
+[ 1,2,3,2,2 ]
+$ b = ['1', '2', '3', '2', '2'];
+[ '1','2','3','2','2' ]
+$ alg.equal(a.begin(), a.end(), b.begin(), def.lambda(...argv){ return argv[0] == argv[1].integer(); });
 true
+```
 
 ### equal_range(begin, end, val)
 
 equal_range는 begin~end의 구간이 val와 같은지를 검사한다.
 
-$ a = \[1,1,2,2,3,3,4,4\];
-\[ 1,1,2,2,3,3,4,4 \]
+```
+$ a = [1,1,2,2,3,3,4,4];
+[ 1,1,2,2,3,3,4,4 ]
 $ alg.equal_range(a.begin(), a.end(), 1);
 false
 $ alg.equal_range(a.begin().next(2), a.begin().next(4), 2);
 true
+```
 
 ### replace(begin, end, from, to)
 
 replace는 begin ~ end 구간사이에서 값이 from인 아이템을 to로 변경시킨다. 아래의 예제는 0을 3으로 바꾸는 것이다.
 
-$ a = %\[x%3|x<-1~10\];
-\[ 1,2,0,1,2,0,1,2,0,1 \]
+```
+$ a = %[x%3|x<-1~10];
+[ 1,2,0,1,2,0,1,2,0,1 ]
 $ alg.replace(a.begin(), a.end(), 0, 3);
 $ print: a;
-\[ 1,2,3,1,2,3,1,2,3,1 \]
+[ 1,2,3,1,2,3,1,2,3,1 ]
+```
 
 ### replace_if(begin, end, function, to)
 
 replace_if는 begin ~ end 구간사이의 값 x에 대해 funciton(x) 가 true인 경우 to로 변경시킨다. 아래의 예제는 3의 배수를 'X'로 변경시키는 예제이다.
 
-$ a = \[1..10\];
-\[ 1,2,3,4,5,6,7,8,9,10 \]
-$ alg.replace_if(a.begin(), a.end(), %c{ return argv\[0\]%3 == 0; }, 'x');
+```
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ alg.replace_if(a.begin(), a.end(), def.lambda(...argv){ return argv[0]%3 == 0; }, 'x');
 $ print: a;
-\[ 1,2,'x',4,5,'x',7,8,'x',10 \]
+[ 1,2,'x',4,5,'x',7,8,'x',10 ]
 $ 
+```
 
 ### transfrom(begin, end, dest, function)
 
@@ -602,28 +672,32 @@ $
 
 transform은 인자에 따라 두 방식으로 동작하는데, alg.transfrom(begin, end, dest, function)은 begin ~ end구간사의 아이템 x에 대해서, function(x)의 결과를 dest iterator에 삽입한다.
 
-$ a = \[1..10\];
-\[ 1,2,3,4,5,6,7,8,9,10 \]
-$ b = \[\];
-\[  \]
-$ alg.transform(a.begin(), a.end(), b.begin(), %c{ return argv\[0\]*10; });
+```
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ b = [];
+[  ]
+$ alg.transform(a.begin(), a.end(), b.begin(), def.lambda(...argv){ return argv[0]*10; });
 $ print: b;
-\[ 10,20,30,40,50,60,70,80,90,100 \]
+[ 10,20,30,40,50,60,70,80,90,100 ]
+```
 
 위의 예제는 a.begin() ~ a.end() 구간을 10배 곱하여 b에 insert하는 예이다.
 
 alg.transform(begin, end, begin2, des, function)은 앞절과 유사하되 source가 두개이다. begin~end 까지의 각 원소 a 와, 동시에 begin2 ~ 의 각 원소 b에 대해서 function(a, b)의 결과를 dest 반복자에 삽입한다.
 
-$ a = \[1..10\];
-\[ 1,2,3,4,5,6,7,8,9,10 \]
-$ b = %\[x|x<- 100~ \];
-\[ 100,101,102,103,104,105,106,107,108,109, ... \]
+```
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
+$ b = %[x|x<- 100~ ];
+[ 100,101,102,103,104,105,106,107,108,109, ... ]
 $ using alg;
-$ c = \[\];
-\[  \]
-$ alg.transform(a.begin(), a.end(), b.begin(), c.begin(), %c{ return argv\[0\] + argv\[1\]; });
+$ c = [];
+[  ]
+$ alg.transform(a.begin(), a.end(), b.begin(), c.begin(), def.lambda(...argv){ return argv[0] + argv[1]; });
 $ print: c;
-\[ 101,103,105,107,109,111,113,115,117,119 \]
+[ 101,103,105,107,109,111,113,115,117,119 ]
+```
 
 위의 예제는 리스트 a와 b를 begin~end, begin2~ 의 범위동안 각 아이템을 더하여 c에 삽입한 예제이다. b가 조건제시법 리스트라 길이가 무한하지만, 함수가 동작하는 범위는 a.begin() ~ a.end()까지의 범위임을 유의하라. 동작 길이는 a.begin()~a.end()에 한정된다.
 
@@ -632,22 +706,25 @@ type
 
 type traits 를 위한 모듈이다. 먼저 아래와 같이 동적으로 자료를 생성할 수 있다.
 
+```
 $ print: type.list(1,2,3);
-\[ 1,2,3 \]
+[ 1,2,3 ]
 $ print: type.tuple();
 (  )
 $ print: type.map(1,2,3,4);
 { 1:2,3:4 }
-$ str = '\[0-9\]+';
+$ str = '[0-9]+';
 $ print: a = type.regex(str);
-r'\[0-9\]+'
+r'[0-9]+'
 $ print: a == '12345';
 true
+```
 
 특히 기존에는 regex 객체를 constant 로만 ( r'\[0-9\]+' 와 같이) 생성할 수 있었는데, 이를 동적으로 생성하고자 하면 위와 같이 type.regex를 사용하면 된다.
 
 그리고, type의 멤버들은 각 자료형의 type들이다. 이들을 이용해서 변수와 상수들의 형검사를 할 수 있다.
 
+```
 $ 1.type == type.int;
 true
 $ 'string'.type == type.string;
@@ -655,6 +732,7 @@ true
 $ 1.34.type == type.int;
 false
 $ 
+```
 
 xml
 ===
@@ -679,20 +757,24 @@ xml.beutify는 encoding과 비슷하나, 사람이 readable하기 좋게 indent�
 
 먼저 입력 스트링이 이와 같으면
 
+```
 str = '''
 <?xml version="1.0"?>
 <tag_a>
-<tag\_b attr1="value1" attr2="value2">text of tag b</tag\_b>
+<tag_b attr1="value1" attr2="value2">text of tag b</tag_b>
 </tag_a>
 ''';
+```
 
 이 xml 스트링은
 
+```
 { '$info':'xml version="1.0"',
    'tag_a':{ 
 		    'tag_b':{ '$attrs':{ 'attr1':'value1','attr2':'value2'  },'$text':'text of tag b' } 
                 }
 }
+```
 
 와 같이 변환된다. xml의 경로 구조를 따르고 있으며 한 노드는 (tag_a) 자기의 이름을 키로하고, 자기 밑의 child노드들을
 
@@ -702,29 +784,36 @@ value로 하는 map 구조이다. 특수한 노드가 $attrs와 $text, $info 가
 
 즉, 위의 예를 좀 바꾸어
 
+```
 str = '''
 <?xml version="1.0"?>
 <tag_a>
-<tag\_b attr1="value1" attr2="value2">text of tag b</tag\_b>
-<tag\_b>text of tag b 2nd</tag\_b>
+<tag_b attr1="value1" attr2="value2">text of tag b</tag_b>
+<tag_b>text of tag b 2nd</tag_b>
 </tag_a>
 ''';
+```
 
 이런 입력값에 대해서 오르카는
 
+```
 { '$info':'xml version="1.0"',
-  'tag\_a':{ 'tag\_b':( { '$text':'text of tag b 2nd' },
+  'tag_a':{ 'tag_b':( { '$text':'text of tag b 2nd' },
 			        { '$attrs':{ 'attr1':'value1','attr2':'value2' },'$text':'text of tag b' } )
 	       } 
 }
+```
 
 위와 같이 tag_b의 value로서 튜플로 각각의 노드들이 표현된다.
 
 이제 이로부터 tag_a안에 무슨 노드들이 있는지 보고 싶으면
 
+```
 ret = xml.decoding(str);
+ret['tag_a'].keys();
+```
 
-ret\['tag_a'\].keys(); 와 같이 하면 되고
+와 같이 하면 되고
 
 내려가려면 ret\['tag\_a'\]\['tag\_b'\]\[1\]\['$text'\] 와 같은 식으로 tree를 탐색하면 된다. xml내에서의 search등은 다음 버전에서 지원할 생각인데, alg.traverse 함수를 사용해서 사용자가 직접 탐색조건을 지정할 수도 있다.
 
@@ -732,9 +821,11 @@ ret\['tag_a'\].keys(); 와 같이 하면 되고
 
 xml.encoding(ret) 을 통해 인코딩하면
 
+```
 xml.encoding(ret)
 
-<? xml version="1.0" ?><tag\_a><tag\_b >text of tag b 2nd</tag\_b><tag\_b attr1=value1 attr2=value2 >text of tag b</tag\_b></tag\_a>
+<? xml version="1.0" ?><tag_a><tag_b >text of tag b 2nd</tag_b><tag_b attr1=value1 attr2=value2 >text of tag b</tag_b></tag_a>
+```
 
 위와 같이 복원된다.
 
@@ -742,6 +833,7 @@ xml.encoding(ret)
 
 xml.beutify(ret)을 실행하면
 
+```
 <? xml version="1.0" ?>
 <tag_a>
         <tag_b >
@@ -752,6 +844,7 @@ xml.beutify(ret)을 실행하면
         </tag_b>
 
 </tag_a>
+```
 
 와 같이 인덴트를 맞춰서 인코딩해준다.
 
@@ -778,15 +871,21 @@ json.beutify는 오르카 자료구조를 json 스트링으로 인코딩하되, 
 
 예를들어 설명해보면,
 
-  str = "{ 'a':3, 'b':6, 'c':\[1,2,3, { 'a':{'b':'c'}, 'd':\[1,2,3\], 'd':3 },   4,5,6\] }";
+```
+  str = "{ 'a':3, 'b':6, 'c':[1,2,3, { 'a':{'b':'c'}, 'd':[1,2,3], 'd':3 },   4,5,6] }";
+```
 
 이런 스트링이 존재할 때
 
+```
 ret = json.decoding(str);
+```
 
 이 함수는
 
-{ 'a':3,'b':6,'c':\[ 1,2,3,{ 'a':{ 'b':'c' },'d':( \[ 1,2,3 \],3 ) },4,5,6 \] }
+```
+{ 'a':3,'b':6,'c':[ 1,2,3,{ 'a':{ 'b':'c' },'d':( [ 1,2,3 ],3 ) },4,5,6 ] }
+```
 
 위와 같은 오르카 자료구조를 생성한다. 보면 (syntax가 유사하기 때문에) 거의 출력된 모습이 같다. 단,
 
@@ -802,19 +901,21 @@ ret = json.decoding(str);
 
 print: str = json.beutify(ret) 을 실행하면
 
+```
         {'a':3,
         'b':6,
-        'c':    \[1,
+        'c':    [1,
                 2,
                 3,
                         {'a':   {'b':'c'},
-                        'd':    \[1,
+                        'd':    [1,
                                 2,
-                                3\],
+                                3],
                         'd':3},
                 4,
                 5,
-                6\]}
+                6]}
+```
 
 위와 같이 depth를 맞춰 정렬시켜준다.
 
@@ -825,20 +926,25 @@ os
 
 run 인터페이스는 전달받은 것을 실행한다. popen이라 생각하면 된다.
 
+```
 $ using os;
 $ os.run(‘ls’);
+```
 
 를 사용하면 폴더의 내용이 출력된다.
 
 그런데, 간편함을 위해서 이를 실행하는 다른 방법도 제공한다.
 
+```
 $ ; ls -al
+```
 
 과 같이 입력하면 ls -al 이 실행된다. 세미콜론을 먼저 치면 입력한 라인이 쉘을 통해 실행된다. 즉 ; ls -al 은 os.run(‘ls -al’); 과 의미상 같다.
 
 또 실행된 결과를 참조하기 위해 caller를 통한 역 참조를 사용하는데,
 
-$ def \_\_cout\_\_;
+```
+$ def __cout__;
 $ ; ls -al    
 total 2924
 drwxrwxrwx+ 10 MYHOME 없음       0 Dec  1 14:56 .
@@ -847,8 +953,8 @@ drwxrwxrwx+  6 MYHOME 없음       0 Dec  1 02:11 .svn
 -rw-rw-rw-   1 MYHOME 없음       8 Nov  8 17:26 BUILD_NUMBER
 -rw-rw-rw-   1 MYHOME 없음   18007 Nov  8 17:26 COPYING
 ….
-$ print: my.\_\_cout\_\_;
-\[ 'total 2924
+$ print: my.__cout__;
+[ 'total 2924
 ','drwxrwxrwx+ 10 MYHOME 없음       0 Dec  1 14:56 .
 ','drwxrwxrwx+ 24 MYHOME 없음       0 Nov 27 11:01 ..
 ','drwxrwxrwx+  6 MYHOME 없음       0 Dec  1 02:11 .svn
@@ -856,14 +962,17 @@ $ print: my.\_\_cout\_\_;
 
 ','-rw-rw-rw-   1 MYHOME 없음   18007 Nov  8 17:26 COPYING
 …
+```
 
-와 같이 run객체는 호출자에 \_\_cout\_\_ 이 존재하면 출력 결과를 문자열로 추가한다. 단, \_\_cout\_\_은 nil이거나 string 타입이어야 한다. 안그러면 예외.
+와 같이 run객체는 호출자에 __cout__ 이 존재하면 출력 결과를 문자열로 추가한다. 단, __cout__은 nil이거나 string 타입이어야 한다. 안그러면 예외.
 
 ### getenv(name)
 
 환경변수를 조회할 때 사용된다.
 
+```
 $ print: os.getenv(‘PATH’);
+```
 
 는 현재 쉘의 PATH를 출력한다.
 
@@ -871,139 +980,163 @@ $ print: os.getenv(‘PATH’);
 
 현재의 working directory를 반환한다.
 
+```
 $ print: os.cwd();
 /root/curr
+```
 
 ### mkdir(path)
 
 입력받은 경로의 디렉토리를 새로 생성한다.
 
+```
 $ 
 $ os.mkdir('newdir');
 $ 
 $ os.cd('newdir');
 $ print: os.ls('.');
-\[ \]
+[ ]
 $ 
+```
 
 ### rename(src, dest)
 
 입력받은 파일의 이름을 변경한다.
 
+```
 $ print: os.ls('.');
-\[ \]
+[ ]
 $ os.mkdir('newdir');
 $ print: os.ls('.');
-\[ './newdir' \]
+[ './newdir' ]
 $ os.rename('newdir', 'renamed_dir');
 $ print: os.ls('.');
-\[ './renamed_dir' \]
+[ './renamed_dir' ]
 $ 
+```
 
 ### copy(src, dest)
 
 파일을 복사한다.
 
+```
 $ print: os.ls('.');
-\[ './file_a' \]
-$ os.copy('file\_a', 'file\_b');
+[ './file_a' ]
+$ os.copy('file_a', 'file_b');
 $ print: os.ls('.');
-\[ './file\_b','./file\_a' \]
+[ './file_b','./file_a' ]
 $ 
+```
 
 ### remove(name)
 
 파일을 삭제한다.
 
+```
 $ print: os.ls('.');
-\[ './file_a' \]
+[ './file_a' ]
 $ os.remove('file_a');
 $ print: os.ls('.');
-\[ \]
+[ ]
 $ 
+```
 
 ### ls()
 
 디렉터리의 파일들을 리스팅한다. 결과값은 리스트 형태로 반환된다.
 
+```
 $ os.cd('/usr');
 $ print: os.ls('.');
-\[ './tmp','./include','./kerberos','./local','./bin','./games','./sbin','./share','./lib','./src','./etc','./libexec' \]
+[ './tmp','./include','./kerberos','./local','./bin','./games','./sbin','./share','./lib','./src','./etc','./libexec' ]
 $ 
+```
 
 ### cd(path)
 
 디렉터리를 변경한다.
 
+```
 $ os.cd('/usr');
 $ print: os.ls('.');
-\[ './tmp','./include','./kerberos','./local','./bin','./games','./sbin','./share','./lib','./src','./etc','./libexec' \]
+[ './tmp','./include','./kerberos','./local','./bin','./games','./sbin','./share','./lib','./src','./etc','./libexec' ]
 $ 
+```
 
 ### isexists(path)
 
 인자로 전달받은 경로의 파일이나 디렉터리가 존재하면 true를 리턴한다.
 
+```
 $ print: os.isexists('/etc');
 True
 $ print: os.isexists('/etc/passwd');
 True
-$ print: os.isexists('/if\_not\_exist');
+$ print: os.isexists('/if_not_exist');
 False
 $ 
+```
 
 ### isfile(path)
 
 인자로 전달받은 경로가 파일이면 true를 리턴한다.
 
+```
 $ print: os.isfile('/etc/passwd');
 True
 $ 
 $ print: os.isfile('/etc');
 False
 $ 
-$ print: os.isfile('/if\_not\_exist');
+$ print: os.isfile('/if_not_exist');
 False
 $ 
+```
 
 ### isdir(path)
 
 인자로 전달받은 경로가 디렉터리이면 true를 리턴한다.
 
+```
 $ print: os.isdir('/etc');
 True
 $ print: os.isdir('/etc/passwd');
 False
-$ print: os.isdir('/if\_not\_exist');
+$ print: os.isdir('/if_not_exist');
 False
 $ 
+```
 
 ### dir_iterator(path)
 
 dir_iterator 는 입력받은 경로의 파일들을 순회할 수 있는 iterator 객체를 리턴한다. (튜토리얼의 iterator 객체부분을 참조하라) 사용자가 직접 next() 를 호출하여 파일을 순회할 수도 있고, for 문을 사용하여 처리할 수도 있다.
 
+```
 $ os.cd('/etc');
 $ for a in os.dir_iterator('.'):
-\* print: a;
-\* 
+* print: a;
+* 
 ./printcap
 ./terminfo
 ./rc2.d
 ./bash_completion.d
 ...
+```
 
 ### dir_traverser(path)
 
 dir\_iterator가 현재 디렉토리의 파일들만을 순회하는데 반해, dir\_traverser는 현재 디렉토리 밑의 전체 파일들을 순회한다.
 
+```
 $ for a in os.dir_traverser('/etc/yum'):
-\* print: a;
-\* 
+* print: a;
+* 
 /etc/yum/pluginconf.d
 /etc/yum/pluginconf.d/blacklist.conf
 /etc/yum/pluginconf.d/whiteout.conf
 /etc/yum/pluginconf.d/refresh-packagekit.conf
 $
+```
 
 ### read(filepath, size, offset)
 
@@ -1021,13 +1154,15 @@ file_size(filepath) 는 filepath에 있는 파일의 크기를 리턴한다.
 
 last\_write\_time(filepath) 는 filepath에 있는 파일의 최종 기록시간을 datetime 형식으로 리턴한다.
 
+```
 $ os.write('foo.txt', 'hello, file');
 $ print: os.read('foo.txt');
 hello, file
 $ print: os.file_size('foo.txt');
 11
-$ print: os.last\_write\_time('foo.txt');
+$ print: os.last_write_time('foo.txt');
 2010-11-14T15:16:51
+```
 
 system
 ======
@@ -1054,6 +1189,7 @@ system 모듈은 시스템 정보를 조회하기 위한 것으로 다음 인터
 
 오르카의 버전을 문자열로 리턴한다.
 
+```
 $ system.cpu_n();
 4
 $ system.free();
@@ -1064,6 +1200,7 @@ $ system.os();
 Linux version 2.6.35-22-generic (buildd@rothera) (gcc version 4.4.5 (Ubuntu/Linaro 4.4.4-14ubuntu4) ) #33-Ubuntu SMP Sun Sep 19 20:34:50 UTC 2010
 $ system.version();
 0.5
+```
 
 math
 ====
@@ -1081,6 +1218,7 @@ operator
 
 +, -, *, /, %, <, <=, >, >=, ==, !=, ||, && 의 사칙연산 및 비교연산함수들을 인터페이스로 가지고 있다. 이 멤버들은 특수기호를 포함하고 있기 때문에, 참조할 때 다음과 같이 ' ' 로 묶어서 사용한다.
 
+```
 $ operator.'+'(3, 4);
 7
 $ operator.'-'(3, 4);
@@ -1091,6 +1229,7 @@ $ operator.'%'(3, 4);
 3
 $ operator.'<='(3, 4);
 true
+```
 
 이 함수들은 이항연산자들이다. 여러 인자에 대한 처리를 위해서는 fun.reduce, fun.apply 를 사용한다.
 
@@ -1108,10 +1247,12 @@ fun
 
 iteratable의 각 멤버에 대해 f를 적용하고 그 결과를 리스트로 되돌린다.
 
+```
 $ using fun;
-$ ret = fun.map(\[1,2,3\], %c{ return argv\[0\] * 2; } );
+$ ret = fun.map([1,2,3], def.lambda(...argv){ return argv[0] * 2; } );
 $ print: ret;
-\[ 2,4,6 \]
+[ 2,4,6 ]
+```
 
 위 코드는 \[ 1 * 2, 2 * 2, 3 * 2\] 과 같이 동작했다.
 
@@ -1121,9 +1262,11 @@ iteratable의 각 멤버들에 대해서 fun을 적용한 누적결과를 리턴
 
 다음은 리스트의 전체값을 더하는 코드이다.
 
+```
 $ using fun;
-$ print: fun.reduce(\[1,2,3,4,5\], %c{ return argv\[0\] + argv\[1\]; });
+$ print: fun.reduce([1,2,3,4,5], def.lambda(...argv){ return argv[0] + argv[1]; });
 15
+```
 
 argv\[0\]은 누적된 결과가 계속해서 들어가고, argv\[1\]에 멤버들의 각 원소가 들어간다. 따라서 위코드는 ((((1 + 2) + 3) + 4) + 5) 와 같이 동작했다.
 
@@ -1137,10 +1280,12 @@ fun 함수의 첫번째 파라미터에 arg를 bind한 새로운 함수를 생�
 
 mul10 = fun.bind_1st(..mul, 10); 과 같이 하면
 
+```
 $ print: mul10(2);
 20
 $ print: mul10(2.4);
 4.8
+```
 
 과 같이 입력되는 값에 10을 곱하는 (mul함수의 a에 10이 바인딩되어) 새로운 함수가 나타난다.
 
@@ -1161,28 +1306,29 @@ gui
 
 단, 이 모듈은 하부단의 표현 레이어로 현재는 Gtk 만을 사용하고 있기 때문에, 현재 윈도우즈에서 이 기능을 사용하려면 windows용 gtk 라이브러리를 설치해야 한다. 이 부분이 번거롭긴 하지만 아래의 몇몇 예제를 보면 그럴만한 가치가 있다는 것을 알게 될 것이다.
 
+```
   def main : window
    {
-       my.attr\['wh'\] = (800, 600);
+       my.attr['wh'] = (800, 600);
    
        def box : vbox
        {
            def menu : menubar
            {
-               file = \[ 'open', %c{
+               file = [ 'open', def.lambda() {
                                    name = dialog.fileopen(upper('main'));
                                    str= os.read(name);
-                                   upper('box').hs.edit.attr\['text'\] = str;
+                                   upper('box').hs.edit.attr['text'] = str;
                                },
-                       'save', %c{
-                                   str= upper('box').hs.edit.attr\['text'\];
+                       'save', def.lambda() {
+                                   str= upper('box').hs.edit.attr['text'];
                                    name = dialog.filesave(upper('main'));
                                    os.write(name, str);
                                },
-                       'exit', %c{
+                       'exit', def.lambda() {
                                    upper('main').quit();
                                }
-                       \];
+                       ];
    
                my.push_back('file', file);
            }
@@ -1195,6 +1341,7 @@ gui
            }
        }
    }
+```
 
 위의 예제는 메모장을 오르카로 표현한 것이다. 만일 win api 나 gtk 프로그래밍을 해봤다면 코드만으로 이 작업을 하는 것이 얼마나 번거로운지 알 것이고, RAD 툴을 쓴다해도 그 툴의 표현방식과 실제 코드의 갭으로 인해 코드의 직관성이 떨어지게 된다.
 
@@ -1204,23 +1351,27 @@ gui
 
 즉, 하나의 버튼이 있는 윈도우를 생각해보자, 그 버튼은 윈도우 안에 속해있다.
 
+```
    def main : window
    {
        def box : vbox
        {
            def ok : button
            {
-               my.attr\['text'\] = 'ok';
+               my.attr['text'] = 'ok';
            }
        }
    }
+```
 
 해서 그 코드는 위와 같이 표현된다. 윈도우를 상속받은 main window 안에 button 의 속성을 상속받은 ok button 이 존재한다. 단, GUI 객체를 어떤식으로 배치할지를 정하는 container 객체가 하나 있어야 하는데, vbox, hbox, fixed container 중의 하나안에 존재해야 한다.
 
 위 코드를 아래와 같이 실행시키면 윈도우가 나타난다.
 
+```
 my.main.make();
 my.main.show();
+```
 
 ![](image/gui_first.jpg)
 
@@ -1232,40 +1383,42 @@ make 인터페이스는 윈도우 안의 GUI 객체들을 포함관계대로 구
 
 이제 실제 동작이 있는 테스트 예제를 보자
 
+```
   def main : window
    {
-       my.attr\['xy'\] = (50, 20);
-       my.attr\['wh'\] = (300, 200);
+       my.attr['xy'] = (50, 20);
+       my.attr['wh'] = (300, 200);
    
        def box : fixed
        {
            def counter : label
            {
-               my.attr\['xy'\] = (40, 50);
-               my.attr\['text'\] = 0;
+               my.attr['xy'] = (40, 50);
+               my.attr['text'] = 0;
            }
    
            def plus : button
            {
-               my.attr\['xy'\] = (150, 30);
-               my.attr\['wh'\] = (100, 50);
-               my.attr\['text'\] = '+';
-               my.event\['clicked'\] = %c{
-                   upper('box').counter.attr\['text'\] += 1;
+               my.attr['xy'] = (150, 30);
+               my.attr['wh'] = (100, 50);
+               my.attr['text'] = '+';
+               my.event['clicked'] = def.lambda() {
+                   upper('box').counter.attr['text'] += 1;
                };
            }
    
            def minus : button
            {
-               my.attr\['xy'\] = (150, 130);
-               my.attr\['wh'\] = (100, 50);
-               my.attr\['text'\] = '-';
-               my.event\['clicked'\] = %c{
-                   upper('box').counter.attr\['text'\] -= 1;
+               my.attr['xy'] = (150, 130);
+               my.attr['wh'] = (100, 50);
+               my.attr['text'] = '-';
+               my.event['clicked'] = def.lambda() {
+                   upper('box').counter.attr['text'] -= 1;
                };
            }
        }
    }
+```
 
 위의 예제는, 윈도우 안에 카운터 텍스트가 있고 이 카운터를 증감시키는 \+, \- 버튼이 존재한다. fixed container 안에 있기 때문에 attibute로 xy, wh 를 절대좌표로 지정했다.
 
@@ -1329,6 +1482,7 @@ time
 
 time.clone(format): 생성자로서 보기와 같은 포멧의 시간정보를 받아 시간 객체를 새로 생성한다.
 
+```
 $ print: a = time.clone('01:02:03.4');
 01:02:03.400000
 $ print: a.hour;
@@ -1337,11 +1491,14 @@ $ print: a.minute;
 2
 $ print: a.second;
 3
+```
 
 time.time\_of\_day() : 현재시간값을 리턴한다.
 
-$ print: time.time\_of\_day();
+```
+$ print: time.time_of_day();
 23:01:33.990408
+```
 
 ### time.hours(h)
 
@@ -1368,14 +1525,17 @@ duration 이기 때문에 각 항목들은 제한이 없다. 예를들어 minute
 
 그리고 time 은 정수와 덧셈이 가능하다. 더해지는 정수값은 microseconds를 의미한다.
 
+```
 $ print: a;
 01:02:03
 $ print: a + 1234;
 01:02:03.001234
 $ 
+```
 
 time간에는 비교연산이 가능하다. 비교의 의미는 같은 크기를 가졌는가 이다.
 
+```
 $ using time;
 $ a = time.clone('01:02:03');
 $ b = time.clone('01:02:04');
@@ -1385,25 +1545,31 @@ $ print: a == b;
 false
 $ print: a < b;
 true
+```
 
 date
 ====
 
 date는 일단위의 특정시각을 의미한다. 각각 year, month, day 의 필드로 구성되어 있다.
 
+```
 $ using date;
 $ print: a = date.clone('2000-01-02');
 2000-01-02
 $ print: a.year, ' ', a.month, ' ', a.day;
 2000 1 2
+```
 
 date.today 는 현재 날짜를 의미한다.
 
+```
 $ print: date.today();
 2010-11-02
+```
 
 date는 시각인데 반해 년,월,일,주 단위의 간격을 의미하는 dateduration이라는 객체가 있다. 이 일자의 시간객체는 상호간에 더하고 곱하고 나눌수 있다. 단, 나누기는 각 필드에 대해 나누게 되며 나머지는 사라진다. 정수를 더할 수도 있는데 이는 최저 해상도인 일수를 의미한다.
 
+```
 $ using date;
 $ print: date.years(1);
 1 years 
@@ -1423,14 +1589,18 @@ $ print: a += 1;
 2 years -2 months 1 weeks -3 days 
 $ print: a -= 2;
 2 years -2 months 1 weeks -5 days 
+```
 
 이제 date와 dateduration을 더하고 빼서 새로운 일자를 구할 수 있다.
 
+```
 $ print: date.clone('2000-01-01') + date.months(2);
 2000-03-01
+```
 
 date 끼리의 뺄셈은 두 일자 사이의 날 수를 의미한다. date에 정수를 더하고 뺄수도 있는데 이는 date.days 단위를 의미한다.
 
+```
 $ using date;
 $ print: date.clone('2000-01-01');
 2000-01-01
@@ -1438,33 +1608,41 @@ $ print: date.today() - date.clone('2000-01-01');
 3958
 $ print: date.clone('2000-01-01') + 100;
 2000-04-10
+```
 
 datetime
 ========
 
 date 와 time이 더해지면 datetime 객체가 된다. 이것은 특정 date로부터 time 시간만큼 지난 특정 시각을 의미한다.
 
-$ print: date.today() + time.time\_of\_day();
+```
+$ print: date.today() + time.time_of_day();
 2010-11-02T23:26:12.827502
+```
 
 datetime은 다음과 같이 생성할 수도 있으며 now() 는 현재의 년월일시를 의미한다. datetime은 내부적으로 date() 와 time() 인터페이스를 가지고 있다.
 
+```
 $ print: datetime.clone('2000-01-02 03:04:05');
 2000-01-02T03:04:05
 $ print: a = datetime.now();
 2010-11-02T23:21:56.685685
 $ print: a.date(), ' ', a.time();
 2010-11-02 23:21:56.685685
+```
 
 datetime은 시간인 dateduration 이나 time을 더하거나 뺄 수 있다.
 
+```
 $ print: a = datetime.clone('2000-01-01 03:04:05');
 2000-01-01T03:04:05
 $ print: a + date.years(10) - date.months(30) + time.hours(100) - time.minutes(2000);
 2007-07-03T21:44:05
+```
 
 datetime끼리의 뺄셈은 그 시각 사이의 간격인 time객체가 리턴된다. 마이크로 세컨드를 정수값으로 리턴한다. datetime에 정수를 더하거나 빼면 최저해상도인 마이크로 세컨드 만큼의 덧, 뺄셈을 의미한다.
 
+```
 $ print: a = datetime.clone('2000-01-01 03:04:05');
 2000-01-01T03:04:05
 $ print: a + 1000000 * 3600 * 24 * 10;
@@ -1473,6 +1651,7 @@ $ print: a - 10;
 2000-01-01T03:04:04.999990
 $ print: datetime.clone('2010-01-01 03:04:05') - a;
 87672:00:00
+```
 
 time.msleep(msec) 이것은 좀 별다른 static 함수로서 milliseconds만큼 sleep한다.
 
@@ -1499,12 +1678,14 @@ gnuplot을 손쉽게 사용하기 위한 shell 수준의 wrapper이다. wrapper�
 
 아래의 예는 한 그래프에 x^2, 2*x^2 그래프를 그리는 예이다. 플롯들은 선으로 연결되고, grid 속성이 추가 되었으며, 그래프는 1초간 나타난다.
 
+```
    a = gnuplot.clone();
    a.clear();
-   a.add('x^2', %\[(x, x*x)|x<-1~1000\]);
-   a.add('2\*x^2', %\[(x, x\*x*2)|x<-1~1000\]);
+   a.add('x^2', %[(x, x*x)|x<-1~1000]);
+   a.add('2*x^2', %[(x, x*x*2)|x<-1~1000]);
    a.set('line');
    a.plot('pause 1');
+```
 
 출력된 그래프 이미지는 아래와 같다.  
 ![](image/gnuplot2d.jpg)
@@ -1519,14 +1700,16 @@ gnuplot을 손쉽게 사용하기 위한 shell 수준의 wrapper이다. wrapper�
 
 이 인터페이스는 plot과 유사하나 3차원 데이터들을 그린다. s는 space 를 의미하는 prefix 이다.
 
-   sbf= %\[(x, y, 40*(x\*x + y\*y)\*math.exp(-(x\*x) - (y*y)))|x<--2~2:0.1, y<- -2~2:0.1\];  
-   sbf2= %\[(x, y, 4*y-1)|x<- -2~2:0.1, y<- 0~1:0.1\];
+```
+   sbf= %[(x, y, 40*(x*x + y*y)*math.exp(-(x*x) - (y*y)))|x<--2~2:0.1, y<- -2~2:0.1];  
+   sbf2= %[(x, y, 4*y-1)|x<- -2~2:0.1, y<- 0~1:0.1];
   
    gnuplot.sadd('40*(x^2 + y^2) * exp(-x^2 -y^2)', sbf, true);
    gnuplot.sadd('4*y-1', sbf2, true);
    gnuplot.set('grid');
    gnuplot.set('line');
    gnuplot.splot('pause 1');
+```
 
 위 예제는 z = 40*(x^2 + y^2)\*exp(-x^2-y^2) 그래프와 z = 4\*y-1 그래프를 그린다. 그려진 결과는 아래와 같다.  
 ![](image/gnuplot3d.jpg)
@@ -1549,26 +1732,32 @@ orca remoted 8080
 
 다음, 다른 머신에서 remotec 모듈을 이용해 해당 노드로의 연결을 설정한다.
 
+```
 $ using remotec;
 $ c = remotec.clone('127.0.0.1', 8080);
 $ print: c.ping();
 true
 $
+```
 
 이러면 객체 c의 밑에서 일어나는 멤버작업들은 원격 노드에서 일어나게 된다. (.attr, .attr_last, .attr= 을 통해 구현되어 있다) 이제 원격 노드에 대해서 객체를 write, read 하는 예를 선보이겠다.
 
+```
 $ c.hello = 'hello, remote';
 $ print: c.hello;
 hello, remote
+```
 
 아주 간단한데, 이건 로컬의 객체 c 내부에서 작업한 게 아니라 c.hello = 'hello, remote' 하는 순간 원격 node의 root.hello 란 객체에 저 스트링을 set했고, print: c.hello 로 remotec객체 c의 hello 멤버를 참조하면 접속되어 있는 노드의 root.hello 값을 가져오게 된다.
 
 다단계 설정도 가능하다.
 
+```
 $ c.foo.bar = 10;
 $ print: c.foo.bar;
 10
 $
+```
 
 이렇게 하면 원격 노드의 root.foo.bar 객체에 10이 설정되고 (foo 객체는 없으면 생성된다) print: c.foo.bar로 참조하면 해당 객체의 멤버가 돌아온다.
 
@@ -1578,6 +1767,7 @@ $
 
 remoted 가 8080포트로 떠있는 상태에서 다음 코드를 실행시키면,
 
+```
 using remotec;
 
 def sum(...)
@@ -1588,23 +1778,26 @@ def sum(...)
 c = remotec.clone('127.0.0.1', 8080);
 c.sum = my.sum;
 print: c.sum(10, 20);
+```
 
 결과값으로 30이 리턴된다. 원격 노드의 root.sum에 클라이언트에서 정의한 객체를 전달하고 그것을 실행시킨 결과값을 받아왔다.
 
 그런데 잠깐, 원격 호출을 한다는건 저쪽 머신에만 있는 리소스를 사용해서 처리하기 위해서도 있지만 처리해야 할 일을 분담하는 의미도 있다. 그런데 위의 예에서는 원격 머신이 처리를 끝낼 때까지 클라이언트에서 블록된다. 논블록킹으로 처리가 진행되게 하려면 아래와 같이 코드를 수정하면 된다.
 
+```
 using remotec;
 
 def sum(...)
 {
-	return argv\[0\] + argv\[1\];
+	return argv[0] + argv[1];
 }
 
 c = remotec.clone('127.0.0.1', 8080);
 c.sum = my.sum;
-c.sum.\_\_nowait\_\_(10, 20);
+c.sum.__nowait__(10, 20);
 print: c.is_done(100);
 print: c.pop_obj();
+```
 
 c.sum을 호출할 때 가상의 멤버 \_\_nowait\_\_ 을 한번 더 달아주면 논블록킹으로 바로 리턴되며 (리턴값은 nil) is_done(msec) 멤버를 호출하여 처리가 끝났는지 확인할 수 있다.
 
@@ -1614,15 +1807,17 @@ isdone(msec) 은 처리가 끝났는지를 true/false로 리턴하되 인자가 
 
 해서, remotec 객체의 remote_do() 함수를 이용하면 위의 코드를 다음과 같이도 실행할 수 있다.
 
+```
 using remotec;
 
 c = remotec.clone('127.0.0.1', 8080);
-c.remote_do: 10, 20, %c{ 
-	return argv\[0\] + argv\[1\]; 
+c.remote_do: 10, 20, def.lambda(...argv) { 
+	return argv[0] + argv[1]; 
 };
 
 print: c.is_done(100);
 print: c.pop_obj();
+```
 
 이 코드는 30을 리턴한다.
 
@@ -1650,6 +1845,7 @@ dist.dist\_for(list, fun) list 들을 나누어 등록되어 있는 원격노드
 
 다음은 프로젝트에 포함되어있는 test\_dist.orca이다. 테스트 프로그램은 원격노드를 port, port+1, port+2 로 세개 띄우고 dist를 통해 dist\_do, dist\_for 를 실행시킨다. dist\_do로는 간단한 sum함수를 실행시키고 dist_for로는 1~100 까지의 리스트를 분산처리로 각각 제곱한 결과를 가져오도록 하고 있다.
 
+```
 using remoted;
 using remotec;
 using dist;
@@ -1684,37 +1880,40 @@ dist.add('127.0.0.1', port+1);
 dist.add('127.0.0.1', port+2);
 
 
-r = dist.dist_do(10, 20, %c{ return argv\[0\] + argv\[1\]; });
+r = dist.dist_do(10, 20, def.lambda(...argv) { return argv[0] + argv[1]; });
 print: r.is_done(100);
 print: ret = r.pop_obj();
 
 if ret != 30:
 	throw test.dist, 'dist_do failed';
 
-list = \[1..100\];
-rs = dist.dist_for(list, %c{ return argv\[0\] * argv\[0\]; } );
+list = [1..100];
+rs = dist.dist_for(list, def.lambda(...argv) { return argv[0] * argv[0]; } );
 print: rs;
 
-if rs != %\[ x*x | x<-1~100 \]:
+if rs != %[ x*x | x<-1~100 ]:
 	throw test.dist, 'dist_for failed';
 
 print: '## now quit: ', dist.shutdown();
 return 'OK', my;
+```
 
 다음은 위의 테스트 프로그램의 실행결과이다. 중간 dist_do 의 결과로 30 이 나왔고, \[1..100\] 을 제곱한 결과가 제대로 분산처리된 것을 확인할 수 있다.
 
-\# port: 8985
-\## dist server start
-\## dist server start
-\## dist server start
+```
+# port: 8985
+## dist server start
+## dist server start
+## dist server start
 true
 30
-\[ 1,4,9,16,25,36,49,64,81,100,121,144,169,196,225,256,289,324,361,400,441,484,52
+[ 1,4,9,16,25,36,49,64,81,100,121,144,169,196,225,256,289,324,361,400,441,484,52
 9,576,625,676,729,784,841,900,961,1024,1089,1156,1225,1296,1369,1444,1521,1600,1
 681,1764,1849,1936,2025,2116,2209,2304,2401,2500,2601,2704,2809,2916,3025,3136,3
 249,3364,3481,3600,3721,3844,3969,4096,4225,4356,4489,4624,4761,4900,5041,5184,5
 329,5476,5625,5776,5929,6084,6241,6400,6561,6724,6889,7056,7225,7396,7569,7744,7
-921,8100,8281,8464,8649,8836,9025,9216,9409,9604,9801,10000 \]
+921,8100,8281,8464,8649,8836,9025,9216,9409,9604,9801,10000 ]
+```
 
 하둡과 같은 다른 분산처리 시스템에 비해 매우 쉽게 구축하고 유연하게 처리할 수 있는 것을 확인할 수 있다.
 
@@ -1729,24 +1928,32 @@ dfsd는 분산파일 서버노드이고, cached는 key, value 기반의 분산�
 
 분산 파일서버 노드인 dfsd는 dfsd(path, port) 로서 현시스템의 특정 path를 마운트 할 수 있게 port번호로 대기한다.
 
-\[머신 192.168.0.2\]
+```
+[머신 192.168.0.2]
 $ orca dfsd /home/lynix 8080
 
-\[머신 192.168.0.3\]
+[머신 192.168.0.3]
 $ orca dfsd /home/orca 8080
+```
 
 이렇게 대기하고 있는 노드에 대해 fs.mount(path, ip, port) 를 사용하여 마운트 시키는데,
 
+```
 fs.mount('/mnt/node_a', '192.168.0.2', 8080); 
 fs.mount('/mnt/node_b', '192.168.0.3', 8080); 
+```
 
 와 같이 실행하면
 
+```
 data = fs.read('/mnt/node_a/foo/bar.txt');
+```
 
 위의 문장을 실행하면 192.168.0.2 머신의 /home/lynix/foo/bar.txt를 읽어 data에 저장한다.
 
-data = fs.copy('/mnt/node\_a/foo/bar.txt', '/mnt/node\_b/')
+```
+data = fs.copy('/mnt/node_a/foo/bar.txt', '/mnt/node_b/')
+```
 
 위 문장을 실행하면 0.2머신의 /home/lynix/foo/bar.txt 를 0.3 머신의 /home/orca 로 복사한다.
 
@@ -1768,10 +1975,12 @@ fs.mount\_dist\_dir(path, list) : mount가 특정 path에 한 서버를 마운�
 
 fs.mount\_dist\_dir('/mnt/dir', ('192.168.0.1', 8080), ('192,168.0.2', 8081)); 와 같이 사용하고
 
+```
 fs.write('/mnt/dir/file1', 'hello, file'); 
 fs.write('/mnt/dir/file2', 'hello, file'); 
 fs.write('/mnt/dir/file3', 'hello, file'); 
 ...
+```
 
 와 같이 호출하면 path의 값을 적절히 해슁해 특정 서버로 중계한다. 해당 해슁은 string.hash() 인터페이스를 사용한다.
 
@@ -1794,27 +2003,33 @@ lisp.compile(str)을 실행하면 컴파일된 코드가 리스트 형태로 리
 
 가장먼저 3 + (4 * 2) 의 리습 코드를 실행한 모습이다. 컴파일된 결과와 그 결과를 실행한 값을 볼 수 있다. 인터프리터 상이라, 컴파일 결과물도 출력된 모습을 볼 수 있다.
 
+```
 $ ret = lisp.compile('(+ 3 (* 4 2))');
-( \[ \[ +,3,\[ *,4,2 \] \] \],{ 'F':false,'T':true,'car':car <0x9d82350>,'cdr':cdr <0x9d823d8>,'do':do_list <0x9d82460>,'list':list <0x9d824e8> } )
+( [ [ +,3,[ *,4,2 ] ] ],{ 'F':false,'T':true,'car':car <0x9d82350>,'cdr':cdr <0x9d823d8>,'do':do_list <0x9d82460>,'list':list <0x9d824e8> } )
 $ lisp.execute(ret);
 11
+```
 
 아래와 같이 defun, macro, let 및 if, cond 구문들도 지원한다.
 
+```
 $ lisp.execute(lisp.compile('(defun (sum x y) (+ x y) )(sum 4 4)'));
 8
 $ lisp.execute(lisp.compile('(defmacro (addy x) `(+ ,x y))  (let ((y 20)) (addy 10))'));
 30
 $ lisp.execute(lisp.compile('( cond ((>= -3 20) (* 3 10))  ((< 20 10) 3)   (T "error") )'));
 error
+```
 
 또한, lisp 구문안에선 orca 객체들을 참조할 수 있다. 단, io, io.print만이 namespace에 잡혀있기 때문에, 다른 객체를 참조하기 전엔 (using path) 구문으로 등록해주어야 한다.
 
-$ lisp.execute(lisp.compile('(print "hello\\n")'));
+```
+$ lisp.execute(lisp.compile('(print "hello\n")'));
 hello
 nil
 lisp.execute(lisp.compile('(using math) (math.sin (/ 30.0 90.0))'));
 0.327195
+```
 
 그리고, lisp 모듈 자체가 user defined statement 를 지원한다.
 
@@ -1829,21 +2044,25 @@ cpp
 
 cpp 모듈은 user define statement 을 지원하는 모듈로서, 사용자가 cpp 로 된 객체를 손쉽게 작성할 수 있게 해준다. 오르카에서는 다른 언어들과 마찬가지로 cpp 로 만든 확장 라이브러리를 작성할 수있으나, 이런 류의 확자 라이브러리들은 편의성에 있어서 어느정도 한계를 지닌다. 실제 원하는 코드가 일부분이라 해도 언어별로 요구되는 스펙에 맞춰 구현체를 작성해야 한다.
 
+```
    using cpp;
    
-   def sum := %cpp{
+   def.cpp sum(...argv) {
 	// this is cpp code
-       return argv\[0\] + argv\[1\];
+       return argv[0] + argv[1];
    };
    
    print: my.sum(10, 20);
+```
 
 위와 같은 코드를 작성하고, 해당 모듈을 실행하면 최초 실행시나 코드가 변경되서 재컴파일 할 필요가 있으면 아래와 같이 컴파일 내역이 나타나고
 
+```
 $ ./orca tt
-cpp external module compile: g++ -shared -o /tmp/lib\_\_tt\_1\_context.so /tmp/\_\_tt\_1\_context.cpp -I${ORCA\_HOME}/include/orca -L${ORCA\_HOME}/lib -lorca
+cpp external module compile: g++ -shared -o /tmp/lib__tt_1_context.so /tmp/__tt_1_context.cpp -I${ORCA_HOME}/include/orca -L${ORCA_HOME}/lib -lorca
 /usr/bin/ld: cannot find -lorca
 30
+```
 
 30 이 출력된다. 위의 컴파일 메세지를 보면 tt.orca 파일로부터 해당 cpp 객체의 내용을 사용하여 /tmp/\_\_tt\_1\_context.cpp 파일을 오르카가 생성하고 이를 컴파일하여 lib\_\_tt\_1\_context.so 파일을 만든다는 것을 알 수 있다.
 
@@ -1853,17 +2072,18 @@ cpp 모듈을 사용하기 위한 최초 설정이 좀 번거롭긴 하지만 �
 
 cpp UDS객체에 오르카가 전달하는 파라미터는 vector argv; 형식으로 전달된다. 때문에 위의 예제에서 argv\[0\], argv\[1\] 은 orcaData 타입이다. cpp의 자동 형변환 및 연산자 재지정을 통해 c++ 코드에서도 유연한 처리가 가능하다.
 
-아래는 \_\_tt\_1_context.cpp의 내용으로 오르카 확장 라이브러리가 요구하는 내역을 모듈이 자동으로 생성했음을 알 수있다. 코드 중간에 사용자가 %cpp{ } 안에 작성한 부분이 들어있다.
+아래는 \_\_tt\_1_context.cpp의 내용으로 오르카 확장 라이브러리가 요구하는 내역을 모듈이 자동으로 생성했음을 알 수있다. 코드 중간에 사용자가 def.cpp { } 안에 작성한 부분이 들어있다.
 
+```
  #include "orcaObject.h"
    
-       class \_\_tt\_1_context : public orcaObject
+       class __tt_1_context : public orcaObject
        {
        public:
            orcaData udf(orcaVM* vm, vector& argv)
            {
 	       // this is cpp code
-               return argv\[0\] + argv\[1\];   
+               return argv[0] + argv[1];   
            }
    
            orcaData operator()(orcaVM* vm, int param_n)
@@ -1881,20 +2101,23 @@ cpp UDS객체에 오르카가 전달하는 파라미터는 vector argv; 형식�
        #define EXPORT
        #endif
    
-       extern "C" EXPORT void* get\_\_\_tt\_1_context()
+       extern "C" EXPORT void* get___tt_1_context()
        {
-           \_\_tt\_1\_context* sp = new \_\_tt\_1\_context();
+           __tt_1_context* sp = new __tt_1_context();
            return sp;
        } 
+```
 
 단, cpp 코드를 사용할 때, 별도의 헤더나 라이브러리를 인클루드 해야 할 필요가 있다. 이경우엔
 
-   def sum := %cpp{
+```
+   def.cpp sum(...argv) {
        #include #cflags -I/usr/local
        #ldflags -ltest
    
-       return argv\[0\] + argv\[1\];
+       return argv[0] + argv[1];
    }; 
+```
 
 위와 같이 #include, #cflags, #ldflags 를 지정하면 된다. #include에 지정된 것들은 생성되는 코드의 윗부분에 등록되고, cflags, ldflags 에 지정된 것들은 컴파일시, 명령행 옵션으로 추가된다.
 
@@ -1907,8 +2130,10 @@ sh 모듈은, os.run을 사용한 쉘 스크립트 wrapper인데 오르카의 us
 
 아래 예제는 tgzip이란 멤버를 sh 모듈을 사용한 사용자 정의 구문 객체로 선언하고, 이를 이용해 폴더를 tgz 로 만드는 예제이다.
 
-def tgzip = %sh{ tar -xcvf argv\[0\] argv\[1\] };
+```
+def tgzip = %sh{ tar -xcvf argv[0] argv[1] };
 my.tgzip('out.tar.gz', '/home/lynix/out');
+```
 
 httpd
 =====
@@ -1927,8 +2152,6 @@ httpd
 
 그리고, *.osp 파일을 요청하면 오르카의 osp 모듈이 해당 페이지를 파싱한 후 쓰레드로 실행시킨다. (OSP = orca server page)
 
-현재, 간단한 테스트 페이지로서 http://orca-lang.or.kr:8080/hello.osp 를 제공한다.
-
 base64
 ======
 
@@ -1942,11 +2165,13 @@ str에 대해서 base64 인코딩을 수행한다.
 
 str에 대해서 base64 디코딩을 수행한다.
 
+```
 $ using base64;
 $ print: a = base64.enc('12345678');
 MTIzNDU2Nzg=
 $ print: b = base64.dec(a);
 12345678
+```
 
 stopwatch
 =========
@@ -1963,6 +2188,7 @@ elapse()
 
 지난 시간을 microsec 해상도의 정수로 리턴한다.
 
+```
 $ using stopwatch;
 $ 
 $ stopwatch.start();
@@ -1972,12 +2198,14 @@ $
 $ print: stopwatch.elapse();
 24143768
 $ 
+```
 
 lap(msg)
 --------
 
 지난 시간을 화면에 출력한다. day, hour, sec, ms, usec 순으로 디코딩해서 출력하며, 만일 특별한 메세지를 출력하고자 하면, 인자로 스트링을 전달하면 지연시간을 출력하기 전에 먼저 출력한다.
 
+```
 $ sw = stopwatch;
 $ sw.start();
 $ sw.lap('lap 1: ');
@@ -1985,41 +2213,46 @@ lap 1: 17 sec, 71 ms, 530 us
 $ sw.lap();
 20 sec, 287 ms, 624 us
 $ 
+```
 
 title(msg)
 ----------
 
 타이머의 헤더 메세지를 설정한다. 이것을 설정하고 나면 이후의 lap() 을 호출 시 자동으로 헤더 메세지가 출력된다. 만일 지우고 싶다면 단순히 title() 을 호출한다. 이 함수는 stopwatch 객체를 리턴한다. 즉, stopwatch.title('title').lap() 과 같이 호출 가능하다.
 
+```
 $ using stopwatch;
 $ sw1 = stopwatch.clone();
-$ sw1.title('\[sw1\]');
+$ sw1.title('[sw1]');
 $ sw2 = stopwatch.clone();
-$ sw2.title('\[sw2\]');
+$ sw2.title('[sw2]');
 $ 
 $ sw1.start();
 $ sw2.start();
 $ sw1.lap();
-\[sw1\]5 sec, 792 ms, 273 us
+[sw1]5 sec, 792 ms, 273 us
 $ sw2.lap();
-\[sw2\]5 sec, 855 ms, 888 us
+[sw2]5 sec, 855 ms, 888 us
 $ sw1.lap('lap1');
-\[sw1\]lap122 sec, 128 ms, 36 us
+[sw1]lap122 sec, 128 ms, 36 us
 $ sw2.lap('lap2: ');
-\[sw2\]lap2: 32 sec, 976 ms, 62 us
+[sw2]lap2: 32 sec, 976 ms, 62 us
 $ 
+```
 
 scope\_start, scope\_end
 ------------------------
 
 scope statement 를 지원한다. scope\_start 는 start와, scope\_end는 lap과 같다.
 
+```
 $ sw1.title('scope statement test:') { 
-\* root.time.msleep(1000);
-\* }
-\* 
+* root.time.msleep(1000);
+* }
+* 
 scope statement test:999 ms, 425 us
 $
+```
 
 orca
 ====
@@ -2030,8 +2263,10 @@ orca
 
 사용 예는 다음과 같다.
 
-str = argv\[0\];
+```
+str = argv[0];
 orca.load(str);
+```
 
 ### unload(name)
 
@@ -2048,10 +2283,12 @@ obj의 lang.id() 값으로 lock을 건다. scope object mutext를 반환하여 s
 
 사용예는 다음과 같다.
 
+```
 util.lock(obj) {
     obj.push_back(1);
     ...
 }
+```
 
 lru
 ---
@@ -2074,6 +2311,7 @@ k 를 lru의 가장 앞단으로 옮긴다. lru 항목중 한 원소를 참조�
 
 현재 lru 리스트의 길이를 반환한다.
 
+```
 $ using util.lru;
 lru <0x858c230>
 $ a = 'string a';
@@ -2093,6 +2331,7 @@ $ lru.victimize();
 $ lru.dump();          
 string: string c      
 string: string b 
+```
 
 run
 ===
@@ -2105,9 +2344,11 @@ run 모듈을 사용하면, argv\[0\] 로 객체의 path를 받고 argv\[1:\] �
 
 즉 아래와 같이 사용할 수 있다. 마지막의 nil 은 리턴값이다.
 
+```
 $ orca run io.print hello, orca
 hello,orca
 nil
+```
 
 간단한 유틸리티성 모듈이다.
 
@@ -2123,27 +2364,33 @@ get_param(name)
 
 인자로 받은 request parameter 값을 가져온다.
 
+```
 $ var = cgi.get_param('key');
 $ print: var;
 value
+```
 
 urlenc(src)
 -----------
 
 입력받은 스트링을 url형식으로 인코딩한다.
 
+```
 $ print: cgi.urlenc("if a+3 > 4: print('overflow');");
 if+a%2B3+%3E+4%3A+print%28%27overflow%27%29%3B
+```
 
 urldec(src)
 -----------
 
 url 인코딩된 값을 복원한다.
 
+```
 $ print: cgi.urlenc("if a+3 > 4: print('overflow');");
 if+a%2B3+%3E+4%3A+print%28%27overflow%27%29%3B
 $ print: cgi.urldec('if+a%2B3+%3E+4%3A+print%28%27overflow%27%29%3B');
 if a+3 > 4: print('overflow');
+```
 
 htmlenc(src)
 ------------
@@ -2155,20 +2402,24 @@ redirect(url)
 
 다른 문서로 redirect 시킨다.
 
+```
 header {
   cgi.redirect('another.orca');
 }
+```
 
 header
 ------
 
 cgi.header 객체는 scope statement 로 쓰이며 session, cookie 객체를 가지고 session 설정과 cookie 관련 작업을 수행할 수 있다. session 의 초기화와 문서의 redirect 는 이 header 의 scope 영역에서 구성되어야 한다.
 
+```
 cgi.header {
-  cgi.header.session('session\_name\_a');
+  cgi.header.session('session_name_a');
      ...
   cgi.redirect('doc.orca');
 }
+```
 
 header.session
 --------------
@@ -2253,6 +2504,7 @@ html.tag
 
 응답될 html 문서안의 태그를 새로 하나 만든다. 첫번째 인자는 태그의 이름이고, 나머지 인자들은 attribute로 추가될 항목이다. attribute 로 추가될 인자가 스트링 타입이면 그대로, list 타입이면 모든 항목이, map 타입이면 key='value' pair로 들어간다.
 
+```
 using cgi.html.tag;
 
 tag('html') {
@@ -2261,12 +2513,14 @@ tag('html') {
     ...
   }
 }
+```
 
 html.ctag
 ---------
 
  와 같이 따로 close tag를 갖지 않고 단일로 존재하는 태그를 구성한다.
 
+```
 using cgi.html.tag;
 using cgi.html.ctag;
 
@@ -2276,6 +2530,7 @@ tag('html') {
     ctag('img', 'src=img.jpg');
   }
 }
+```
 
 html.br
 -------
@@ -2283,6 +2538,7 @@ html.br
   
 을 출력한다.
 
+```
 using cgi.html.tag;
 using cgi.html.ctag;
 using cgi.html.br;
@@ -2294,12 +2550,14 @@ tag('html') {
     br();
   }
 }
+```
 
 html.text(msg)
 --------------
 
 font 태그를 하나 출력한다. 첫번째 파라미터는 출력될 텍스트이고, 두번째는 폰트, 세번째 인수는 사이즈이다.
 
+```
 using cgi.html.tag;
 using cgi.html.ctag;
 using cgi.html.br;
@@ -2312,6 +2570,7 @@ tag('html') {
     text('simple text', 'gulim', 10);
   }
 }
+```
 
 Simple login example
 ====================
@@ -2320,9 +2579,7 @@ Simple login example
 
 간단하게 소스를 설명하면, form 을 누르면 다시한번 호출되면서 session_test란 이름으로 세션을 하나 설정하고, 세션 변수에 logged를 1로 설정하고 몇개의 값들을 세션과 쿠키에 기록한다 (단순히 테스트 목적으로) 그리고 본 페이지인 result.orca로 redirect 한다.
 
-#!/bin/orca
-
-
+```
 using cgi;
 using cgi.header;
 using cgi.header.session;
@@ -2357,7 +2614,7 @@ cgi.html {
 		}
 
 		tag('body') {
-			tag('form', \["action='login.orca'", "method='get'"\]) {
+			tag('form', ["action='login.orca'", "method='get'"]) {
 				puts: 'username'; 
 				ctag('input', "type='text' name='username'");
 				ctag('input', "type='submit' name='login' value='Click to 
@@ -2367,11 +2624,11 @@ login'");
 		}
 	}
 }
+```
 
 아래는 redirect되는 result.orca로서, 앞서 설정한 session을 설정한 후, 본 페이지에서 세션변수에 logged가 있다면 로그인 되면서 설정한 값들을 출력해주고, 그렇지 않다면 not logged in 을 출력한다. logout 버튼을 클릭하면 login.orca를 호출하여 session을 날린다.
 
-#!/bin/orcash
-
+```
 using cgi;
 using cgi.header;
 using cgi.header.session;
@@ -2405,7 +2662,7 @@ cgi.html {
 				br();
 				puts: 'param.option =', cgi.get_param('option');
 				br();
-				tag('form', \["action='login.orca'", "method='get'"\]) {
+				tag('form', ["action='login.orca'", "method='get'"]) {
 					ctag('input', "type='submit' name='logout' 
 
 value='Click to logout'");
@@ -2417,8 +2674,7 @@ value='Click to logout'");
 		}
 	}
 }
-
-위의 예제는 현재 http://orca-lang.or.kr/cgi-bin/login.orca http://orca-lang.or.kr/cgi-bin/result.orca
+```
 
 로 접근 해볼 수 있다.
 
@@ -2441,15 +2697,16 @@ update(create, drop, insert, update) query를 실행한다.
 
 select query를 실행한다. 리턴값은 mysql result iterator이다. 반복자를 참조함으로써 해당 결과를 얻을 수 있다. 다음은 간단한 예제 프로그램이다.
 
+```
 using mysql;
   
   m = mysql.clone();
-  m.connect('127.0.0.1', argv\[0\], argv\[1\], 'test');
+  m.connect('127.0.0.1', argv[0], argv[1], 'test');
   
   print: m.update('drop table t1');
   print: m.update('create table t1 (code int)');
   
-  for i in \[1..5\]:
+  for i in [1..5]:
       print: m.update('insert into t1 values(${i})');
   
   
@@ -2472,3 +2729,4 @@ mysqlresult <0x8766028>
 ( '3' )
 ( '4' )
 ( '5' )
+```

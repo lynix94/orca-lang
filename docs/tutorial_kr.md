@@ -79,20 +79,30 @@ What's this
 
 먼저 가장 전통적인 예로부터 시작해 보겠다.
 
+
+
+```
 ./orca
+```
+
+
 
 라고 콘솔에 입력하면 인터프리터 창이 뜬다. 물론 ./orca test.orca 혹은 ./orca test 와 같이 파일 이름을 주어 직접 파일을 바로 실행할 수도 있다.
 
 어쨌든 나타난 인터프리터 창에 아래와 같이 입력하면,
 
+```
 $ print('hello, world');
 hello, world
+```
 
 위와 같은 결과가 나타난다.
 
 너무나 간단해서 이 부분에 대해서는 더 설명할 것이 없는데, 재밌는 것은 위 문장은
 
+```
 print: 'hello, world';
+```
 
 로 입력해도 된다.
 
@@ -102,13 +112,17 @@ function\_name( expression\_list ) 와 같이 함수호출형의 표현식은 fu
 
 즉, 첫번째 파라미터의 각 요소에 대해 두번재 파라미터의 코드블럭을 실행하는 for_each 함수가 있다하면, 일반 표현식은 아래와 같지만,
 
-for\_each( list\_a, %c{ print(argv\[0\]); } );
+```
+for_each( list_a, def.lambda(...argv) { print(argv[0]); } );
+```
 
 simple call statement를 이용하면 아래와 같이 표기할 수 있다.
 
-for\_each: list\_a, %c{
-    print(argv\[0\]);
+```
+for_each: list_a, def.lambda(...argv) {
+    print(argv[0]);
 };
+```
 
 불행이도 예제의 코드블럭이 길지 않아서 실감이 안나는데.. 좀 길다고 상상을 해보자 마지막 중괄호 뒤에 세미콜론을 붙이는 것을 잊지말자.
 
@@ -120,12 +134,14 @@ for\_each: list\_a, %c{
 
 먼저 함수안에 위치하는 변수들은 지역변수로 처리된다. (전문적으로, VM의 로컬 변수 스택에서 관리되며, 재진입 가능하다는 뜻이다)
 
+```
 $ a = 10;
 $ print: a;
 10
 $ a = 'hello';
 $ print: a;
 hello
+```
 
 위와 같은 결과가 나타난다. 첫번째 line에서 a에 10을 대입한 후 출력하였고,
 
@@ -138,11 +154,14 @@ hello
 
 정수형의 기본적인 연산을 지원하되 0.2 버전부터 정수형의 한계를 없앴다. 때문에 이제 정수형 자료형은 크기 제한 없는 연산이 가능하다. 확인해 보면 다음과 같다.
 
+```
 $ print: 10000000000000000000000 * 33333333333333333333333333333;
 333333333333333333333333333330000000000000000000000
+```
 
 정수형은 내장 자료형으로 string(), float() 이 있다 각각, 스트링과 float으로 형변환 해주는 함수이다. string() 은 인자로서 출력 포멧을 가질 수 있다.
 
+```
 $ print: 1.string();
 1
 $ print: 10.string('%010d');
@@ -150,17 +169,22 @@ $ print: 10.string('%010d');
 $ print: 30.float();
 30
 $
+```
 
 정수형에서의 16진, 2진수 표현은 다음과 같이 한다.
 
+```
 $ print: 0xaabbcc;
 11189196
 $ print: 0xaabbccddeeff00112233445566778899;
 226943873990930480490908391077492263065                                                                                            
-$ print: 0b11110000;                                                                                                               
+$ print: 0b11110000;   
 240                                                                                                                                
 $ print: 0b11110000111100001111000011110000111100001111000011110000;
-67818912035696880                                                                                                                  
+67818912035696880      
+```
+
+​                                                                                                            
 
 10진 정수형과 마찬가지로 big number도 무리없이 처리가능하다.
 
@@ -169,11 +193,14 @@ $ print: 0b11110000111100001111000011110000111100001111000011110000;
 
 실수형도 지원한다. precision 은 c의 double과 같다. 확인해 보면 아래와 같다.
 
+```
 $ print: 1.0 / 3.0;
 0.333333
+```
 
 실수형도 형변환 함수로서 string() 과 integer() 를 내장하고 있다.
 
+```
 $ print: 0.3.string();
 0.3
 $ print: 0.3.string('%3.3f');
@@ -182,6 +209,9 @@ $ print: 0.3.string('%10e');
 3.000000e-01
 $ print: 1.2.integer();
 1
+```
+
+
 
 문자열
 ---
@@ -190,55 +220,67 @@ $ print: 1.2.integer();
 
 스트링의 포멧처리는 ruby 스타일과 비슷한데 구분자는 ${ expression } 이다.
 
+```
 $ name = ‘james’;
 $ print: ‘hello, ${name}’;
 hello, james
+```
 
 와 같은 결과를 낸다. ${ } 안에는 표현식이(연산 함수호출등) 존재할 수 있다.
 
 String 은 c/c++ 배열과 유사하게 \[\] 연산자를 적용할 수 있는데, 간단한 예는 다음과 같다.
 
-$ ‘hello, world’\[0\];
+```
+$ ‘hello, world’[0];
 h
-$ ‘hello, world’\[-1\];
+$ ‘hello, world’[-1];
 d
+```
 
 마이너스 값은 뒤쪽에서부터의 인덱스 값이다.
-
-$ ‘hello, world’\[0:5\];
+```
+$ ‘hello, world’[0:5];
 hello
-
+```
 slicing 연산자는 위와 같이 쓰여, from:to에 해당되는 영역으로 새로운 string을 구성하여 리턴한다.
-
-$ ‘hello, world’\[2:0\];
+```
+$ ‘hello, world’[2:0];
 le
-
+```
 slicing의 index가 뒤집혀 있다면, 알아서 뒤집어서 가져온다.
 
-$ ‘hello, world’\[0:5);
+```
+$ ‘hello, world’[0:5);
 hello,
+```
 
 Slicing을 쓸 때 오른쪽을 ) 로 하면 가장 오른쪽 원소를 포함한 slicing된 값을 리턴한다.
 
 따라서, 위의 스트링을 뒤집고 싶다면
 
-$ ‘hello, world’\[-1:0);
+```
+$ ‘hello, world’[-1:0);
 dlrow, olleh
+```
 
 와 같이 따로 reverse 인터페이스 없이 슬라이싱으로 처리 가능하다.
 
 string은 +, * 연산자를 지원한다. + 는 스트링을 concat하는 동작을 수행하는데, 다른 인수가 스트링타입이 아니라면 스트링으로 변환시켜서 더한다.
 
+```
 $ print: ‘hello, ‘ + ‘world’;
 hello, world
 
 $ print: ‘3 + 4 = ‘ + 7;
 3 + 4 = 7
+```
 
 \* 연산자는 스트링의 내용을 n 회만큼 반복한다.
 
+```
 $ print: ‘5 times’ * 5;
 5 times5 times5 times5 times5 times 
+```
 
 String은 현재 length, find, find\_all, strip, lstrip, rstript, integer, replace, hash, starts\_with, ends\_with, chomp, push\_back 인터페이스를 제공하며, 0.5에서 추가로 char, lower, upper 인터페이스를 지원한다.
 
@@ -246,67 +288,84 @@ String은 현재 length, find, find\_all, strip, lstrip, rstript, integer, repla
 
 length() 는 스트링의 길이를 계산한다.
 
+```
 $ print: ‘hello, world’.length();
 12
+```
 
 find()는 해당 문자열이 있는 위치를 리턴한다.
 
+```
 $ print: 'hello, world'.find('world');
 7
+```
 
 find_all은 해당 스트링이 나타나는 모든곳을 리스트로 만드어 리턴한다.
 
+```
 $ print: 'hello, world'.find_all('o');
-\[ 4,8 \]
+[ 4,8 ]
+```
 
 find 및 fina\_all의 첫번째 인수로는 다음에 설명할 정규표현식이 올 수 있다. find, find\_all의 두번째 세번째 인수로는 검색을 할 start, end index가 올 수 있다.
 
+```
 $ print: '"', '    hello,    '.rstrip() + '  world   '.strip() + ' ! '.lstrip(), '"';
 "    hello,world! "
 
 $ print: ‘123’.integer() + 100;
 223
+```
 
 integer() 는 정수형으로 형변환 한다.
 
+```
 $ print: '30.8'.float();
 30.8
 $ print: '30e14'.float();
 3e+15
 $           
+```
 
 float() 은 실수형으로 형변환한다.
 
+```
 $ print: ‘hello, world’.replace(‘world’, ‘earth’);
 Hello, earth
+```
 
 replace의 첫번째 인수로는 다음에 설명할 정규표현식이 올 수 있다. Replace 의 두번째 세번째 인수로는 치환을 수행할 범위를 지정하기 위한 것으로 string의 start, end index가 올 수 있다.
 
 hash(mod) 은 스트링에 대한 간단한 정수 해쉬값을 리턴한다. INT_MAX까지의 값이 반환되는데, mod 값이 입력되면 나머지 값이 리턴된다.
 
+```
 $ a = 'hello, world!';
 $ print: a.hash();
 1193
 $ print: a.hash(100);
 93
+```
 
 chomp(by)는 문자열을 by들로 나누어 리스트에 담아 리턴한다. by에는 스트링이 올 수도 있고 정규표현식이 올 수도 있다.
 
+```
 $ a = 'aaaa-bbbb-cccc-dddd';
 $ print: a.chomp('-');
-\[ 'aaaa','bbbb','cccc','dddd' \]
+[ 'aaaa','bbbb','cccc','dddd' ]
 $ 
 $ a = 'aaaa-bbbb_cccc:dddd';
-$ print: a.chomp(r'\[^a-zA-Z\]');
-\[ 'aaaa','bbbb','cccc','dddd' \]
+$ print: a.chomp(r'[^a-zA-Z]');
+[ 'aaaa','bbbb','cccc','dddd' ]
 $ 
 $ a = 'aaaa-bbbb_cccc-dddd';
-$ print: a.chomp(r'\[-_\]');
-\[ 'aaaa','bbbb','cccc','dddd' \]
+$ print: a.chomp(r'[-_]');
+[ 'aaaa','bbbb','cccc','dddd' ]
 $ 
+```
 
 스트링은 슬라이싱과 문자열 비교를 통해 일부비교가 가능하지만 특별히 잦은 앞과 뒤의 비교를 위해 starts\_with, ends\_with 인터페이스도 제공한다. 사실 이 인터페이스는 Java에서 따왔는데, 비교 파라미터로 정규표현식이 올수도 있어 더 유용하게 사용할 수 있다.
 
+```
 $ 
 $ a = '1111aaaa0000bbbb';
 $ print: a.starts_with('1111');
@@ -317,22 +376,26 @@ $ print: a.ends_with('bbbb');
 true
 $ print: a.ends_with('1111');
 false
-$ print: a.starts_with(r'\[0-9\]+');
+$ print: a.starts_with(r'[0-9]+');
 true
-$ print: a.ends_with(r'\[a-z\]+');
+$ print: a.ends_with(r'[a-z]+');
 true
-$ print: a.ends_with(r'\[0b\]+');
+$ print: a.ends_with(r'[0b]+');
 true
+```
 
 upper()와 lower() 는 문자열을 대문자, 소문자로 변경한다.
 
+```
 $ 'Hello, World!'.upper();
 HELLO, WORLD!
 $ 'Hello, World!'.lower();
 hello, world!
+```
 
 char(idx)는 idx위치의 문자코드를 리턴한다.
 
+```
 $ 'abc123'.char(0);
 97
 $ 'abc123'.char(1);
@@ -343,20 +406,25 @@ $ 'abc123'.char(3);
 49
 $ 'abc123'.char(4);
 50
+```
 
 문자열의 특별한 형태로 16진, 2진수 문자열을 표기할 수 있다. 16진, 2진 스트링을 표현할 수 있게 되었다. 기존의 스트링 표현식 앞에 h, b를 붙여주면 된다.
 
+```
 $ print: h'3031323334';
 01234
 $ print: b'01110011';
 s
 $ print: b'01110011 01110100';
 st
+```
 
 0.5 버전부터 python style의 포멧스트링을 지원한다. 형식은 파이썬 스타일과 같으며, 내부적으로는 string의 modulo operator를 오버라이딩하여 구현된 것이다.
 
+```
 $ 'i: %d, f: %f, e: %e, s: %s' % (100, 12.34, 12.34, 'hello, world!');
 i: 100, f: 12.340000, e: 1.234000e+01, s: hello, world!
+```
 
 정규표현식
 -----
@@ -369,31 +437,41 @@ orca에서 제공하는 정규표현식은 boost::regex를 사용하여 구현�
 
 먼저 match의 경우엔 아래와 같이 할 수 있다.
 
+```
 str = '123abc456def';
-if str == r'\[0-9a-z\]+':
+if str == r'[0-9a-z]+':
     print: ‘matched’
+```
 
 위의 예제는 matched를 출력한다. 따로 match() 인터페이스를 두지 않고, ==, != 연산자를 통해 이 작업을 수행할 수 있다.
 
 위의 str에 대해 아래와 같이 find를 수행하면,
 
-$ print: str.find(r’\[a-z\]+\[0-9\]+’);
+```
+$ print: str.find(r’[a-z]+[0-9]+’);
 ( 'abc456',3,9 )
+```
 
 와 같은 결과를 얻는다. 튜플의 첫번째 값은 찾아진 매치된 문자열이고, 두번째 값은 시작 인덱스, 세번쩨는 마지막 인덱스이다.
 
-$ print: str.find_all(r'\[0-9\]+\[a-z\]+');
-\[ ( '123abc',0,6 ),( '456def',6,12 ) \]
+```
+$ print: str.find_all(r'[0-9]+[a-z]+');
+[ ( '123abc',0,6 ),( '456def',6,12 ) ]
+```
 
 find_all은 위와 같이 매치되는 모든 결과들을 리스트로 만들어서 리턴한다.
 
-$ print: str.find_all(r'(\[0-9\]+)\[a-z\]+');
-\[ ( ( '123abc',0,6 ),( '123',0,3 ) ),( ( '456def',6,12 ),( '456',6,9 ) ) \]
+```
+$ print: str.find_all(r'([0-9]+)[a-z]+');
+[ ( ( '123abc',0,6 ),( '123',0,3 ) ),( ( '456def',6,12 ),( '456',6,9 ) ) ]
+```
 
 정규표현식은 또한 subgroup을 지원하는데, 파라미터로 건네지는 정규표현식에 괄호를 쳐서 그 일부를 subgroup으로 만들 수 있다. 결과값에선 보다시피 해당 서브 그룹이 또다른 튜플로 추가된다. 서브 그룹을 구분하기 위해 튜플로 한번 더 감싸져 있는 것에 유의하기 바란다. Subgroup에 대한 자세한 내역은 boost::regex를 참조하기 바란다.
 
-$ print: str.replace(r'\[0-9\]+', '{{$0}}');
+```
+$ print: str.replace(r'[0-9]+', '{{$0}}');
 {{123}}abc{{456}}def
+```
 
 보기와 같이 매치된 내역을 변환시킬 수도 있다.
 
@@ -404,56 +482,67 @@ Orca의 정규표현식은 똑같은 string 인터페이스에서 처리하도�
 
 리스트는 추가 가능한 원소들의 나열을 나타낸다.
 
-$ a = \[1,2,3,4,5\];
-$ print: a,' ',a\[0\],' ',a\[-1\];
-\[1,2,3,4,5\] 1 5
+```
+$ a = [1,2,3,4,5];
+$ print: a,' ',a[0],' ',a[-1];
+[1,2,3,4,5] 1 5
+```
 
 물론 대입 및 중첩도 가능하다.
 
-$ a\[1\] = \['abc', 3\];
+```
+$ a[1] = ['abc', 3];
 $ print: a;
-\[1, \['abc', 3\], 3, 4, 5\]
-$ print: a\[1\]\[0\];
+[1, ['abc', 3], 3, 4, 5]
+$ print: a[1][0];
 abc
+```
 
 슬라이싱도 지원한다. 슬라이싱 방식은 스트링의 그것과 유사하다.
 
 리스트는 내장 함수로 먼저 원소를 앞에서 삽입, 삭제하는 push\_front, pop\_front가 있고, 뒤에서 삽입, 삭제하는 push\_back, push\_front 함수가 있다. 이 함수의 리턴값은 삽입, 삭제가 일어난 리 스트의 최종 모습이다.
 
-$ a= \[1,2,3\];
+```
+$ a= [1,2,3];
 $ print: a.push_back(4);
-\[ 1,2,3,4 \]
+[ 1,2,3,4 ]
 $ print: a.pop_back();
-\[ 1,2,3 \]
+[ 1,2,3 ]
 $ print: a.push_front('100');
-\[ '100',1,2,3 \]
+[ '100',1,2,3 ]
 $ print: a.pop_front();
-\[ 1,2,3 \]
+[ 1,2,3 ]
+```
 
 tuple() 인터페이스는 리스트를 같은 순서의 튜플로 변환해 준다.
 
-$ a = \[1..10\];
+```
+$ a = [1..10];
 $ print: a, a.tuple();
-\[ 1,2,3,4,5,6,7,8,9,10 \]( 1,2,3,4,5,6,7,8,9,10 )
+[ 1,2,3,4,5,6,7,8,9,10 ]( 1,2,3,4,5,6,7,8,9,10 )
+```
 
 size() 인터페이스는 리스트의 길이를 반환한다. empty() 는 리스트가 비어있을 경우 true를 리턴한다. clear() 는 리스트를 초기화 한다.
 
-$ a = \[1..10\];
-\[ 1,2,3,4,5,6,7,8,9,10 \]
+```
+$ a = [1..10];
+[ 1,2,3,4,5,6,7,8,9,10 ]
 $ print: a.size();
 10
 nil
 $ a.empty();
 false
 $ a.clear();
-\[  \]
+[  ]
 $ a.empty();
 true
 $ 
+```
 
 반복자를 반환하는 begin(), end() 인터페이스가 있다.
 
-$ list = \[1,2,3\];
+```
+$ list = [1,2,3];
 $ i = list.begin();
 $ e = list.end();
 $ print: i();
@@ -462,35 +551,40 @@ $ i.next();
 $ i();
 $ i(3);
 $ print: list;
-\[ 1,3,3 \]
+[ 1,3,3 ]
 $ print: i == e;
 false
 $ i.next();
 $ e.prev();
 $ print: i == e;
 true
+```
 
 find(value) 인터페이스는 value가 있는 위치의 반복자를 반환한다.
 
-$ list = \[1,2,3\];
+```
+$ list = [1,2,3];
 $ i = list.find(2);
 $ print: i();
 2
 $ i.prev();
 $ print: i();
 1
+```
 
 리스트 반복자는 insert(), remove() 인터페이스를 갖는다. 각각 자기 위치의 앞에 새로운 원소를 삽입하거나 자기 위치의 원소를 삭제한다.
 
-$ list = \[1,2,3\];
+```
+$ list = [1,2,3];
 $ i = list.find(2);
 $ i.insert(100);
 $ print: list;
-\[ 1,100,2,3 \]
+[ 1,100,2,3 ]
 $ i = list.find(100);
 $ i.erase();
 $ print: list;
-\[ 1,2,3 \]
+[ 1,2,3 ]
+```
 
 반복자에 대해 유의할 것이, 원본 리스트는 타임스탬프를 유지하고 있어서 내부 원소의 위치가 바뀌면 (삽 입, 삭제로) 타임스탬프가 증가한다.
 
@@ -498,15 +592,17 @@ $ print: list;
 
 마지막으로, 리스트를 정렬하는 sort 인터페이스가 있다. 단순히 sort를 호출하면 지정된 방식으로 정렬을 수행하지만, sort의 인자로 비교함수를 전달하면 해당 함수를 '<' 함수로 사용하여 대소비교를 수행한다.
 
-$ a = \[1,3,2,4,2\];
-\[ 1,3,2,4,2 \]
+```
+$ a = [1,3,2,4,2];
+[ 1,3,2,4,2 ]
 $ a.sort();
-\[ 1,2,2,3,4 \]
+[ 1,2,2,3,4 ]
 $ print: a;
-\[ 1,2,2,3,4 \]
+[ 1,2,2,3,4 ]
 $ 
-$ a.sort(%c{ return argv\[0\] >= argv\[1\]; });
-\[ 4,3,2,2,1 \]
+$ a.sort(def.labmda(...argv){ return argv[0] >= argv[1]; });
+[ 4,3,2,2,1 ]
+```
 
 위의 예에서 마지막 부분은, 역순으로 정렬하고자 '<'와 정반대로 동작하는 람다함수를 인자로 전달한 예를 보여준다.
 
@@ -517,23 +613,28 @@ $ a.sort(%c{ return argv\[0\] >= argv\[1\]; });
 
 튜플은 인터페이스 측면에서는 리스트와 거의 유사하다.
 
+```
 $ a = ( 1, 3, 4 );
-$ print: a,' ',a\[1\];
+$ print: a,' ',a[1];
 ( 1, 3, 4 ) 3
+```
 
 내장 함수로서 삽입, 삭제는 push\_back, pop\_back 인터페이스만 제공한다.
 
+```
 $ a = (1,2,3);
 $ print: a.push_back(100);
 ( 1,2,3,100 )
 $ print: a.pop_back();
 ( 1,2,3 )
+```
 
 list() 인터페이스는 순서가 같은 리스트를 생성하고, size() 인터페이스는 튜플의 길이를 리턴한다. empty() 는 비어있을 경우 true를 리턴한다. clear() 는 튜플을 초기화 한다.
 
+```
 $ a = (1..10);
 $ print: a, a.list();
-( 1,2,3,4,5,6,7,8,9,10 )\[ 1,2,3,4,5,6,7,8,9,10 \]
+( 1,2,3,4,5,6,7,8,9,10 )[ 1,2,3,4,5,6,7,8,9,10 ]
 $ print: a.size();
 10
 $ a = (1..10);
@@ -544,9 +645,11 @@ $ a.clear();
 (  )
 $ a.empty();
 true
+```
 
 tuple의 경우도 리스트와 유사하게 begin(), end(), find() 를 제공한다. 단, insert, remove는 제공하지 않는다.
 
+```
 $ tp = (1,2,3);
 $ i = tp.begin();
 $ e = tp.end();
@@ -573,20 +676,24 @@ $ print: i();
 $ i.prev();
 $ print: i();
 1
+```
 
 맵
 -
 
 파이썬, 루비의 딕셔너리 및 STL의 map 과 같은 자료구조이다.
 
+```
 $ a = { ‘harry’:100, ‘tom’:20 };
-$ print: a\[‘harry’\];
+$ print: a[‘harry’];
 100
+```
 
 이런 식으로 처음 선언할 때는 slicing처럼 key, value pair를 나열하고, \[\] 연산자를 이용하여 참조한다.
 
 map 은 원소의 갯수를 반환하는 size() 인터페이스를 가진다. empty() 는 비어있을 경우 true를 리턴한다. clear() 는 맵을 초기화 한다.
 
+```
 $ a = { 1:2, 3:4 };
 $ print: a.size();
 2
@@ -597,9 +704,11 @@ $ a.clear();
 $ a.empty();
 true
 $ 
+```
 
 has\_key 인터페이스는 해당 key 값이 존재하는지를 true/false 로 알려준다. erase\_key 는 해당 키를 가지는 원소를 삭제한다.
 
+```
 $ a = {1:2, 3:4 };
 $ print: a;
 { 1:2,3:4 }
@@ -614,11 +723,13 @@ false
 $ print: a;
 { 3:4 }
 $ 
+```
 
 map의 경우도 begin, end 인터페이스를 지원한다. map 은 정렬연관 컨테이너이기 때문에 begin() 으로부터 end() 까지 한단계씩 진행하면 정렬 순서대로 아이템들을 억세스할 수 있다.
 
 반복자로부터 값을 참조하려면 반복자를 실행시키면 되는데 map의 경우는 key-value pair이다 보니 실행하면 ( key, value ) 의 튜플이 반환된다. key, value 를 따로 억세스하기 위해서는 it.first(), it.second() 인터페이스를 각각 호출한다 (STL map의 경우와 같으나 실행해야 하는 것만 다르다)
 
+```
 $ m = { 1:100, 2:200, 3:300 };
 $ a = m.begin();
 $ print: a(), a.first(), a.second();
@@ -632,9 +743,11 @@ $ print: a(), a.first(), a.second();
 $ a.next();
 uncaugted exception: orca.iter out of range
 recent call-stack trace
+```
 
 반복자로부터 값을 변경하는 것은 반복자에 변경될 값을 입력하여 호출하면 되는데 맵의 경우 키를 바꿀 수는 없고 (키를 바꾼다는 것은 정렬순서가 바뀌는 것이며 반복자가 정렬순서를 바꾸면서 유효할 수 없다) value 값이 변경된다.
 
+```
 $ a = { 1:100, 2:200, 3:300 };
 $ it = a.begin();
 $ it(1000);
@@ -644,9 +757,11 @@ $ it.next();
 $ it(3000);
 $ print: a;
 { 1:1000,2:2000,3:3000 }
+```
 
 find() 는 해당 키값을 가르키는 반복자를 리턴한다.
 
+```
 $ a = {1:100, 2:200, 3:300};
 $ it = a.find(2);
 $ print: it();
@@ -658,13 +773,15 @@ true
 $ print: it();
 uncaugted exception: orca.iter out of range
 recent call-stack trace
->\> mapiter      (internal 0)
->\> orcaRoot     (internal 0)
->\> orcaRoot     (internal 0)
->\> orcaRoot     (internal 0)
+>> mapiter      (internal 0)
+>> orcaRoot     (internal 0)
+>> orcaRoot     (internal 0)
+>> orcaRoot     (internal 0)
+```
 
 맵은 upper\_bound와 lower\_bound도 제공한다. find와 유사하나 find는 찾는 키가 존재하지 않으면 end() 반복자를 리턴하는데 반해, lower\_bound, upper\_bound는 정렬이 깨지지 않는 상황에서 삽입할 수 있는 위치를 리턴하는데, 찾는 값이 있다면 lower\_bound는 해당 키의 위치를, upper\_bound는 그 다음 위치를 리턴한다.
 
+```
 $   a = { 1:1, 2:2, 4:4, 5:5, 6:6 };
 $   i = a.lower_bound(3);
 $   print: i();
@@ -678,14 +795,17 @@ $  print: i();
 $   i = a.upper_bound(4);
 $   print: i();
 ( 5,5 )
+```
 
 keys() 는 맵의 key 값들을 리스트로 반환한다. values()는 맵의 value 값들을 리스트로 만들어 반환한다.
 
-$ a = { 1:'value 1', 'two':2, 'key3':\[1,2,3\] };
+```
+$ a = { 1:'value 1', 'two':2, 'key3':[1,2,3] };
 $ print: a.keys();
-\[ 1,'key3','two' \]
+[ 1,'key3','two' ]
 $ print: a.values();
-\[ 'value 1',\[ 1,2,3 \],2 \]
+[ 'value 1',[ 1,2,3 ],2 ]
+```
 
 조건 제시법
 ------
@@ -694,14 +814,18 @@ $ print: a.values();
 
 원래 수학의 조건 제시법은, 예를들어 1부터 100까지의 짝수는 다음과 같이 표현된다.
 
-\[x|x<-n, 1<x<10, n%2=0\]
+```
+[x|x<-n, 1<x<10, n%2=0]
+```
 
 그런데, 이것이 프로그래밍의 표현식으로 나타나기 위해서는 몇가지 변형이 가해져야 하는데, 일단 오르카의 조건제시법은 정수에 대해서만 가능하기 때문에, x<-n 은 따로 표시안해도 되고, x<-1~10 과 같이 한번에 표시될 수 있다.
 
 그리고, 처음부터 원소가 정해져 있는 일반 리스트와 구분하기 위해 처음에 %를 붙이게 된다. 해서 1부터 10까지의 짝수는 다음과 같이 표시될 수 있다.
 
-$ print: %\[x|x<- 1~10, x%2 == 0\];
-\[2,4,6,8,10\]
+```
+$ print: %[x|x<- 1~10, x%2 == 0];
+[2,4,6,8,10]
+```
 
 이제 세세하게 한 항목식 따져 보자면..
 
@@ -713,14 +837,18 @@ $ print: %\[x|x<- 1~10, x%2 == 0\];
 
 단, 이런 형태는 어쨌거나 런타임 시에 고정된 형태의 리스트가 오는 것이기 때문에 처음의 범위형태와 다르게 지연연산의 효과가 약간 줄어든다.
 
-$ a = %x\[x|x<-1~100000000\];
-$ print: a\[10\]
+```
+$ a = %x[x|x<-1~100000000];
+$ print: a[10]
 11
+```
 
 범위형을 쓰면 지연연산(필요한 순간에 그 값을 취함)때문에 위와 같은 형태가 가능하고 출력도 즉시 나타나지만,
 
-$ a = %x\[x|x<-\[1..1000000000\]\];
-$ print: a\[10\];
+```
+$ a = %x[x|x<-[1..1000000000]];
+$ print: a[10];
+```
 
 이를 실행시키면 결국 필요한 것은 열한번째 원소일 뿐이지만, 첫줄의 조건제시법을 구성할 때 쓰이는 \[1..1000000000\] 리스트를 만들기 위해 엄청난 메모리와 시간을 소모한다. 때문에 시스템의 메모리가 부족하면 프로그램이 더 진행되지 않을 것이고, 충분하다 하더라도 출력시까지 delay 가 나타날 것이다.
 
@@ -730,16 +858,20 @@ $ print: a\[10\];
 
 발생자도 겹쳐져서 사용될 수 있는데 , 아래 의 구문은
 
-$ print: %\[(x,y)|x<-1~5, y<-3~5\];
-\[ ( 1,3 ),( 1,4 ),( 1,5 ),( 2,3 ),( 2,4 ),( 2,5 ),( 3,3 ),( 3,4 ),( 3,5 ),( 4,3 ),( 4,4 ),( 4,5 ),( 5,3 ),( 5,4 ),( 5,5 ) \]
+```
+$ print: %[(x,y)|x<-1~5, y<-3~5];
+[ ( 1,3 ),( 1,4 ),( 1,5 ),( 2,3 ),( 2,4 ),( 2,5 ),( 3,3 ),( 3,4 ),( 3,5 ),( 4,3 ),( 4,4 ),( 4,5 ),( 5,3 ),( 5,4 ),( 5,5 ) ]
+```
 
 와 같은 결과가 나타난다. x가 1~5까지를 발생하는 동안, y는 3~5까지를 발생시키며 각각의 조합들에 대해서 (x,y) 와 같이 최종적으로 튜플을 구성하는 예이다.
 
 물론 여기에 x,y 를 사용하는 조건절도 집어넣을 수 있는데,
 
-$ print: %\[(x,y)|x<-1~5, y<-3~5, x==y\];
-\[ ( 3,3 ),( 4,4 ),( 5,5 ) \]
+```
+$ print: %[(x,y)|x<-1~5, y<-3~5, x==y];
+[ ( 3,3 ),( 4,4 ),( 5,5 ) ]
 $
+```
 
 위와 같이 발생된 항목들중에 x==y 인 것만 추리게 되므로 출력은 위와 같아진다.
 
@@ -747,31 +879,37 @@ $
 
 솟수의 정의는 1과 자기자신을 제외하고는 나누어 떨어지는 값이 없는 수인데, 어떤 수를 입력받았을 때 이것이 나누어 떨어지는 리스트를 구하는 함수를 아래와같이 정의할 수 있다.
 
+```
 $ def factor(n)
-\* {
-\*   return %\[x|x<-1~n, n%x==0\];
-\* }
-\* 
+* {
+*   return %[x|x<-1~n, n%x==0];
+* }
+* 
 
 $ print: .factor(100);
-\[ 1,2,4,5,10,20,25,50,100 \]
+[ 1,2,4,5,10,20,25,50,100 ]
+```
 
 시험해보면 잘 동작한다. 1~100까지의 숫자중 100이 나누어떨어지는 경우는 위의 경우와 같다.
 
 이제 1부터 입력받은 숫자 n사이에 존재하는 솟수를 출력하는 함수를 다음과 같이 정의해보자
 
+```
 def prime(n)
 {
-  return %\[x|x<-1~n, ..factor(x) == \[1, x\]\];
+  return %[x|x<-1~n, ..factor(x) == [1, x]];
 }
+```
 
 위함수는 n을 입력받은 후, 1~n 까지의 숫자들 각각에 대해 factor를 구하고(나누어떨어지는 수들의 리스트) 구해진 factor가 1과 자기자신인 것만을 리턴한다.
 
 한번 아래와 같이 시험해보면...
 
+```
 $ print: .prime(100);
-\[ 2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97 \]
+[ 2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97 ]
 $ 
+```
 
 잘 작동한다!!!
 
@@ -793,21 +931,23 @@ factor(10)은 %\[x|x<-1~10, 10%x == 0\] 이라는 조건제시법을 리턴한�
 
 이제 앞절에서 언급되었던 quick sort 예제를 다시 설명하겠다.
 
- 
+
+```
 decode def qsort(a)
 {
-  \[\] ->
+  [] ->
     {
-      return \[\];
+      return [];
     }
   %x:%xs -> 
     {
-      return qsort(%\[a|a<-xs, a<=x\]) + \[x\] +  qsort(%\[b|b<-xs, b>x\]);
+      return qsort(%[a|a<-xs, a<=x]) + [x] +  qsort(%[b|b<-xs, b>x]);
     }
 }
 
-$ print: .qsort(\[-7, 1.2, 30, 4\]);
-\[ -7,1.2,4,30 \]
+$ print: .qsort([-7, 1.2, 30, 4]);
+[ -7,1.2,4,30 ]
+```
 
 decode 함수인 qsort 는 리스트를 입력받아서 비어있으면 그냥 리턴하고, 비어있지 않다면 맨 앞의 원소를 떼어낸 후(예제에선 x), 나머지 들중에서 x보다 작은것은 앞쪽에, 큰것은 뒤쪽에 배열한 후 다시 각각 배열한 앞, 뒤쪽의 원소들에 대해서도 quick sort를 똑같이 수행한다. (리스트가 빌 때까지)
 
@@ -819,18 +959,24 @@ step 이 있는 발생자의 표기 형식은 x <- START ~ END : STEP 과 같다
 
 예를들어 다음 조건제시법은 0 ~ 10까지의 실수들을 0.1 단위로 생성한다.
 
-$ a = %\[x|x<- 0 ~ 10 : 0.1\];
-\[ 0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2,2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3,3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4,4.1,4.2,4.3,4.4,4.5,4.6,4.7,4.8,4.9,5,5.1,5.2,5.3,5.4,5.5,5.6,5.7,5.8,5.9,6,6.1,6.2,6.3,6.4,6.5,6.6,6.7,6.8,6.9,7,7.1,7.2,7.3,7.4,7.5,7.6,7.7,7.8,7.9,8,8.1,8.2,8.3,8.4,8.5,8.6,8.7,8.8,8.9,9,9.1,9.2,9.3,9.4,9.5,9.6,9.7,9.8,9.9,10 \]
+```
+$ a = %[x|x<- 0 ~ 10 : 0.1];
+[ 0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2,2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3,3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4,4.1,4.2,4.3,4.4,4.5,4.6,4.7,4.8,4.9,5,5.1,5.2,5.3,5.4,5.5,5.6,5.7,5.8,5.9,6,6.1,6.2,6.3,6.4,6.5,6.6,6.7,6.8,6.9,7,7.1,7.2,7.3,7.4,7.5,7.6,7.7,7.8,7.9,8,8.1,8.2,8.3,8.4,8.5,8.6,8.7,8.8,8.9,9,9.1,9.2,9.3,9.4,9.5,9.6,9.7,9.8,9.9,10 ]
 
+```
 조건제시법 리스트는 특성상 무한길이가 가능하기 때문에, 이 경우 출력포맷은 아래와 같이 ... 으로 나타나고,
 
-$ a = %\[x|x<-1~\];
-\[ 1,2,3,4,5,6,7,8,9,10, ... \]
+```
+$ a = %[x|x<-1~];
+[ 1,2,3,4,5,6,7,8,9,10, ... ]
+```
 
 size() 인터페이스는 -1을 리턴한다. 이 경우는 리스트가 조건제시법이면서 길이를 알 수 없다는 뜻이다.
 
+```
 $ print: a.size()
 -1
+```
 
 반복자
 ---
@@ -879,8 +1025,10 @@ if
 
 그렇게 되면 if a == b + 3 이
 
+```
 if a == b
   +3;
+```
 
 로 해석되버리는 모호함이 존재한다.
 
@@ -889,11 +1037,13 @@ while
 
 while 문은 while bool_expr : statement 의 구조를 가지며, C/C++의 while과 비슷하게 동작한다.
 
+```
 a = sum = 0;
 while a < 10: {
   sum  += a;
   a+=1;
 }
+```
 
 위 문장은 0부터 9까지 더하는 예제이다.
 
@@ -904,11 +1054,13 @@ do while
 
 do while 문은 do statement while bool_expr 의 형태를 띈다.
 
+```
 a = sum = 0;
 do {
   sum += a;
   a += 1;
 } while a < 10;
+```
 
 위 예제는 앞절과 같은 기능을 수행한다. do while 문의 마지막 while bool_expr은 모호함을 발생시키지 않기 때문에 따로 콜론을 마지막에 추가할 필요는 없다.
 
@@ -923,17 +1075,20 @@ b에는 list, tuple, map 이 오거나 나중에 나올 iterator, generator 객�
 
 a 는 b에서의 원소를 차례로 대입 받게 될 지역변수로서 statement에서 참조될 값이다. 설명보단 간단한 예제를 보자.
 
+```
 sum = 0;
-for a in \[1..10\]:
+for a in [1..10]:
   sum += a;
 
 print: sum;
+```
 
 위의 예제는 1 부터 10까지의 합계를 더한 결과를 출력하는데, b 자리에 있는 리스트 생성식 \[1..10\] 이 \[1,2,3,4,5,6,7,8,9,10\] 인 리스트를 생성하고, a에는 차례대로 앞에서부터 하나씩의 원소가 대입되면서 statement 에 해당하는 sum += a 를 실행하게 된다.
 
 iterator도 지원하는데, for a in b 의 b에는 next() 인터페이스를 가지고 있는 객체가 올 수 있다. 간단한 예제는 아래와 같다.
 
-def one\_to\_hundred 
+```
+def one_to_hundred 
 {
   my.cur = 0;
   return my;
@@ -948,12 +1103,13 @@ def one\_to\_hundred
   }
 }
 
-it = my.one\_to\_hundred();
+it = my.one_to_hundred();
 
 sum = 0;
 for i in it:
   sum += i;
 print: sum;
+```
 
 scope 객체
 --------
@@ -962,14 +1118,17 @@ scope 객체
 
 scope statement 는 다음과 같은 형태를 띈다.
 
+```
 object { 
   statement list
 }
+```
 
 이런 식으로 구성되면 statement list 가 실행되기 전에, object.scope\_start() 가 자동적으로 실행되고, 마지막에 object.scope\_end()가 실행된다. 또한, object.scope_end()는 exception 이 발생하거나, statement list안에서 return 을 하더라도 실행되는 것이 보장된다.
 
 예를 들어 어느 구문을 뮤텍스로 잡고 싶다면.
 
+```
 using ipc;
 
 def scope_mutex 
@@ -980,11 +1139,11 @@ def scope_mutex
         owner.clone();
         ..mtx = new ipc.mutex;
     }
-
+    
     def scope_start {
         ..mtx.lock();
     }
-
+    
     def scope_end {
         ..mtx.unlock();
     }
@@ -999,13 +1158,16 @@ def fun {
         bar();
     }
 }
+```
 
 와 같은 구문을 구성하고 fun() 를 실행하면,
 
+```
 mtx.scope_start();
 foo();
 bar();
 mtx.scope_end();
+```
 
 순서대로 실행된다. 짐작하겠지만 scope\_start에서는 mutex를 얻고, scope\_end에서는 mutex를 풀며 그 사이 영역을 상호배제 시키는 예제이다.
 
@@ -1013,10 +1175,12 @@ mtx.scope_end();
 
 만일 foo(), bar() 에서 어떤 exception이 발생하고, foo에서 이를 catch하지 않아서 외부로 전파되게 되면, mtx.scope_end()가 그 시점 (stack unwinding 시점)에서 자동으로 호출된다. 또는
 
+```
 mtx {
   foo();
   return;
 }
+```
 
 인 상황에서도 return 전에 mtx.scope_end()가 호출된다.
 
@@ -1035,19 +1199,23 @@ parallel do
 
 이를 위해 현재 구현된 것은 parallel do와 parallel for 구문이다.
 
+```
 b = foo(a);
 user_log ('result of foo: ${b}');
 bar(b);
+```
 
 위와 같은 경우를 생각해보자, 메인 로직이 foo를 실행하고 이것의 결과를 이용해 bar를 실행한다. 그런데, foo의 결과값을 파일에 로깅하고 싶어 user\_log 함수를 불렀다 치면, 사실 user\_log 함수는 메인 로직의 부차적인 부분으로 병렬처리된다 해도 큰 지장이 없는 부분이다.
 
 이런 경우에 대해서
 
+```
 b = foo(a);
 parallel do {
   user_log('result of foo: ${b}');
 }
 bar(b);
+```
 
 와 같이 고치면 메인 쓰레드는 b = foo(a); bar(b); 만 실행되고
 
@@ -1059,6 +1227,7 @@ b = foo(a); 가 끝나는 시점에 서브 쓰레드가 하나 생성되어 para
 
 이런 구조이기 때문에 (마지막 지역변수 스택을 복사하는 방식) 유의해야 할 점은
 
+```
 def foo
 {
     def value; 
@@ -1075,20 +1244,25 @@ parallel do {
 
 print: a;
 print: b.value;
+```
 
 와 같이 실행한다면 메인 쓰레드의 최종 결과값이 a는 10, b.value 는 20이 된다. 왜냐하면 a는 POD로서 (integer 이기 때문에 별도의 레퍼런스 없이 값이 그대로 복사되고 관리되는 타입) 서브 쓰레드에서 20으로 변경시킨다 해도 서브 쓰레드 로컬 스택의 값만 바뀌고 메인 쓰레드의 것은 변경되지 않는 반면, b의 경우 객체의 레퍼런스값이기 때문에 서브 쓰레드에서 값을 바꾸면 메인 쓰레드의 것도 영향을 받는다.
 
 쉽게 말해
 
+```
 a = .foo.clone();
 b = a;
 b.value = 10;
+```
 
 과 같이 했을 때, a.value 도 10이 되는 것과 마찬가지지만
 
+```
 a = 20;
 b = a;
 b = 10;
+```
 
 을 한다 해도 a 는 20 그대로인 이유와 같다.
 
@@ -1096,16 +1270,20 @@ b = 10;
 
 한가지 더, parallel do 구문은 쓰레드 기반이기 때문에 순서를 보장하진 않는다. 무슨 소린고 하니
 
+```
 foo();
 parallel do { sub_1(); }
 bar();
 parallel do { sub_2(); }
+```
 
 와 같이 하면
 
+```
 main thread: foo(), bar();
 thread 1 : sub_1();
 thread 2 : sub_2();
+```
 
 의 세 쓰레드가 별도로 돌지 서브 쓰레드가 sub\_1(), sub\_2() 와 같이 순서대로 실행하지는 않는 다는 것이다.
 
@@ -1113,6 +1291,7 @@ thread 2 : sub_2();
 
 개인적인 추천은 parallel do 구문은 blocking IO 에 사용하고 parallel for 구문은 CPU bound job에 활용하면 좋을 듯 하다.
 
+```
 using time;
 using stopwatch;
 
@@ -1120,38 +1299,43 @@ sw = stopwatch;
 
 sw.start();
 time.msleep(1000);
- 
+
 sw.lap('without parallel do: ');
 
 sw.start();
 parallel do {
   time.msleep(1000);
 }
- 
+
 sw.lap('with parallel do: ');
 
 without parallel do: 999 ms, 599 us
 
 with parallel do: 399 us
+```
 
 위와 같이 parallel do 구문을 쓰면 메인 쓰레드가 msleep을 지나쳐 오므로 보기와 같이 빠르게 sw.lap() 까지 도달한다.
 
 parallel for
 ------------
 
+```
 parallel for a in input
 {
   statement_list;
 }
+```
 
 parallel for 구문은 위와 같은 형식으로 쓰여, list형 (list, set builder form, iterator) 객체인 input에 대해 statement 를 실행시킨다. 이 구문은 Intel 의 threading building block 라이브러리에서 영감을 받아 작성했는데, 그보다는 범용적이고 편하게 쓸 수 있도록 구성됐다.
 
 예를 들어가며 설명하자면
 
-parallel for a in \[1,2,3,4,5\]:
+```
+parallel for a in [1,2,3,4,5]:
 {
   foo(a);
 }
+```
 
 위 구문은 for(1), foo(2), foo(3), foo(4), foo(5)를 각각 병렬적으로 실행한다. 단, 최적 처리를 위해 이 구문이 동시 실행하는 쓰레드의 숫자는 시스템의 CPU 숫자와 같다. 즉 듀얼코어 시스템에서는 2개의 쓰레드가 리스트를 나눠가며 실행하고, 쿼드코어라면 4개의 쓰레드가 실행된다.
 
@@ -1161,17 +1345,18 @@ parallel for a in \[1,2,3,4,5\]:
 
 단, 리스트들의 원소를 각 쓰레드에 할당하는 작업이 오버헤드가 있기 때문에 간단한 작업에서는 더 느릴 수도 있다.
 
+```
 using time;
 using stopwatch;
 
 sw = stopwatch;
 
 sw.start();
-for a in \[1..10\]: {
+for a in [1..10]: {
   print: a;
 
   c = 0;
-  for b in %\[x|x<-1~100000\]: {
+  for b in %[x|x<-1~100000]: {
     c = c+1;
   }
 }
@@ -1179,18 +1364,18 @@ for a in \[1..10\]: {
 sw.lap('with for: ');
 
 sw.start();
-parallel for a in \[1..10\]: {
+parallel for a in [1..10]: {
   print: a;
 
   c = 0;
-  for b in %\[x|x<-1~100000\]: {
+  for b in %[x|x<-1~100000]: {
     c = c+1;
   }
 }
 
 sw.lap('with parallel for: ');
 
-C:\\Lab\\orca>orca test_for
+C:\Lab\orca>orca test_for
 1
 2
 3
@@ -1213,13 +1398,16 @@ with for: 421 ms, 875 us
 9
 10
 with parallel for: 93 ms, 750 us
+```
 
 시험에 사용된 PC는 쿼드코어 인데, 위와 같이 전체 실행시간이 대략 1/4정도로 줄어든 것을 볼 수 있다. :>
 
 parellel for 구문은 옵션으로 by, per 를 붙일 수 있다.
 
-parallel for a in \[1..100\] by 3 per 30:
+```
+parallel for a in [1..100] by 3 per 30:
   print: a;
+```
 
 를 지정하면 3개의 쓰레드가 30개 단위로 리스트들을 처리한다. 즉, 리스트를 \[1..30\], \[31..60\], \[61..90\], \[91..100\] 의 구간으로 나누어 3개의 쓰레드가 병렬처리 한다.
 
@@ -1227,14 +1415,18 @@ by와 per는 옵션으로 생략가능하며 생략되었을 때의 기본값은
 
 by, per의 값으로는 연산식도 가능하다. 추가로 제공될 system 모듈을 사용해서,
 
-a = \[1..1000\];
+```
+a = [1..1000];
 parallel for i in a by (cpu = system.cpu_n() * 2) per (a.size() / cpu): {
   print: i;
 }
+```
 
 와 같이 cpu 갯수와 배열 길이를 참조하여 어뎁티브하게 돌 수 있게 지정도 가능하다. 물론 가독성 있게 이렇게 쓰는게 좋을 것이다.
 
+```
 parallel for i in a by (cpu = system.cpu_n() * 2) per (a.size() / cpu)
+```
 
 decode statement
 ----------------
@@ -1243,13 +1435,15 @@ decode statement
 
 기본적으로 decode statement는
 
+```
 decode (A)
 {
-  pattern\_list -> statement\_list
-  pattern\_list -> statement\_list
-  pattern\_list -> statement\_list
+  pattern_list -> statement_list
+  pattern_list -> statement_list
+  pattern_list -> statement_list
   ...
 }
+```
 
 와 같은 구성을 띄우며 입력된 A에 대해서 왼쪽의 pattern과 일치하면 오른쪽의 statement_list를 실행하는 형식을 띈다.
 
@@ -1259,22 +1453,26 @@ A에는 list, vector, list type object(SBF, iterator), string 이 올 수 있으
 
 ### 문자열 매치
 
+```
 decode('orca')
 {
   'orca' -> print: 'orca, matched';
   'python' -> print: 'python, matched';
 }
+```
 
 이 구문을 실행하면, 'orca, matched'가 출력된다. 마치 단순한 switch 구문을 보는 것 같다. (약간 더 편하긴 하지만)
 
 좀 더 복잡하게 해보면,
 
+```
 decode(str)
 {
   'send:', %to, ':', %msg -> ..send(to, msg);
   'connect:', %to -> ..connect(to);
   %fail -> ..error(fail);
 } 
+```
 
 간단한 채팅서버 프로토콜에 대한 패턴 매칭이라 생각하고 위의 예제를 보면 메세지를 전송하는 프로토콜은 첫번째 패턴과 매칭된다. 'send:tom:hello, tom' 과 같은값이 입력으로 온다면 첫번째 패턴과 매칭되고, to에 tom이, msg에 hello, tom 이 대입된 후 오른쪽의 구문이 실행된다.
 
@@ -1290,6 +1488,7 @@ decode(str)
 
 위의 예제를 다음과 같이 쓸 수도 있다.
 
+```
 magin = '';
 ...
 decode(str)
@@ -1303,6 +1502,7 @@ decode(str)
       ..connect(to); 
     }
   ... 
+```
 
 위의 패턴 리스트에서 magic 은 패턴 비교를 위해 쓰였고, to, msg 는 패턴의 대입을 위해 쓰였다. 이 구분을 위해서 to, msg앞에 % 를 굳이 붙인 것이다.
 
@@ -1310,21 +1510,25 @@ decode(str)
 
 decode 구문의 패턴에는 정규표현식이 쓰여 표현식을 더 풍부하게 해줄 수 있다.
 
+```
 decode (str)
 {
- 'id:', r'\[a-zA-Z\]\[a-zA-Z_0-9\]*', ', number:', r'\[0-9\]+' -> print: 'matched!!';
+ 'id:', r'[a-zA-Z][a-zA-Z_0-9]*', ', number:', r'[0-9]+' -> print: 'matched!!';
   %fail -> print: 'failed..';
 }
+```
 
 위와 같은 구문은 'id:lynix, number:103'와 같은 입력에는 matched!!를 출력하지만 'id:3aa, number:10', 'id:lynix, number:10a', 와 같은 것에는 failed 를 출력한다.
 
 그런데, 이런 정규표현식을 사용할 때 실제 매치되는 값이 어떤 값인지 궁금할 때가 있다. 이처럼 정규표현식을 변수에 대입하고자 하면 위의 예제를..
 
+```
 decode (str)
 {
- 'id:', %id=r'\[a-zA-Z\]\[a-zA-Z_0-9\]*', ', number:', %number=r'\[0-9\]+' -> print: 'matched!!, id=${id}, number=${number}';
+ 'id:', %id=r'[a-zA-Z][a-zA-Z_0-9]*', ', number:', %number=r'[0-9]+' -> print: 'matched!!, id=${id}, number=${number}';
   %fail -> print: 'failed..';
 }
+```
 
 와 같이 하면 'id:lynix, number:103'은 matched!!, id=lynix, number=103 을 출력하게 된다.
 
@@ -1332,20 +1536,24 @@ decode (str)
 
 리스트에 대한 매칭도 가능하다. 리스트 매칭을 위한 패턴에는 리스트 타입이 와야한다.
 
-decode (\[1,2,3,4,5\])
+```
+decode ([1,2,3,4,5])
 {
- \[1, 2\], %mid, \[4, 5\] -> print: mid;
+ [1, 2], %mid, [4, 5] -> print: mid;
 }
+```
 
 위의 예제는 \[3\] 을 출력한다.
 
 앞에서와 유사하게 로컬변수 mid에 중간값을 대입하게 했는데, 이런 대입법 외에도 리스트 연산에 효율적으로 쓰이는 head:body 대입도 가능하다.
 
-decode (\[1,2,3,4,5\])
+```
+decode ([1,2,3,4,5])
 {
-  \[\] -\> print: 'empty';
+  [] -> print: 'empty';
   %head:%tail -> print: 'head: ${head}, tail: ${tail}';
 }
+```
 
 위 예제는 head: 1, tail: \[2,3,4,5\] 를 출력한다. 참고로, 비어있는 리스트라 하더라도 head, tail에 각각 NIL이 매칭 되기 때문에, 전통적인 head:tail 재귀 처리일 때는 앞쪽 패턴에는 빈 리스트를 처리하기 위한 \[\] -> print: 'empty'; 같은 구문이 하나 있어야 한다. (한번만 쓰일 거면 없어도 된다)
 
@@ -1355,11 +1563,12 @@ decode (\[1,2,3,4,5\])
 
 decode 구문을 리스트에 적용하게 되면, 아무래도 LISP의 그 수많은 사용예와 같이 재귀적으로 사용되게 된다. 그런데, 리스트를 차례대로 출력하는 함수를 그냥 구성하면
 
+```
 def print_list(a)
 {
   decode (a)
     {
-	\[\] -\> print: 'done';
+	[] -> print: 'done';
     %head:%tail -> {
 		print: head;
 		print_list(tail);
@@ -1367,48 +1576,55 @@ def print_list(a)
     }
 }
 
-.print_list(\[1,2,3,4,5\]);
+.print_list([1,2,3,4,5]);
+```
 
 이 예제는,
 
+```
 1
 2
 3
 4
 5
 done
+```
 
 을 출력한다.
 
 그런데, 단순한 재귀 함수인데 def print_list(a), decode(a) 가 같이 있는게 가독성이 떨어지기 때문에, 위의 구문과 동일하게,
 
+```
 decode def print_list(a)
 {
-  \[\] -\> print: 'done';
+  [] -> print: 'done';
   %head:%tail -> {
 		print: head;
 		print_list(tail);
   }
 }
+```
 
 이렇게 표기할 수 있다.
 
 리스트에 대한 decode def 구문을 통해 함수형 프로그래밍을 흉내내 볼 수 있다. 함수형 프로그래밍에 가장 자주 언급되는 quick sort 를 오르카로 구성해보자. 이 decode 구문안에는 조건제시법이 쓰이기 때문에, 이 함수에 대한 설명은 다음 조건제시법 파트에서 다시한번 자세히 설명하겠다. 여기서는 일단 구경만...
 
+```
 decode def qsort(a)
 {
-  \[\] ->
+  [] ->
     {
       return \[\];
     }
   %x:%xs -> 
     {
-      return qsort(%\[a|a<-xs, a<=x\]) + \[x\] +  qsort(%\[b|b<-xs, b>x\]);
+      return qsort(%[a|a<-xs, a<=x]) + [x] +  qsort(%[b|b<-xs, b>x]);
     }
 } 
 
-$ print: .qsort(\[-7, 1.2, 30, 4\]);
-\[ -7,1.2,4,30 \]
+$ print: .qsort([-7, 1.2, 30, 4]);
+[ -7,1.2,4,30 ]
+```
 
 또한 디코드 구문은 0.4 버전부터 매칭 패턴에 사용자 정의 함수를 돌입할 수 있게 되었는데, 간단한 업그레이드였으나 효과는 매우 좋아서, xml 모듈과 json 모듈을 참고해보면 알겠지만 xml, json과 같은 netsted되어있는 구조를 수십 라인 만으로 간단히 처리할 수 있다.
 
@@ -1418,14 +1634,15 @@ $ print: .qsort(\[-7, 1.2, 30, 4\]);
 
 이것을 기존의 (개선되기 전의) decode 구문으로 파싱하려 시도할 때,
 
+```
 decode def tolist(str)
 {
-	'\[', %body, '\]' -> 
+	'[', %body, ']' -> 
 		{
 			ret = tolist(body);
 			if type.is_tuple(ret): 
 				return ret.list(); 
-			return \[ ret \];
+			return [ ret ];
 		}
 	%head, ',', %tail ->
 		{
@@ -1436,26 +1653,28 @@ decode def tolist(str)
 
 			return t.push_front(h);
 		}
-	%value = r'\[0-9\]+' ->
+	%value = r'[0-9]+' ->
 		{
 			return value.integer();
 		}
 }
+```
 
 와 같이 시도해 볼 수 있다. 이 때 프로그래머는 body에 \[ \] 쌍이 맡게 body는 "1, \[2\], 3" 이 대입되기를 바랬을텐데 실제로는 body에 "1, \[2" 이 대입되고 (가장 먼저 나타나는 것을 매치하니) 나머지는 매치되지 않아, 첫번째 것에서는 매치를 실패하고 두번째로 넘어가서 head에 "\[1" 이 taild에 ", \[2\], 3\]" 이 매치되서 엉망이된다.
 
 이때 위 구문을
 
+```
 using match;
 
 decode def tolist(str)
 {
-	'\[', %body = match.bracket, '\]' -> 
+	'[', %body = match.bracket, ']' -> 
 		{
 			ret = tolist(body);
 			if type.is_tuple(ret): 
 				return ret.list(); 
-			return \[ ret \];
+			return [ ret ];
 		}
 	%head = match.comma, ',', %tail ->
 		{
@@ -1466,11 +1685,12 @@ decode def tolist(str)
 
 			return t.push_front(h);
 		}
-	%value = r'\[0-9\]+' ->
+	%value = r'[0-9]+' ->
 		{
 			return value.integer();
 		}
 }
+```
 
 와 같이 match.bracket라는 함수를 이용해 match하게 변경해보면, match.bracket에게 decode구문은 "1, \[2\], 3\]" 라는 스트링을 전달해 준다. (맨 앞의 "\["은 앞에서 매치됐으니 제외하고) 그러면 이 함수는 이 안에서 중첩에 맞게 "1, \[2\], 3" 까지를 매치시켜서 리턴하고 남은 영역을 decode구문에게 알려준다. 그러면 decode는 남은 "\]"을 매치시켜 첫번째 매치구문이 성공하고, body에는 "1, \[2\], 3"이 입력된다. 이러면 action code로 들어가서 body를 재귀호출 하게 되는데 이러면 두번째 매치 구문이 시도되서 head에 "1"이 tail에 "\[2\], 3"이 매치되서 다시 되돌고 되돌아서.. (의도한 대로 딱딱 끊어져서) 최종적으로 \[ 1, \[2\], 3 \] 과 같은 리스트로 생성된다.
 
@@ -1488,17 +1708,21 @@ decode def tolist(str)
 
 함수를 선언하려면
 
+```
 def name {
   statement_list
 }
+```
 
 와 같은 형식으로 선언한다.
 
 예를 들어 두 값을 더하는 간단한 함수 add는
 
+```
 def add(a, b) {
     return a + b;
 }
+```
 
 print: my.add(10, 20);
 
@@ -1506,6 +1730,7 @@ print: my.add(10, 20);
 
 가변인자가 필요할 때는 선언 시
 
+```
 def sum_all(…) {
     sum = 0;
     for a in argv:
@@ -1516,6 +1741,7 @@ def sum_all(…) {
 
 print: my.sum_all(1,2,3);
 6
+```
 
 과 같이 할 수 있다. … 는 가변인자를 받겠다는 의미이며, 받은 가변인자는 argv 리스트로 넘겨받는다. …는 함수 선언의 다른 파라미터와 섞여 사용될 수 있으나 가장 마지막에 와야 한다. 즉, def (a, …, b) 는 안되고, def (a, b, …) 는 된다는 의미이다.
 
@@ -1526,17 +1752,18 @@ print: my.sum_all(1,2,3);
 
 먼저 위의 함수란 것은 사실 객체를 하나 생성한 것이다. 그렇다면 멤버변수가 있는 그럴듯한 객체를 하나 만들어보자
 
+```
 def counter {
     def c;
 
     def inc {
         owner.c += 1;
     }
-
+    
     def dec {
         owner.c -= 1;
     }
-
+    
     my.c = 0;
 }
 
@@ -1547,6 +1774,7 @@ foo.inc();
 print: foo.c;
 foo.dec();
 print: foo.c;
+```
 
 위의 예제는 0, 1, 0을 차례대로 출력한다. 먼저 기본 클래스인 counter를 정의하고 그 안의 멤버변수로 c를, 함수로 init, inc, dec를 정의했다. 그런데, 보다시피 사실 함수나 객체나 def { } 로 정의한다. 왜냐면 정말 전부다 객체니까.
 
@@ -1560,8 +1788,9 @@ counter또한 my.c = 0 이라는 코드를 포함하고 있는데, foo() 로 실
 
 사실,
 
+```
 class counter:
-  def \_\_init\_\_(self):
+  def __init__(self):
     self.c = 0;
 
   def inc(self):
@@ -1569,6 +1798,7 @@ class counter:
 
   def dec(self):
     self.c -= 1;
+```
 
 파이썬으로는 위와 같이 할 수 있겠는데 이런 방식은 익숙하긴 하지만 수많은 가정을 담고 있다. 이런 전통적인 방식은 객체와 함수를 분리하게 만들어 미니멀하고 아토믹한 특징을 사라지게 만든다. (헉, 이건 대체 무슨소리람… ㅠ_ㅠ). 다시 말하자면, inc 입장에서 self란 것이 자신을 의미하지 않고 클래스 본체를 의미하게 되는데 다시 생각해보니 이상하지 않은가?
 
@@ -1576,14 +1806,17 @@ class counter:
 
 그리고, thread 를 띄우는 어떤 인터페이스를 생각해면 파이썬에선 언어 설계단계에서 객체를 받을 지 함수 객체를 받을지 인터페이스를 결정해야 하는데, 함수도 객체라면 이런 수고를 안해도 된다.
 
+```
 def foo {
     print: ‘hello, thread’;
 }
 
 thread.run(my.foo);
+```
 
 도 되고,
 
+```
 def foo {
     # some init code here
     …
@@ -1591,16 +1824,17 @@ def foo {
     return;
 
     def run {
-
-
+    
+    
     }
-
+    
     def blah {
-
+    
     }
 }
 
 Thread.run(my.foo);
+```
 
 와 같이 thread가 자신만의 멤버들을 유지하게 할 수 있다. (뭔가 일관성이 있지?)
 
@@ -1616,19 +1850,21 @@ my, owner가 의외로 치기 성가시고, 한눈에 안 들어오기 때문에
 
 이로서 위의 표현은
 
+```
 def counter {
     def c;
 
     def inc {
         ..c += 1;
     }
-
+    
     def dec {
         ..c -= 1;
     }
-
+    
     .c = 0;
 }
+```
 
 로 다시 쓸 수 있다.
 
@@ -1636,6 +1872,7 @@ def counter {
 
 객체의 멤버를 정의할 때는 원칙적으로 특수문자가 없어야 하나, 특수문자를 포함한 멤버를 정의하고자 할 때는 따옴표를 주고 정의하고 참조할 수 있다.
 
+```
 def foo
 {
   def ‘+’(rhs)
@@ -1643,58 +1880,71 @@ def foo
       …
     }
 }
+```
 
 위와 같은 방식으로 foo 에 ‘+’ 멤버를 정의할 수 있으며, 이를 참조할 때는 foo.’+’ 와 같이 사용할 수 있다.
 
 실제로 operator 모듈은 다음과 같은 멤버를 가지고 있다.
 
+```
 $ operator.members;
 { '!=':!=,'%':%,'&&':&&,'*':*,'+':+,'-':-,'/':/,'<':<,'<=':<=,'==':==,'>':>,'>=':>=,'||':||, }
 $ operator.'+'(3,4);
 7
+```
 
 ### one time initializer
 
 입력값을 받아서 자신의 멤버 item에 리스트로 저장하는 함수를 생각해보면 간단하게는,
 
+```
 def foo(a)
 {
 	def item;
 
 	if my.item == nil: 
-		my.item = \[\];
-
+		my.item = [];
+	
 	my.item.push_back(a);
 }
+```
 
 와 같은 식으로 구현했었다. item의 특성을 선언단에서 지정해줄 수 없고 런타임에서 결정해주어야 했기 때문인데, 이런 형테의 구현을 간편하게 하기 위하여 one time initialize expression 을 도입하였다.
 
+```
 def name := expression
+```
 
 과 같은 형태로 쓰이며, expression의 값이 name 멤버에 대입되어 모듈이 로드된다. 이 구문은 모듈로드시 한번만 수행되며 런타임에는 수행되지 않는다.
 
 우의 예제를 다시 쓰면 다음과 같다.
 
+```
 def foo(a)
 {
-	def item := \[\];
+	def item := [];
 	my.item.push_back(a);
 }
+```
 
 ### name'string' 표현형식
 
 date 객체를 예로들면, 2010-01-01 과 2011-04-03 일 사이의 날 수를 구하고 싶으면,
 
+```
 $ using date;
 $ print: date.clone('2011-04-03') - date.clone('2010-01-01');
 457
+```
 
 과 같이 실행하면 된다. 그런데, 많은경우 object\_name.clone('string') 의 표현이, date와 같이 일회성인 경우 타이핑하기 번거롭기도 하고 가독성도 떨어진다. 해서 object\_name'string' == object_name.clone('string') 과 동일한 의미를 같도록 하였다.
 
 해서 date.clode('2011-04-03')은 date'2011-04-03' 과 같은 의미를 같는다. 해서 위의 표현은 다음과 같이 다시 쓸 수 있다.
 
+```
 $ date'2011-04-03' - date'2010-01-01';
 457
+```
 
 상속
 --
@@ -1755,31 +2005,44 @@ type type은 객체의 형식을 나타내는 자료형으로, 객체의 형과 
 
 먼저 자료의 type 검사는 다음과 같이할 수 있다.
 
+
+```
 a = 1;
 a.type == 2.type; 
+```
 
 위는 1의 타입과 2의 타입이 같은 지를 검사하는 구문인데, 정수형으로 같기 때문에 true가 리턴된다.
 
+```
 a.type == 2;
+```
 or
+```
 a.type == type.int;
+```
 
 도 같은 결과를 얻는다.
 
+```
 a.type != 2.type
+```
 
 는 반대로 false를 리턴한다.
 
 type 의 < 연산은 상속관계를 의미한다.
 
+```
 a.type < b 
+```
 (or a.type < b.type)
 
 (or a.type < b.type) 의 연산은 a가 b를 상속했으면 true, 아니면 false를 리턴한다.
 
 type의 <= 연산은 인스턴스 관계를 의미한다.
 
+```
 a.type <= b
+```
 (or a.type <= b.type)
 
 (or a.type <= b.type) 의 연산은 a가 b의 인스턴스인지를 알려준다.
@@ -1788,6 +2051,7 @@ a.type <= b
 
 typename은 자료의 type을 스트링 형태로 리턴한다. 형검사는 .type 을 이용하지만 때에 따라 스트링으로 처리하고자 할 때는 이 멤버를 사용한다.
 
+```
 $ print: 1.typename;
 int
 
@@ -1797,13 +2061,15 @@ regex
 $ print: io.typename;
 object io
 
-$ print: \[1,2,3\].typename;
+$ print: [1,2,3].typename;
 list
+```
 
 ### static_members
 
 이는 객체의 static member들을 map 형태로 구성하여 리턴한다. map형태라고 한 이유는, 실제 map이 아니라 map과 유사한 인터페이스를 제공하기 때문이다. 즉,
 
+```
    def foo
    {
      static bar;
@@ -1812,17 +2078,20 @@ list
 
    a = my.foo.static_members;
    print: a;
-   a\['new_member'\] = 1;
+   a['new_member'] = 1;
    print: a;
    print: my.foo.static_members;
    print: my.foo.new_member;
+```
 
 위 코드를 실행하면,
 
+```
 { 'bar':nil }
 { 'bar':nil,'new_member':1 }
 { 'bar':nil,'new_member':1 }
 1
+```
 
 의 결과가 출력되는데, 이와 같이 이 객체는 map과 인터페이스가 같지만, 그 내용을 변경하면 원본객체의 멤버들에도 변경이 가해진다.
 
@@ -1840,6 +2109,7 @@ parents는 객체가 상속한 parents들을 리스트 형태로 반환한다. p
 
 id는 객체가 힙상에 존재하는 경우라면 그 객체의 고유주소를 리턴한다.
 
+```
 $   print: 1.id;
 0
 
@@ -1848,6 +2118,7 @@ $    print: 'str'.id;
 
 $    print: io.id;
 166676848
+```
 
 예외
 --
@@ -1858,6 +2129,7 @@ Exception 이 발생했을 때 이를 throw 할 수 있고, 그 구문은 기존
 
 따라서 아래와 같은 코드가 가능하다.
 
+```
 try {
     …
     throw io.diconn;
@@ -1885,17 +2157,20 @@ catch {
 finally {
     print: ‘finally is always called ’;
 }
+```
 
 Pathname을 사용함으로서 보다 예외처리를 분류해서 할 수 있게 된다.
 
 Throw 할 때는 두번째 인자부터는 파라미터로 전달된다. 바로 다음과 같이.
 
+```
 try {
     throw app.test, 10, ‘test’;
 }
 catch app : num, msg {
     print: num, msg;
 }
+```
 
 catch 시에는 tag name 뒤에 콜론을 하나 붙인 후, 받고자 하는 파라미터 목록을 나열한다.
 
@@ -1904,31 +2179,35 @@ catch 시에는 tag name 뒤에 콜론을 하나 붙인 후, 받고자 하는 �
 
 간단한 용도를 위해서 람다 객체도 지원하는데, 선언법은
 
-%c { statement_list } 와 같다.
+def.lambda { statement_list } 와 같다.
 
 이는 이름만 없을 뿐이지 모든 면에서 일반 오르카 객체와 동일하다. 자체적으로 멤버변수를 가질 수 있고, 생성되는 람다의 owner는 람다가 정의된 객체이다.
 
 아래는 test_lambda.orca 에 있는 코드이다.
 
+```
 def for_each(list, functor) {
     for a in list: {
         functor(a);
     }
 }
 
-my.for_each(\[1..10\], %c{ print(argv\[0\]); });
+my.for_each([1..10], def.lambda(...argv){ print(argv[0]); });
 
-\# below is same with above statement
+# below is same with above statement
 
-my.for_each: \[1..10\], %c {
-    print: argv\[0\];
+my.for_each: [1..10], def.lambda(...argv) {
+    print: argv[0];
 };
+```
 
 말했다시피 람다는 객체와 동일하기 때문에
 
-$ a = %c { print: ‘foo’; };
+```
+$ a = def.lambda { print: ‘foo’; };
 $ a();
 foo
+```
 
 와 같이 대입이나 clone등 객체와 관계되는 모든 연산이 가능하다.
 
@@ -1939,16 +2218,17 @@ foo
 
 연산자 재정의는 친숙한 복소수 객체에 대한 예를 들어보이며 설명하겠다. 아래는 테스트 소스인 test_operator.orca에 있는 복소수 객체의 정의와 그것의 연산자들을 재정의한 것이다.
 
+```
 def complex
    {
      def real;
      def img;
-   
+
      def init(r, i) {
        ..real = r;
        ..img = i;
      }
-   
+       
      def '+'(rhs) {
        if owner.type == rhs:
            result = owner.clone(owner.real + rhs.real, owner.img + rhs.img);
@@ -1956,7 +2236,7 @@ def complex
            result = owner.clone(owner.real + rhs, owner.img);
        return result;
      }
-   
+       
      def '-'(rhs) {
        if owner.type == rhs:
            result = owner.clone(owner.real - rhs.real, owner.img - rhs.img);
@@ -1964,29 +2244,30 @@ def complex
            result = owner.clone(owner.real - rhs, owner.img);
        return result;
      }
-   
+       
      def '-rev'(lhs) {
        result = owner.clone(lhs - owner.real, -owner.img);
        return result;
      }
-   
+       
      def mag() {
        m = ..real * ..real + ..img * ..img;
        return m;
      }
-   
+       
      def '<'(rhs) {
        return ..mag() < rhs.mag();
      }
-   
+       
      def '=='(rhs) {
        return ..mag() == rhs.mag();
      }
-   
+
 　　def string() {
        return '${..real} + ${..img}j';
      }   
 　} 
+```
 
 사칙연산은 ‘+’, ‘-‘, ‘*’, ‘/’ 로 되어있고, 파라미터는 오른쪽에 위치하는 인수이다. 비교 연산자의 경우 ‘==’, ‘<’만 정의하면 ‘!=’, ‘<=’, ‘>’, ‘>=’는 두 개를 조합해서 해결해준다.
 
@@ -1994,7 +2275,8 @@ def complex
 
 먼저 .attr은 어떤 객체 a에서 멤버 b를 요청할 때, 만일 b가 멤버중에 속하지 않으면 (자신 뿐만 아니라 부모 객체에도 없으면) .attr이 호출된다. 파라미터는 요청되는 멤버의 이름이다.
 
-def day\_of\_month
+```
+def day_of_month
 {
 	def ‘.attr’(name)
 	{
@@ -2018,14 +2300,15 @@ def day\_of\_month
 	}
 }
 
-$ p = my.day\_of\_month.clone();
+$ p = my.day_of_month.clone();
 $ print: p.April
 30
 $ print: p.foo
 uncaugted exception: orca.name foo not found
 recent call-stack trace
->\> operator_get (internal 0)
->\> orcaRoot     (internal 0)
+>> operator_get (internal 0)
+>> orcaRoot     (internal 0)
+```
 
 보기와 같이 p.April을 요청하면 .attr('April') 가 호출되었다.
 
@@ -2067,6 +2350,7 @@ Native 객체
 
 orcaFile.h를 보면 아래와 같은데 일단 소스를 한번 쭈욱 보자.
 
+```
 class orcaFile : public orcaObject 
 {
 public:
@@ -2075,94 +2359,95 @@ public:
     orcaFile() : m_fp(NULL)
     {
         set_name("file");
-
-        insert\_native\_function("open", (object\_fp)&orcaFile::ex\_open);
-        insert\_native\_function("close", (object\_fp)&orcaFile::ex\_close);
-        insert\_native\_function("read", (object\_fp)&orcaFile::ex\_read);
-        insert\_native\_function("write", (object\_fp)&orcaFile::ex\_write);
+    
+        insert_native_function("open", (object_fp)&orcaFile::ex_open);
+        insert_native_function("close", (object_fp)&orcaFile::ex_close);
+        insert_native_function("read", (object_fp)&orcaFile::ex_read);
+        insert_native_function("write", (object_fp)&orcaFile::ex_write);
     }
-
+    
     ~orcaFile() {
         if (m_fp) {
             fclose(m_fp);
         }
     }
-
+    
     orcaObject* v_clone() {
         orcaFile* fp = new orcaFile(NULL);
         return fp;
     }
-
+    
     orcaData ex_open(orcaVM* vm, int n) 
     {
         if (n<1) {
             return NIL;
         }
-
+    
         string& name = vm->get_param(0).String();
-
+    
         string mode;
         if (is(vm->get_param(1))) 
             mode = "rw";
         else
             mode = vm->get_param(1).String();
-
+    
         if (m_fp != NULL) {
             fclose(m_fp);
         }
-
-        m\_fp = fopen(name.c\_str(), mode.c_str());
+    
+        m_fp = fopen(name.c_str(), mode.c_str());
         if (m_fp == NULL) {
             throw orcaException("io.file.handle", "invalide file handle");
         }
-
-        fseek(m\_fp, 0, SEEK\_END);
-        m\_size = ftell(m\_fp);
-        fseek(m\_fp, 0, SEEK\_SET);
-
+    
+        fseek(m_fp, 0, SEEK_END);
+        m_size = ftell(m_fp);
+        fseek(m_fp, 0, SEEK_SET);
+    
         return NIL;
     }
-
+    
     orcaData ex_close(orcaVM* vm, int n) 
     {
         if (m_fp != NULL) {
             fclose(m_fp);
             m_fp = NULL;
         }
-
+    
         return NIL;
     }
-
+    
     orcaData ex_read(orcaVM* vm, int n) 
     {
         if (m_fp == NULL) {
             return NIL;
         }
-
+    
         string s;
         s.resize(m_size);
-
-        fread(&s\[0\], 1, m\_size, m\_fp);
-        s.resize(strlen(&s\[0\]));
-
+    
+        fread(&s[0], 1, m_size, m_fp);
+        s.resize(strlen(&s[0]));
+    
         return s;
     }
-
+    
     orcaData ex_write(orcaVM* vm, int n) 
     {
         string& in = vm->get_param(0).String();
-
+    
         if (m_fp == NULL) {
             return NIL;
         }
-
-        return (int)fwrite(in.c\_str(), 1, in.length()+1, m\_fp);
+    
+        return (int)fwrite(in.c_str(), 1, in.length()+1, m_fp);
     }
 
 private:
     FILE* m_fp;
     int m_size;
 }; 
+```
 
 native function call 은 어느 언어든지 지원하지만, file 객체를 이렇게 간단하게 만들기는 쉽지 않을 듯 하다. 왜냐면, 다른 언어들은 function 기반인데반해, orca는 함수마저도 객체다 보니 함수를 확장하는 것이나 객체를 확장하는 것이나 같은 의미이기 때문이다.
 
@@ -2172,33 +2457,35 @@ native function call 은 어느 언어든지 지원하지만, file 객체를 이
 
 단, 위의 파일들은 언어자체에 내장되어 있는 라이브러리이고, dll, so 를 만들어 사용하려면 한 단계를 더 걸쳐야 하는데, sample.dll 혹은 libsample.so 란 이름의 dll을 구성했다면, 내부에 extern “C” void* get_sample() 함수를 정의하고, orcaObject* 를 생성해서 해당 객체를 리턴하게 하면 된다. 이러면 앞절에서 서술한 using sample “cpp”로 모듈을 로드할 수 있다.
 
+```
 #include "stdafx.h"
 #include "sample.h"
 
 extern "C" SAMPLE_API void samplefoo()
 {
-    printf("foo called\\n");
+    printf("foo called\n");
 }
 
 class sample : public orcaObject
 {
 public: 
     orcaData operator()(orcaVM* vm, int param_n) {
-        printf("sample called\\n");
+        printf("sample called\n");
 
         int a, b;
         a=vm->get_param(0).Integer();
         b=vm->get_param(1).Integer();
-
+    
         return a + b;
     }
 };
 
-extern "C" SAMPLE\_API void* get\_sample() 
+extern "C" SAMPLE_API void* get_sample() 
 {
     sample* sp = new sample();
     return sp;
 }
+```
 
 이건 프로젝트에 포함된 windows용 dll 제작 소스인데, get_sample은 새로운 orcaObject* sample을 리턴하게 되어있다.
 
@@ -2208,6 +2495,7 @@ sample 클래의 code 부분은 void operator() 로 정의할 수 있는데, 첫
 
 orcaIO.h 가 해당 케이스의 좋은 예이다. 해당 파일의 일부만을 가져오면
 
+```
 class orcaIO : public orcaObject 
 {
 public:
@@ -2217,22 +2505,24 @@ public:
     public:
         virtual orcaData operator()(orcaVM* vm, int n) {
             string str;
-            for (int i=0; iget\_param(i).to\_str(vm, str);
-
-            str += "\\n";
-
+            for (int i=0; i<n; i++)
+				get_param(i).to_str(vm, str);
+    
+            str += "\n";
+    
             cout << str;
-
+    
             return NIL;
         }
     };
-
+    
     orcaIO() 
     {
         set_name("io");
-        insert\_static("print", new ex\_print());
+        insert_static("print", new ex_print());
     }
 }; 
+```
 
 위와 같이 io 밑에 print라는 객체를 생성하고 삽입시켰다. 실제 orca의 io 객체는 이렇게 구현되어 있다.
 
@@ -2247,45 +2537,47 @@ parse 객체
 
 아래의 calc 객체는 간단한 사칙연산기를 parse 구문으로 구현한 것이다.
 
+```
 def.parse calc(str)
    {
        stmt : stmt '+' mul
-                   %c{
-                       return argv\[0\] + argv\[2\];
+                   def.lambda (...argv) {
+                       return argv[0] + argv[2];
                    }
            | stmt '-' mul
-                   %c{
-                       return argv\[0\] - argv\[2\];
+                   def.lambda (...argv) {
+                       return argv[0] - argv[2];
                    }
            | mul
-                   %c{
-                       return argv\[0\];
+                   def.lambda (...argv) {
+                       return argv[0];
                    }
            ;
-   
+
        mul : mul '*' number
-                   %c{
-                       return argv\[0\] * argv\[2\];
+                   def.lambda (...argv) {
+                       return argv[0] * argv[2];
                    }
            |  mul '/' number 
-                   %c{
-                       return argv\[0\] / argv\[2\];
+                   def.lambda (...argv) {
+                       return argv[0] / argv[2];
                    }
            | number
-                   %c{
-                       return argv\[0\];
+                   def.lambda (...argv) {
+                       return argv[0];
                    }  
            ; 
-   
-       number : r'\[0-9\]+' 
-                   %c{
-                       return argv\[0\].integer(); 
+       
+       number : r'[0-9]+' 
+                   def.lambda (...argv) {
+                       return argv[0].integer(); 
                    } 
            ;
-   
-       ~ : r'\[ \\t\\r\\n\]+'
-	;
+       
+       ~ : r'[ \t\r\n\]+'
+    ;
 }
+```
 
 이와 같이 구성한 후, my.calc('3+4*2') 와 같이 실행하면 11이 출력된다.
 
@@ -2304,12 +2596,14 @@ UDS 객체
 
 가장 간단한 예로, 다음의 예를 먼저 보고 설명한다.
 
+```
 a = def.cpp{
   // this is cpp code
   cout << "hello, " << argv\[0\].String() << endl;
 };
 
 a('world');
+```
 
 위의 코드는 hello, world를 출력하는데, def.cpp{ ... } 로 정의된 객체의 내부 코드가 CPP 언어로 되어 있는것에 주의하자. %name{ statement } 가 선언되면 오르카는 name 모듈에게 statement 코드를 넘겨주고, 추가적으로 현재의 시간정보와 모듈의 유니크한 이름 을 넘겨준다.
 
@@ -2321,89 +2615,3 @@ a('world');
 
 기본적으로 제공되는 모듈은 cpp, sh, lisp 이 있는데 sh 은 인터프리터와 같이 동작하고(매번 재처리), cpp, lisp 은 컴파일러와 같이 동작 한다. 세 모듈의 구현내역을 참조하면 독자적인 사용자정의구문을 지원하는 모듈을 작성할 수 있을 것이다.
 
-one time evaluation 구문
-----------------------
-
-once 구문은 해당 구문을 처음 실행할 때 단 한번만 처리한 후 그 결과를 파일로 저장해 놓는다. 그리고, 다음에 해당 모듈이 실행될 때는 해당 구문을 실행하지않고 결과를 바로 사용한다. once는 문장블럭의 앞에 %1 을 붙여주어 표시한다. 아래 예제를 보면,
-
-using stopwatch;
-using fibonacci;
-
-stopwatch.title('elapsed: ') {
-  a = %1{ fibonacci(20); };
-}
-print: a;
-
-와 같은 코드를 실행시키면, 처음 이 코드가 실행될 때는 fibonacci(20)을 실행하기 때문에 다소 느리게 결과가 나오지만 다시한번 실행하면 바로 결과가 나온다.
-
-$ ../orca test.orca
-elapsed: 276 ms, 17 us
-6765
-$ ../orca test.orca
-elapsed: 11 us
-6765
-
-evaluation 된 결과는 test.orca.once 란 파일로 시스템에 저장되고, 다음번에 모듈이 로드될 때 같이 로드된다. 응용 프로그램 입장에서 한번만 evaluation 되면 되는 표현식을 once를 사용하여 처리할 수 있다.
-
-pure 객체
--------
-
-함수의 실행결과가 입력값에만 의존하는 것을 pure function이라고 한다. 예를들어
-
-def sum(a, b)
-{
-  return a + b;
-}
-
-이와 같은 함수는 리턴값이 오직 입력값 a, b 에만 좌우되기 때문에 pure function 인 것이다. sum은 너무 단순한 예제인데, 이런류의 pure function의 또다른 예로 fibonacci 수열의 값을 계산하는 함수를 들 수 있겠다.
-
-fibonacci 함수는 다음과 같이 정의되는데,
-
-   def fibonacci(n)
-   {
-       if n == 0:
-           return 0;
-
-       if n == 1:
-           return 1;
-
-       return fibonacci(n-1) + fibonacci(n-2);
-   }
-
-fibonacci 함수의 값은 입력값 N이 정해지면 출력값이 그에 관계된다. 그런데, 함수의 모양이 위와 같이 재귀적으로 구성되기 때문에 N이 커지면 많은 수행시간을 요구한다.
-
-따라서 아래와 같이 fibonnaci(22) 의 값을 구해보면
-
-using stopwatch;
-using fibonacci;
-
-stopwatch.title('elapsed: ') {
-  a = fibonacci(22);
-}
-
-print: a;
-
-elapsed: 1 sec, 597 ms, 555 us                                                                                                     
-46368
-
-위와 같이 장시간이 걸린다. 그런데, fibonacci(22)는 fibonacci(21) + fibonacci(20) 의 결과이고, fibonacci(21)은 fibonacci(20) + fibonacci(19) 의 결과인데, 지금 구조로는 각 fibonacci 함수들을 매번 새로 계산하고 있다.
-
-만일 한번 계산된 fibonacci (N) 의 결과를 재사용할 수 있다면 연산 결과가 비약적으로 빨라질 것이다.
-
-해서 오르카에서는 객체를 define 할 때 pure한정자를 명시해주면, 런타임 동안 입력값에 대해 그 결과값을 캐싱해서 재사용하게 된다. 따라서 앞의 fibonacci 객체를 pure define fibonacci(n) { ... } 과 같이 define 해주고 위의 예제를 다시 실행해보면,
-
-   pure def fibonacci(n)
-   {
-       if n == 0:
-           return 0;
-   
-       if n == 1:
-           return 1;
-   
-       return fibonacci(n-1) + fibonacci(n-2);
-   }
-
-elapsed: 370 us
-46368
-
-와 같이 실행속도가 비약적으로 향상된 것을 알 수 있다. pure의 캐싱에 결과는 LRU로 관리되어 오래 참조되지 않은 것은 자동으로 소거된다.
