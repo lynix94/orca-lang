@@ -108,31 +108,31 @@ struct CatchList
 		const char* cp = code;
 
 		for(int i=0; i<num; i++) {
+			// name
 			int len = cp[0];
-
-			if (len > 0) {
-				p.name = &cp[1];
-				cp += 1 + 1 + len;
-
-				int num = cp[0];
-				cp++;
-				if (num > 0) {
-					for(int i=0; i<num; i++) {
-						p.lv.push_back(cp[i]);
-					}
-
-					cp += num;
-				}
-
-				p.address = *(int*)cp;
-				cp += sizeof(int);
-
+			if (len == 0) {
+				p.name = NULL;
 			}
 			else {
-				p.name = NULL;
-				p.address = *(int*)&cp[1];
-				cp += 1 + sizeof(int);
+				p.name = &cp[1];
 			}
+
+			cp += 1 + len;
+
+			// vars
+			int num = cp[0];
+			cp++;
+			if (num > 0) {
+				for(int i=0; i<num; i++) {
+					p.lv.push_back(cp[i]);
+				}
+
+				cp += num;
+			}
+
+			// address
+			p.address = *(int*)cp;
+			cp += sizeof(int);
 
 			catch_list.push_back(p);
 		}

@@ -519,6 +519,15 @@ catch_stmt:/*{{{*/
 		{
 			g_ex->goto_finally();
 		}
+	| CATCH RIGHT_ARROW name_list
+		{
+			name_list_t* vp = (name_list_t*)$3;
+			g_ex->catch_start(NULL, vp);
+		}
+	statement_block
+		{
+			g_ex->goto_finally();
+		}
 	;
 /*}}}*/
 

@@ -15,7 +15,7 @@
 
 // Exception structure in code
 // OP_MARK_TRY, address, num, ...catch_stmt* [finally_stmt]... , 
-// [namelen, catch_name, varlen, (vars)*, addr]+ OP_DONE_TRY
+// [namelen, catch_name, varnum, (vars)*, addr]+ OP_DONE_TRY
 
 void parserException::pop() 
 {
@@ -88,26 +88,37 @@ void parserException::catch_start(const char* s, vector<const char*>* vp)
 	st_exc& ex = m_ex[m_ex.size() - 1];
 
 	if (s != NULL) {
-		ex.init_code.push_back(strlen(s));
-		copy(s, s+strlen(s)+1, back_inserter(ex.init_code));
+		ex.init_code.push_back(strlen(s)+1); // name len
+		copy(s, s+strlen(s)+1, back_inserter(ex.init_code)); // name
 
 		if (vp) {
-			ex.init_code.push_back(vp->size());
-			for(int i=0; i<vp->size(); i++) {
+			ex.init_code.push_back(vp->size()); // var num
+			for(int i=0; i<vp->size(); i++) { // vars
 				int idx = code_top->find_lvar((*vp)[i]);
 				ex.init_code.push_back(idx);
 			}
 		}
 		else {
-			ex.init_code.push_back(0);
+			ex.init_code.push_back(0); // var num: 0
 		}
 	}
 	else { 
-		ex.init_code.push_back(0);
+		ex.init_code.push_back(0); // name len: 0)
+
+		if (vp) {
+			ex.init_code.push_back(vp->size());  // var num
+			for(int i=0; i<vp->size(); i++) { // vars
+				int idx = code_top->find_lvar((*vp)[i]);
+				ex.init_code.push_back(idx);
+			}
+		}
+		else {
+			ex.init_code.push_back(0); // var num: 0
+		}
 	}
 
 	char* b = i2l(code_top->size());
-	copy(b, b+sizeof(int), back_inserter(ex.init_code));
+	copy(b, b+sizeof(int), back_inserter(ex.init_code)); // addr
 	ex.handler_num++;
 }
 

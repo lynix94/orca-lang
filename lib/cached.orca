@@ -45,8 +45,6 @@ def client
 	def obj_stack;
 
 
-	def header;
-
 	def init(s, c)
 	{
 		..sock = s;

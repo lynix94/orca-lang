@@ -101,6 +101,17 @@ if msg != 'test' || msg2 != 'test2' {
 	throw test.ex <- 'nested exception fail';
 }
 
+try {
+	throw test.ex <- 'default msg';
+}
+catch -> msg {
+	print: msg;
+}
+
+if msg != 'default msg' {
+	throw test.ex <- 'default msg fail';
+}
+
 
 print: 'OK';
 
