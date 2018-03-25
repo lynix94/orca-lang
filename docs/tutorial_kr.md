@@ -439,8 +439,9 @@ orca에서 제공하는 정규표현식은 boost::regex를 사용하여 구현�
 
 ```
 str = '123abc456def';
-if str == r'[0-9a-z]+':
+if str == r'[0-9a-z]+' {
     print: ‘matched’
+}
 ```
 
 위의 예제는 matched를 출력한다. 따로 match() 인터페이스를 두지 않고, ==, != 연산자를 통해 이 작업을 수행할 수 있다.
@@ -1017,29 +1018,16 @@ $ print: a.size()
 if
 --
 
-가장 기본적인 if 문의 구조는 if bool_expr : statement 이다. 여기에 elif 와 else가 추가 될 수 있고, statement 자리에는 C/C++, Java에서 그렇듯 단일 문장이 오거나 { } 으로 감싸인 문장 블럭이 올 수 있다.
-
-참고로, 오르카는 C/C++ 의 syntax를 많이 흉내내었으나, 튜플 자료구조가 괄호로 둘러 싸이는 바람에, bool_expr 을 괄호로 둘러싸는 대신에 끝부분에 : 를 추가하도록 선택했다.
-
-콜론 마저 없으면 더 편할 것 같지만
-
-그렇게 되면 if a == b + 3 이
-
-```
-if a == b
-  +3;
-```
-
-로 해석되버리는 모호함이 존재한다.
+가장 기본적인 if 문의 구조는 if bool_expr { statement } 이다. 여기에 elif 와 else가 추가 될 수 있고, statement 자리에는 { } 으로 감싸인 문장 블럭이 올 수 있다.
 
 while
 -----
 
-while 문은 while bool_expr : statement 의 구조를 가지며, C/C++의 while과 비슷하게 동작한다.
+while 문은 while bool_expr { statement } 의 구조를 가지며, C/C++의 while과 비슷하게 동작한다.
 
 ```
 a = sum = 0;
-while a < 10: {
+while a < 10 {
   sum  += a;
   a+=1;
 }
@@ -1052,7 +1040,7 @@ do while
 
 가끔은 while 대신 do while 이 필요할 때가 있다.
 
-do while 문은 do statement while bool_expr 의 형태를 띈다.
+do while 문은 do { statement } while bool_expr 의 형태를 띈다.
 
 ```
 a = sum = 0;
@@ -1062,14 +1050,12 @@ do {
 } while a < 10;
 ```
 
-위 예제는 앞절과 같은 기능을 수행한다. do while 문의 마지막 while bool_expr은 모호함을 발생시키지 않기 때문에 따로 콜론을 마지막에 추가할 필요는 없다.
+위 예제는 앞절과 같은 기능을 수행한다. 
 
 for
 ---
 
-오르카의 제어문들이나 문법들이 C/C++과 유사하지만, for 문만큼은 유행을 따르고 있는데, C++ 을 사랑하는 나로서도 이런 형태가 더 편하다는건 인정할 수 밖에 없었다.
-
-for a in b : statement 의 형태를 띈다.
+for 문은 for a in b { statement } 의 형태를 띈다.
 
 b에는 list, tuple, map 이 오거나 나중에 나올 iterator, generator 객체가 올 수도 있다.
 
@@ -1077,8 +1063,9 @@ a 는 b에서의 원소를 차례로 대입 받게 될 지역변수로서 statem
 
 ```
 sum = 0;
-for a in [1..10]:
+for a in [1..10] {
   sum += a;
+}
 
 print: sum;
 ```
@@ -1096,8 +1083,9 @@ def one_to_hundred
   def cur;
   def next() {
     owner.cur += 1;
-    if owner.cur > 100:
-    throw done;
+    if owner.cur > 100 {
+		throw done;
+	}
 
     return owner.cur;
   }
@@ -1106,8 +1094,9 @@ def one_to_hundred
 it = my.one_to_hundred();
 
 sum = 0;
-for i in it:
+for i in it {
   sum += i;
+}
 print: sum;
 ```
 
@@ -1331,7 +1320,7 @@ parallel for 구문은 위와 같은 형식으로 쓰여, list형 (list, set bui
 예를 들어가며 설명하자면
 
 ```
-parallel for a in [1,2,3,4,5]:
+parallel for a in [1,2,3,4,5]
 {
   foo(a);
 }
@@ -1352,11 +1341,11 @@ using stopwatch;
 sw = stopwatch;
 
 sw.start();
-for a in [1..10]: {
+for a in [1..10] {
   print: a;
 
   c = 0;
-  for b in %[x|x<-1~100000]: {
+  for b in %[x|x<-1~100000] {
     c = c+1;
   }
 }
@@ -1364,11 +1353,11 @@ for a in [1..10]: {
 sw.lap('with for: ');
 
 sw.start();
-parallel for a in [1..10]: {
+parallel for a in [1..10] {
   print: a;
 
   c = 0;
-  for b in %[x|x<-1~100000]: {
+  for b in %[x|x<-1~100000] {
     c = c+1;
   }
 }
@@ -1405,8 +1394,9 @@ with parallel for: 93 ms, 750 us
 parellel for 구문은 옵션으로 by, per 를 붙일 수 있다.
 
 ```
-parallel for a in [1..100] by 3 per 30:
+parallel for a in [1..100] by 3 per 30 {
   print: a;
+}
 ```
 
 를 지정하면 3개의 쓰레드가 30개 단위로 리스트들을 처리한다. 즉, 리스트를 \[1..30\], \[31..60\], \[61..90\], \[91..100\] 의 구간으로 나누어 3개의 쓰레드가 병렬처리 한다.
@@ -1417,7 +1407,7 @@ by, per의 값으로는 연산식도 가능하다. 추가로 제공될 system �
 
 ```
 a = [1..1000];
-parallel for i in a by (cpu = system.cpu_n() * 2) per (a.size() / cpu): {
+parallel for i in a by (cpu = system.cpu_n() * 2) per (a.size() / cpu) {
   print: i;
 }
 ```
@@ -1648,8 +1638,9 @@ decode def tolist(str)
 		{
 			h = tolist(head);			
 			t = tolist(tail);
-			if type.ist_tuple(t):
+			if type.ist_tuple(t) {
 				t = t.list();
+			}
 
 			return t.push_front(h);
 		}
@@ -1680,8 +1671,9 @@ decode def tolist(str)
 		{
 			h = tolist(head);			
 			t = tolist(tail);
-			if type.ist_tuple(t):
+			if type.ist_tuple(t) {
 				t = t.list();
+			}
 
 			return t.push_front(h);
 		}
@@ -1733,8 +1725,9 @@ print: my.add(10, 20);
 ```
 def sum_all(…) {
     sum = 0;
-    for a in argv:
+    for a in argv {
         sum += a;
+	}
 
 	return sum;
 }
@@ -2165,9 +2158,9 @@ Throw 할 때는 두번째 인자부터는 파라미터로 전달된다. 바로 
 
 ```
 try {
-    throw app.test, 10, ‘test’;
+    throw app.test <- 10, ‘test’;
 }
-catch app : num, msg {
+catch app -> num, msg {
     print: num, msg;
 }
 ```
@@ -2187,7 +2180,7 @@ def.lambda { statement_list } 와 같다.
 
 ```
 def for_each(list, functor) {
-    for a in list: {
+    for a in list {
         functor(a);
     }
 }
@@ -2230,18 +2223,22 @@ def complex
      }
        
      def '+'(rhs) {
-       if owner.type == rhs:
+       if owner.type == rhs {
            result = owner.clone(owner.real + rhs.real, owner.img + rhs.img);
-       else:
+		}
+       else {
            result = owner.clone(owner.real + rhs, owner.img);
+		}
        return result;
      }
        
      def '-'(rhs) {
-       if owner.type == rhs:
+       if owner.type == rhs {
            result = owner.clone(owner.real - rhs.real, owner.img - rhs.img);
-       else:
+		}
+       else {
            result = owner.clone(owner.real - rhs, owner.img);
+		}
        return result;
      }
        
@@ -2296,7 +2293,7 @@ def day_of_month
 		'December' -> return 31;
 		}		
 
-		throw orca.name, name + ' not found';
+		throw orca.name <- name + ' not found';
 	}
 }
 

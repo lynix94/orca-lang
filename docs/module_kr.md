@@ -215,7 +215,7 @@ using time;
 def inc_thread(key) {
     sem = clone ipc.semaphore;
     sem.set(key, 10);
-    for a in [1..10]: {
+    for a in [1..10] {
         print: 'produced...';
         sem.inc();
         time.msleep(1000);
@@ -225,7 +225,7 @@ def inc_thread(key) {
 def dec_thread(key) {
     sem = clone ipc.semaphore;
     sem.set(key, 10);
-    for a in [1..10]: {
+    for a in [1..10] {
         sem.dec();
         print: 'consumed...';
     }
@@ -385,10 +385,10 @@ def server {
     sock.bind(8080);
     sock.listen();
 
-    while true: {
+    while true {
         fd = select.select([sock.get()], [], [], 1000);
 
-        if fd[0] == [sock.get()]: {
+        if fd[0] == [sock.get()] {
             new_cl = sock.accept();
 
             str = new_cl.recv();
@@ -439,7 +439,7 @@ $
 의미상,
 
 ```
-for a in a.begin():
+for a in a.begin()
 {
 	function(a());
 }
@@ -1113,9 +1113,10 @@ dir_iterator 는 입력받은 경로의 파일들을 순회할 수 있는 iterat
 
 ```
 $ os.cd('/etc');
-$ for a in os.dir_iterator('.'):
+$ for a in os.dir_iterator('.') {
 * print: a;
-* 
+* }
+*
 ./printcap
 ./terminfo
 ./rc2.d
@@ -1128,8 +1129,9 @@ $ for a in os.dir_iterator('.'):
 dir\_iterator가 현재 디렉토리의 파일들만을 순회하는데 반해, dir\_traverser는 현재 디렉토리 밑의 전체 파일들을 순회한다.
 
 ```
-$ for a in os.dir_traverser('/etc/yum'):
+$ for a in os.dir_traverser('/etc/yum') {
 * print: a;
+* }
 * 
 /etc/yum/pluginconf.d
 /etc/yum/pluginconf.d/blacklist.conf
@@ -1884,15 +1886,17 @@ r = dist.dist_do(10, 20, def.lambda(...argv) { return argv[0] + argv[1]; });
 print: r.is_done(100);
 print: ret = r.pop_obj();
 
-if ret != 30:
-	throw test.dist, 'dist_do failed';
+if ret != 30 {
+	throw test.dist <- 'dist_do failed';
+}
 
 list = [1..100];
 rs = dist.dist_for(list, def.lambda(...argv) { return argv[0] * argv[0]; } );
 print: rs;
 
-if rs != %[ x*x | x<-1~100 ]:
-	throw test.dist, 'dist_for failed';
+if rs != %[ x*x | x<-1~100 ] {
+	throw test.dist <- 'dist_for failed';
+}
 
 print: '## now quit: ', dist.shutdown();
 return 'OK', my;
@@ -2593,10 +2597,10 @@ using cgi.html.text;
 
 cgi.header {
 	session('session_test');
-	if (cgi.get_param('logout')): {
+	if (cgi.get_param('logout')) {
 		session.destroy();
 	}
-	if (cgi.get_param('login')): {
+	if (cgi.get_param('login')) {
 		session.add('logged', '1');
 		session.add('name', cgi.get_param('username'));
 		cookie.set('key', 'value');
@@ -2653,7 +2657,7 @@ cgi.html {
 		}
 
 		tag('body') {
-			if (session.exist('logged')): {
+			if (session.exist('logged')) {
 				puts: 'logged'; 
 				br();
 				puts: 'session.name =', session.get('name'); 
@@ -2668,7 +2672,7 @@ cgi.html {
 value='Click to logout'");
 				}
 			}
-			else: {
+			else {
 				puts: 'not logged in'; 
 			}
 		}
@@ -2706,14 +2710,16 @@ using mysql;
   print: m.update('drop table t1');
   print: m.update('create table t1 (code int)');
   
-  for i in [1..5]:
+  for i in [1..5] {
       print: m.update('insert into t1 values(${i})');
+  }
   
   
   print: ret = m.execute('select * from t1');
   
-  for a in ret:
+  for a in ret {
       print: a();
+  }
 
 $ orca tt root passwd
 0

@@ -410,8 +410,9 @@ First, match operation could be done like this.
 
 ```
 str = '123abc456def';
-if str == r'[0-9a-z]+':
+if str == r'[0-9a-z]+' {
     print: 'matched';
+}
 ```
 
 Above example will print 'matched'. Match operation could be done by ==, != operator. In above str, if find interface is called like this.
@@ -940,7 +941,7 @@ if
 
 Structure of if statement is
 
-if bool\_expression : statement\_list
+if bool\_expression { statement\_list }
 
 And it could be exists that additional elif and else clauses.j
 
@@ -949,13 +950,13 @@ while
 
 Structure of while statement is
 
-while boolean\_expression : statement\_list
+while boolean\_expression { statement\_list }
 
 This is worked like C/C++ while
 
 ```
 a = sum = 0;
-while a < 10: {
+while a < 10 {
   sum  += a;
   a+=1;
 }
@@ -968,7 +969,7 @@ do while
 
 Structure of do while statement is
 
-do stement\_list while boolean\_expression
+do { stement\_list } while boolean\_expression
 
 ```
 a = sum = 0;
@@ -985,14 +986,15 @@ for
 
 The structure of for statement is
 
-for a in b : statement_list
+for a in b { statement_list }
 
 b could be list, tuple and map. And iterator object and set builder form list are possible as b. a will be assigned all items in b in order, and statement_list are excuted. Let's look at example.
 
 ```
 sum = 0;
-for a in [1..10]:
+for a in [1..10] {
   sum += a;
+}
 ```
 
 Above example sums up 1 to 10. \[1..10\] generate list \[1,2,3,4,5,6,7,8,9,10\] and each item is assigned to a in order. And sum += a is excuted every time. Iterator object could be used, iterator object is that have next() interface. Simple example is below
@@ -1006,8 +1008,9 @@ def one_to_hundred
   def cur;
   def next() {
     owner.cur += 1;
-    if owner.cur > 100:
-    throw done;
+    if owner.cur > 100 {
+		throw done;
+	}
 
     return owner.cur;
   }
@@ -1016,8 +1019,9 @@ def one_to_hundred
 it = my.one_to_hundred();
 
 sum = 0;
-for i in it:
+for i in it {
   sum += i;
+}
 print: sum;
 ```
 
@@ -1156,7 +1160,7 @@ parallel for a in input_list
 The grammer of parallel for statement is like above, And simillar to for statement, all itemes in input\_list (list, set builder form, iterator object are could be as input\_list) is assigned to a then statement_list is excuted. But excution is not sequential but parallel. Let's see simple example
 
 ```
-parallel for a in [1,2,3,4,5]:
+parallel for a in [1,2,3,4,5]
 {
   foo(a);
 }
@@ -1173,11 +1177,11 @@ using stopwatch;
 sw = stopwatch;
 
 sw.start();
-for a in [1..10]: {
+for a in [1..10] {
   print: a;
 
   c = 0;
-  for b in %[x|x<-1~100000]: {
+  for b in %[x|x<-1~100000] {
     c = c+1;
   }
 }
@@ -1185,11 +1189,11 @@ for a in [1..10]: {
 sw.lap('with for: ');
 
 sw.start();
-parallel for a in [1..10]: {
+parallel for a in [1..10] {
   print: a;
 
   c = 0;
-  for b in %[x|x<-1~100000]: {
+  for b in %[x|x<-1~100000] {
     c = c+1;
   }
 }
@@ -1238,7 +1242,7 @@ Normal expression is possible as value of by, per. You can use system module for
 
 ```
 a = [1..1000]; 
-parallel for i in a by (cpu = system.cpu_n() * 2) per (a.size() / cpu): { 
+parallel for i in a by (cpu = system.cpu_n() * 2) per (a.size() / cpu) { 
   print: i; 
 } 
 ```
@@ -1410,8 +1414,9 @@ decode def tolist(str)
 		{
 			h = tolist(head);			
 			t = tolist(tail);
-			if type.ist_tuple(t):
+			if type.ist_tuple(t) {
 				t = t.list();
+			}
 
 			return t.push_front(h);
 		}
@@ -1441,8 +1446,9 @@ decode def tolist(str)
 		{
 			h = tolist(head);			
 			t = tolist(tail);
-			if type.ist_tuple(t):
+			if type.ist_tuple(t) {
 				t = t.list();
+			}
 
 			return t.push_front(h);
 		}
@@ -1491,8 +1497,9 @@ This prints 30 If you want variable arguments,
 ```
 def sum_all(...) {
     sum = 0;
-    for a in argv:
+    for a in argv {
         sum += a;
+	}
 
     return sum;
 }
@@ -1907,9 +1914,9 @@ Other parameters are dilivered as object to catch code Like this,
 
 ```
 try {
-    throw app.test, 10, "test";
+    throw app.test <- 10, "test";
 }
-catch app : num, msg {
+catch app -> num, msg {
     print: num, msg;
 }
 ```
@@ -1927,7 +1934,7 @@ This code block has no name but it's same as normal orca object entirely. It cou
 
 ```
 def for_each(list, functor) {
-    for a in list: {
+    for a in list {
         functor(a);
     }
 }
@@ -1970,18 +1977,22 @@ def complex
      }
    
      def '+'(rhs) {
-       if owner.type == rhs:
+		if owner.type == rhs {
            result = owner.clone(owner.real + rhs.real, owner.img + rhs.img);
-       else:
+		}
+		else {
            result = owner.clone(owner.real + rhs, owner.img);
+		}
        return result;
      }
    
      def '-'(rhs) {
-       if owner.type == rhs:
+		if owner.type == rhs {
            result = owner.clone(owner.real - rhs.real, owner.img - rhs.img);
-       else:
+		}
+		else {
            result = owner.clone(owner.real - rhs, owner.img);
+		}
        return result;
      }
    
@@ -2034,7 +2045,7 @@ def day_of_month
 		'December' -> return 31;
 		}		
 
-		throw orca.name, name + ' not found';
+		throw orca.name <- name + ' not found';
 	}
 }
 
