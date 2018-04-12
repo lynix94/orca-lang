@@ -229,10 +229,14 @@ orcaData orcaString::hash(orcaVM* vm, string& str)/*{{{*/
 
 orcaData orcaString::split(orcaVM* vm, string& str)/*{{{*/
 {	
-	int s=0, e=INT_MAX;
+	//int sss=0, count=INT_MAX;
 	orcaData p = vm->get_param(0);
 	orcaList* lp = new orcaList();
-	int start = s;
+	int start = 0;
+	int count = INT_MAX;
+	if (!is<TYPE_NIL>(vm->get_param(1))) {
+		count= vm->get_param(1).Integer();
+	}
 
 	if (is<TYPE_STR>(p) || is<TYPE_NIL>(p)) {
 		string by;
@@ -249,6 +253,12 @@ orcaData orcaString::split(orcaVM* vm, string& str)/*{{{*/
 			if (r-start == 0) { } // nothing
 			else lp->push_back(str.substr(start, r - start));
 			start = r+by.length();
+
+			count--;
+			if (count <= 0) {
+				lp->push_back(str.substr(start));
+				break;
+			}
 		}while(true);
 	}
 	else if (is<TYPE_REGEX>(p)) {
@@ -268,6 +278,12 @@ orcaData orcaString::split(orcaVM* vm, string& str)/*{{{*/
 			}
 
 			start = (mr[0].second - str.begin());
+
+			count--;
+			if (count <= 0) {
+				lp->push_back(str.substr(start));
+				break;
+			}
 		}while(true);
 	}
 	else {

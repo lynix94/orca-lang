@@ -46,12 +46,23 @@ public:
 	class ex_builder : public orcaObject 
 	{
 	public:
-		DEFAULT_NATIVE_DEFINE(ex_builder);
+		ex_builder(void* vp) {}
+
+		orcaObject* v_clone() {
+			return new ex_builder((void*)NULL);
+		}
 
 		ex_builder() 
 		{ 
 			set_name("builder"); 
 			insert_native_function("push_back", (object_fp)&ex_builder::ex_push_back);
+		}
+
+		virtual ~ex_builder()
+		{
+			for (int i=0; i<items.size(); i++) {
+				items[i].rc_dec();
+			}
 		}
 
 		orcaData ex_push_back(orcaVM* vm, int n)
@@ -68,10 +79,9 @@ public:
 			ss << str;
 			for (int i=0; i<items.size(); i++) {
 				ss << items[i].string_(vm);
-				items[i].rc_dec();
 			}
 
-			str = ss.str();
+			str += ss.str();
 		}
 
 		vector<orcaData> items;

@@ -159,8 +159,18 @@ if result != ['aaa', 'bbb', 'ccc'] {
 	throw test.string <- 'string split fail';
 }
 
+print: result = 'aaa.bbb.ccc'.split('.', 1);
+if result != ['aaa', 'bbb.ccc'] {
+	throw test.string <- 'string split fail';
+}
+
 print: result = 'aaa000bbb111ccc'.split(r'[0-9]+');
 if result != ['aaa', 'bbb', 'ccc'] {
+	throw test.string <- 'string split fail';
+}
+
+print: result = 'aaa000bbb111ccc'.split(r'[0-9]+', 1);
+if result != ['aaa', 'bbb111ccc'] {
 	throw test.string <- 'string split fail';
 }
 
