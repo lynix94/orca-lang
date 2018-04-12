@@ -21,6 +21,17 @@ bool data_cmp::operator()(orcaData l, orcaData r) const
 		return l.operator_lt(get_current_vm(), r).Boolean(); // for user made operator..
 	}
 
+	if (is<TYPE_REGEX>(l)) {
+		if (is<TYPE_REGEX>(r)) {
+			return l.re_str() < r.re_str();
+		}
+		
+		return false;
+	}
+	else if (is<TYPE_REGEX>(r)){
+		return true;
+	}
+
 	return l.operator_lt(NULL, r).Boolean();
 }
 
