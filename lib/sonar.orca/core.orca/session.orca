@@ -1,0 +1,33 @@
+using random;
+
+def init_once
+{
+	..session = type.map();
+	random.seed();
+}
+
+def session;
+
+def alloc_session()
+{
+	id = random.string(20);
+	..session[id] = type.map();
+
+	return id;
+}
+
+def get_session(id)
+{
+	if ..session.has_key(id) {
+		return ..session[id];
+	}
+
+	return nil;
+}
+
+def free_session(id)
+{
+	if ..session.has_key(id) {
+		..session.remove_key(id);
+	}
+}

@@ -1,0 +1,25 @@
+using socket;
+using thread;
+using sonar;
+
+print: '## httpd start: ', argv;
+
+argv[0].split(':') -> ip, port;
+
+def sock;
+
+.sock = socket.create();
+.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1);
+.sock.bind(port);
+.sock.listen();
+
+do {
+	sock = .sock.accept();
+	cl = sonar.core.client.clone(sock);
+	thread.run(cl.run);
+} while(true);
+
+.sock.close();
+return;
+
+

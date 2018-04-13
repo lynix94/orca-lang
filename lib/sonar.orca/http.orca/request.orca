@@ -1,0 +1,22 @@
+using strings;
+
+def get := {,};
+
+def post := {,};
+
+def cookies := {,};
+
+def multipart := {,};
+
+def url := '';
+
+def uri := '';
+
+def string()
+{
+	b = strings.builder.clone();
+	b.push_back("Request{url:%s, uri:%s, get:%s, post:%s, cookies:%s, multipart:%s}" % (..url, ..uri, ..get, ..post, ..cookies, ..multipart));
+
+	return root.string(b);
+}
+

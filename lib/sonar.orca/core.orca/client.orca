@@ -1,0 +1,203 @@
+using sonar.http.request;
+using sonar.core;
+
+def sock;
+
+def init(s)
+{
+	..sock = s;
+}
+
+def send(msg)
+{
+	#print: ' >> ', msg;
+	..sock.send(msg);
+}
+
+def send_error(msg)
+{
+	res = '''HTTP/1.1 ${msg}
+Server: Orca/0.4 (Unix)  (Red-Hat/Linux)
+Accept-Ranges: bytes
+Content-Length: ${msg.length()}
+Connection: close
+Content-Type: text/html; charset=UTF-8
+
+''';
+	..send(res);
+	..send(msg);
+}
+
+def send_response(header, msg)
+{
+	res = '''HTTP/1.1 200 OK
+Server: Orca/0.4 (Unix)  (Red-Hat/Linux)
+Accept-Ranges: bytes
+Content-Length: ${msg.length()+1}
+Connection: close
+Content-Type: text/html; charset=UTF-8
+${header}
+
+''';
+	..send(res);
+	..send(msg);
+}
+
+def recv()
+{
+	msg = ..sock.recv();
+	print: ' << ', msg;
+
+	len = 0;
+	hlen = 0;
+	CL = msg.find(r'Content-Length: ([0-9]+)');
+	if CL != nil {
+		len = CL[1][0].integer();
+		hlen = CL[1][2];
+	}
+
+	len += hlen;
+	if msg.length() >= len {
+		return msg;
+	}
+
+	do {
+		part = ..sock.recv(0, 2000);
+		if part.length() == 0 {
+			break;
+		}
+
+		msg.push_back(part);
+	} while msg.length() < len;
+
+	return msg;
+}
+
+def run()
+{
+	print: 'thread ${my.ID} launced';
+
+	do {
+		try {
+			print:'## wait...';
+
+			cmd = ..recv();
+			..do_what(cmd);
+			..sock.close();
+			break;
+		}
+		catch io.socket {
+			print: 'socket disconnected';
+			..sock.close();
+			break;
+		}
+	} while(true);
+
+	print: 'thread ${my.ID} done';
+}
+
+def get_param(str, p)
+{
+	if p == nil {
+		p = type.map();
+	}
+
+	str = str.strip();
+	list = str.split('&');
+	for a in list {
+		kv = a.split('=');
+		k = kv[0];
+		v = '';
+		if kv.size() > 1 {
+			v = kv[1];
+		}
+
+		p[k] = v;
+	}
+
+	return p;
+}
+
+def do_what(msg)
+{
+	header = '';
+	body = '';
+
+	req = request.clone();
+
+	req.url = msg.find(r'[GET|POST] ([^ ]+) ')[1][0];
+
+	ret = req.url.split('?');
+	req.uri = ret[0][1:];
+
+	// process url parameters
+	if ret.size() > 1 {
+		req.get = ..get_param(ret[1], req.get);
+	}
+
+	// process cookie
+	cookie = msg.find(r'Cookie: ([^\n]+)');
+	if cookie != nil {
+		str = cookie[1][0];
+		str_list = str.split('; ');
+		for a in str_list {
+			req.cookies = ..get_param(a, req.cookies);
+		}
+	}
+
+	// process multipart parameters
+	multi = msg.find(r'Content-Type: multipart/form-data; boundary=([-_0-9a-zA-Z]+)');
+
+	if multi != nil {
+		boundary = '--' + multi[1][0];
+		list = msg.split(boundary);
+		list.pop_front();
+		list.pop_back();
+
+		it = list.begin();
+		for a in it {
+			name = a().find(r'name=\"([^\"]+)\"');
+			if name == nil {
+				continue;
+			}
+
+			name = name[1][0];
+
+			value = a().find(r'[\r|]\n[\r|]\n(.*)');
+			if value == nil {
+				continue;
+			}
+
+			value = value[1][0];
+
+			req.multipart[name] = value;
+		}
+	}
+	else {
+		// process post parameter
+		post_param = msg.find(r'[\r|]\n[\r|]\n([a-zA-Z_][a-zA-Z_0-9=&]+)');
+
+		if post_param != nil {
+			req.post = ..get_param(post_param[1][0], req.post);
+		}
+	}
+	
+	// process response
+	handler = nil;
+	for k, v in core.url_map {
+		if k == req.uri {
+			handler = v;
+			break;
+		}
+	}
+	
+	if handler == nil {
+		..send_error('404 Not Found');
+		return;
+	}
+
+	ret = handler(req);
+	..send_response(ret[0], ret[1]);
+}
+
+

@@ -1,0 +1,10 @@
+
+using sonar;
+
+
+def page(request)
+{
+	return ('', 'admin page');
+};
+
+

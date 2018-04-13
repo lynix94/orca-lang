@@ -1,0 +1,38 @@
+using os;
+using io.open;
+
+print: argv;
+
+if argv.size() < 2 {
+	return;
+}
+
+
+if argv[0] == 'new' {
+	project_name = argv[1];
+}
+
+os.mkdir('%s' % project_name);
+
+f = open('%s/manage.orca' % project_name, 'w');
+f.write(.template.template_manage);
+f.close();
+
+f = open('%s/urls.orca' % project_name, 'w');
+f.write(.template.template_urls);
+f.close();
+
+f = open('%s/settings.orca' % project_name, 'w');
+f.write(.template.template_settings);
+f.close();
+
+
+
+
+
+
+
+
+
+
+

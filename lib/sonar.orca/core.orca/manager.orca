@@ -1,0 +1,40 @@
+using sonar;
+
+def execute(...argv)
+{
+	print: argv;
+	if argv == nil || argv.size() == 0 {
+		print: '# nothing todo';
+		return;
+	}
+
+	switch argv[0]
+	{
+	case 'runserver':
+		print: '# run server';
+		if argv.size() < 2 {
+			print: 'insufficient parameter: address is needed';
+			return;
+		}
+
+		..server(argv[1]);
+	
+	default:
+		print: '# nothing todo';
+	}
+}
+
+
+
+def server(addr)
+{
+	def addr;
+
+	print: addr;
+	my.addr = addr;
+
+	sonar.core.httpd(addr);
+}
+
+
+

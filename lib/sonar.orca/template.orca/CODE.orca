@@ -1,0 +1,38 @@
+
+def template_manage :=
+'''
+using sonar;
+using settings;
+using urls;
+
+if argv == nil {
+	return;
+}
+
+settings();
+urls();
+
+sonar.core.manager.execute(argv...);
+''';
+
+
+
+def template_urls :=
+'''
+using sonar.core;
+using sonar.contrib.admin;
+
+core.url_map =	{	r'^admin':admin.page,
+					# add other url map here
+				};
+''';
+
+
+
+def template_settings :=
+'''
+using sonar;
+''';
+
+
+
