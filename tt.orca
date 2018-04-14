@@ -1,0 +1,54 @@
+
+using sqlite3;
+using orm;
+using os;
+
+
+# init
+os.remove('orca_orm.db');
+
+conn = sqlite3.connect('orca_orm.db');
+print: conn;
+
+res = conn.execute('create table t1 (a int, b int)');
+print: res();
+
+for i in range(0, 10) {
+	query = 'insert into t1 values(%d, %d)' % (i(), i());
+	res = conn.execute(query);
+	print: res();
+}
+
+
+
+# test
+orm.set_conn(conn);
+
+t1 = orm.table.clone('t1');
+t1.add_attr('a');
+t1.add_attr('b');
+
+res = t1.where(t1.a <= 10 && t1.b > 3).orderby(t1.a).result();
+for r in res {
+	print: r().MEMBERS;
+	if r().a != r().b {
+		throw orca.orm <- 'invalid value';
+	}
+}
+
+
+'''
+# project to new object
+res = t1.where(t1.a <= 10 && t1.b > 3).orderby(t1.a).project('t1.a + 3').result();
+for r in res {
+	print: r().MEMBERS;
+}
+''';
+
+
+os.remove('orca_orm.db');
+print: 'done';
+
+
+
+
