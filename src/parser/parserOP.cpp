@@ -187,6 +187,11 @@ void parserOP::rotate()
 	code_top->push_char(OP_ROTATE);
 }
 
+void parserOP::rotate3()	
+{
+	code_top->push_char(OP_ROTATE3);
+}
+
 void parserOP::dup()
 {
 	code_top->push_char(OP_DUP);

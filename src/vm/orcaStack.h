@@ -71,6 +71,17 @@ public:
 		std::swap(m_frame[m_sp], m_frame[m_sp-1]);
 	}
 
+	void rotate3() {
+		orcaData p1, p2, p3;
+		p1 = m_frame[m_sp-2];
+		p2 = m_frame[m_sp-1];
+		p3 = m_frame[m_sp-0];
+
+		m_frame[m_sp-2] = p2;
+		m_frame[m_sp-1] = p3;
+		m_frame[m_sp-0] = p1;
+	}
+
 	void dup() {
 		push(m_frame[m_sp]);
 	}

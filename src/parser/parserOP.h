@@ -54,6 +54,7 @@ public:
 	void minus();
 	void do_not();
 	void rotate();
+	void rotate3();
 	void dup();
 	void dup2();
 	void eval();

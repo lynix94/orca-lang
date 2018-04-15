@@ -99,6 +99,8 @@ using namespace std;
 %type <integer> pattern_list			// num of pattern
 %type <integer> assign_target_list_with_argv
 %type <integer> assign_target_list
+%type <integer> channel_assign_target_list_with_argv
+%type <integer> channel_assign_target_list
 
 %type <real> real
 %type <real> minus_real
@@ -258,7 +260,7 @@ channel_stmt:/*{{{*/
 		{
 			g_ctl->channel_out_start();
 		}
-	assign_target_list_with_argv ';'
+	channel_assign_target_list_with_argv ';'
 		{
 			g_ctl->channel_out_end($4);
 		}
@@ -348,6 +350,103 @@ assign_target:/*{{{*/
 	| '.' reserved_object
 		{
 			g_op->push_reserved(OP_PUSH_MY);
+			g_op->assign_reserved($2);
+			g_op->pop_stack();
+		}
+	;
+/*}}}*/
+
+channel_assign_target_list_with_argv:/*{{{*/
+	channel_assign_target_list
+		{
+			$$ = $1;
+		}
+	| channel_assign_target_list ',' argv_name
+		{
+			const char* cp = $3;
+			cp += 3; // skip ...
+			g_op->assign_local(cp); // already made as tuple
+			g_op->pop_stack();
+			$$ = -($1);
+		}
+	| argv_name
+		{
+			const char* cp = $1;
+			cp += 3; // skip ...
+			g_op->assign_local(cp); // already made as tuple
+			g_op->pop_stack();
+			$$ = 0;
+		}
+	;
+/*}}}*/
+
+channel_assign_target_list:/*{{{*/
+	  channel_assign_target_list ',' channel_assign_target
+		{
+			$$ = $1 + 1;
+		}
+	| channel_assign_target
+		{
+			$$ = 1;
+		}
+	;
+/*}}}*/
+
+channel_assign_target:/*{{{*/
+	  lvar
+		{
+			g_op->assign_local($1);
+			g_op->pop_stack();
+		}
+	| postfix_object '.' name_or_string
+		{
+			g_op->rotate();
+			g_op->assign_member($3);
+			g_op->pop_stack();
+		}
+	| postfix_object '.' reserved_object
+		{
+			g_op->rotate();
+			g_op->assign_reserved($3);
+			g_op->pop_stack();
+		}
+	| postfix_object '[' slice_expression ']'
+		{
+			g_op->rotate3();
+			g_op->assign_list(false);
+			g_op->pop_stack();
+		}
+	| postfix_object '[' slice_expression ')'
+		{
+			g_op->rotate3();
+			g_op->assign_list(true);
+			g_op->pop_stack();
+		}
+	| DOUBLE_DOT name_or_string
+		{
+			g_op->push_reserved(OP_PUSH_OWNER);
+			g_op->rotate();
+			g_op->assign_member($2);
+			g_op->pop_stack();
+		}
+	| DOUBLE_DOT reserved_object
+		{
+			g_op->push_reserved(OP_PUSH_OWNER);
+			g_op->rotate();
+			g_op->assign_reserved($2);
+			g_op->pop_stack();
+		}
+	| '.' name_or_string
+		{
+			g_op->push_reserved(OP_PUSH_MY);
+			g_op->rotate();
+			g_op->assign_member($2);
+			g_op->pop_stack();
+		}
+	| '.' reserved_object
+		{
+			g_op->push_reserved(OP_PUSH_MY);
+			g_op->rotate();
 			g_op->assign_reserved($2);
 			g_op->pop_stack();
 		}

@@ -652,7 +652,7 @@ const char* orcaFlexLexer::get_context()/*{{{*/
 
 	yyunput_string(def.c_str());
 	
-	printf("# lexer get_context> '%s'\n", ctx.c_str());
+	//printf("# lexer get_context> '%s'\n", ctx.c_str());
 	return g_parser->strdup(ctx.c_str());
 }
 /*}}}*/

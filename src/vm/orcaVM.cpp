@@ -1426,6 +1426,11 @@ do_assign_list:
 				m_stack->rotate();
 				break;
 
+			case OP_ROTATE3:
+				PRINT1("\t\t%p : rotate3\n", c);
+				m_stack->rotate3();
+				break;
+
 			case OP_DUP:
 				PRINT1("\t\t%p : dup\n", c);
 				m_stack->dup();
