@@ -217,7 +217,7 @@ public:
 	orcaData ex_div(orcaVM* vm, int n);
 	orcaData ex_lt(orcaVM* vm, int n);
 	orcaData ex_eq(orcaVM* vm, int n);
-	orcaData ex_totalseconds(orcaVM* vm, int n);
+	orcaData ex_total_seconds(orcaVM* vm, int n);
 
 	orcaData ex_hours(orcaVM* vm, int n) 
 	{

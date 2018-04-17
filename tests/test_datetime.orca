@@ -17,12 +17,12 @@ if ret == false {
 print: '# add operation';
 print: dt1 = datetime.clone('2010-01-02 10:20:30');
 
-print: dt2 = dt1 + 1;
-if dt2 != datetime.clone('2010-01-02 10:20:30.000001') {
+print: dt2 = dt1 + 1.2;
+if dt2 != datetime.clone('2010-01-02 10:20:31.2') {
 	throw test.datetime <- 'datetime op failed';
 }
 
-print: dt2 = dt1 + 1000000 * 3600 * 24 * 2 + 1000000 * 3600* 2; # 2 day, 2hour
+print: dt2 = dt1 + 3600 * 24 * 2 + 3600* 2; # 2 day, 2hour
 
 if dt2 != datetime.clone('2010-01-04 12:20:30') {
 	throw test.datetime <- 'datetime op failed';
@@ -48,11 +48,11 @@ print: '# sub operation';
 print: dt1 = datetime.clone('2010-01-02 10:20:30');
 
 print: dt2 = dt1 - 1;
-if dt2 != datetime.clone('2010-01-02 10:20:29.999999') {
+if dt2 != datetime.clone('2010-01-02 10:20:29') {
 	throw test.datetime <- 'datetime op failed';
 }
 
-print: dt2 = dt1 - 1000000 * 3600 * 24 * 2 - 1000000 * 3600* 2; # 2 day, 2hour
+print: dt2 = dt1 - 3600 * 24 * 2 - 3600* 2; # 2 day, 2hour
 
 if dt2 != datetime.clone('2009-12-31 08:20:30') {
 	throw test.datetime <- 'datetime op failed';

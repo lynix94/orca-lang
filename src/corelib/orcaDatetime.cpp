@@ -26,6 +26,7 @@ void orcaDatetime::__init()
 	insert_native_function("init", (object_fp)&orcaDatetime::ex_init);
 	insert_native_function("date", (object_fp)&orcaDatetime::ex_date);
 	insert_native_function("time", (object_fp)&orcaDatetime::ex_time);
+	insert_native_function("timestamp", (object_fp)&orcaDatetime::ex_timestamp);
 	insert_native_function("+", (object_fp)&orcaDatetime::ex_add);
 	insert_native_function("-", (object_fp)&orcaDatetime::ex_sub);
 	insert_native_function("<", (object_fp)&orcaDatetime::ex_lt);
@@ -85,42 +86,29 @@ orcaData orcaDatetime::ex_time(orcaVM* vm, int n)
 	return new orcaTime(m_ptime.time_of_day());
 }
 
+orcaData orcaDatetime::ex_timestamp(orcaVM* vm, int n) 
+{
+	ptime from = from_time_t(0);
+	time_duration diff = m_ptime - from;
+
+	double d = diff.total_seconds() + (diff.fractional_seconds()/1000000.0);
+	return d;
+}
+
 orcaData orcaDatetime::ex_add(orcaVM* vm, int n) 
 {
 	orcaData d = vm->get_param(0);
 	orcaData bn, bn_tmp;
-	int i;
+	double f;
 
 	switch(d.get_type())
 	{
 	case TYPE_INT:
 	case TYPE_REAL:
 	case TYPE_STR:
-		i = d.Integer();
-		return new orcaDatetime(m_ptime + microseconds(i));
-
-	case TYPE_BIGNUM: {
-		mpz_t b, b_tmp;
-		mpz_init(b);
-		mpz_init(b_tmp);
-
-		mpz_mod_ui(b, d.bn(), 1000000);
-		int us = mpz_get_si(b);
-		mpz_tdiv_q_ui(b_tmp, d.bn(), 1000000);
-
-		mpz_mod_ui(b, b_tmp, 3600*24);
-		int s = mpz_get_si(b);
-		mpz_tdiv_q_ui(b_tmp, b_tmp, 3600*24);
-
-		int ds = mpz_get_si(b_tmp);
-
-		mpz_clear(b);
-		mpz_clear(b_tmp);
-		return new orcaDatetime(m_ptime 
-								+ days(ds) 
-								+ seconds(s) 
-								+ microseconds(us));
-		}
+	case TYPE_BIGNUM:
+		f = d.Double() * 1000000;
+		return new orcaDatetime(m_ptime + microseconds(f));
 
 	case TYPE_OBJ:
 		orcaObject* op = vm->get_param(0).Object();
@@ -142,38 +130,16 @@ orcaData orcaDatetime::ex_add(orcaVM* vm, int n)
 orcaData orcaDatetime::ex_sub(orcaVM* vm, int n) 
 {
 	orcaData d = vm->get_param(0);
-	int i;
+	double f;
 
 	switch(d.get_type())
 	{
 	case TYPE_INT:
 	case TYPE_REAL:
 	case TYPE_STR:
-		i = d.Integer();
-		return new orcaDatetime(m_ptime - microseconds(i));
-
-	case TYPE_BIGNUM: {
-		mpz_t b, b_tmp;
-		mpz_init(b);
-		mpz_init(b_tmp);
-
-		mpz_mod_ui(b, d.bn(), 1000000);
-		int us = mpz_get_si(b);
-		mpz_tdiv_q_ui(b_tmp, d.bn(), 1000000);
-
-		mpz_mod_ui(b, b_tmp, 3600*24);
-		int s = mpz_get_si(b);
-		mpz_tdiv_q_ui(b_tmp, b_tmp, 3600*24);
-
-		int ds = mpz_get_si(b_tmp);
-
-		mpz_clear(b);
-		mpz_clear(b_tmp);
-		return new orcaDatetime(m_ptime 
-								- days(ds) 
-								- seconds(s) 
-								- microseconds(us));
-		}
+	case TYPE_BIGNUM:
+		f = d.Double() * 1000000;
+		return new orcaDatetime(m_ptime - microseconds(f));
 
 	case TYPE_OBJ:
 		orcaObject* op = vm->get_param(0).Object();

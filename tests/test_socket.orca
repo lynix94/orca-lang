@@ -38,7 +38,7 @@ def client {
 		throw test.socket <- 'socket abnormal';
 	}
 
-	msg = sock.recv(100, 1000);
+	msg = sock.recv(100, 0.3);
 	print: msg;
 	sock.close();
 }

@@ -121,6 +121,7 @@ void orcaTime::__init()
 	insert_native_function("/", (object_fp)&orcaTime::ex_div);
 	insert_native_function("<", (object_fp)&orcaTime::ex_lt);
 	insert_native_function("==", (object_fp)&orcaTime::ex_eq);
+	insert_native_function("total_seconds", (object_fp)&orcaTime::ex_total_seconds);
 
 	insert_static_native_function("time_of_day", (object_fp)&orcaTime::ex_time_of_day);
 	insert_static_native_function("hours", (object_fp)&orcaTime::ex_hours);
@@ -210,39 +211,16 @@ orcaData orcaTime::ex_get(orcaVM* vm, int n)
 orcaData orcaTime::ex_add(orcaVM* vm, int n) 
 {
 	orcaData d = vm->get_param(0);
-	int i;
+	double f;
 
 	switch(d.get_type())
 	{
 	case TYPE_INT:
 	case TYPE_REAL:
 	case TYPE_STR:
-		i = d.Integer();
-		return new orcaTime(m_td + microseconds(i));
-
-	case TYPE_BIGNUM: {
-		mpz_t b, b_tmp;
-		mpz_init(b);
-		mpz_init(b_tmp);
-
-		mpz_mod_ui(b, d.bn(), 1000000);
-		int us = mpz_get_si(b);
-		mpz_tdiv_q_ui(b_tmp, d.bn(), 1000000);
-
-		mpz_mod_ui(b, b_tmp, 3600);
-		int s = mpz_get_si(b);
-		mpz_tdiv_q_ui(b_tmp, b_tmp, 3600);
-
-		int h = mpz_get_si(b_tmp);
-
-		mpz_clear(b);
-		mpz_clear(b_tmp);
-
-		return new orcaTime(m_td 
-							+ hours(h) 
-							+ seconds(s) 
-							+ microseconds(us));
-		}
+	case TYPE_BIGNUM: 
+		f = d.Double() * 1000000;
+		return new orcaTime(m_td + microseconds(f));
 
 	case TYPE_OBJ:
 		orcaObject* op = vm->get_param(0).Object();
@@ -258,39 +236,16 @@ orcaData orcaTime::ex_add(orcaVM* vm, int n)
 orcaData orcaTime::ex_sub(orcaVM* vm, int n) 
 {
 	orcaData d = vm->get_param(0);
-	int i;
+	double f;
 
 	switch(d.get_type())
 	{
 	case TYPE_INT:
 	case TYPE_REAL:
 	case TYPE_STR:
-		i = d.Integer();
-		return new orcaTime(m_td - microseconds(i));
-
-	case TYPE_BIGNUM: {
-		mpz_t b, b_tmp;
-		mpz_init(b);
-		mpz_init(b_tmp);
-
-		mpz_mod_ui(b, d.bn(), 1000000);
-		int us = mpz_get_si(b);
-		mpz_tdiv_q_ui(b_tmp, d.bn(), 1000000);
-
-		mpz_mod_ui(b, b_tmp, 3600);
-		int s = mpz_get_si(b);
-		mpz_tdiv_q_ui(b_tmp, b_tmp, 3600);
-
-		int h = mpz_get_si(b_tmp);
-
-		mpz_clear(b);
-		mpz_clear(b_tmp);
-
-		return new orcaTime(m_td 
-							- hours(h) 
-							- seconds(s) 
-							- microseconds(us));
-		}
+	case TYPE_BIGNUM: 
+		f = d.Double() * 1000000;
+		return new orcaTime(m_td - microseconds(f));
 
 	case TYPE_OBJ:
 		orcaObject* op = vm->get_param(0).Object();
@@ -358,22 +313,12 @@ orcaData orcaTime::ex_eq(orcaVM* vm, int n)
 	return NIL;
 }
 
-orcaData orcaTime::ex_totalseconds(orcaVM* vm, int n)
+orcaData orcaTime::ex_total_seconds(orcaVM* vm, int n)
 {
-	int sec = m_td.total_seconds();
-	int us = (int)m_td.fractional_seconds();
+	long sec = m_td.total_seconds();
+	long us = m_td.fractional_seconds();
 
-	if (abs(sec) > 1000) {
-		mpz_t b;
-		mpz_init(b);
-		mpz_set_si(b, sec);
-		mpz_mul_ui(b, b, 1000000);
-		mpz_add_ui(b, b, us);
-		mpz_clear(b);
-		return b;
-	}
-	else {
-		return sec*1000000 + us;
-	}
+	double d = sec + (us/1000000.0);
+	return d;
 }
 

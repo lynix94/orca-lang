@@ -60,7 +60,7 @@ Connection: keep-alive
 	msg = '';
 	try {
 		do {
-			ret = ..client.recv(0, 2000);
+			ret = ..client.recv(0, 2);
 
 			msg += ret;
 		} while ret.length() > 0;

@@ -77,7 +77,7 @@ def client
 			..sock.recv(0, 0);
 		}
 		
-		msg = ..sock.recv_all(len, 2000);
+		msg = ..sock.recv_all(len, 2);
 		print: '<<', header, msg;
 		return msg;
 	}

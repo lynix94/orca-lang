@@ -45,6 +45,7 @@ public:
 	orcaData ex_sub(orcaVM* vm, int n); 
 	orcaData ex_lt(orcaVM* vm, int n); 
 	orcaData ex_eq(orcaVM* vm, int n); 
+	orcaData ex_timestamp(orcaVM* vm, int n); 
 
 	void init_by_string(string& format)
 	{

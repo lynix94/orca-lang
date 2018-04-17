@@ -100,11 +100,11 @@ public:
 			throw orcaException(vm, "io.socket", "invalid handle");
 		}
 
-		int tmout = -1;
+		double tmout = -1;
 		int size = 65536;
 		char* buff;
 		if (n >= 2) {
-			tmout = vm->get_param(1).Integer();
+			tmout = vm->get_param(1).Double();
 		}
 		if (n >= 1) {
 			size = vm->get_param(0).Integer();
@@ -127,8 +127,8 @@ public:
 			fd_set fd_rd;
 			FD_ZERO(&fd_rd);
 			FD_SET(m_handle, &fd_rd);
-			tv.tv_sec = tmout / 1000;
-			tv.tv_usec = (tmout % 1000) * 1000;
+			tv.tv_sec = int(tmout);
+			tv.tv_usec = int(tmout * 1000000) % 1000000;
 			ret = select(m_handle+1, &fd_rd, NULL, NULL, &tv);
 			if (ret) {
 				if (FD_ISSET(m_handle, &fd_rd)) {
@@ -209,11 +209,11 @@ public:
 			throw orcaException(vm, "io.socket", "invalid handle");
 		}
 
-		int tmout = -1;
+		double tmout = -1;
 		int size = 0;
 		char* buff;
 		if (n >= 2) {
-			tmout = vm->get_param(1).Integer();
+			tmout = vm->get_param(1).Double();
 		}
 		if (n >= 1) {
 			size = vm->get_param(0).Integer();
@@ -241,8 +241,8 @@ public:
 				fd_set fd_rd;
 				FD_ZERO(&fd_rd);
 				FD_SET(m_handle, &fd_rd);
-				tv.tv_sec = tmout / 1000;
-				tv.tv_usec = (tmout % 1000) * 1000;
+				tv.tv_sec = int(tmout);
+				tv.tv_usec = int(tmout * 1000000) % 1000000;
 				ret = select(m_handle+1, &fd_rd, NULL, NULL, &tv);
 				if (ret) {
 					if (FD_ISSET(m_handle, &fd_rd)) {
