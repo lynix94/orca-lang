@@ -1,4 +1,5 @@
 using io.open;
+using os;
 
 input = 'hello, file';
 print: 'aaaaaaaa';
@@ -22,6 +23,7 @@ if input != output {
 	throw test.file <- 'file operation fail';
 }
 
+os.remove('test.txt');
 
 return true;
 

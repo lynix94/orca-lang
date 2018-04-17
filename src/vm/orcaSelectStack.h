@@ -9,6 +9,7 @@
 #ifndef _DEF_ORCA_SELECT_STACK
 #define _DEF_ORCA_SELECT_STACK
 
+#include <sys/eventfd.h>
 #include <set>
 
 using namespace std;
@@ -41,9 +42,14 @@ struct CASE
 
 struct SELECT 
 {
+	SELECT()
+	{
+		efd = eventfd(0, 0);
+	}
+
 	vector<CASE> cases;
-	portCond cond;
 	portMutex mutex;
+	int efd;
 
 	void push_case(orcaObject* src, int out_num, const char* code);
 };

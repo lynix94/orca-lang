@@ -78,6 +78,7 @@ namespace fs = boost::filesystem;
 // core
 #include "orcaPack.h"
 #include "orcaDatetime.h"
+#include "orcaSocket.h"
 
 #include "orcaVM.h"
 
@@ -2964,9 +2965,33 @@ do_assign_list:
 						}
 					}
 
+					int maxfd = sp->efd;
+					fd_set fd_rd;
+					FD_ZERO(&fd_rd);
+					FD_SET(sp->efd, &fd_rd);
+
+					for (int i=0; i<sp->cases.size(); i++) {
+						orcaSocket* so = dynamic_cast<orcaSocket*>(sp->cases[i].src);
+						if (so) {
+							int sock = so->get_handle();
+							FD_SET(sock, &fd_rd);
+							if (sock > maxfd) maxfd = sock;
+						}
+					}
+
 					g_select.regist(sp);
-					sp->cond.wait(&sp->mutex);
-					g_select.regist(sp);
+					sp->mutex.unlock();
+
+					int ret = select(maxfd+1, &fd_rd, NULL, NULL, NULL);
+					if (ret) {
+						if (FD_ISSET(sp->efd, &fd_rd)) {
+							uint64_t u;
+							ret = read(sp->efd, &u, sizeof(uint64_t));
+						}
+					}
+
+					sp->mutex.lock();
+					g_select.unregist(sp);
 					sp->mutex.unlock();
 				} while(true);
 
@@ -3575,7 +3600,8 @@ void orcaVM::channel_signal(orcaObject* op)/*{{{*/
 	SELECT* sp = g_select.find_select(op);
 	if (sp != NULL) {
 		sp->mutex.lock();
-		sp->cond.signal();
+		uint64_t u;
+		ssize_t ret = write(sp->efd, &u, sizeof(uint64_t));
 		sp->mutex.unlock();
 	}
 }

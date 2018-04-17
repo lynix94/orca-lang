@@ -41,6 +41,8 @@ public:
 		insert_native_function("create", (object_fp)&orcaSocket::ex_create);
 		insert_native_function("send", (object_fp)&orcaSocket::ex_send);
 		insert_native_function("recv", (object_fp)&orcaSocket::ex_recv);
+		insert_native_function("->", (object_fp)&orcaSocket::ex_channel_out);
+		insert_native_function("size", (object_fp)&orcaSocket::ex_size);
 		insert_native_function("recv_all", (object_fp)&orcaSocket::ex_recv_all);
 		insert_native_function("close", (object_fp)&orcaSocket::ex_close);
 		insert_native_function("connect", (object_fp)&orcaSocket::ex_connect);
@@ -147,6 +149,58 @@ public:
 		delete[] buff;
 
 		return s;
+	}
+/*}}}*/
+
+	orcaData ex_channel_out(orcaVM* vm, int n) {/*{{{*/
+		if (n<1) vm->need_param();
+
+		if (!m_handle) {
+			throw orcaException(vm, "io.socket", "invalid handle");
+		}
+
+		int size = 65536;
+		char* buff = new char[size+1];
+
+		int ret = ::recv(m_handle, &buff[0], size, 0);
+		if (ret <= 0) {
+			close();
+			delete[] buff;
+			throw orcaException(vm, "io.socket.disconn", "disconnected");
+		}
+
+		buff[ret] = 0;
+		string s;
+		s.resize(ret);
+		copy(&buff[0], &buff[ret], s.begin());
+		delete[] buff;
+
+		orcaTuple* tp = new orcaTuple();
+		tp->push_back(s);
+
+		return tp;
+	}
+/*}}}*/
+
+	orcaData ex_size(orcaVM* vm, int n) {/*{{{*/
+		if (!m_handle) {
+			throw orcaException(vm, "io.socket", "invalid handle");
+		}
+
+		struct timeval tv;
+		fd_set fd_rd;
+		FD_ZERO(&fd_rd);
+		FD_SET(m_handle, &fd_rd);
+		tv.tv_sec = 0;
+		tv.tv_usec = 0;
+		int ret = select(m_handle+1, &fd_rd, NULL, NULL, &tv);
+		if (ret) {
+			if (FD_ISSET(m_handle, &fd_rd)) {
+				return 1;
+			}
+		}
+
+		return 0;
 	}
 /*}}}*/
 
