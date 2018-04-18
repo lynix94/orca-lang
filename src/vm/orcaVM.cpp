@@ -1042,7 +1042,7 @@ void orcaVM::parallel_do(const char* code, const char* offset, int* run_count, o
 {
 	g_thread_pool->m_mutex_pool.lock();
 
-	static thread_arg_t arg;
+	thread_arg_t arg;
 	arg.vm_main = this;
 	arg.code = code;
 	arg.offset = offset;
@@ -1051,12 +1051,16 @@ void orcaVM::parallel_do(const char* code, const char* offset, int* run_count, o
 	arg.per = per;
 	arg.is_iterator = is_iterator;
 
+	g_thread_pool->m_cond_mutex.lock();
 	bool ret = g_thread_pool->signal_restart(arg);
 	if (ret == false) {
 		pthread_create(&arg.tid, NULL, parallel_thread_entry, &arg); 
 	}
 
-	g_thread_pool->m_cond_start.wait(&g_thread_pool->m_mutex_pool);
+	g_thread_pool->m_cond_start.wait(&g_thread_pool->m_cond_mutex);
+	g_thread_pool->m_cond_mutex.unlock();
+
+
 	g_thread_pool->m_mutex_pool.unlock();
 }
 /*}}}*/
@@ -2725,21 +2729,21 @@ do_assign_list:
 
 				int run_count = 0;
 				do {
-					g_thread_pool->m_mutex_pool.lock();
+					g_thread_pool->m_cond_mutex.lock();
 					while (run_count >= cpu_num) {
-						g_thread_pool->m_cond_done.wait(&g_thread_pool->m_mutex_pool);
+						g_thread_pool->m_cond_done.wait(&g_thread_pool->m_cond_mutex);
 					}
-					g_thread_pool->m_mutex_pool.unlock();
+					g_thread_pool->m_cond_mutex.unlock();
 
 					if (tit && tit->get_iter() == tp->end() ||
 						lit && lit->get_iter() == lp->end() ||
 						iterator_done == true)
 					{
-						g_thread_pool->m_mutex_pool.lock();
+						g_thread_pool->m_cond_mutex.lock();
 						while (run_count > 0) {
-							g_thread_pool->m_cond_done.wait(&g_thread_pool->m_mutex_pool);
+							g_thread_pool->m_cond_done.wait(&g_thread_pool->m_cond_mutex);
 						}
-						g_thread_pool->m_mutex_pool.unlock();
+						g_thread_pool->m_cond_mutex.unlock();
 
 						if (tit) delete tit;
 						if (lit) delete lit;

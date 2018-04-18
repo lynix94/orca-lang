@@ -178,21 +178,21 @@ retry:
 void thread_pool::set_start(pthread_t tid)
 {
 	PRINT1("thread start, tid:%d\n", (int)tid);
-	m_mutex_pool.lock();
+	m_cond_mutex.lock();
 	m_map[tid]->running = true;
 	m_cond_start.signal();
 	inc_run(tid);
-	m_mutex_pool.unlock();
+	m_cond_mutex.unlock();
 
 }
 
 void thread_pool::set_stop(pthread_t tid)
 {
 	PRINT1("thread stop, tid:%d\n", (int)tid);
-	m_mutex_pool.lock();
+	m_cond_mutex.lock();
 	dec_run(tid);
 	m_cond_done.signal();
-	m_mutex_pool.unlock();
+	m_cond_mutex.unlock();
 
 	m_map[tid]->mutex.lock();
 	m_map[tid]->running = false;

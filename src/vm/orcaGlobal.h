@@ -62,8 +62,10 @@ public:
 
 	void join_all();
 
-	portCond m_cond_start;
 	portMutex m_mutex_pool;
+
+	portMutex m_cond_mutex;
+	portCond m_cond_start;
 	portCond m_cond_done;
 	
 private:
