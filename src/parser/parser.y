@@ -482,6 +482,12 @@ parallel_stmt:/*{{{*/
 		{
 			g_ctl->parallel_for_end();
 		}
+	| PARALLEL postfix_object ';'
+		{
+			if (g_op->change_to_parallel_call() == false) {
+				throw g_parser->strdup("object is not callable");
+			}
+		}
 	;
 /*}}}*/
 

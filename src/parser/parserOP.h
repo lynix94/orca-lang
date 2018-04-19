@@ -26,6 +26,7 @@ public:
 
 	// about op
 	void call(int pnum);
+	bool change_to_parallel_call();
 	void mul();
 	void mod();
 	void add();
@@ -96,6 +97,7 @@ public:
 
 	bool push_mvar_using_space(const char* s);
 private:
+	int m_last_call_idx; // used for parallel call
 	int m_last_idx; // index to op code which push stack
 	int m_last_find;
 };

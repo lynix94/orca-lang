@@ -30,6 +30,8 @@ public:
 	orcaLocal(int initialSize=2048); 
 	~orcaLocal();
 
+	void reset();
+
 	void set(int i, orcaData d) {
 		lp[i].rc_dec();
 		lp[i] = d;

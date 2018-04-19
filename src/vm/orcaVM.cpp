@@ -10,7 +10,6 @@
 
 //#define _VM_DEBUG_
 
-
 #ifdef WIN32
 #include <winsock2.h>
 #include <windows.h>
@@ -1032,29 +1031,27 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 
 THREAD_RET parallel_thread_entry(void* ap)/*{{{*/
 {
-	thread_arg_t arg = *(thread_arg_t*)ap;
+	thread_arg_u arg = *(thread_arg_u*)ap;
 	g_thread_pool->work(arg);
 	return 0;
 }
 /*}}}*/
 
-void orcaVM::parallel_do(const char* code, const char* offset, int* run_count, orcaObject* op, int per, bool is_iterator)/*{{{*/
+void orcaVM::parallel_do(const char* code, const char* offset)/*{{{*/
 {
 	g_thread_pool->m_mutex_pool.lock();
 
-	thread_arg_t arg;
-	arg.vm_main = this;
-	arg.code = code;
-	arg.offset = offset;
-	arg.run_count = run_count;
-	arg.iter = op;
-	arg.per = per;
-	arg.is_iterator = is_iterator;
+	thread_arg_u arg;
+	arg.p_do.type = 'd';
+	arg.p_do.vm_main = this;
+	arg.p_call.run_count = NULL;
+	arg.p_do.code = code;
+	arg.p_do.offset = offset;
 
 	g_thread_pool->m_cond_mutex.lock();
 	bool ret = g_thread_pool->signal_restart(arg);
 	if (ret == false) {
-		pthread_create(&arg.tid, NULL, parallel_thread_entry, &arg); 
+		pthread_create(&arg.p_do.tid, NULL, parallel_thread_entry, &arg); 
 	}
 
 	g_thread_pool->m_cond_start.wait(&g_thread_pool->m_cond_mutex);
@@ -1064,6 +1061,57 @@ void orcaVM::parallel_do(const char* code, const char* offset, int* run_count, o
 	g_thread_pool->m_mutex_pool.unlock();
 }
 /*}}}*/
+
+void orcaVM::parallel_for(const char* code, const char* offset, int* run_count, orcaObject* op, int per, bool is_iterator)/*{{{*/
+{
+	g_thread_pool->m_mutex_pool.lock();
+
+	thread_arg_u arg;
+	arg.p_for.type = 'f';
+	arg.p_for.vm_main = this;
+	arg.p_for.code = code;
+	arg.p_for.offset = offset;
+	arg.p_for.run_count = run_count;
+	arg.p_for.iter = op;
+	arg.p_for.per = per;
+	arg.p_for.is_iterator = is_iterator;
+
+	g_thread_pool->m_cond_mutex.lock();
+	bool ret = g_thread_pool->signal_restart(arg);
+	if (ret == false) {
+		pthread_create(&arg.p_for.tid, NULL, parallel_thread_entry, &arg); 
+	}
+
+	g_thread_pool->m_cond_start.wait(&g_thread_pool->m_cond_mutex);
+	g_thread_pool->m_cond_mutex.unlock();
+
+
+	g_thread_pool->m_mutex_pool.unlock();
+}
+/*}}}*/
+
+void orcaVM::parallel_call(orcaData f, vector<orcaData>& params)
+{
+	g_thread_pool->m_mutex_pool.lock();
+
+	thread_arg_u arg;
+	arg.p_call.type = 'c';
+	arg.p_call.vm_main = this;
+	arg.p_call.run_count = NULL;
+	arg.p_call.func = &f;
+	arg.p_call.params = &params;
+
+	g_thread_pool->m_cond_mutex.lock();
+	bool ret = g_thread_pool->signal_restart(arg);
+	if (ret == false) {
+		pthread_create(&arg.p_call.tid, NULL, parallel_thread_entry, &arg); 
+	}
+
+	g_thread_pool->m_cond_start.wait(&g_thread_pool->m_cond_mutex);
+	g_thread_pool->m_cond_mutex.unlock();
+
+	g_thread_pool->m_mutex_pool.unlock();
+}
 
 void orcaVM::exec_code(const char* code, const char* offset)/*{{{*/
 {
@@ -2751,7 +2799,7 @@ do_assign_list:
 					}
 
 					orcaObject* new_iterator = iterator->clone(NULL);
-					parallel_do(code, c + 1 + sizeof(short) + sizeof(int),
+					parallel_for(code, c + 1 + sizeof(short) + sizeof(int),
 								&run_count, new_iterator, per, is_iterator);
 
 					int count = per;
@@ -2788,6 +2836,22 @@ do_assign_list:
 				} while(true);
 
 				c = code + TO_INT(&c[1 + sizeof(short)]);
+				goto fast_jmp;
+				break;
+			}
+
+			case OP_PARALLEL_CALL: {
+				PRINT2("\t\t%p : parallel call (param: %d)\n", c, c[1]); 
+				vector<orcaData> params;
+				for (int i=0; i<c[1]; i++) {
+					orcaData p = m_stack->pop();
+					params.push_back(p);
+				}
+
+				orcaData f = m_stack->pop();
+				parallel_call(f, params);
+
+				c += 1 + FJ_INC;
 				goto fast_jmp;
 				break;
 			}

@@ -28,6 +28,7 @@ parserOP* g_op = &s_op;
 parserOP::parserOP()
 {
 	m_last_idx = 0;
+	m_last_call_idx = 0;
 }
 
 void parserOP::assign_local(const char* name)	
@@ -63,11 +64,25 @@ void parserOP::assign_list(bool include_right)
 		code_top->push_char(OP_ASSIGN_LIST); 
 }
 
+#include <stdio.h>
+
 void parserOP::call(int pnum)		
 { 
 	m_last_idx = code_top->size();
+	m_last_call_idx = code_top->size();
 	code_top->push_char(OP_CALL); 
 	code_top->push_char(pnum);
+}
+
+bool parserOP::change_to_parallel_call()		
+{ 
+	int curr_size = code_top->size();
+	if ((curr_size - 2) == m_last_call_idx) {
+		code_top->set_char(OP_PARALLEL_CALL, m_last_call_idx);
+		return true;
+	}
+
+	return false; // syntax error
 }
 
 void parserOP::disable_fast_pop()

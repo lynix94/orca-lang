@@ -93,9 +93,10 @@ public:
 					 const string& sub_postfix, const string& kw_name,
 					 orcaObject* owner, string owner_path);
 	void reserve_local(); // for interactive
-	void parallel_do(const char* code, const char* offset, 
-					 int* run_count = NULL, orcaObject* op = NULL, int per = 0,
-					 bool is_iterator = true);
+	void parallel_do(const char* code, const char* offset);
+	void parallel_for(const char* code, const char* offset, 
+					 int* run_count, orcaObject* op, int per, bool is_iterator);
+	void parallel_call(orcaData f, vector<orcaData>& params);
 
 	// for interface
 	orcaData get_param(int i);

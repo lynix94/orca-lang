@@ -99,6 +99,7 @@
 #define OP_PARALLEL_START			0x6B
 #define OP_PARALLEL_END				0x6C
 #define OP_PARALLEL_FOR				0x6D
+#define OP_PARALLEL_CALL			0x6E
 
 #define OP_DECODE					0x70
 #define OP_DECODE_END				0x71

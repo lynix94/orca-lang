@@ -35,6 +35,14 @@ orcaLocal::~orcaLocal()
 	delete[] m_frame;
 }
 
+void orcaLocal::reset()
+{
+	//printf("### reset frame:%d, lp:%d\n", m_size, lp-m_frame);
+	memset(m_frame, 0x00, sizeof(orcaData) * FRAME_HEADER_SIZE);
+	lp = &m_frame[FRAME_HEADER_SIZE];
+	lp[IDX_CURSIZE].i_set(0);
+}
+
 void orcaLocal::more()
 {
 	int idx = lp - m_frame;

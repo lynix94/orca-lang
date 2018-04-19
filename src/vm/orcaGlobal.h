@@ -26,16 +26,54 @@ extern pthread_key_t g_thread_context;
 
 class orcaVM;
 
-struct thread_arg_t
+struct parallel_call_t
 {
+	// common area
+	char type;
 	orcaVM* vm_main;
-	const char* code;
-	const char* offset;
 	pthread_t tid;
 	int* run_count;
+
+	// specific area
+	orcaData* func;
+	vector<orcaData>* params;
+};
+
+
+struct parallel_do_t // p_do should be subset of p_for (same offset with p_for)
+{
+	// common area
+	char type;
+	orcaVM* vm_main;
+	pthread_t tid;
+	int* run_count;
+
+	// specific area
+	const char* code;
+	const char* offset;
+};
+
+struct parallel_for_t
+{
+	// common area
+	char type;
+	orcaVM* vm_main;
+	pthread_t tid;
+	int* run_count;
+
+	// specific area
+	const char* code;
+	const char* offset;
 	int per;
 	orcaObject* iter;
 	bool is_iterator;
+};
+
+union thread_arg_u
+{
+	parallel_call_t p_call;
+	parallel_do_t p_do;
+	parallel_for_t p_for;
 };
 
 struct thread_pool_t 
@@ -44,7 +82,7 @@ struct thread_pool_t
 	portMutex mutex;
 
 	bool running;
-	thread_arg_t arg;
+	thread_arg_u arg;
 
 	thread_pool_t() {
 		running = false;
@@ -57,8 +95,8 @@ public:
 	thread_pool();
 	~thread_pool();
 
-	bool signal_restart(thread_arg_t arg);
-	void work(thread_arg_t arg);
+	bool signal_restart(thread_arg_u arg);
+	void work(thread_arg_u arg);
 
 	void join_all();
 
@@ -71,7 +109,7 @@ public:
 private:
 	void set_start(pthread_t tid);
 	void set_stop(pthread_t tid);
-	thread_arg_t get_arg(pthread_t tid);
+	thread_arg_u get_arg(pthread_t tid);
 
 	bool is_exit();
 	void inc_run(pthread_t tid);
