@@ -33,9 +33,9 @@ public:
 		orcaList* wd = dynamic_cast<orcaList*>(vm->get_param(1).Object());
 		orcaList* ed = dynamic_cast<orcaList*>(vm->get_param(2).Object());
 
-		int tmout = -1;
+		double tmout = -1;
 		if (n > 3) {
-			tmout = vm->get_param(3).Integer();
+			tmout = vm->get_param(3).Double();
 		}
 
 		fd_set fd_rd, fd_wd, fd_ed;
@@ -73,8 +73,8 @@ public:
 		struct timeval* tvp = NULL;
 
 		if (tmout >= 0) {
-			tv.tv_sec = tmout / 1000;
-			tv.tv_usec = (tmout % 1000) * 1000;
+			tv.tv_sec = int(tmout);
+			tv.tv_usec = (long long)(tmout * 1000000) % 1000000;
 			tvp = &tv;
 		}
 

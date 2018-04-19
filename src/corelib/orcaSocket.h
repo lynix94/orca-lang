@@ -128,7 +128,7 @@ public:
 			FD_ZERO(&fd_rd);
 			FD_SET(m_handle, &fd_rd);
 			tv.tv_sec = int(tmout);
-			tv.tv_usec = int(tmout * 1000000) % 1000000;
+			tv.tv_usec = (long long)(tmout * 1000000) % 1000000;
 			ret = select(m_handle+1, &fd_rd, NULL, NULL, &tv);
 			if (ret) {
 				if (FD_ISSET(m_handle, &fd_rd)) {
@@ -242,7 +242,7 @@ public:
 				FD_ZERO(&fd_rd);
 				FD_SET(m_handle, &fd_rd);
 				tv.tv_sec = int(tmout);
-				tv.tv_usec = int(tmout * 1000000) % 1000000;
+				tv.tv_usec = (long long)(tmout * 1000000) % 1000000;
 				ret = select(m_handle+1, &fd_rd, NULL, NULL, &tv);
 				if (ret) {
 					if (FD_ISSET(m_handle, &fd_rd)) {

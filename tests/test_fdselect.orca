@@ -17,7 +17,7 @@ def server {
 	sock.listen();
 
 	while true {
-		fd = fdselect.fdselect([sock.get()], [], [], 1000);
+		fd = fdselect.fdselect([sock.get()], [], [], 1.0);
 
 		if fd[0] == [sock.get()] {
 			new_cl = sock.accept();
