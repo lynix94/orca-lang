@@ -188,8 +188,26 @@ void thread_pool::work(thread_arg_u arg)
 
 void thread_pool::join_all()
 {
-	m_quit = true;
+	// wait until all done
+	while (true) {
+		int running  = 0;
+		port_msleep(10);
 
+		m_mutex_pool.lock();
+		map<pthread_t, thread_pool_t*>::iterator it;
+		for (it = m_map.begin(); it != m_map.end(); ++it) {
+			if (it->second->running) {
+				running++;
+			}
+		}
+		m_mutex_pool.unlock();
+
+		if (running == 0) {
+			break;
+		}
+	}
+
+	m_quit = true;
 	map<pthread_t, thread_pool_t*>::iterator it;
 	for (it = m_map.begin(); it != m_map.end(); ++it) {
 retry:
@@ -212,6 +230,7 @@ retry:
 		pthread_join(it->first, NULL);
 	}
 }
+
 
 void thread_pool::set_start(pthread_t tid)
 {
