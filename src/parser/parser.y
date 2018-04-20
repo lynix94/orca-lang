@@ -809,9 +809,9 @@ switch_pattern_stmt:/*{{{*/
 		{
 			g_ctl->switch_case_start();
 		}
-	expression ':'
+	expression_list ':'
 		{
-			g_ctl->switch_case_shift();
+			g_ctl->switch_case_shift($3);
 		}
 	opt_statement_list
 		{

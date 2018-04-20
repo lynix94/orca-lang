@@ -81,7 +81,7 @@ public:
 	void switch_start();
 	void switch_end();
 	void switch_case_start();
-	void switch_case_shift();
+	void switch_case_shift(int n);
 	void switch_case_end();
 
 	void select_start();

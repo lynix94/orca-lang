@@ -2642,20 +2642,33 @@ do_assign_list:
 				m_local->clean_mark(MARK_SWITCH);
 				break;
 
-			case OP_SWITCH_CASE:
-				PRINT1("\t\t%p : case pattern start\n", c); 
-				p1 = m_stack->pop();
-				if (m_switch_stack->compare(p1) == false) {
-					c = code + TO_INT(&c[1]);
-					goto fast_jmp;
-				} else {
-					c += sizeof(int) + FJ_INC;
+			case OP_SWITCH_CASE: {
+				PRINT2("\t\t%p : case pattern start (%d)\n", c, c[1]); 
+
+				int count = c[1];
+				bool found = false;
+				for (int i=0; i<count; i++) {
+					p1 = m_stack->pop();
+					if (found) continue; // to consume remain stack
+
+					if (m_switch_stack->compare(p1) == true) {
+						found = true;
+					}
+				}
+
+				if (found == false) {
+					c = code + TO_INT(&c[2]);
 					goto fast_jmp;
 				}
-				break;
+				else {
+					c += sizeof(char) + sizeof(int) + FJ_INC;
+					goto fast_jmp;
+				}
 
-			case OP_SBF: 
-			  {
+				break;
+			}
+
+			case OP_SBF: {
 				PRINT4("\t\t%p : sbf: code: %d, gen: %d, rule: %d\n", 
 						c, TO_INT(&c[1]), TO_INT(&c[1+sizeof(int)]),
 						TO_INT(&c[1+2*sizeof(int)])); 

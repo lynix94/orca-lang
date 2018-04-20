@@ -431,11 +431,16 @@ void parserControl::switch_case_start()/*{{{*/
 }
 /*}}}*/
 
-void parserControl::switch_case_shift()/*{{{*/
+void parserControl::switch_case_shift(int n)/*{{{*/
 {
 	context& ctx = m_ctl[m_ctl.size()-1];
 
 	code_top->push_char(OP_SWITCH_CASE);
+	if (n > 127) {
+		throw "switch case exceeds max";
+	}
+	code_top->push_char(n);
+
 	// continues are used for go to next pattern start
 	ctx.list_cont.push_back(code_top->size());
 	code_top->increase(sizeof(int));
