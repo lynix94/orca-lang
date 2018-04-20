@@ -18,7 +18,13 @@
 bool data_cmp::operator()(orcaData l, orcaData r) const
 {
 	if (is<TYPE_OBJ>(l) || is<TYPE_OBJ>(r)) {
-		return l.operator_lt(get_current_vm(), r).Boolean(); // for user made operator..
+		orcaData ret = l.operator_lt(get_current_vm(), r); // for user made operator..
+
+		if (is<TYPE_NIL>(ret)) { // not defined, if so use id
+			return l.o() < r.o();
+		}
+
+		return ret.Boolean();
 	}
 
 	if (is<TYPE_REGEX>(l)) {
