@@ -78,6 +78,7 @@ namespace fs = boost::filesystem;
 #include "orcaPack.h"
 #include "orcaDatetime.h"
 #include "orcaSocket.h"
+#include "orcaSelect.h"
 
 #include "orcaVM.h"
 
@@ -3056,7 +3057,13 @@ do_assign_list:
 						if (so) {
 							int sock = so->get_handle();
 							FD_SET(sock, &fd_rd);
-							if (sock > maxfd) maxfd = sock;
+							maxfd = max(maxfd, sock);
+						}
+
+						orcaSelector* sel = dynamic_cast<orcaSelector*>(sp->cases[i].src);
+						if (sel) {
+							int fd = sel->set_fd(&fd_rd);
+							maxfd = max(maxfd, fd);
 						}
 					}
 

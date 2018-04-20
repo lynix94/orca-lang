@@ -751,7 +751,7 @@ opt_select_default_stmt:/*{{{*/
 			g_ctl->select_case_start();
 			g_ctl->select_default_shift();
 		}
-	statement_list
+	opt_statement_list
 		{
 			g_ctl->select_case_end(0);
 		}
@@ -766,7 +766,8 @@ select_case_stmt:/*{{{*/
 		{
 			g_ctl->select_case_shift();
 		}
-	assign_target_list_with_argv ':' statement_list
+	assign_target_list_with_argv ':'
+	opt_statement_list
 		{
 			g_ctl->select_case_end($6);
 		}
@@ -951,7 +952,7 @@ decode_pattern_stmt:/*{{{*/
 		{
 			g_ctl->decode_pattern_shift();
 		}
-	statement_list
+	opt_statement_list
 		{
 			g_ctl->decode_pattern_end();
 		}

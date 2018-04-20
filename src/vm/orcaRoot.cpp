@@ -65,7 +65,7 @@ orcaRoot::orcaRoot()
 	insert_static("os", new orcaOS());
 	insert_static("dl", new orcaDL());
 	insert_static("thread", new orcaThread());
-	insert_static("socket", new orcaSocket());
+	insert_static("socket", new orcaSocketModule());
 	insert_static("fdselect", new orcaSelect());
 	insert_static("ipc", new orcaIPC());
 	insert_static("time", new orcaTime());
@@ -89,6 +89,7 @@ orcaRoot::orcaRoot()
 	insert_native_function("string", (object_fp)&orcaRoot::ex_string);
 	insert_native_function("repr", (object_fp)&orcaRoot::ex_repr);
 	insert_native_function("range", (object_fp)&orcaRoot::ex_range);
+	insert_native_function("selector", (object_fp)&orcaRoot::ex_selector);
 
 #if defined(LINUX)
 #if defined(USE_GTK)
@@ -213,6 +214,44 @@ orcaData orcaRoot::ex_range(orcaVM* vm, int n)
 	
 	return rp;
 }
+
+void push_fds(orcaData p, vector<orcaData>& fds)
+{
+	if(isobj<orcaTuple>(p)) {
+		orcaTuple* tp = (orcaTuple*)p.o();
+		for (int i=0; i<tp->size(); i++) {
+			push_fds(tp->at(i), fds);
+		}
+		return;
+	}
+	
+	if(isobj<orcaList>(p)) {
+		orcaList* lp = (orcaList*)p.o();
+		orcaListIter li = lp->begin();
+		for (; li != lp->end(); ++li) {
+			push_fds(*li, fds);
+		}
+		return;
+	}
+
+	fds.push_back(p);
+	p.rc_inc();
+	return;
+}
+
+orcaData orcaRoot::ex_selector(orcaVM* vm, int n)
+{
+	vector<orcaData> fds;
+	for (int i=0; i<n; i++) {
+		orcaData p = vm->get_param(i);
+		push_fds(p, fds);
+	}
+
+	orcaSelector* sp = new orcaSelector();
+	sp->pass_fds(fds);
+	return sp;
+}
+
 
 
 

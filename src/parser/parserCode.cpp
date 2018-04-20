@@ -161,6 +161,7 @@ parserCode::parserCode(const char* module_name, vector<const char*>* param, /*{{
 	m_space["string"] = "string";
 	m_space["repr"] = "repr";
 	m_space["range"] = "range";
+	m_space["selector"] = "selector";
 }
 /*}}}*/
 
