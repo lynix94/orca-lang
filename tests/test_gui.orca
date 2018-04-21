@@ -90,7 +90,7 @@ def main : window
 	def box : vbox
 	{
 		count = 0;
-		for i in test_gui.test_list: {
+		for i in test_gui.test_list {
 			a = test_gui.template.clone();
 			a.make();
 
