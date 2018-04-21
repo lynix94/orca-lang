@@ -1,0 +1,71 @@
+
+
+print: argv;
+name = argv[0];
+ts = argv[1];
+body = argv[2];
+params = argv[3];
+suffix = argv[4];
+
+
+switch suffix
+{
+case 'html':
+	return .process_html(body);
+
+case 'html.form':
+	return .process_form(body);
+
+default:
+	return nil;
+}
+
+
+
+def process_html(body)
+{
+	def html_object(req)
+	{
+		def __template;
+
+		def init(body)
+		{
+			..__template = body;
+		}
+
+		keys = .__template.list_format();
+		#print: keys;
+
+		dict = {,};
+		for key in keys() {
+			if my.MEMBERS.has_key(key) {
+				value = my.MEMBERS[key](req);
+				dict[key] = value;
+			}
+			else {
+				dict[key] = '';
+			}
+		}
+
+		return my.__template % dict;
+	}
+
+	ret = my.html_object.clone(body);
+	return ret;
+}
+
+
+def process_form(body)
+{
+	def html_form_object(req)
+	{
+		print: req;
+		return '';
+	}
+
+	ret = my.html_form_object.clone();
+	return ret;
+}
+
+
+
