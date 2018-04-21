@@ -325,6 +325,10 @@ orcaData orcaVM::invoke_internal_func(InternalFunction& in) /*{{{*/
 		r = g_string.lower(this, d.so->s); 
 		break;
 
+	case FI_STR_LIST_FORMAT:	
+		r = g_string.list_format(this, d.so->s); 
+		break;
+
 	case FI_INT_TO_INT:	
 		r = g_integer.integer(this, d.i); 
 		break;

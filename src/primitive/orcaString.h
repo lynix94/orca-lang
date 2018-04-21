@@ -42,6 +42,7 @@ public:
 	orcaData char_(orcaVM* vm, string& str);
 	orcaData upper(orcaVM* vm, string& str);
 	orcaData lower(orcaVM* vm, string& str);
+	orcaData list_format(orcaVM* vm, string& str);
 
 	static string slice(string& s, int start, int end, bool include_right);
 

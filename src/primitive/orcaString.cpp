@@ -26,7 +26,7 @@ static string g_white_string = " \t\r\n";
 orcaString g_string;
 
 
-orcaString::orcaString() /*{{{*/
+orcaString::orcaString() 
 {
 	// this is the only one copy
 	make_original();
@@ -53,14 +53,15 @@ orcaString::orcaString() /*{{{*/
 	d.internal(FI_STR_TO_REPR,"repr");					insert_static("repr", d); 
 	d.internal(FI_STR_UPPER,"upper");					insert_static("upper", d); 
 	d.internal(FI_STR_LOWER,"lower");					insert_static("lower", d); 
+	d.internal(FI_STR_LIST_FORMAT,"list_format");		insert_static("list_format", d);
 }
-/*}}}*/
 
-static char char_upper(char in)/*{{{*/
+
+static char char_upper(char in)
 {
 	return toupper(in);
 }
-/*}}}*/
+
 
 orcaData orcaString::upper(orcaVM* vm, string& str) /*{{{*/
 { 
@@ -73,13 +74,12 @@ orcaData orcaString::upper(orcaVM* vm, string& str) /*{{{*/
 }
 /*}}}*/
 
-static char char_lower(char in)/*{{{*/
+static char char_lower(char in)
 {
 	return tolower(in);
 }
-/*}}}*/
 
-orcaData orcaString::lower(orcaVM* vm, string& str) /*{{{*/
+orcaData orcaString::lower(orcaVM* vm, string& str) 
 { 
 	string ret;
 	ret.resize(str.length());
@@ -87,20 +87,18 @@ orcaData orcaString::lower(orcaVM* vm, string& str) /*{{{*/
 	transform(str.begin(), str.end(), ret.begin(), char_lower);
 	return ret;
 }
-/*}}}*/
 
-orcaData orcaString::char_(orcaVM* vm, string& str) /*{{{*/
+
+orcaData orcaString::char_(orcaVM* vm, string& str) 
 { 
 	int v = str[vm->get_param(0).Integer()];
 	return v;
 }
-/*}}}*/
 
-orcaData orcaString::length(orcaVM* vm, string& str) /*{{{*/
+orcaData orcaString::length(orcaVM* vm, string& str) 
 { 
 	return str.length();
 }
-/*}}}*/
 
 orcaTuple* orcaString::_find_regex(string& str, regex& re, int s, int e)/*{{{*/
 {	
@@ -463,17 +461,10 @@ orcaData orcaString::float_(orcaVM* vm, string& s) /*{{{*/
 }
 /*}}}*/
 
-orcaData orcaString::to_string(orcaVM* vm, string& s) /*{{{*/
-{
-	return s;
-}
-/*}}}*/
-
-orcaData orcaString::to_repr(orcaVM* vm, string& s) /*{{{*/
+orcaData orcaString::to_repr(orcaVM* vm, string& s) 
 {
 	return string("\"") + kyString::to_escape(s) + "\"";
 }
-/*}}}*/
 
 string orcaString::slice(string& s, int start, int end, bool include_right) /*{{{*/
 {
@@ -520,11 +511,39 @@ string orcaString::slice(string& s, int start, int end, bool include_right) /*{{
 }
 /*}}}*/
 
-orcaData orcaString::push_back(orcaVM* vm, string& str) // int/*{{{*/
+orcaData orcaString::push_back(orcaVM* vm, string& str) // int
 {	
 	orcaData p = vm->get_param(0);
 	p.string_(vm, str);
 	return 0; // return value is made in orcaVM.cpp (caller)
 }
-/*}}}*/
+
+orcaData orcaString::list_format(orcaVM* vm, string& str) 
+{ 
+	int s=0;
+	int e=INT_MAX;
+
+	orcaList* lp = new orcaList();
+	int start = s;
+
+	for (int i=0; i<str.length()-1; i++) {
+		if (str[i] == '%' && str[i+1] == '{') {
+			int j = i+2;
+			for (; j<str.length() && str[j] != '}'; j++) {
+				if (iswspace(str[j])) break;
+				if (str[j] == '%') break;
+			}
+	
+			if (str[j] == '}') {
+				lp->push_back(str.substr(i+2, j-(i+2)));
+				i=j;
+			}
+			else {
+				i = j-1;
+			}
+		}
+	}
+
+	return lp;
+}
 

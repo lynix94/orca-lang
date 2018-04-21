@@ -32,164 +32,190 @@ LIBORCA_API orcaData NIL;
 
 string format_str(orcaVM* vm, string& format, vector<orcaData>& params)/*{{{*/
 {
-	string out;
+	orcaData d = params[params.size()-1];
+	orcaMap* mp = NULL;
+	if (isobj<orcaMap>(d)) {
+		mp = dynamic_cast<orcaMap*>(d.o());
+	}
+
+	stringstream ss;
 	vector<orcaData>::iterator it = params.begin();
 	for (int i=0; i<format.length(); i++) {
-		if (format[i] == '%')
-		{
-			string new_format;
-			string new_out;
+		if (format[i] == '%') {
+			// keyword format
+			if (i < format.length()-1 && format[i+1] == '{') {
+				int j=i+2;
+				for (; j<format.length() && format[j] != '}'; j++) {
+					if (iswspace(format[j])) break;
+					if (format[j] == '%') break;
+				}
 
-			int count = 0;
-			bool loop = true;
-			bool flag = true;
-			char type = 0;
-			do {
-				new_format += format[i];
+				if (format[j] == '}' && mp != NULL) {
+					orcaData key = format.substr(i+2, j-(i+2));
+					orcaData value =  mp->at(key);
+					ss << value.string_(vm);
+					i = j;
+				}
+				else {
+					ss << format.substr(i, j-i);
+					i = j-1;
+					continue;
+				}
+			}
+			else {
+				string new_format;
 
-				loop = false;
-				switch(format[i])
+				int count = 0;
+				bool loop = true;
+				bool flag = true;
+				char type = 0;
+				do {
+					new_format += format[i];
+
+					loop = false;
+					switch(format[i])
+					{
+					case 'd':
+					case 'i':
+					case 'u':
+					case 'x':
+					case 'X':
+					case 'o':
+					case 'c':
+						type = 'i';
+						break;
+
+					case 'e':
+					case 'E':
+					case 'g':
+					case 'G':
+					case 'f':
+					case 'F':
+						type = 'f';
+						break;
+
+					case 's':
+						type = 's';
+						break;
+
+					case 'p':
+						type = 'p';
+						break;
+
+					case '$':
+						throw orcaException(vm, "orca.param", 
+											string("invalid format parameters ") + "$");
+						break;
+
+					case '%':
+					case '.':
+					case '+':				
+					case '-':
+					case '#':
+						if (count != 0) {
+							flag = false;
+						}
+						else {
+							loop = true;
+						}
+						count++;
+						break;
+
+					default: 
+						if (isdigit(format[i])) loop = true;
+						else flag = false;
+					}
+
+					i++;
+				} while (loop);
+
+				if (flag == false) {
+					// not format
+					ss << new_format;
+					i--;
+					continue;
+				}
+
+				i--;
+				char buff[1024];
+				if (it == params.end()) {
+					throw orcaException(vm, "orca.param", "insufficient param in format arguments");
+				}
+
+				orcaData d = (*it);
+
+				int p_i;
+				string p_s;
+				double p_d;
+				void* p_p;
+				switch(type)
 				{
-				case 'd':
-				case 'i':
-				case 'u':
-				case 'x':
-				case 'X':
-				case 'o':
-				case 'c':
-					type = 'i';
+				case 'i': 
+					if (d.get_type() != TYPE_BIGNUM) {
+						switch(d.get_type()) {
+							case TYPE_INT: p_i = d.i(); break;
+							case TYPE_REAL: p_i = (int)d.r(); break;
+							case TYPE_STR: p_i = atoi(d.s().c_str()); break;
+							case TYPE_BOOL: p_i = d.i(); break;
+							default: p_i = 0;
+						}
+						snprintf(buff, sizeof(buff), new_format.c_str(), p_i);
+					}
+					else {
+						new_format = new_format.replace(0, 1, "%Z"); 
+						gmp_snprintf(buff, sizeof(buff), new_format.c_str(), d.bn());
+					}
 					break;
 
-				case 'e':
-				case 'E':
-				case 'g':
-				case 'G':
-				case 'f':
-				case 'F':
-					type = 'f';
+
+				case 'f': 
+					switch(d.get_type()) {
+						case TYPE_INT: p_d = d.i(); break;
+						case TYPE_BIGNUM: p_d = get_bn_double(d.bn()); break;
+						case TYPE_REAL: p_d = d.r(); break;
+						case TYPE_STR: p_d = atof(d.s().c_str()); break;
+						case TYPE_BOOL: p_d = d.i(); break;
+						default: p_d = 0;
+					}
+					snprintf(buff, sizeof(buff), new_format.c_str(), p_d);
 					break;
 
 				case 's':
-					type = 's';
+					p_s = d.string_(vm);
+					snprintf(buff, sizeof(buff), new_format.c_str(), p_s.c_str());
 					break;
 
 				case 'p':
-					type = 'p';
+					p_p = NULL;
+					if (is<TYPE_OBJ>(d)) {
+						p_p = d.o();
+					}
+
+					snprintf(buff, sizeof(buff), new_format.c_str(), p_p);
+					
+	#ifdef WINDOWS
+					{
+						char buff_tmp[32];
+						strncpy(buff_tmp, buff, 32);
+						snprintf(buff, sizeof(buff), "0x%s", buff_tmp);
+					}
+	#endif
 					break;
 
-				case '$':
-					throw orcaException(vm, "orca.param", 
-										string("invalid format parameters ") + "$");
+				default:
 					break;
-
-				case '%':
-				case '.':
-				case '+':				
-				case '-':
-				case '#':
-					if (count != 0) {
-						flag = false;
-					}
-					else {
-						loop = true;
-					}
-					count++;
-					break;
-
-				default: 
-					if (isdigit(format[i])) loop = true;
-					else flag = false;
 				}
 
-				i++;
-			} while (loop);
-
-			if (flag == false) {
-				// not format
-				out += new_format;
-				i--;
-				continue;
+				it++;
+				ss << buff;
 			}
-
-			i--;
-			char buff[1024];
-			if (it == params.end()) {
-				throw orcaException(vm, "orca.param", "insufficient param in format arguments");
-			}
-
-			orcaData d = (*it);
-
-			int p_i;
-			string p_s;
-			double p_d;
-			void* p_p;
-			switch(type)
-			{
-			case 'i': 
-				if (d.get_type() != TYPE_BIGNUM) {
-					switch(d.get_type()) {
-						case TYPE_INT: p_i = d.i(); break;
-						case TYPE_REAL: p_i = (int)d.r(); break;
-						case TYPE_STR: p_i = atoi(d.s().c_str()); break;
-						case TYPE_BOOL: p_i = d.i(); break;
-						default: p_i = 0;
-					}
-					snprintf(buff, sizeof(buff), new_format.c_str(), p_i);
-				}
-				else {
-					new_format = new_format.replace(0, 1, "%Z"); 
-					gmp_snprintf(buff, sizeof(buff), new_format.c_str(), d.bn());
-				}
-				break;
-
-
-			case 'f': 
-				switch(d.get_type()) {
-					case TYPE_INT: p_d = d.i(); break;
-					case TYPE_BIGNUM: p_d = get_bn_double(d.bn()); break;
-					case TYPE_REAL: p_d = d.r(); break;
-					case TYPE_STR: p_d = atof(d.s().c_str()); break;
-					case TYPE_BOOL: p_d = d.i(); break;
-					default: p_d = 0;
-				}
-				snprintf(buff, sizeof(buff), new_format.c_str(), p_d);
-				break;
-
-			case 's':
-				p_s = d.string_(vm);
-				snprintf(buff, sizeof(buff), new_format.c_str(), p_s.c_str());
-				break;
-
-			case 'p':
-				p_p = NULL;
-				if (is<TYPE_OBJ>(d)) {
-					p_p = d.o();
-				}
-
-				snprintf(buff, sizeof(buff), new_format.c_str(), p_p);
-				
-#ifdef WINDOWS
-				{
-					char buff_tmp[32];
-					strncpy(buff_tmp, buff, 32);
-					snprintf(buff, sizeof(buff), "0x%s", buff_tmp);
-				}
-#endif
-				break;
-
-			default:
-				break;
-			}
-
-			it++;
-			out += buff;
 		}
 		else {
-			out += format[i];
+			ss << format[i];
 		}
 	}
 
-	return out;
+	return ss.str();
 }
 /*}}}*/
 
