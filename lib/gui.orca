@@ -40,14 +40,14 @@ def window
 		owner.init_gtk();
 		owner();
 
-		if owner.TYPE < gui.table {
+		if owner.TYPE < gui.table.TYPE {
 			return;
 		}
 
 		members = owner.MEMBERS.values();
 
 		alg.remove_if: members.begin(), members.end(), lambda(a){
-			ret = a.TYPE < window;
+			ret = a.TYPE < window.TYPE;
 			if ret == nil || ret == false {
 				return true;
 			}

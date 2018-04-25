@@ -461,6 +461,11 @@ orcaData orcaString::float_(orcaVM* vm, string& s) /*{{{*/
 }
 /*}}}*/
 
+orcaData orcaString::to_string(orcaVM* vm, string& s) 
+{
+	return s;
+}
+
 orcaData orcaString::to_repr(orcaVM* vm, string& s) 
 {
 	return string("\"") + kyString::to_escape(s) + "\"";

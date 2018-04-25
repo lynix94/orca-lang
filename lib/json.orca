@@ -51,7 +51,7 @@ def decoding(str)
 		}
 
 		tp = decoding(value);
-		if tp.TYPE == ..dummy_list {
+		if tp.TYPE == ..dummy_list.TYPE {
 			return tp.list;
 		}
 		return [tp];
@@ -62,7 +62,7 @@ def decoding(str)
 		}
 
 		tp = decoding(value);
-		if tp.TYPE == ..dummy_list {
+		if tp.TYPE == ..dummy_list.TYPE {
 			map = type.map();
 			for a in tp.list {
 				if map.has_key(a[0]) {
@@ -87,7 +87,7 @@ def decoding(str)
 		item  = decoding(head);
 		remain = decoding(tail);
 
-		if remain.TYPE == ..dummy_list {
+		if remain.TYPE == ..dummy_list.TYPE {
 			remain.list.push_front(item);
 			return remain;
 		}

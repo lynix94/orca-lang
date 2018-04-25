@@ -338,7 +338,7 @@ def.parse parse_code(src)
 						if ..owner.mmap.has_key(argv[0][0]) {
 
 							macro =  ..owner.mmap[argv[0][0]];
-							if !macro.TYPE <= ..owner.function {
+							if !macro.TYPE <= ..owner.function.TYPE {
 								return ..owner.mmap[argv[0][0]];
 							}
 						}

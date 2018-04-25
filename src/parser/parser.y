@@ -821,11 +821,11 @@ switch_pattern_stmt:/*{{{*/
 	;
 /*}}}*/
 
-opt_statement_list:
+opt_statement_list:/*{{{*/
 	/* empty */
 	| statement_list
 	;
-
+/*}}}*/
 
 decode_stmt:/*{{{*/
 	DECODE expression 
@@ -1857,36 +1857,41 @@ and_expr:/*{{{*/
 /*}}}*/
 
 not_expr:/*{{{*/
-	'!' logical_expr
+	'!' logical_compare_expr
 		{
 			g_op->do_not();
 		}
-	| logical_expr
+	| logical_compare_expr
 	;
 /*}}}*/
 
-logical_expr:/*{{{*/
-	numeric_expr GT numeric_expr
+logical_compare_expr:/*{{{*/
+	logical_compare_expr GT logical_eq_expr
 		{
 			g_op->gt();
 		}
-	| numeric_expr GE numeric_expr
+	| logical_compare_expr GE logical_eq_expr
 		{
 			g_op->ge();
 		}
-	| numeric_expr LT numeric_expr
+	| logical_compare_expr LT logical_eq_expr
 		{
 			g_op->lt();
 		}
-	| numeric_expr LE numeric_expr
+	| logical_compare_expr LE logical_eq_expr
 		{
 			g_op->le();
 		}
-	| numeric_expr EQ numeric_expr
+	| logical_eq_expr
+	;
+/*}}}*/
+
+logical_eq_expr:/*{{{*/
+	logical_eq_expr EQ numeric_expr
 		{
 			g_op->eq();
 		}
-	| numeric_expr NEQ numeric_expr
+	| logical_eq_expr NEQ numeric_expr
 		{
 			g_op->neq();
 		}

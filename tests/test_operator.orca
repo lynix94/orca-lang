@@ -10,7 +10,7 @@ def complex
 	}
 
 	def '+'(rhs) {
-	if owner.TYPE == rhs {
+	if owner.TYPE == rhs.TYPE {
 		result = owner.clone(owner.real + rhs.real, owner.img + rhs.img);
 	}
 	else {
@@ -20,7 +20,7 @@ def complex
 	}
 
 	def '-'(rhs) {
-	if owner.TYPE == rhs {
+	if owner.TYPE == rhs.TYPE {
 		result = owner.clone(owner.real - rhs.real, owner.img - rhs.img);
 	}
 	else {

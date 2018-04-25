@@ -65,6 +65,86 @@ if !my.TYPENAME.starts_with('object') {
 	throw test.type <- 'type testing is failed';
 }
 
+print: '#is instace of test';
+if (1 < type.int) == false {
+	throw test.type <- 'type testing is failed';
+}
+
+if (10000000000000000000000000000000000000 < type.int) == false {
+	throw test.type <- 'type testing is failed';
+}
+
+if (1.0 < type.float) == false {
+	throw test.type <- 'type testing is failed';
+}
+
+if ('string' < type.string) == false {
+	throw test.type <- 'type testing is failed';
+}
+
+if (1 < type.str) == true {
+	throw test.type <- 'type testing is failed';
+}
+
+if (10000000000000000000000000000000000000 < type.float) == true {
+	throw test.type <- 'type testing is failed';
+}
+
+if (1.0 < type.integer) == true {
+	throw test.type <- 'type testing is failed';
+}
+
+if ('string' < type.int) == true {
+	throw test.type <- 'type testing is failed';
+}
+
+if (1 < io.TYPE) == true {
+	throw test.type <- 'type testing is failed';
+}
+
+if (10000000000000000000000000000000000000 < io.TYPE) == true {
+	throw test.type <- 'type testing is failed';
+}
+
+if (1.0 < io.TYPE) == true {
+	throw test.type <- 'type testing is failed';
+}
+
+if ('string' < io.TYPE) == true {
+	throw test.type <- 'type testing is failed';
+}
+
+a = io.clone();
+if (a < io.TYPE) == false {
+	throw test.type <- 'type testing is failed';
+}
+
+if (a < root.TYPE) == true {
+	throw test.type <- 'type testing is failed';
+}
+
+if (a.TYPE < io.TYPE) == true {
+	throw test.type <- 'type testing is failed';
+}
+
+if (a.TYPE < root.TYPE) == true {
+	throw test.type <- 'type testing is failed';
+}
+
+def foo : io { }
+
+if (.foo.TYPE < io.TYPE) == false {
+	throw test.type <- 'type testing is failed';
+}
+
+
+print: '#is subclass of test';
+
+
+
+
+
+
 print: 'OK: ', my;
 
 
