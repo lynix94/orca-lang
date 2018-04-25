@@ -123,6 +123,7 @@ void parser_split_ctx_def(const string& src, string& ctx, string& def)/*{{{*/
 {
 	istringstream f(src);
 	string line;	
+	stringstream ctx_ss, def_ss;
 
 	int open = 0;
 	int close = 0;
@@ -131,8 +132,8 @@ void parser_split_ctx_def(const string& src, string& ctx, string& def)/*{{{*/
 			open = close = 0;
 
 			while (true) {
-				def += line + "\n";
-				ctx += "\n";
+				def_ss << line << "\n";
+				ctx_ss << "\n";
 
 				open += count_in(line.c_str(), "{");
 				close += count_in(line.c_str(), "}");
@@ -144,11 +145,18 @@ void parser_split_ctx_def(const string& src, string& ctx, string& def)/*{{{*/
 				getline(f, line);
 			}
 		}
+		else if (parser_starts_with(line.c_str(), "using")) {
+			def_ss << line << "\n";
+			ctx_ss << "\n";
+		}
 		else {
-			ctx += line + "\n";
-			def += "\n";
+			ctx_ss << line << "\n";
+			def_ss << "\n";
 		}
 	}
+
+	ctx = ctx_ss.str();
+	def = def_ss.str();
 }
 /*}}}*/
 
