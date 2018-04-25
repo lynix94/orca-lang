@@ -138,7 +138,40 @@ if (.foo.TYPE < io.TYPE) == false {
 }
 
 
-print: '#is subclass of test';
+if type.is_iteratable([,]) == false {
+	throw test.type <- 'type testing is failed';
+}
+
+if type.is_iteratable((,)) == false {
+	throw test.type <- 'type testing is failed';
+}
+
+if type.is_iteratable({,}) == false {
+	throw test.type <- 'type testing is failed';
+}
+
+if type.is_iteratable({,}.begin()) == false {
+	throw test.type <- 'type testing is failed';
+}
+
+
+if type.is_indexable([,]) == false {
+	throw test.type <- 'type testing is failed';
+}
+
+if type.is_indexable((,)) == false {
+	throw test.type <- 'type testing is failed';
+}
+
+if type.is_indexable({,}) == false {
+	throw test.type <- 'type testing is failed';
+}
+
+if type.is_indexable({,}.begin()) == true {
+	throw test.type <- 'type testing is failed';
+}
+
+
 
 
 

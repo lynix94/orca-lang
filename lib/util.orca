@@ -46,22 +46,3 @@ def upper(name)
 	return nil;
 }
 
-def iteratable(a)
-{
-	switch a.TYPE
-	{
-	case type.list, type.map, type.tuple:
-		return a;
-	}
-
-	if a.MEMBERS.has_key('next') {
-		return a;
-	}
-
-	if a == nil {
-		return [];
-	}
-
-	return [a];
-}
-

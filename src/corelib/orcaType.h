@@ -67,6 +67,9 @@ public:
 		d.v.type.t = TYPE_OBJ;
 		d.v.type.vp = m_mp;
 		insert_static("map", d);
+
+		insert_static_native_function("is_iteratable", (object_fp)&orcaTypes::ex_iteratable);
+		insert_static_native_function("is_indexable", (object_fp)&orcaTypes::ex_indexable);
 	}
 
 	~orcaTypes()
@@ -75,6 +78,49 @@ public:
 		delete m_tp;
 		delete m_mp;
 	}
+
+	orcaData ex_iteratable(orcaVM* vm, int n) 
+	{
+		if (n < 1) vm->need_param();
+
+		orcaData p = vm->get_param(0);
+		if (!is<TYPE_OBJ>(p)) {
+			return false;
+		}
+
+		if (isobj<orcaTuple>(p) || isobj<orcaList>(p) || isobj<orcaMap>(p)) {
+			return true;
+		}
+
+		orcaObject* o = p.o();
+		if (o->has_member("next")) {
+			return true;
+		}
+
+		return false;
+	}
+	
+	orcaData ex_indexable(orcaVM* vm, int n) 
+	{
+		if (n < 1) vm->need_param();
+
+		orcaData p = vm->get_param(0);
+		if (!is<TYPE_OBJ>(p)) {
+			return false;
+		}
+
+		if (isobj<orcaTuple>(p) || isobj<orcaList>(p) || isobj<orcaMap>(p)) {
+			return true;
+		}
+
+		orcaObject* o = p.o();
+		if (o->has_member("[]")) {
+			return true;
+		}
+
+		return false;
+	}
+	
 
 	orcaList* m_lp;
 	orcaTuple* m_tp;
