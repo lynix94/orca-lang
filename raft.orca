@@ -1,0 +1,395 @@
+
+using socket;
+using thread;
+using random;
+using datetime;
+using time;
+using ipc;
+
+
+def node
+{
+	def id;
+	def term;
+	def state := 'c';  // f, c, l
+	def peers := {,};
+	def wait_map := {,};
+
+	def addr;
+	def ip;
+	def port;
+
+	def peer_wait_sock;
+	def peer_req_sock;
+
+	def last_ping;
+
+	def init(id, addr)
+	{
+		..id = id;
+		..term = 0;
+
+		..addr = addr;
+		..addr.split(':', 1) -> ..ip, ..port;
+		..peer_wait_sock = socket.create();
+		..peer_req_sock = socket.create();
+
+		..last_ping = 0;
+	}
+
+	def process_client(sock)
+	{
+		id = nil;
+		words = sock.recv().strip().split(' ');
+		if words.size() == 2 && words[0] == 'id' {
+			id = words[1];
+		}
+
+		if id != nil { # new peer
+			if ..peers.has_key(id) {
+				..peers[id].peer_wait_sock = sock;
+				..wait_map[sock] = ..peers[id];
+				print: '[INFO] wait %s-%d' % (..peers[id].id, ..peers[id].peer_wait_sock.get());
+			}
+			else {
+				print('Unknown id: %s\r\n' % id);
+				sock.send('Unknown id: %s\r\n' % id);
+				sock.close();
+			}
+		}
+		else { # management
+			while true {
+				if words.size() > 0 {
+					if words[0] == 'quit' {
+						sock.send('bye\r\n');
+						sock.close();
+						return;
+					}
+
+					..process_client_request(sock, words);
+				}
+
+				words = sock.recv().strip().split(' ');
+			}
+		}
+	}
+
+	def listen()
+	{
+		..peer_wait_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1);
+		..peer_wait_sock.bind(..port);
+		..peer_wait_sock.listen();
+
+		do {
+			sock = ..peer_wait_sock.accept();
+			parallel ..process_client(sock);
+		} while true;
+	}
+
+	def connect()
+	{
+		for id, peer in ..peers {
+			peer.peer_req_sock.connect(peer.ip, peer.port);
+			print: '[INFO] %s: req %s-%d' % (..id, peer.id, peer.peer_req_sock.get());
+			peer.peer_req_sock.send('id %s\r\n' % ..id);
+		}
+
+		print: '[INFO] connect done';
+	}
+
+	def process_client_request(sock, words)
+	{
+		def requests := [];
+		def mtx := ipc.mutex.clone();
+
+		if sock != nil {
+			.mtx {
+				.requests.push_back((sock, words));
+			}
+		}
+		else {
+			.mtx {
+				if .requests.size() == 0 {
+					return;
+				}
+
+				req = .requests[0];
+				.requests.pop_front();
+			}
+
+			sock = req[0];
+			words = req[1];
+
+			switch words[0]
+			{
+			case 'sleep':
+				if words.size() >= 2 {
+					sock.send('ok\r\n');
+					tmout = words[1].float();
+					time.sleep(tmout);
+				}
+				else {
+					print('insufficient parameter\r\n');
+					sock.send('insufficient parameter\r\n');
+				}
+
+			default:
+				print('Unknown command: %s\r\n' % words[0]);
+				sock.send('Unknown command: %s\r\n' % words[0]);
+			}
+		}
+	}
+
+	def leader_election()
+	{
+		while true {
+			switch ..state
+			{
+			case 'f':
+				..do_follower();
+
+			case 'c':
+				..do_candidate();
+
+			case 'l':
+				..do_leader();
+			}
+
+			..process_client_request();
+		}
+	}
+
+	def do_follower()
+	{
+		print: '%s do_follower(term:%d)' % (..id, ..term);
+
+		select
+		{
+		case selector(..wait_map.keys()) -> ...socks:
+			for sock in socks {
+				p = ..wait_map[sock];
+				d = p.peer_wait_sock.recv(0);
+				msgs = d.split('\r\n');
+				for msg in msgs {
+					if msg == '' { continue; }
+
+					if msg == 'vote' {
+						p.peer_wait_sock.send('no\r\n');
+					}
+					elif msg.starts_with('ping') {
+						toks = msg.split(' ', 1);
+						if toks[1].integer() >= ..term {
+							..term = toks[1].integer();
+							p.peer_wait_sock.send('pong\r\n');
+							..last_ping = datetime.now().timestamp();
+						}
+					}
+					else {
+						print: '## unknown msg: "%s"' % msg;
+					}
+				}
+			}
+
+		case time.timer(1.0) -> ts:
+			// timeout
+		}
+
+		if ..last_ping > 0 && datetime.now().timestamp() - ..last_ping > 5 {
+			..state = 'c';
+		}
+	}
+
+	def do_candidate()
+	{
+		print: '%s do_candidate(term:%d)' % (..id, ..term);
+
+		timeout = random.integer(300) + 150;
+
+		# process vote
+		voted = false;
+		select
+		{
+		case selector(..wait_map.keys()) -> ...socks:
+			for sock in socks {
+				p = ..wait_map[sock];
+				d = p.peer_wait_sock.recv(0);
+				msgs = d.split('\r\n');
+				for msg in msgs {
+					if msg == '' { continue; }
+
+					if msg == 'vote' {
+						if voted == false {
+							p.peer_wait_sock.send('yes\r\n');
+							voted = true;
+						}
+						else {
+							p.peer_wait_sock.send('no\r\n');
+						}
+					}
+					elif msg.starts_with('ping') {
+						toks = msg.split(' ', 1);
+						if toks[1].integer() > ..term {
+							..term = toks[1].integer();
+							..state = 'f';
+							p.peer_wait_sock.send('pong\r\n');
+							..last_ping = datetime.now().timestamp();
+							voted = true;
+						}
+					}
+					else {
+						print: '## unknown msg: "%s"' % msg;
+					}
+				}
+			}		 
+
+		case time.timer(timeout/1000.0) -> ts:
+			// timeout
+		}
+
+
+		if voted {
+			return;
+		}
+		
+
+		# process vote request
+		count = 1;
+		for id, p in ..peers {
+			p.peer_req_sock.send('vote\r\n');
+		}
+		
+		for id, p in ..peers {
+			d = p.peer_req_sock.recv(0, 0.5);
+			msgs = d.split('\r\n');
+			for msg in msgs {
+				if msg == '' { continue; }
+
+				if msg == 'yes' {
+					count+=1;
+				}
+				else {
+					print: '## unknown msg: "%s"' % msg;
+				}
+			}
+		}		 
+
+		# process result
+		print: '%s get %d' % (..id, count);
+		if count > (..peers.size()+1)/2 {
+			..state = 'l';
+			..term += 1;
+		}
+	}
+
+
+	def do_leader()
+	{
+		print: '%s do_leader(term:%d)' % (..id, ..term);
+
+		for id, p in ..peers {
+			p.peer_req_sock.send('ping %d\r\n' % ..term);
+		}
+
+		for id, p in ..peers {
+			d = p.peer_req_sock.recv(0, 0.5);
+			msgs = d.split('\r\n');
+			for msg in msgs {
+				if msg == '' { continue; }
+
+				if msg != 'pong' {
+					print: 'unknown pong: "%s"' % msg;
+				}
+			}
+		}
+
+		select
+		{
+		case selector(..wait_map.keys()) -> ...socks:
+			for sock in socks {
+				p = ..wait_map[sock];
+				d = p.peer_wait_sock.recv(0);
+				msgs = d.split('\r\n');
+				for msg in msgs {
+					if msg == '' { continue; }
+
+					if msg == 'vote' {
+						p.peer_wait_sock.send('no\r\n');
+					}
+					elif msg.starts_with('ping') {
+						toks = msg.split(' ', 1);
+						if toks[1].integer() > ..term {
+							..term = toks[1].integer();
+							..state = 'f';
+							p.peer_wait_sock.send('pong\r\n');
+							..last_ping = datetime.now().timestamp();
+						}
+					}
+					else {
+						print: '## unknown msg: "%s"' % msg;
+					}
+				}
+			}
+
+		case time.timer(1.0) -> ts:
+			// timeout
+		}
+
+		time.sleep(1);
+	}
+}
+
+
+
+
+# n1 
+n1 = .node.clone('1', '127.0.0.1:5001');
+n1_2 = .node.clone('2', '127.0.0.1:5002');
+n1_3 = .node.clone('3', '127.0.0.1:5003');
+n1.peers = {'2':n1_2, '3':n1_3};
+parallel n1.listen();
+
+# n2 
+n2 = .node.clone('2', '127.0.0.1:5002');
+n2_3 = .node.clone('3', '127.0.0.1:5003');
+n2_1 = .node.clone('1', '127.0.0.1:5001');
+n2.peers = {'3':n2_3, '1':n2_1};
+parallel n2.listen();
+
+# n3 
+n3 = .node.clone('3', '127.0.0.1:5003');
+n3_1 = .node.clone('1', '127.0.0.1:5001');
+n3_2 = .node.clone('2', '127.0.0.1:5002');
+n3.peers = {'1':n3_1, '2':n3_2};
+parallel n3.listen();
+
+time.sleep(0.3);
+
+n1.connect();
+n2.connect();
+n3.connect();
+
+time.sleep(0.3);
+
+parallel n1.leader_election();
+parallel n2.leader_election();
+parallel n3.leader_election();
+
+
+print: 'main done';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
