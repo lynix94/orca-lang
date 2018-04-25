@@ -1192,7 +1192,7 @@ fast_jmp:
 				PRINT2("\t\t%p : assign member (%s)\n", c, &c[2]);
 				p2 = m_stack->pop();
 				p1 = m_stack->top();
-				m_stack->replace( p1.o()->update_member(&c[2], p2) );
+				m_stack->replace(p1.Object()->update_member(&c[2], p2));
 				c += c[1] + 1 + FJ_INC;
 				goto fast_jmp;
 				break;				
@@ -1201,7 +1201,7 @@ fast_jmp:
 				PRINT2("\t\t%p : assign member fast(%s)\n", c, &c[2]);
 				p2 = m_stack->pop();
 				p1 = m_stack->pop();
-				p1.o()->update_member(&c[2], p2);
+				p1.Object()->update_member(&c[2], p2);
 				c += c[1] + 1 + FJ_INC;
 				goto fast_jmp;
 				break;				
@@ -1213,13 +1213,13 @@ fast_jmp:
 				switch(c[1])
 				{
 				case OP_PUSH_OWNER:
-					if (p1.o()->m_owner) p1.o()->m_owner->rc_dec();
-					p1.o()->m_owner = p2.o();
+					if (p1.Object()->m_owner) p1.o()->m_owner->rc_dec();
+					p1.o()->m_owner = p2.Object();
 					p1.o()->m_owner->rc_inc();
 					break;
 
 				case OP_PUSH_CALLER:
-					set_caller(p2.o());
+					set_caller(p2.Object());
 					break;
 				}
 
@@ -1234,13 +1234,13 @@ fast_jmp:
 				switch(c[1])
 				{
 				case OP_PUSH_OWNER:
-					if (p1.o()->m_owner) p1.o()->m_owner->rc_dec();
-					p1.o()->m_owner = p2.o();
+					if (p1.Object()->m_owner) p1.o()->m_owner->rc_dec();
+					p1.o()->m_owner = p2.Object();
 					p1.o()->m_owner->rc_inc();
 					break;
 
 				case OP_PUSH_CALLER:
-					set_caller(p2.o());
+					set_caller(p2.Object());
 					break;
 				}
 
