@@ -959,18 +959,18 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			}
 			break;
 
-		case OP_DEF_CONTEXT_START:    // this, type_len, type, flag, name_len, name, code_len, code, param_n, params
-		case OP_DEF_CONTEXT_UNDER_START: { // this, type_len, type, flag, name_len, name, under_len, under, code_len, code, param_n, params
+		case OP_DEF_CONTEXT_START:    // this, ctx_mod_len, ctx_mod, flag, name_len, name, code_len, code, param_n, params
+		case OP_DEF_CONTEXT_UNDER_START: { // this, ctx_mod_len, ctx_mod, flag, name_len, name, under_len, under, code_len, code, param_n, params
 			bool is_under = false;
 			if ((unsigned char)c[i] == OP_DEF_UNDER_START) {
 				is_under = true;
 			}
 
 			int idx = i;
-			// type
-			int type_len = c[++idx];
-			const char* type = &c[++idx];
-			idx += type_len;
+			// ctx_mod
+			int ctx_mod_len = c[++idx];
+			const char* ctx_mod = &c[++idx];
+			idx += ctx_mod_len;
 
 			// name
 			int name_len = c[++idx];
@@ -996,7 +996,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			idx += code_len-1;
 			
 
-			PRINT4("\t\t  context object: %s, %s, %s, '%s'\n", type, name, under, code);
+			PRINT4("\t\t  context object: %s, %s, %s, '%s'\n", ctx_mod, name, under, code);
 
 			// params
 			vector<const char*> params;
@@ -1009,9 +1009,9 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 				params.push_back(cp);
 			}
 
-			orcaData ctx = do_context(type, name, code, last_write_time, params);
+			orcaData ctx = do_context(ctx_mod, name, code, last_write_time, params);
 
-			if (c[i +1+type_len +1] & BIT_DEFINE_STATIC) {
+			if (c[i +1+ctx_mod_len +1] & BIT_DEFINE_STATIC) {
 				op->insert_static(name, ctx.Object());
 			}
 			else {
@@ -3180,31 +3180,29 @@ do_assign_list:
 }
 /*}}}*/
 
-orcaData orcaVM::do_context(const char* mod, const char* name, const char* cp, time_t last_write_time, vector<const char*>& params)/*{{{*/
+orcaData orcaVM::do_context(const char* ctx_mod, const char* name, const char* cp, time_t last_write_time, vector<const char*>& params)/*{{{*/
 {
 	orcaData out;
-	orcaObject* modp;
+	orcaObject* ctx_modp;
 	bool ret;
+	char buff[1024];
+	strncpy(buff, ctx_mod, 1024);
 
-	char main_mod[1024];
-	int i=0;
-	for (; i<strlen(mod); i++) {
-		if (mod[i] == '.') {
-			break;
+	const char *o_name = strtok((char*)ctx_mod, ".");
+	orcaObject* curr = g_root;
+	while (o_name) {
+		ret = curr->has_member(o_name, out);
+		if (ret == false) {
+			printf("ERROR: module %s (for context) not found\n", o_name);
+			return NIL;
 		}
-		main_mod[i] = mod[i];
-	}
-	main_mod[i] = 0;
 
-
-	ret = g_root->has_member(main_mod, out);
-	if (ret == false) {
-		printf("ERROR: module %s (for context) not found\n", main_mod);
-		return NIL;
+		curr = out.Object();
+		o_name = strtok(NULL, ".");
 	}
 
 	// set modp
-	modp = out.Object();
+	ctx_modp = curr;
 
 	// set last write time
 	orcaDatetime* dp = new orcaDatetime(last_write_time);
@@ -3217,13 +3215,12 @@ orcaData orcaVM::do_context(const char* mod, const char* name, const char* cp, t
 	}
 
 	// now let's compile
-	push_stack(modp);
+	push_stack(ctx_modp);
 	push_param(name);
 	push_param(dp);
 	push_param(cp);
 	push_param(tp);
-	push_param(mod);
-	call(5);
+	call(4);
 
 	out = m_stack->pop();
 	if (is<TYPE_OBJ>(out) == false) {
@@ -3283,7 +3280,14 @@ bool orcaVM::load_helper(const string& mod_name, const string& candidate_path,/*
 	bool ret;
 
 	if (sub_postfix != "orca") { // load for context compile
-		load(sub_postfix, g_root);
+		// in case 'html.js' load html
+		int idx = sub_postfix.find(".");
+		if (idx > 0) {
+			load(sub_postfix.substr(0, idx));
+		}
+		else {
+			load(sub_postfix, g_root);
+		}
 	}
 
 	FILE *fp_kw = open_check_kw_file(candidate_path, kw_path);
@@ -3385,7 +3389,7 @@ bool orcaVM::load(const string& input_path, orcaObject* owner, string owner_path
 	}
 
 	// #2. set main_postfix, sub_postfix & kw_path.
-	vector<string> toks = kyString::split(base_name, ".");
+	vector<string> toks = kyString::split(base_name, ".", 2);
 	switch (toks.size())
 	{
 	case 3:
@@ -3400,9 +3404,6 @@ bool orcaVM::load(const string& input_path, orcaObject* owner, string owner_path
 		main_postfix = "orca";
 		sub_postfix = "orca";
 		break;
-	default:
-		printf("load failed abnormal name: %s\n", input_path.c_str());
-		return false;
 	}
 	
 	if (main_postfix != "orca") {

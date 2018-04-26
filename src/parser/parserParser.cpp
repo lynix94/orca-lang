@@ -269,7 +269,7 @@ bool parserParser::parse_context_file(const string& filename, const string& mod_
 	curr_fp = fmemopen((void*)def.c_str(), def.size(), "r");
 	lineno = 1;
 	try {
-		if (yyparse() != 0) {
+		if (yyparse() != 0 && g_parser->n_tok > 0) {
 			return false;
 		}
 	}

@@ -109,7 +109,7 @@ public:
 	orcaData get_caller();
 	void set_caller(orcaObject* o);
 
-	orcaData do_context(const char* mod, const char* name, 
+	orcaData do_context(const char* ctx_mod, const char* name, 
 						const char* cp, time_t last_write_time,
 						vector<const char*>& params);
 

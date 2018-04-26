@@ -122,10 +122,11 @@ int kyString::hash(const string& str, int mod)/*{{{*/
 }
 /*}}}*/
 
-vector<string> kyString::split(const string& str, const string& by) /*{{{*/
+vector<string> kyString::split(const string& str, const string& by, int count) /*{{{*/
 {	
 	vector<string> vs;
 	int start = 0;
+	int c = 0;
 
 	do {
 		int r = str.find(by, start);
@@ -137,16 +138,23 @@ vector<string> kyString::split(const string& str, const string& by) /*{{{*/
 		if (r-start == 0) { } // nothing
 		else vs.push_back(str.substr(start, r - start));
 		start = r+by.length();
+
+		c++;
+		if (c >= count) {
+			vs.push_back(str.substr(start));
+			break;
+		}
 	} while(true);
 
 	return vs;
 }
 /*}}}*/
 
-vector<string> kyString::split(const string& str, regex& re) /*{{{*/
+vector<string> kyString::split(const string& str, regex& re, int count) /*{{{*/
 {	
 	vector<string> vs;
 	int start = 0;
+	int c = 0;
 
 	do {
 		match_results<string::const_iterator> mr;
@@ -164,6 +172,12 @@ vector<string> kyString::split(const string& str, regex& re) /*{{{*/
 		}
 
 		start = (mr[0].second - str.begin());
+
+		c++;
+		if (c >= count) {
+			vs.push_back(str.substr(start));
+			break;
+		}
 	} while(true);
 
 	return vs;

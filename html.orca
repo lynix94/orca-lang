@@ -6,20 +6,18 @@ name = argv[0];
 ts = argv[1];
 body = argv[2];
 params = argv[3];
-suffix = argv[4];
 
-switch suffix
+
+return .process_context(body);
+
+
+def js(body)
 {
-case 'html', 'html.js':
-	return .process_html(body);
-
-// add other kind of tags
-default:
-	return .process_html(body);
+	return ..process_context(body);
 }
 
 
-def process_html(body)
+def process_context(body)
 {
 	def html_object(req)
 	{

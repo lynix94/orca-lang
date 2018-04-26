@@ -653,7 +653,7 @@ using_stmt:/*{{{*/
 		{
 			code_top->using_object($2, NULL);
 		}
-	| USING '.' name object_path ';'
+	| USING '.' object_path object_path ';'
 		{
 			code_top->using_object($4, $3);
 		}

@@ -54,8 +54,8 @@ public:
 
 	static int hash(const string& src, int mod = INT_MAX);
 
-	static vector<string> split(const string& src, const string& s);
-	static vector<string> split(const string& src, boost::regex& r);
+	static vector<string> split(const string& src, const string& s, int count = INT_MAX);
+	static vector<string> split(const string& src, boost::regex& r, int count = INT_MAX);
 
 	static string to_escape(const string& src);
 	static string from_escape(const string& src);
