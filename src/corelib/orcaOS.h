@@ -13,6 +13,9 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <time.h>
+#include <utime.h>
+#include <sys/stat.h>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -152,6 +155,7 @@ public:
 		insert_static_native_function("remove", (object_fp)&orcaOS::ex_remove);
 		insert_static_native_function("ls", (object_fp)&orcaOS::ex_ls);
 		insert_static_native_function("cd", (object_fp)&orcaOS::ex_cd);
+		insert_static_native_function("touch", (object_fp)&orcaOS::ex_touch);
 
 		insert_static_native_function("isexists", (object_fp)&orcaOS::ex_isexists);
 		insert_static_native_function("isfile", (object_fp)&orcaOS::ex_isfile);
@@ -221,6 +225,28 @@ public:
 		return NIL;
 	}
 
+	orcaData ex_touch(orcaVM* vm, int n) 
+	{
+		string& name = vm->get_param(0).String();
+		FILE* fp = fopen(name.c_str(), "a+");
+		if (fp) { 
+			fclose(fp);
+		}
+
+		struct stat st;
+		time_t mtime;
+		struct utimbuf new_times;
+
+		stat(name.c_str(), &st);
+		mtime = st.st_mtime;
+
+		new_times.actime = st.st_atime;
+		new_times.modtime = time(NULL);
+		utime(name.c_str(), &new_times);
+
+		return NIL;
+	}
+
 	orcaData ex_dir_iterator(orcaVM* vm, int n) 
 	{
 		string& name = vm->get_param(0).String();
@@ -242,8 +268,7 @@ public:
 		try {
 			fs::create_directory(name);
 		} catch(...) {
-			throw orcaException(vm, "orca.file", string("directory ") 
-								+ name + "creation failed");
+			throw orcaException(vm, "orca.file", string("directory ") + name + "creation failed");
 		}
 
 		return NIL;
@@ -256,8 +281,7 @@ public:
 		try {
 			fs::remove(name);
 		} catch(...) {
-			throw orcaException(vm, "orca.file", string("remove ") 
-								+ name + " failed");
+			throw orcaException(vm, "orca.file", string("remove ") + name + " failed");
 		}
 
 		return NIL;
@@ -278,8 +302,7 @@ public:
 
 		} catch(...) {
 			delete lp;
-			throw orcaException(vm, "orca.file", string("list dir ") 
-								+ name + " failed");
+			throw orcaException(vm, "orca.file", string("list dir ") + name + " failed");
 		}
 
 		return lp;
@@ -292,19 +315,16 @@ public:
 
 		try {
 			if (!fs::exists(src)) {
-				throw orcaException(vm, "orca.file", string("file ") 
-									+ src + " not exists");
+				throw orcaException(vm, "orca.file", string("file ") + src + " not exists");
 			}
 
 			if (fs::exists(dst)) {
-				throw orcaException(vm, "orca.file", string("destion file ") 
-									+ dst + " exists");
+				throw orcaException(vm, "orca.file", string("destion file ") + dst + " exists");
 			}
 
 			fs::rename(src, dst);
 		} catch(...) {
-			throw orcaException(vm, "orca.file", string("rename ") 
-								+ src + " failed");
+			throw orcaException(vm, "orca.file", string("rename ") + src + " failed");
 		}
 
 		return NIL;
@@ -317,19 +337,16 @@ public:
 
 		try {
 			if (!fs::exists(src)) {
-				throw orcaException(vm, "orca.file", string("file ") 
-									+ src + " not exists");
+				throw orcaException(vm, "orca.file", string("file ") + src + " not exists");
 			}
 
 			if (fs::exists(dst)) {
-				throw orcaException(vm, "orca.file", string("destion file ") 
-									+ dst + " exists");
+				throw orcaException(vm, "orca.file", string("destion file ") + dst + " exists");
 			}
 
 			fs::copy_file(src, dst);
 		} catch(...) {
-			throw orcaException(vm, "orca.file", string("copy ") 
-								+ src + " failed");
+			throw orcaException(vm, "orca.file", string("copy ") + src + " failed");
 		}
 
 		return NIL;
@@ -387,8 +404,7 @@ public:
 
 		FILE* fp = fopen(path.c_str(), "r");
 		if (fp == NULL) {
-			throw orcaException(vm, "orca.file", string("file ") 
-								+ path + " not exists");
+			throw orcaException(vm, "orca.file", string("file ") + path + " not exists");
 		}
 
 		fseek(fp, 0, SEEK_END);
@@ -429,8 +445,7 @@ public:
 		if (fp == NULL) {
 			fp = fopen(path.c_str(), "w");
 			if (fp == NULL) {
-				throw orcaException(vm, "orca.file", string("file ") 
-									+ path + " creation fail");
+				throw orcaException(vm, "orca.file", string("file ") + path + " creation fail");
 			}
 		}
 

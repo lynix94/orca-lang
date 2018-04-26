@@ -1,0 +1,95 @@
+using socket;
+using pack;
+using time;
+using distribute.remotec;
+using distribute.dist;
+using util.lock;
+
+def clients;
+
+def init_once
+{
+	..clients = [];
+}
+
+def init
+{
+	..clients = [];
+}
+
+def add(ip, port)
+{
+	lock(..clients) {
+		r = remotec.clone(ip, port);
+		..clients.push_back(r);
+	}
+}
+
+def pop_one
+{
+	while ..clients.size() == 0 {
+		time.msleep(100);
+	}
+		
+	lock(..clients) {
+		r = ..clients[0];
+		..clients.pop_front();
+		..clients.push_back(r);
+		return r;
+	}
+}
+
+def push_one(r)
+{
+	lock(..clients) {
+		..clients.push_back(r);
+	}
+}
+
+
+def dist_do(...argv)
+{
+	r = ..pop_one();
+	r.remote_do(argv...);
+	return r;
+}
+
+def dist_for(items, f)
+{
+	clients = [];
+	rcount = type.map();
+	ret = [];
+
+	for a in items {
+		r = ..dist_do(a, f);
+		clients.push_back(r);
+
+		if !rcount.has_key(r.ID) {
+			rcount[r.ID] = 0;
+		}
+
+		rcount[r.ID] += 1;
+	}
+
+	for r in clients {
+		r.is_done(-1);
+		ret.push_back(r.get_obj(rcount[r.ID] - 1));
+		rcount[r.ID] -= 1;
+	}
+
+	for r in clients {
+		r.clean_obj();
+	}
+
+	return ret;
+}
+
+def shutdown
+{
+	for a in ..clients {
+		a.shutdown();
+	}
+}
+
+
+

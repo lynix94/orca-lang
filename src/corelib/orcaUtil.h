@@ -114,78 +114,68 @@ struct orca_lru
 };
 
 
-class orcaUtil : public orcaObject 
+class orcaUtilLru : public orcaObject 
 {
 public:
-	orcaUtil()
-	{
-		set_name("cutil");
-		insert_member("lru", new ex_lru());
+	DEFAULT_NATIVE_DEFINE(orcaUtilLru);
+
+	orcaUtilLru() 
+	{ 
+		set_name("lru"); 
+		insert_native_function("insert", (object_fp)&orcaUtilLru::ex_insert);
+		insert_native_function("victimize", (object_fp)&orcaUtilLru::ex_victimize);
+		insert_native_function("touch", (object_fp)&orcaUtilLru::ex_touch);
+		insert_native_function("size", (object_fp)&orcaUtilLru::ex_size);
+		insert_native_function("dump", (object_fp)&orcaUtilLru::ex_dump);
 	}
 
-	class ex_lru : public orcaObject 
+	orcaData ex_insert(orcaVM* vm, int n)
 	{
-	public:
-		DEFAULT_NATIVE_DEFINE(ex_lru);
+		if (n < 2) vm->need_param();
+		m_lru.insert(vm->get_param(0), vm->get_param(1));
+		vm->get_param(0).rc_inc();
+		vm->get_param(1).rc_inc();
+		return NIL;
+	}
 
-		ex_lru() 
-		{ 
-			set_name("lru"); 
-			insert_native_function("insert", (object_fp)&ex_lru::ex_insert);
-			insert_native_function("victimize", (object_fp)&ex_lru::ex_victimize);
-			insert_native_function("touch", (object_fp)&ex_lru::ex_touch);
-			insert_native_function("size", (object_fp)&ex_lru::ex_size);
-			insert_native_function("dump", (object_fp)&ex_lru::ex_dump);
+	orcaData ex_victimize(orcaVM* vm, int n)
+	{
+		orcaData key = NIL;
+		orcaData dp = NIL;
+
+		if (m_lru.victimize(&dp, &key)) {
+			dp.rc_dec();
+			key.rc_dec();
 		}
 
-		orcaData ex_insert(orcaVM* vm, int n)
-		{
-			if (n < 2) vm->need_param();
-			m_lru.insert(vm->get_param(0), vm->get_param(1));
-			vm->get_param(0).rc_inc();
-			vm->get_param(1).rc_inc();
-			return NIL;
+		return NIL;
+	}
+
+	orcaData ex_touch(orcaVM* vm, int n)
+	{
+		if (n < 1) vm->need_param();
+		return m_lru.touch(vm->get_param(0));
+	}
+
+	orcaData ex_size(orcaVM* vm, int n)
+	{
+		return m_lru.size();
+	}
+
+	orcaData ex_dump(orcaVM* vm, int n)
+	{
+		list_item<orcaData, orcaData>* head = m_lru.head;
+		list_item<orcaData, orcaData>* curr = head->next;
+		
+		while (curr != head) {
+			curr->item.dump();
+			curr = curr->next;
 		}
 
-		orcaData ex_victimize(orcaVM* vm, int n)
-		{
-			orcaData key = NIL;
-			orcaData dp = NIL;
+		return NIL;
+	}
 
-			if (m_lru.victimize(&dp, &key)) {
-				dp.rc_dec();
-				key.rc_dec();
-			}
-
-			return NIL;
-		}
-
-		orcaData ex_touch(orcaVM* vm, int n)
-		{
-			if (n < 1) vm->need_param();
-			return m_lru.touch(vm->get_param(0));
-		}
-
-		orcaData ex_size(orcaVM* vm, int n)
-		{
-			return m_lru.size();
-		}
-
-		orcaData ex_dump(orcaVM* vm, int n)
-		{
-			list_item<orcaData, orcaData>* head = m_lru.head;
-			list_item<orcaData, orcaData>* curr = head->next;
-			
-			while (curr != head) {
-				curr->item.dump();
-				curr = curr->next;
-			}
-
-			return NIL;
-		}
-
-		orca_lru<orcaData, orcaData> m_lru;
-	};
+	orca_lru<orcaData, orcaData> m_lru;
 };
 
 #endif

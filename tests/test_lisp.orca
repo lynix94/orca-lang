@@ -1,5 +1,5 @@
 
-using lisp;
+using lang.lisp;
 using pack;
 using math;
 
@@ -360,7 +360,8 @@ if r != 30 {
 
 
 
-def foo := lambda.lisp {
+'''
+def foo := lambda.lang.lisp {
  (+ argv0 argv1)
 };
 
@@ -370,6 +371,7 @@ print: r = .foo(3, 4);
 if r != 3+4 {
 	throw test.lisp <- 'lisp result for context failed';
 }
+''';
 
 print: 'OK';
 

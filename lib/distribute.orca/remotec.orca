@@ -1,0 +1,319 @@
+using socket;
+using pack;
+using fdselect;
+using time;
+
+using distribute.remotec;
+
+
+def flag_running;
+def flag_root;
+def flag_nowait;
+def obj;
+
+static def magic;
+
+
+# remote calling
+remotec.log: '## call: ', argv;
+
+len = 0;
+
+if argv.TYPE == type.tuple {
+	for p in argv {
+		.push_obj(p);
+		len += 1;
+	}
+}
+
+.call_obj(len);
+
+if .flag_nowait {
+	return nil;
+}
+else {
+	.server.recv();
+	ret = .pop_obj();
+	return ret;
+}
+
+
+def log(...argv)
+{
+	#print: argv;
+}
+
+
+
+def server
+{
+	def sock;
+	def send(msg)
+	{
+		msg = ..header(msg);
+		remotec.log: ' >> ', msg;
+		..sock.send(msg);
+	}
+
+	def recv()
+	{
+		header = ..sock.recv(remotec.magic.length() + 5);
+		if header.starts_with(remotec.magic) {
+			len = header[-5:-1).integer();
+		}
+		else {
+			..sock.recv(0, 0);
+		}
+		
+		msg = ..sock.recv_all(len, 2);
+		remotec.log: '<<', header, msg;
+		return msg;
+	}
+
+	def header(msg)
+	{
+		len = msg.length();
+		head = remotec.magic + len.string('%5d');
+		return head + msg;
+	}
+
+}
+
+def init(ip, port)
+{
+	if ip == nil {
+		..flag_running = nil;
+		..flag_root = false;
+		..flag_nowait = false;
+	}
+	else {
+		..server.sock = socket.create();
+		..server.sock.connect(ip, port);
+		..flag_running = false;
+		..flag_root = true;
+		..flag_nowait = false;
+	}
+
+	..magic = 'orca.dist_0.1:';
+}
+
+
+def call_obj(num)
+{
+	remotec.log: 'call_obj: ', num;
+	3 times do {
+		..server.send('<call>'+num);
+		msg = ..server.recv();
+		if msg == '<ok:call start>' {
+			if ..flag_running.TYPE == type.bool {
+				..flag_running  = true;
+			}
+			else {
+				..flag_running.flag_running  = true;
+			}
+
+			break;
+		}
+	} 
+
+	remotec.log: 'call return';
+}
+
+
+def push_obj(obj)
+{
+	str = pack.save(obj);
+
+	..server.send('<push>'+str);
+	3 times do {
+		msg = ..server.recv();
+
+		decode (msg)
+		{
+		case '<ok:push>':
+			break;
+		case '<req_code>', %name:
+			str = pack.dump_code(name);
+			..server.send('<code>'+name+','+str);
+		}
+	} 
+}
+
+
+def assign_obj(name)
+{
+	3 times do {
+		..server.send('<assign>'+name);
+		
+		msg = ..server.recv();
+		if msg == '<ok:assign>' {
+			break;
+		}
+	} 
+}
+
+def find_obj(name)
+{
+	3 times do {
+		..server.send('<find>'+name);
+		msg = ..server.recv();
+		if msg == '<ok:find>' {
+			break;
+		}
+		elif msg[0:4] == '<nok' {
+			break;
+		}
+	} 
+}
+
+def pop_obj()
+{
+	3 times do {
+		..server.send('<pop>');
+		msg = ..server.recv();
+
+		if msg[0:8] == '<ok:pop>' {
+			obj = pack.load(msg[8:]);
+			break;
+		}
+	} 
+
+	return obj;
+}
+
+def get_obj(idx)
+{
+	3 times do {
+		..server.send('<get>' + idx);
+		msg = ..server.recv();
+
+		if msg[0:8] == '<ok:get>' {
+			obj = pack.load(msg[8:]);
+			break;
+		}
+	} 
+
+	return obj;
+}
+
+def clean_obj()
+{
+	3 times do {
+		..server.send('<clean>');
+		msg = ..server.recv();
+
+		if msg == '<ok:clean>' {
+			break;
+		}
+	} 
+
+	return nil;
+}
+
+
+def '.attr'(name)
+{
+	remotec.log: 'get: ', name;
+	if ..flag_root {
+		..find_obj('root');
+
+		attr = owner.clone();
+		attr.server.sock = owner.server.sock;
+		attr.flag_running = owner;
+	}
+	else {
+		attr = owner;
+	}
+
+		
+	if name == '__nowait__' {
+		..flag_nowait = true;
+	}
+	else {
+		..find_obj(name);
+	}
+
+	return attr;
+}
+
+def '.attr_last'(name)
+{
+	remotec.log: 'get_last: ', name;
+	if ..flag_root {
+		..find_obj('root');
+
+		attr = owner.clone();
+		attr.server.sock = owner.server.sock;
+	}
+	else {
+		attr = owner;
+	}
+
+	..find_obj(name);
+	obj = ..pop_obj();
+	return obj;
+}
+
+def '.attr='(name, data)
+{
+	if ..flag_root {
+		..find_obj('root');
+	}
+
+	..push_obj(data);
+	..assign_obj(name);
+	return 'done';
+}
+
+def remote_do(...argv)
+{
+	f = argv[-1];
+	..push_obj(f);
+	argv.pop_back();
+
+	for p in argv {
+		..push_obj(p);
+	}
+
+	..call_obj(argv.size());
+}
+
+def is_done(timeout)
+{
+	if ..flag_running == false {
+		return true;
+	}
+
+	if fdselect.readable(..server.sock.get(), timeout) {
+		..flag_running = false;
+		..server.recv();
+		return true;
+	}
+
+	return false;
+}
+
+def ping
+{
+	..server.send('<ping>');
+	msg = ..server.recv();
+	if msg == '<ack>' {
+		return true;
+	}
+
+	return false;
+}
+
+def shutdown
+{
+	..server.send('<shutdown>');
+	msg = ..server.recv();
+	if msg == '<ack>' {
+		return true;
+	}
+
+	return false;
+}
+
+
+

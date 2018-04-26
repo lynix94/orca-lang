@@ -3448,6 +3448,7 @@ bool orcaVM::load(const string& input_path, orcaObject* owner, string owner_path
 		}
 	}
 
+
 	// #5. load
 	if (fs::is_directory(candidate_path)) {
 		if (kyString::ends_with(candidate_path, ".orca")) {/*{{{*/

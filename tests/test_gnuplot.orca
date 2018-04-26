@@ -1,5 +1,5 @@
 
-using gnuplot;
+using tool.gnuplot;
 using alg;
 using math;
 

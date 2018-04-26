@@ -1,0 +1,554 @@
+
+using operator;
+using fun;
+using pack;
+using lang.lisp;
+
+
+# handle context lisp
+
+if argv == nil {
+	return;
+}
+
+src_name = argv[0];
+src_time = argv[1];
+
+dstfile = src_name + '.lcf';
+recompile = false;
+
+if !os.isfile(dstfile) {
+	recompile = true;
+}
+elif os.last_write_time(dstfile) < src_time {
+	recompile = true;
+}
+
+if recompile {
+	code = .compile(argv[2]);
+	bytecode = pack.save(code);
+	os.write(dstfile, bytecode);
+}
+else {
+	bytecode = os.read(dstfile);
+	code = pack.load(bytecode);
+}
+
+ret = .context_obj.clone();
+ret.code = code;
+ret.base = my;
+
+return ret;
+
+
+def context_obj(...argv)
+{
+	local = type.map();
+	if argv != nil {
+		for i in [0..argv.size()-1] {
+			local['argv'+i] = argv[i];
+		}
+		local['argv'] = argv.list();
+	}
+
+	return lisp.execute(.code, local, .base);
+
+	def code;
+	def base;
+}
+
+
+def init_once
+{
+	try {
+		orca_home = os.getenv('ORCA_HOME');
+		..path = orca_home + '/tmp/';
+	}
+	catch { }
+
+	if os.isdir(..path) {
+		return;
+	}
+
+	..path = '/tmp/';
+}
+
+
+def path;
+
+def fmap := {
+	'T':true, 'F':false
+};
+
+def mmap := type.map();
+
+def umap := {
+	'print':io.print,
+	'io':io
+};
+
+
+def car(list)
+{
+	return list[0];
+}
+
+def cdr(list)
+{
+	decode list
+	{
+	case []		: return nil;
+	case %head[%tail] : return tail;
+	}
+}
+
+def do_list(h, t)
+{
+	return t;
+}
+
+
+def list(h, t)
+{
+	if h.TYPE == type.list {
+		return h.push_back(t);
+	}
+
+	return [h, t];
+}
+
+
+def defun(name, code)
+{
+	if name.TYPE == type.list {
+		f = ..function.clone();
+		f.code = code;
+		f.argv = name[1:];
+		name = name[0];
+
+		if name == 'lambda' {
+			return f;
+		}
+
+		..fmap[name] = f;
+	}
+	else {
+		..fmap[name] = code;
+	}
+}
+
+def defmacro(name, code)
+{
+	if name.TYPE == type.list {
+		f = ..function.clone();
+		f.code = code;
+		f.argv = name[1:];
+		name = name[0];
+		..mmap[name] = f;
+	}
+	else {
+		..mmap[name] = code;
+	}
+}
+
+
+
+def function
+{
+	def code;
+	def argv;
+
+	def string
+	{
+		return '(fun): ' + (..code, ..argv).string();
+	}
+}
+
+def compile(src)
+{
+	..fmap = { 'T':true, 'F':false };
+	..fmap['car'] = ..car;
+	..fmap['cdr'] = ..cdr;
+	..fmap['list'] = ..list;
+	..fmap['do'] = ..do_list;
+
+	code = ..parse_code(src);
+	return (code, ..fmap);
+}
+
+def.parse parse_code(src)
+{
+	stmt:	expr_list
+		;
+
+	expr:	'(' expr_list ')'
+			lambda(...argv){ 
+				code = argv[1];
+				if code[0].TYPE == type.tuple && code[0][0] == 'path' {
+					name = code[0][1][0];
+
+					if ..owner.mmap.has_key(name) { 
+						function = ..owner.mmap[name].clone();
+						idx = 1;
+
+						new_local = type.map();
+						for p in function.argv {
+							new_local[p] = code[idx];
+							idx += 1;
+						}
+
+						return ..owner.execute((function.code, ..owner.fmap), new_local, owner);
+					}
+				}
+
+				return code;
+			}
+		| number
+		| string
+		| list
+		| function
+		| control_stmt
+		| defun_stmt
+		| defmacro_stmt
+		| comma_expr
+		;
+
+	comma_expr: ',' expr
+				lambda(...argv){
+					return ('comma', argv[1]);
+				}
+			;
+
+	control_stmt : if_stmt
+				| cond_stmt
+				| using_stmt
+				| let_stmt
+				| quote_stmt
+				;
+
+	defun_stmt: '(' 'defun' name expr ')'
+				lambda(...argv){
+					..owner.defun(argv[2], argv[3]);
+					return nil;
+				}
+			| '(' 'defun' fun_define expr ')'
+					lambda(...argv){
+						..owner.defun(argv[2], argv[3]);
+						return nil;
+					} 
+			| '(' 'lambda' fun_define expr ')'
+					lambda(...argv){
+						return  ..owner.defun(argv[2].push_front('lambda'), argv[3]);
+					} 
+			;
+
+	defmacro_stmt: '(' 'defmacro' name expr ')'
+				lambda(...argv){
+					..owner.defmacro(argv[2], argv[3]);
+					return nil;
+				}
+			| '(' 'defmacro' fun_define expr ')'
+					lambda(...argv){
+						..owner.defmacro(argv[2], argv[3]);
+						return nil;
+					} 
+			;
+
+	fun_define:	'(' name_list ')'
+				lambda(...argv){ return argv[1]; }
+			;
+
+	name_list: name_list name
+				lambda(...argv){ return argv[0].push_back(argv[1]); }
+			| name
+				lambda(...argv){ return [argv[0]]; }
+			;
+
+	function: internal 
+			| external 
+			;
+
+	if_stmt : '(' 'if' expr expr expr  ')'
+				lambda(...argv){
+					return [('if', argv[2], argv[3], argv[4])];
+				}
+			;
+
+	cond_stmt : '(' 'cond' expr_pair_list  ')'
+				lambda(...argv) {
+					return [('cond', argv[2])];
+				}
+			;
+
+	let_stmt : '(' 'let' expr expr  ')'
+				lambda(...argv) {
+					return [('let', argv[2], argv[3])];
+				}
+			;
+
+	quote_stmt : '(' 'quote' expr_list ')'
+					lambda(...argv) { return [('quote', argv[2])]; }
+				| "'(" expr_list ')'
+					lambda(...argv) { return [('quote', argv[1])]; }
+				| "`(" expr_list ')'
+					lambda(...argv) { return [('backquote', argv[1])]; }
+				;
+
+	using_stmt : '(' 'using' path_expr  ')'
+				lambda(...argv) {
+					mod = root;
+
+					try {
+						for p in argv[2] {
+							mod = mod.MEMBERS[p];
+						}
+					
+						..owner.umap[argv[2][-1]] = mod;
+					}
+					catch {
+	
+					}
+				}
+			;
+
+	expr_pair_list: expr_pair_list expr_pair
+				lambda(...argv) {
+					return argv[0].push_back(argv[1]);
+				}
+			| expr_pair
+				lambda(...argv) {
+					return [argv[0]];
+				}
+			;
+
+	expr_pair : '(' expr expr ')'
+			lambda(...argv) {
+				return (argv[1], argv[2]);
+			}
+			;
+
+	internal: r'[*/+-]|<=|>=|==|!=|<|>'
+				lambda(...argv) { return operator.MEMBERS[argv[0]]; }
+			;
+
+	external: path_expr
+				lambda(...argv) { 
+					# do macro
+					if argv[0].size() == 1 {
+						if ..owner.mmap.has_key(argv[0][0]) {
+
+							macro =  ..owner.mmap[argv[0][0]];
+							if !macro.TYPE <= ..owner.function.TYPE {
+								return ..owner.mmap[argv[0][0]];
+							}
+						}
+					}
+
+					return ('path', argv[0]); 
+				}
+			;
+
+	path_expr:	path_expr '.' base_name
+					lambda(...argv) { return argv[0].push_back(argv[2]); }
+			|	base_name
+					lambda(...argv) { return type.tuple(argv[0]); }
+			;
+
+	base_name:	name
+			|	'owner'
+			|	'my'
+			|	'caller'
+			;
+
+	name: r'[a-zA-Z_][a-zA-Z0-9_]*'
+		;
+
+	list: '[' expr_list ']'
+				lambda(...argv) { 
+					return argv[1].push_front(('path', type.tuple('list')));
+				}
+		;
+
+	expr_list: expr_list expr
+				lambda(...argv) { 
+					if argv[1] != nil {
+						argv[0].push_back(argv[1]); 
+					}
+
+					return argv[0];
+				}
+			| expr
+				lambda(...argv) {
+					if argv[0] != nil {
+						return [argv[0]]; 
+					}
+					else {
+						return [];
+					}
+				}
+		;
+
+	number: r'-?[0-9]+'	
+			lambda(...argv) { return argv[0].integer(); }
+		 | r'(-?[0-9]+[Ee][\+\-]?[0-9]+)|(-?[0-9]*\\.[0-9]+([Ee][\+\-]?[0-9]+)?)'
+			lambda(...argv) { return argv[0].float(); }
+		;
+
+	string: r'"[^"]*"'
+			lambda(...argv) { return argv[0].strip('"'); }
+		;
+
+	~ : r'[ \r\n\t]+'
+		;
+}
+
+def execute(pair, local, base)
+{
+	code = pair[0];
+	fmap = pair[1];
+
+	if base == nil {
+		base = caller;
+	}
+
+	if local == nil {
+		local = type.map();
+	}
+
+	if code.TYPE != type.list {
+		if code.TYPE == type.tuple {
+			if code[0] == 'path' {
+				path = code[1];
+				if path.size() == 1 {
+					name = path[0];
+					if local.has_key(name) {
+						return local[name];
+					}
+
+					if fmap.has_key(name) {
+						return fmap[name].clone();
+					}
+				}
+
+				it = path.begin();
+				curr = base;
+
+				# find module first
+				try { 
+					if ..umap.has_key(it()) {
+						curr = ..umap[path[0]];
+						it.next();
+					}
+
+					while it != path.end() {
+						if it() == 'owner' { 
+							curr = curr.owner;
+						}
+						elif it() == 'my' {
+							curr = curr;
+						}
+						elif it() == 'caller' {
+							curr = curr.caller;
+						}
+						else {
+							curr = curr.MEMBERS[it()];
+						}
+
+						it.next();
+					}
+				}
+				catch orca.iter { 
+					# do nothing
+				}
+
+				return curr;
+			}
+			elif code[0] == 'if' {
+				ret = execute((code[1], fmap), local, base);
+				if ret {
+					return execute((code[2], fmap), local, base);
+				}
+				else {
+					return execute((code[3], fmap), local, base);
+				}
+			}
+			elif code[0] == 'cond' {
+				conditions = code[1];
+				for pair in conditions {
+					ret = execute((pair[0], fmap), local, base);
+					if ret {
+						return execute((pair[1], fmap), local, base);
+					}
+				}
+
+				return nil;
+			}
+			elif code[0] == 'let' {
+				lvar_list = code[1];
+				expr = code[2];
+
+				for lvar in lvar_list {
+					tup = lvar[0];
+					if tup[0] != 'path' {
+						return nil;
+					}
+					if tup[1].size() != 1 {
+						return nil;
+					}
+
+					name = tup[1][0];
+					local[name] = lvar[1];
+				}
+
+				return execute((expr, fmap), local, base);
+			}
+			elif code[0] == 'quote' {
+				return code[1];
+			}
+			elif code[0] == 'backquote' {
+				for sub_expr in code[1].begin() {
+					if sub_expr().TYPE == type.tuple && sub_expr()[0] == 'comma' {
+						ret = execute((sub_expr()[1], fmap), local, base);
+						sub_expr(ret);
+					}
+				}
+				return code[1];
+			}
+			else {
+				return nil;
+			}
+		}
+
+		return code;
+	}
+	
+	for expr in code.begin() {
+		ret = execute((expr(), fmap), local, base);
+		expr(ret);
+	}
+
+
+	#print: '## eval: ', code;
+	if code.size() == 1 {
+		return code[0];
+	}
+
+	if code[0].MEMBERS.has_key('code') {
+		function = code[0];
+		idx = 1;
+
+		new_local = type.map();
+		for p in function.argv {
+			new_local[p] = code[idx];
+			idx += 1;
+		}
+
+		return execute((function.code, fmap), new_local, base);
+	}
+
+	return fun.reduce(code[1:], code[0]);
+}
+
+
+
+

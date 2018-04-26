@@ -1,5 +1,5 @@
-using fs;
-using dfsd;
+using distribute.fs;
+using distribute.dfsd;
 using random;
 using time;
 using os;

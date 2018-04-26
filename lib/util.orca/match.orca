@@ -1,0 +1,127 @@
+
+def comma(str)
+{
+	idx = 0;
+	do {
+		idx = str.find(',', idx);
+		if idx < 0 {
+			return nil;
+		}
+
+		bo = str.find_all('{', 0, idx).size();
+		bc = str.find_all('}', 0, idx).size();
+		ao = str.find_all('[', 0, idx).size();
+		ac = str.find_all(']', 0, idx).size();
+
+		if bo != bc || ao != ac {
+			idx += 1;
+			continue;
+		}
+
+		return str[0:idx];
+	} while true;
+}
+
+
+def tag(open, close, str)
+{
+	idx = 0;
+	do {
+		idx = str.find(close, idx);
+		if idx < 0 {
+			return nil;
+		}
+
+		o = str.find_all(open, 0, idx-1).size();
+		c = str.find_all(close, 0, idx-1).size();
+
+		if o != c {
+			idx += 1;
+			continue;
+		}
+
+		return str[0:idx];
+	} while true;
+}
+
+def match_string(end, str)
+{
+	result = '';
+	idx = 0;
+	do {
+		idx = str.find(end, idx);
+		if idx < 0 {
+			return nil;
+		}
+
+		if str[idx-1] == '\\' {
+			continue;
+		}
+
+		break;
+	} while true;
+
+	return str[0:idx];
+}
+
+def sq_string(str)
+{
+	return ..match_string("'", str);
+}
+
+def dq_string(str)
+{
+	return ..match_string('"', str);
+}
+
+def string_escaping(str) 
+{
+	result = str;
+	result = result.replace('\\', '\\\\');
+	result = result.replace('\t', '\\t');
+	result = result.replace('\r', '\\r');
+	result = result.replace('\n', '\\n');
+	result = result.replace("\'", "\\'");
+	result = result.replace('\"', '\\"');
+
+	return result;
+}
+
+def string_unescaping(str) 
+{
+	result = str;
+	result = result.replace('\\t', '\t');
+	result = result.replace('\\r', '\r');
+	result = result.replace('\\n', '\n');
+	result = result.replace("\\'", "\'");
+	result = result.replace('\\"', '\"');
+	result = result.replace('\\\\', '\\');
+
+	return result;
+}
+
+def match_one_tag(str)
+{
+	idx = 0;
+	do {
+		idx = str.find('</', idx);
+		if idx < 0 {
+			return nil;
+		}
+
+		o = str.find_all('<', 0, idx-1).size();
+		c = str.find_all('</', 0, idx-1).size();
+		oc = str.find_all('/>', 0, idx-1).size();
+
+		o -= c;
+		o -= oc;
+
+		if o != c {
+			idx += 1;
+			continue;
+		}
+
+		return str[0:idx];
+	} while true;
+}
+

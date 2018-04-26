@@ -1,0 +1,253 @@
+
+using fun;
+using util.match;
+
+def match_plain_text(str)
+{
+	# not yet
+	return str;
+}
+
+def decoding(str)
+{
+	#print: '# ', str;
+	decode str.strip()
+	{
+	case '<?', %info, '?>', %remain:
+		ret = decoding(remain);
+		ret['$info'] = info.strip();
+		return ret;
+
+	case '<', %name = r'[a-zA-Z_][a-zA-Z_0-9]*', %attrs, '>', 
+		%one_tag = match.match_one_tag,
+		'</${name}>', %remain:
+		{
+			head = decoding(one_tag);
+
+			if head.TYPE == type.map {
+				tag = head;
+			}
+			elif head.TYPE == type.string {
+				tag = { '$text':head };
+			}
+					
+			if attrs.TYPE == type.string && attrs.strip().length() > 0 {
+				attrs = decoding(attrs);
+				tag['$attrs'] = attrs;
+			}
+	
+			if remain.TYPE == type.string && remain.strip().length()>0 {
+				tail = decoding(remain);
+				if tail.has_key(name) {
+					tmp = tail[name];
+					if tmp.TYPE == type.tuple {
+						tmp.push_back(tag);
+					}
+					else {
+						tail[name] = (tmp, tag);
+					}
+				}
+				else {
+					tail[name] = tag;
+				}
+
+				return tail;	
+			}
+
+			return { name:tag };
+		}
+
+	case '<', %name = r'[a-zA-Z_][a-zA-Z_0-9]*', %attrs, '/>', %remain:
+		{
+			tag = type.map();
+			if attrs.TYPE == type.string && attrs.strip().length() > 0 {
+				attrs = decoding(attrs);
+				tag['$attrs'] = attrs;
+			}
+	
+			if remain.TYPE == type.string && remain.strip().length()>0 {
+				tail = decoding(remain);
+				if tail.has_key(name) {
+					tmp = tail[name];
+					if tmp.TYPE == type.tuple {
+						tmp.push_back(tag);
+					}
+					else {
+						tail[name] = (tmp, tag);
+					}
+				}
+				else {
+					tail[name] = tag;
+				}
+				return tail;	
+			}
+
+			return { name:tag };
+		}
+
+	case %key, '=', %value=r'(\'[^\']*\')|("[^"]*")|([^ ]*)', %remain:
+		{
+			value = decoding(value);
+			tail = type.map();
+			if remain.TYPE == type.string && remain.strip().length() > 0 {
+				tail = decoding(remain);
+			}
+
+			tail[key] = value;
+			return tail;
+		}
+
+	case %value = r'[0-9]+':
+		return value.integer();
+	case %value = r'"[^"]*"':
+		return value[1:-1];
+	case %value = r"'[^']*'":
+		return value[1:-1];
+	case %text = ..match_plain_text:
+		return text;
+	case %error:
+		print: 'not matched';
+	}
+}
+
+
+
+def encoding(obj)
+{
+	ret = '';
+	if obj.TYPE == type.map {
+		for a in obj.begin() {
+			if a.second().TYPE == type.tuple {
+				for b in a.second().begin() {
+					attrs = '';
+					if b().TYPE == type.map && b().has_key('$attrs') {
+						for c in b()['$attrs'].begin() {
+							attrs += c.first() + '=' + c.second() + ' ';
+						}
+					}
+
+					if a.first() == '$attrs' {
+						continue;
+					}
+
+					if a.first() == '$info' {
+						ret += '<? ';
+					}
+					elif a.first() != '$text' {
+						ret += '<${a.first()} ${attrs}>';
+					}
+
+					ret += encoding(b());
+					if a.first() == '$info' {
+						ret += ' ?>';
+					}
+					elif a.first() != '$text' {
+						ret += '</${a.first()}>';
+					}
+				}
+			}
+			else {
+				if a.first() != '$attrs' {
+
+					if a.first() == '$info' {
+						ret += '<? ';
+					}
+					elif a.first() != '$text' {
+						ret += '<${a.first()}>';
+					}
+
+					ret += encoding(a.second());
+					if a.first() == '$info' {
+						ret += ' ?>';
+					}
+					elif a.first() != '$text' {
+						ret += '</${a.first()}>';
+					}
+				}
+			}
+		}
+	}
+	elif obj.TYPE == type.string {
+		return obj;
+	}
+	else {
+	}
+
+	return ret;
+}
+
+
+def beutify(obj, tab)
+{
+	if tab == nil {
+		tab = 0;
+	}
+	else {
+		tab += 1;
+	}
+
+	ret = '';
+	if obj.TYPE == type.map {
+		for a in obj.begin() {
+			if a.second().TYPE == type.tuple {
+				for b in a.second().begin() {
+					attrs = '';
+					if b().TYPE == type.map && b().has_key('$attrs') {
+						for c in b()['$attrs'].begin() {
+							attrs += c.first() + '=' + c.second() + ' ';
+						}
+					}
+
+					if a.first() == '$attrs' {
+						continue;
+					}
+
+					if a.first() == '$info' {
+						ret += '<? ';
+					}
+					elif a.first() != '$text' {
+						ret += '\t'*tab + '<${a.first()} ${attrs}>\n';
+					}
+
+					ret += beutify(b(), tab);
+
+					if a.first() == '$info' {
+						ret += ' ?>\n';
+					}
+					elif a.first() != '$text' {
+						ret += '\n' + '\t'*tab + '</${a.first()}>\n';
+					}
+				}
+			}
+			else {
+				if a.first() != '$attrs' {
+
+					if a.first() == '$info' {
+						ret += '<? ';
+					}
+					elif a.first() != '$text' {
+						ret += '\t'*tab + '<${a.first()}>\n';
+					}
+
+					ret += beutify(a.second(), tab);
+
+					if a.first() == '$info' {
+						ret += ' ?>\n';
+					}
+					elif a.first() != '$text' {
+						ret += '\n' + '\t'*tab + '</${a.first()}>\n';
+					}
+				}
+			}
+		}
+	}
+	elif obj.TYPE == type.string {
+		return '\t'*tab + obj;
+	}
+	else {
+	}
+
+	return ret;
+}
+
+

@@ -1,6 +1,6 @@
 
 orcalibdir = $(prefix)/lib/orca
-orcalib_DATA = alg.kw alg.orca cached.kw cached.orca dfsd.kw dfsd.orca dist.kw dist.orca fs.kw fs.orca fun.kw fun.orca gnuplot.kw gnuplot.orca gui.kw gui.orca httpd.kw httpd.orca httplib.kw httplib.orca json.kw json.orca lisp.kw lisp.orca match.kw match.orca osp.kw osp.orca remotec.kw remotec.orca remoted.kw remoted.orca run.kw run.orca sh.kw sh.orca util.kw util.orca xml.kw xml.orca log.kw log.orca orm.kw orm.orca
+orcalib_DATA = alg.kw alg.orca fun.kw fun.orca gui.kw gui.orca run.kw run.orca sh.kw sh.orca log.kw log.orca 
 
 orcalibsonardir = $(prefix)/lib/orca/sonar.orca
 orcalibsonar_DATA = sonar.orca/CODE.kw sonar.orca/CODE.orca
@@ -16,3 +16,26 @@ orcalibsonartemplate_DATA = sonar.orca/template.orca/CODE.kw sonar.orca/template
 
 orcalibsonarhttpdir = $(prefix)/lib/orca/sonar.orca/http.orca
 orcalibsonarhttp_DATA = sonar.orca/http.orca/request.kw sonar.orca/http.orca/request.orca
+
+orcalibdistributedir = $(prefix)/lib/orca/distribute.orca
+orcalibdistribute_DATA = distribute.orca/remotec.orca distribute.orca/remotec.kw distribute.orca/remoted.orca distribute.orca/remoted.kw distribute.orca/dist.orca distribute.orca/dist.kw distribute.orca/fs.orca distribute.orca/fs.kw distribute.orca/dfsd.orca distribute.orca/dfsd.kw
+
+orcalibnetdir = $(prefix)/lib/orca/net.orca
+orcalibnet_DATA = net.orca/httplib.orca net.orca/httpd.orca net.orca/osp.orca net.orca/httplib.kw net.orca/httpd.kw net.orca/osp.kw
+
+orcaliblangdir = $(prefix)/lib/orca/lang.orca
+orcaliblang_DATA = lang.orca/lisp.orca lang.orca/lisp.kw
+
+orcalibencodingdir = $(prefix)/lib/orca/encoding.orca
+orcalibencoding_DATA = encoding.orca/CODE.orca encoding.orca/CODE.kw encoding.orca/xml.kw encoding.orca/json.kw encoding.orca/xml.orca encoding.orca/json.orca
+
+orcalibutildir = $(prefix)/lib/orca/util.orca
+orcalibutil_DATA = util.orca/CODE.kw util.orca/match.kw util.orca/CODE.orca util.orca/match.orca
+
+orcalibtooldir = $(prefix)/lib/orca/tool.orca
+orcalibtool_DATA = tool.orca/gnuplot.kw tool.orca/gnuplot.orca
+
+orcalibstoragedir = $(prefix)/lib/orca/storage.orca
+orcalibstorage_DATA = storage.orca/CODE.kw storage.orca/CODE.orca storage.orca/cached.kw storage.orca/orm.kw storage.orca/cached.orca storage.orca/orm.orca
+
+

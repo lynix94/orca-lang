@@ -1,4 +1,4 @@
-using xml;
+using encoding.xml;
 
 str = '''
 <?xml version="1.0"?>

@@ -1,6 +1,6 @@
-using remoted;
-using remotec;
-using dist;
+using distribute.remoted;
+using distribute.remotec;
+using distribute.dist;
 using random;
 using time;
 

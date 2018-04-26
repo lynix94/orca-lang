@@ -1,0 +1,5 @@
+
+using __clib__;
+
+def sqlite3 := __clib__.sqlite3;
+

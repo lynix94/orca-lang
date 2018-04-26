@@ -1,0 +1,48 @@
+
+using type;
+using ipc;
+using __clib__;
+
+
+def lru := __clib__.lru;
+
+
+def lock(obj)
+{
+	id = obj.ID;
+	if id == 0 {
+		throw orca.type <- 'obj has no address';
+	}
+
+	.mutex {
+		if .table.has_key(id) {
+			return .table[id];
+		}
+
+		.table[id] = ipc.mutex.clone();
+		return .table[id];
+	}
+
+	def table := type.map();
+	def mutex := ipc.mutex.clone();
+}
+
+def upper(name)
+{
+	op = caller.owner;
+
+	while op != nil {
+		if op.NAME == name {
+			return op;
+		}
+
+		if op.ID == root.ID {
+			return nil;
+		}
+
+		op = op.owner;
+	}
+
+	return nil;
+}
+

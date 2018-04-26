@@ -13,6 +13,7 @@
 
 #include "orcaObject.h"
 
+class orcaVM;
 class orcaRoot : public orcaObject 
 {
 public:

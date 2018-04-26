@@ -1,6 +1,6 @@
 
 using os;
-using sqlite3;
+using storage.sqlite3;
 
 
 os.remove('tmp.db');

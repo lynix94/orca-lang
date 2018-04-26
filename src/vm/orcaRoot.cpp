@@ -73,23 +73,26 @@ orcaRoot::orcaRoot()
 	insert_static("datetime", new orcaDatetime());
 	insert_static("pack", g_pack = new orcaPack());
 	insert_static("stopwatch", new orcaStopWatch());
-	insert_static("base64", new orcaBase64());
 	insert_static("type", new orcaTypes());
 	insert_static("orca", new orcaOrca());
 	insert_static("random", new orcaRandom());
-	insert_static("cutil", new orcaUtil());
 	insert_static("math", new orcaMath());
 	insert_static("operator", new orcaOperator());
 	insert_static("sort", new orcaSort());
 	insert_static("cpp", new orcaCPP());
 	insert_static("system", new orcaSystem());
 	insert_static("queue", new orcaQueue());
-	insert_static("sqlite3", new orcaSqlite3());
 	insert_static("strings", new orcaStrings());
 	insert_native_function("string", (object_fp)&orcaRoot::ex_string);
 	insert_native_function("repr", (object_fp)&orcaRoot::ex_repr);
 	insert_native_function("range", (object_fp)&orcaRoot::ex_range);
 	insert_native_function("selector", (object_fp)&orcaRoot::ex_selector);
+
+	orcaObject* clib = new orcaObject();
+	insert_static("__clib__", clib);
+	clib->insert_static("lru", new orcaUtilLru());
+	clib->insert_static("sqlite3", new orcaSqlite3());
+	clib->insert_static("base64", new orcaBase64());
 
 #if defined(LINUX)
 #if defined(USE_GTK)
