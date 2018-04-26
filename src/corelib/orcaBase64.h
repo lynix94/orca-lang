@@ -21,8 +21,8 @@ public:
 	orcaBase64()
 	{
 		set_name("base64");
-		insert_static_native_function("enc", (object_fp)&orcaBase64::ex_enc);
-		insert_static_native_function("dec", (object_fp)&orcaBase64::ex_dec);
+		insert_static_native_function("encoding", (object_fp)&orcaBase64::ex_enc);
+		insert_static_native_function("decoding", (object_fp)&orcaBase64::ex_dec);
 	}
 
 	orcaData ex_enc(orcaVM* vm, int n) 

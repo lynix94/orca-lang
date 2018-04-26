@@ -12,7 +12,7 @@ test_vectors = [
   'test_oo',
   'test_gc',
   'test_operator',
-  #'test_shell',
+  'test_shell',
   'test_iter',
   'test_lambda',
   'test_thread',
@@ -37,7 +37,7 @@ test_modules = [
   'test_ipc',
   'test_socket',
   'test_fdselect',
-#  'test_os',  ## disable temp.
+  'test_os',
   'test_fun',
   'test_date',
   'test_time',

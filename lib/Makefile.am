@@ -1,6 +1,6 @@
 
 orcalibdir = $(prefix)/lib/orca
-orcalib_DATA = alg.kw alg.orca fun.kw fun.orca gui.kw gui.orca run.kw run.orca sh.kw sh.orca log.kw log.orca 
+orcalib_DATA = alg.kw alg.orca fun.kw fun.orca gui.kw gui.orca run.kw run.orca log.kw log.orca 
 
 orcalibsonardir = $(prefix)/lib/orca/sonar.orca
 orcalibsonar_DATA = sonar.orca/CODE.kw sonar.orca/CODE.orca
@@ -24,7 +24,7 @@ orcalibnetdir = $(prefix)/lib/orca/net.orca
 orcalibnet_DATA = net.orca/httplib.orca net.orca/httpd.orca net.orca/osp.orca net.orca/httplib.kw net.orca/httpd.kw net.orca/osp.kw
 
 orcaliblangdir = $(prefix)/lib/orca/lang.orca
-orcaliblang_DATA = lang.orca/lisp.orca lang.orca/lisp.kw
+orcaliblang_DATA = lang.orca/lisp.orca lang.orca/lisp.kw lang.orca/sh.kw lang.orca/sh.orca
 
 orcalibencodingdir = $(prefix)/lib/orca/encoding.orca
 orcalibencoding_DATA = encoding.orca/CODE.orca encoding.orca/CODE.kw encoding.orca/xml.kw encoding.orca/json.kw encoding.orca/xml.orca encoding.orca/json.orca

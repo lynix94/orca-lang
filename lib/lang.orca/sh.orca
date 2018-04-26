@@ -1,0 +1,36 @@
+
+using os;
+
+print: argv;
+
+return my.script.clone(argv[2], argv[3]); 
+
+def script(...argv)
+{
+  def command;
+  def params;
+
+  def init(command, params)
+  {
+	..command = command;
+	..params = params;
+  }
+
+
+  # main body
+  new_cmd = .command;
+
+  i = 0;
+  for p in .params {
+	new_cmd = new_cmd.replace(p, argv[i]);
+	i += 1;
+  }
+
+  print: new_cmd;
+  os.run(new_cmd);
+  return;
+}
+
+
+
+

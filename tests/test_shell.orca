@@ -7,7 +7,7 @@ if system.os().find('Linux') == -1 {
 
 def __cout__;
 
-;nslookup orca-lang.or.kr
+;/sbin/ifconfig
 
 print: my.__cout__;
 if my.__cout__.length() <= 0 {
