@@ -1,6 +1,6 @@
 
 orcalibdir = $(prefix)/lib/orca
-orcalib_DATA = alg.kw alg.orca fun.kw fun.orca gui.kw gui.orca run.kw run.orca log.kw log.orca 
+orcalib_DATA = alg.kw alg.orca fun.kw fun.orca gui.kw gui.orca run.kw run.orca log.kw log.orca html.orca html.kw
 
 orcalibsonardir = $(prefix)/lib/orca/sonar.orca
 orcalibsonar_DATA = sonar.orca/CODE.kw sonar.orca/CODE.orca

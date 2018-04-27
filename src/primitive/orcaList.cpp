@@ -18,7 +18,7 @@
 #include "orcaStack.h"
 #include "orcaException.h"
 #include <boost/lexical_cast.hpp>
-#include "orcaSort.h"
+#include "orcaSorted.h"
 
 
 bool islist(orcaData p)

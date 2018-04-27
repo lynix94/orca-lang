@@ -1,5 +1,6 @@
 using strings;
 using html;
+using sorted;
 
 #print: argv;
 name = argv[0];
@@ -65,12 +66,15 @@ def form
 
 	def input
 	{
+		def serno := 1;
+
 		def input_tag(label)
 		{
 			def id;
 			def name;
 			def type;
 			def label;
+			def serno;
 
 			.label = label;
 
@@ -81,6 +85,8 @@ def form
 		{
 			ret = ..input_tag.clone();
 			ret.type = type;
+			ret.serno = ..serno;
+			..serno += 1;
 
 			return ret;
 		}
@@ -95,7 +101,9 @@ def form
 		for k, v in ..item {
 			v.id = k;
 			v.name = k;
+		}
 
+		for v in sorted(..item, lambda(a, b) { return a.serno < b.serno; }) {
 			switch v.type
 			{
 			case 'text', 'password':

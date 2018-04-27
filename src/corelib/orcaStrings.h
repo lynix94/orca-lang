@@ -22,7 +22,7 @@ public:
 		set_name("strings");
 
 		insert_static_native_function("join", (object_fp)&orcaStrings::ex_join);
-		insert_member("builder", new ex_builder());
+		insert_member("builder", new orcaStringBuilder());
 	}
 
 	orcaData ex_join(orcaVM* vm, int n) 
@@ -43,26 +43,33 @@ public:
 		return ss.str();
 	}
 
-	class ex_builder : public orcaObject 
+	class orcaStringBuilder : public orcaObject 
 	{
 	public:
-		ex_builder(void* vp) {}
+		orcaStringBuilder(void* vp) {}
 
 		orcaObject* v_clone() {
-			return new ex_builder((void*)NULL);
+			return new orcaStringBuilder((void*)NULL);
 		}
 
-		ex_builder() 
+		orcaStringBuilder() 
 		{ 
 			set_name("builder"); 
-			insert_native_function("push_back", (object_fp)&ex_builder::ex_push_back);
+			insert_native_function("push_back", (object_fp)&orcaStringBuilder::ex_push_back);
+			insert_native_function("string", (object_fp)&orcaStringBuilder::ex_string);
+			insert_native_function("clear", (object_fp)&orcaStringBuilder::ex_clear);
 		}
 
-		virtual ~ex_builder()
+		virtual ~orcaStringBuilder()
 		{
 			for (int i=0; i<items.size(); i++) {
 				items[i].rc_dec();
 			}
+		}
+
+		virtual orcaData operator()(orcaVM* vm, int n)
+		{
+			return new orcaStringBuilder();
 		}
 
 		orcaData ex_push_back(orcaVM* vm, int n)
@@ -71,6 +78,23 @@ public:
 			items.push_back(vm->get_param(0));
 			vm->get_param(0).rc_inc();
 			return this;
+		}
+
+		orcaData ex_clear(orcaVM* vm, int n)
+		{
+			for (int i=0; i<items.size(); i++) {
+				items[i].rc_dec();
+			}
+
+			items.clear();
+			return this;
+		}
+
+		orcaData ex_string(orcaVM* vm, int n)
+		{
+			string ret;
+			string_(vm, ret);
+			return ret;
 		}
 
 		virtual void string_(orcaVM* vm, string& str)

@@ -32,7 +32,7 @@
 #include "orcaUtil.h"
 #include "orcaMath.h"
 #include "orcaOperator.h"
-#include "orcaSort.h"
+#include "orcaSorted.h"
 #include "orcaCPP.h"
 #include "orcaSystem.h"
 #include "orcaQueue.h"
@@ -78,7 +78,7 @@ orcaRoot::orcaRoot()
 	insert_static("random", new orcaRandom());
 	insert_static("math", new orcaMath());
 	insert_static("operator", new orcaOperator());
-	insert_static("sort", new orcaSort());
+	insert_static("sorted", new orcaSorted());
 	insert_static("cpp", new orcaCPP());
 	insert_static("system", new orcaSystem());
 	insert_static("queue", new orcaQueue());

@@ -2,7 +2,7 @@
 
 /**********************************************************************
 
-  orcaSort.h -
+  orcaSorted.h -
 
   Copyright (C) 2009-2011 Lee, Ki-Yeul
 
@@ -14,6 +14,7 @@
 #include "porting.h"
 #include "orcaObject.h"
 #include "orcaList.h"
+#include "orcaMap.h"
 
 struct sort_compare : public binary_function<const char*, const char*, bool>
 {
@@ -32,13 +33,13 @@ struct sort_compare : public binary_function<const char*, const char*, bool>
 	}
 };
 
-class orcaSort : public orcaObject 
+class orcaSorted : public orcaObject 
 {
 public:
-	DEFAULT_NATIVE_DEFINE(orcaSort);
-	orcaSort()
+	DEFAULT_NATIVE_DEFINE(orcaSorted);
+	orcaSorted()
 	{
-		set_name("sort");
+		set_name("sorted");
 	}
 
 	virtual orcaData operator()(orcaVM* vm, int n) 
@@ -70,6 +71,13 @@ public:
 			}
 
 			return tp2;
+		}
+
+		orcaMap* mp = castobj<orcaMap>(p);
+		if (mp) {
+			orcaList* lp = castobj<orcaList>(mp->ex_values(vm, 0));
+			lp->sort(vm, vm->get_param(1));
+			return lp;
 		}
 
 		return NIL;

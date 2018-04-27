@@ -42,11 +42,11 @@ public:
 		virtual orcaData operator()(orcaVM* vm, int n) 
 		{
 			string str;
-			for (int i=0; i<n; i++) 
+			for (int i=0; i<n; i++) {
 				vm->get_param(i).string_(vm, str);
+			}
 
 			str += "\n";
-
 			cout << str;
 
 			return NIL;
@@ -65,8 +65,9 @@ public:
 		virtual orcaData operator()(orcaVM* vm, int n) 
 		{
 			string str;
-			for (int i=0; i<n; i++) 
+			for (int i=0; i<n; i++) {
 				vm->get_param(i).string_(vm, str);
+			}
 
 			cout << str;
 

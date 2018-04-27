@@ -35,8 +35,9 @@ using sonar.contrib.admin;
 using storage;
 using storage.cached;
 using storage.orm;
-using gui.orca;
-using alg.orca;
+using gui;
+using alg;
+using html;
 
 using os;
 
@@ -87,6 +88,7 @@ os.touch('./storage.orca/cached.orca');
 os.touch('./storage.orca/orm.orca');
 os.touch('./gui.orca');
 os.touch('./alg.orca');
+os.touch('./html.orca');
 
 
 
