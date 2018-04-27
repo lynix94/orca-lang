@@ -8,6 +8,10 @@
 
 **********************************************************************/
 
+#include <boost/filesystem/path.hpp>
+namespace fs = boost::filesystem;
+
+
 
 #include "orca_opcode.h"
 #include "parserCode.h"
@@ -35,14 +39,21 @@ void parserCode::init() /*{{{*/ {
 
 void parserCode::Final(string name) /*{{{*/
 {
-	int idx = name.find_last_of(".");
+	string parent_path = fs::path(name).parent_path().string();
+	string basename = fs::path(name).filename().string();
+
+	int idx = basename.find_last_of(".");
 	string oname;
 
 	if (idx > 0) {
-		oname = name.substr(0, idx) + ".kw";
+		oname = basename.substr(0, idx) + ".kw";
 	}
 	else {
-		oname = name + ".kw";
+		oname = basename  + ".kw";
+	}
+
+	if (parent_path.length() > 0) {
+		oname= parent_path + "/" + oname;
 	}
 
 	FILE* fp = fopen(oname.c_str(), "wb+");

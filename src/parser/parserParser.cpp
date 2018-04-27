@@ -280,7 +280,15 @@ bool parserParser::parse_context_file(const string& filename, const string& mod_
 
 	// make binary
 	parserCode::pop_code_stack();
-	parserCode::Final(mod_name.c_str());
+
+	string parent_path = fs::path(filename).parent_path().string();
+	string target_path = mod_name;
+	if (parent_path.length() > 0) {
+		target_path = parent_path + "/" + mod_name;
+	}
+
+	parserCode::Final(target_path.c_str());
+
 
 #ifdef _VM_DEBUG
 	parserCode::dump_final();

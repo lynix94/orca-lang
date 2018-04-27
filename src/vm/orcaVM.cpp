@@ -3392,18 +3392,15 @@ bool orcaVM::load(const string& input_path, orcaObject* owner, string owner_path
 	vector<string> toks = kyString::split(base_name, ".", 2);
 	switch (toks.size())
 	{
-	case 3:
-		main_postfix = toks[1];
-		sub_postfix = toks[2];
-		break;
-	case 2:
-		main_postfix = toks[1];
-		sub_postfix = toks[1];
-		break;
-	case 1:
-		main_postfix = "orca";
-		sub_postfix = "orca";
-		break;
+	case 3:	main_postfix = toks[1];
+			sub_postfix = toks[2];
+			break;
+	case 2:	main_postfix = toks[1];
+			sub_postfix = toks[1];
+			break;
+	case 1: main_postfix = "orca";
+			sub_postfix = "orca";
+			break;
 	}
 	
 	if (main_postfix != "orca") {
@@ -3459,10 +3456,17 @@ bool orcaVM::load(const string& input_path, orcaObject* owner, string owner_path
 
 			fs::directory_iterator m_end, m_iter = fs::directory_iterator(candidate_path);
 			for (; m_iter != m_end; ++m_iter) {
-				if (m_iter->path().string()[0] == '.') continue;
-				if (!fs::is_directory(*m_iter)) {
-					string str = m_iter->path().string();
-					if (str.substr(str.length()-5) != ".orca") continue;
+				string str = m_iter->path().string();
+
+				if (str[0] == '.') continue; // skip hidden system file
+				
+				if (fs::is_directory(*m_iter)) {
+					if (str.substr(str.length()-5) != ".orca") continue; // skip normal directory
+				}
+				else {
+					string base_name = fs::path(str).filename().string();
+					vector<string> toks = kyString::split(base_name, ".", 2);
+					if (toks.size() < 2 || toks[1] != "orca") continue;
 				}
 
 				string new_owner_path = mod_name;
