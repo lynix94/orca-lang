@@ -36,6 +36,9 @@ orcalibtooldir = $(prefix)/lib/orca/tool.orca
 orcalibtool_DATA = tool.orca/gnuplot.kw tool.orca/gnuplot.orca
 
 orcalibstoragedir = $(prefix)/lib/orca/storage.orca
-orcalibstorage_DATA = storage.orca/CODE.kw storage.orca/CODE.orca storage.orca/cached.kw storage.orca/orm.kw storage.orca/cached.orca storage.orca/orm.orca
+orcalibstorage_DATA = storage.orca/CODE.kw storage.orca/CODE.orca storage.orca/cached.kw storage.orca/cached.orca
+
+orcalibormdir = $(prefix)/lib/orca/orm.orca
+orcaliborm_DATA = orm.orca/CODE.kw orm.orca/CODE.orca orm.orca/model.kw orm.orca/model.orca orm.orca/type.orca orm.orca/type.kw
 
 

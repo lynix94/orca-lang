@@ -1,0 +1,117 @@
+using orm;
+using strings;
+
+#
+# main table
+# 
+def _name;
+def _where;
+def _orderby;
+def _project;
+def _groupby;
+def _attrs;
+
+def init(name) {
+	.._name = name;
+	.._attrs = {,};
+}
+
+def ".attr"(name) {
+	if .._attrs.has_key(name) {
+		return .._attrs[name];
+	}
+
+	return nil;
+}
+
+def add_attr(name) {
+	.._attrs[name] = orm.query.clone(name);
+}
+
+def where(q) {
+	.._where = q;
+	return owner;
+}
+
+def orderby(o) {
+	.._orderby = o;
+	return owner;
+}
+
+def project(p) {
+	.._project = p;
+	return owner;
+}
+
+def groupby(g) {
+	.._groupby = g;
+	return owner;
+}
+
+def result() {
+	if .._project.TYPE == nil.TYPE {
+		select_list = strings.join(', ', .._attrs.keys()...);
+	}
+	else {
+		select_list = .._project;
+	}
+
+	query = 'select %s from %s where %s' % (select_list, .._name, .._where);
+	if .._orderby.TYPE != nil.TYPE {
+		query += ' order by %s' % .._orderby;
+	}
+
+	print: query;
+	res = ..owner.conn.execute(query);
+
+	return orm.row_iter.clone(owner, res);
+}
+
+#
+# about meta.
+#
+def primary_key(...argv)
+{
+
+
+}
+
+
+def index(...argv)
+{
+
+
+}
+
+def unique(...argv)
+{
+
+
+}
+
+
+
+#
+# about io.
+#
+def create_table()
+{
+	
+
+
+}
+
+def save()
+{
+
+
+}
+
+def objects()
+{
+
+}
+
+
+
+

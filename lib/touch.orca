@@ -34,10 +34,13 @@ using sonar.contrib;
 using sonar.contrib.admin;
 using storage;
 using storage.cached;
-using storage.orm;
 using gui;
 using alg;
 using html;
+using orm;
+using orm.model;
+using orm.type;
+
 
 using os;
 
@@ -86,10 +89,12 @@ os.touch('./sonar.orca/CODE.orca');
 os.touch('./storage.orca');
 os.touch('./storage.orca/CODE.orca');
 os.touch('./storage.orca/cached.orca');
-os.touch('./storage.orca/orm.orca');
 os.touch('./gui.orca');
 os.touch('./alg.orca');
 os.touch('./html.orca');
+os.touch('./orm.orca/CODE.orca');
+os.touch('./orm.orca/type.orca');
+os.touch('./orm.orca/model.orca');
 
 
 
