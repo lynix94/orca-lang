@@ -69,6 +69,7 @@ os.touch('./touch.orca');
 os.touch('./tool.orca');
 os.touch('./tool.orca/gnuplot.orca');
 os.touch('./sonar.orca');
+os.touch('./sonar.orca/CODE.orca');
 os.touch('./sonar.orca/core.orca');
 os.touch('./sonar.orca/core.orca/client.orca');
 os.touch('./sonar.orca/core.orca/manager.orca');

@@ -1,4 +1,20 @@
 using sonar;
+using os;
+using io.open;
+
+
+def create_app(basepath, appname)
+{
+	os.mkdir('%s/%s.orca' % (basepath, appname));
+
+	f = open('%s/%s.orca/models.orca' % (basepath, appname), 'w');
+	f.write(sonar.template.template_models);
+	f.close();
+
+	f = open('%s/%s.orca/index.orca.html' % (basepath, appname), 'w');
+	f.write(sonar.template.template_page % {'name':appname});
+	f.close();
+}
 
 def execute(...argv)
 {
@@ -18,6 +34,18 @@ def execute(...argv)
 		}
 
 		..server(argv[1]);
+
+	case 'newapp':
+		print: '# new app';
+		if argv.size() < 2 {
+			print: 'insufficient parameter: app name is required';
+			return;
+		}
+
+		..create_app('.', argv[1]);
+
+	case 'syncdb':
+		print: '# sync db';
 	
 	default:
 		print: '# nothing todo';

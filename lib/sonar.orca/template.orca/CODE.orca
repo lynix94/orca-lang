@@ -21,8 +21,10 @@ def template_urls :=
 '''
 using sonar.core;
 using sonar.contrib.admin;
+using %{name};
 
 core.url_map =	{	r'^admin':admin.page,
+					r'':%{name}.index,
 					# add other url map here
 				};
 ''';
@@ -32,6 +34,33 @@ core.url_map =	{	r'^admin':admin.page,
 def template_settings :=
 '''
 using sonar;
+''';
+
+
+
+def template_page :=
+'''
+<html>
+<head>
+</head>
+<body>
+
+using sonar;
+
+index page of %{name}<br><br>
+modify your index page here<br>
+or add new page on same diretory<br>
+or add new app by 'manage newapp'<br>
+
+</body>
+</html>
+''';
+
+def template_models :=
+'''
+using sonar;
+
+# Create your models here.
 ''';
 
 
