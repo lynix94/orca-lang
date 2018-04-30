@@ -202,7 +202,7 @@ public:
 		insert_static_native_function("today", (object_fp)&orcaDate::ex_today);
 		insert_native_function("init", (object_fp)&orcaDate::ex_init);
 
-		insert_native_function(".attr", (object_fp)&orcaDate::ex_get);
+		insert_native_function(".", (object_fp)&orcaDate::ex_get);
 		insert_native_function("+", (object_fp)&orcaDate::ex_add);
 		insert_native_function("-", (object_fp)&orcaDate::ex_sub);
 		insert_native_function("<", (object_fp)&orcaDate::ex_lt);

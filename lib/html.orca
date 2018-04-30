@@ -81,7 +81,7 @@ def form
 			return my;
 		}
 
-		def ".attr"(type)
+		def "."(type)
 		{
 			ret = ..input_tag.clone();
 			ret.type = type;

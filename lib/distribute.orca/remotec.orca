@@ -211,7 +211,7 @@ def clean_obj()
 }
 
 
-def '.attr'(name)
+def '.'(name)
 {
 	remotec.log: 'get: ', name;
 	if ..flag_root {
@@ -236,7 +236,7 @@ def '.attr'(name)
 	return attr;
 }
 
-def '.attr_last'(name)
+def '.$'(name)
 {
 	remotec.log: 'get_last: ', name;
 	if ..flag_root {
@@ -254,7 +254,7 @@ def '.attr_last'(name)
 	return obj;
 }
 
-def '.attr='(name, data)
+def '.='(name, data)
 {
 	if ..flag_root {
 		..find_obj('root');

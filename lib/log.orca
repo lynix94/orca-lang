@@ -28,7 +28,7 @@ def init(name)
 	..name = name;
 }
 
-def '.attr'(name)
+def '.'(name)
 {
 	if ..flag.has_key(name) == false {
 		nlog = owner.clone(name);

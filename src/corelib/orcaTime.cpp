@@ -114,7 +114,7 @@ void orcaTime::__init()
 	insert_static_native_function("timer", (object_fp)&orcaTime::ex_timer);
 	insert_static_native_function("ticker", (object_fp)&orcaTime::ex_ticker);
 	insert_native_function("init", (object_fp)&orcaTime::ex_init);
-	insert_native_function(".attr", (object_fp)&orcaTime::ex_get);
+	insert_native_function(".", (object_fp)&orcaTime::ex_get);
 	insert_native_function("+", (object_fp)&orcaTime::ex_add);
 	insert_native_function("-", (object_fp)&orcaTime::ex_sub);
 	insert_native_function("*", (object_fp)&orcaTime::ex_mul);
