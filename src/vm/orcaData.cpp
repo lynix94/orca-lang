@@ -634,7 +634,16 @@ bool orcaData::operator!=(orcaData& r)/*{{{*/
 
 orcaData orcaData::operator_lt(orcaVM* vm, orcaData& rhs) /*{{{*/
 {
-	if (is<TYPE_INT>(*this)) {
+	if (is<TYPE_NIL>(*this)) {
+		switch(rhs.get_type())
+		{
+		case TYPE_NIL:		return false;
+		case TYPE_TYPE:		return rhs.type_get().t == TYPE_NIL ? true : false;
+		case TYPE_OBJ:		break;
+		default:			return true;
+		}
+	}
+	else if (is<TYPE_INT>(*this)) {
 		switch(rhs.get_type())
 		{
 		case TYPE_INT:		return i() < rhs.i();
@@ -652,9 +661,6 @@ orcaData orcaData::operator_lt(orcaVM* vm, orcaData& rhs) /*{{{*/
 	else if (is<TYPE_STR>(*this)) {
 		switch(rhs.get_type())
 		{
-		case TYPE_INT:
-		case TYPE_BIGNUM:
-		case TYPE_REAL:		return false;
 		case TYPE_STR:		return s() < rhs.s();
 		case TYPE_TYPE:		return rhs.type_get().t == TYPE_STR ? true : false;
 		case TYPE_OBJ:		break;
@@ -688,9 +694,7 @@ orcaData orcaData::operator_lt(orcaVM* vm, orcaData& rhs) /*{{{*/
 		default:			return false;
 		}
 	}
-
-	// subclassof
-	if (is<TYPE_TYPE>(*this)) {
+	else if (is<TYPE_TYPE>(*this)) { // subclassof
 		if (type_get().t == TYPE_OBJ) {
 			orcaObject* o1 = (orcaObject*)type_get().vp;
 
@@ -702,10 +706,8 @@ orcaData orcaData::operator_lt(orcaVM* vm, orcaData& rhs) /*{{{*/
 
 		return false;
 	}
-
-	// instanceof
-	if (is<TYPE_OBJ>(*this)) {
-		if (is<TYPE_TYPE>(rhs)) {
+	else if (is<TYPE_OBJ>(*this)) {
+		if (is<TYPE_TYPE>(rhs)) { // instanceof
 			if (rhs.type_get().t == TYPE_OBJ) {
 				orcaObject* o1 = this->o();
 				orcaObject* o2 = (orcaObject*)rhs.type_get().vp;
@@ -717,15 +719,26 @@ orcaData orcaData::operator_lt(orcaVM* vm, orcaData& rhs) /*{{{*/
 		}
 
 		orcaData d = o()->operator_lt(vm, rhs);
-		if (!is<TYPE_NIL>(d)) {
-			return d;
+		if (is<TYPE_BOOL>(d)) {
+			return d.Boolean();
+		}
+
+		if (!is<TYPE_OBJ>(rhs)) { // object is greater than other
+			return false;
 		}
 	}
-	else if (is<TYPE_OBJ>(rhs)) {
+
+	if (is<TYPE_OBJ>(rhs)) {
 		orcaData d= rhs.o()->operator_ge(vm, *this);
 		if (is<TYPE_BOOL>(d)) {
 			return !d.Boolean();
 		}
+
+		if (is<TYPE_OBJ>(*this)) {
+			return (void*)this < (void*)rhs.o();
+		}
+
+		return true;
 	}
 
 	return NIL;
@@ -814,13 +827,20 @@ orcaData orcaData::operator_ge(orcaVM* vm, orcaData& rhs) /*{{{*/
 
 orcaData orcaData::operator_eq(orcaVM* vm, orcaData& rhs) /*{{{*/
 {
-	if (is<TYPE_INT>(*this)) {
+	if (is<TYPE_NIL>(*this)) {
+		switch(rhs.get_type())
+		{
+		case TYPE_NIL:		return true;
+		case TYPE_OBJ:		break;
+		default:			return false;
+		}
+	}
+	else if (is<TYPE_INT>(*this)) {
 		switch(rhs.get_type())
 		{
 		case TYPE_INT:		return i() == rhs.i();
 		case TYPE_BIGNUM:	return mpz_cmp_si(rhs.bn(), i()) == 0;
 		case TYPE_REAL:		return i() == rhs.r();
-		case TYPE_TYPE:	
 		case TYPE_OBJ:		break;
 		default:			return false;
 		}
@@ -828,10 +848,10 @@ orcaData orcaData::operator_eq(orcaVM* vm, orcaData& rhs) /*{{{*/
 	else if (is<TYPE_REAL>(*this)) {
 		switch(rhs.get_type())
 		{
+		case TYPE_NIL:		return false;
 		case TYPE_INT:		return r() == rhs.i();
 		case TYPE_BIGNUM:	return mpz_cmp_d(rhs.bn(), r()) == 0;
 		case TYPE_REAL:		return r() == rhs.r();
-		case TYPE_TYPE:	
 		case TYPE_OBJ:		break;
 		default:			return false;
 		}
@@ -839,9 +859,9 @@ orcaData orcaData::operator_eq(orcaVM* vm, orcaData& rhs) /*{{{*/
 	else if (is<TYPE_STR>(*this)) {
 		switch(rhs.get_type())
 		{
+		case TYPE_NIL:		return false;
 		case TYPE_STR:		return s() == rhs.s();
 		case TYPE_REGEX:	return boost::regex_match(s(), rhs.re());
-		case TYPE_TYPE:	
 		case TYPE_OBJ:		break;
 		default:			return false;
 		}
@@ -849,72 +869,84 @@ orcaData orcaData::operator_eq(orcaVM* vm, orcaData& rhs) /*{{{*/
 	else if (is<TYPE_BIGNUM>(*this)) {
 		switch(rhs.get_type())
 		{
+		case TYPE_NIL:		return false;
 		case TYPE_INT:		return mpz_cmp_si(bn(), rhs.i()) == 0;
 		case TYPE_BIGNUM:	return mpz_cmp(bn(), rhs.bn()) == 0;
 		case TYPE_REAL:		return mpz_cmp_d(bn(), rhs.r()) == 0;
-		case TYPE_TYPE:	
 		case TYPE_OBJ:		break;
 		default:			return false;
 		}
 	}
-	else if (is<TYPE_REGEX>(*this) && is<TYPE_STR>(rhs)) {
-		return boost::regex_match(rhs.s(), re());
+	else if (is<TYPE_REGEX>(*this)) {
+		switch(rhs.get_type())
+		{
+		case TYPE_STR:		return boost::regex_match(rhs.s(), re());
+		case TYPE_OBJ:		break;
+		default:			return false;
+		}
 	}
-	else if (is<TYPE_NIL>(*this) && is<TYPE_NIL>(rhs)) {
-		return true;
-	}
+	else if (is<TYPE_TYPE>(*this)) {
+		switch(rhs.get_type())
+		{
+		case TYPE_TYPE: {
+			orcaData p1 = *this;
+			orcaData p2 = rhs;
+			type_t t1 = p1.type_get();
+			type_t t2 = p2.type_get();
 
-	if (is<TYPE_TYPE>(*this) && is<TYPE_TYPE>(rhs)) {
-		orcaData p1 = *this;
-		orcaData p2 = rhs;
-		type_t t1 = p1.type_get();
-		type_t t2 = p2.type_get();
+			// object
+			if (t1.t == TYPE_OBJ && t2.t == TYPE_OBJ) {
+				orcaObject* o1 = (orcaObject*)t1.vp;
+				orcaObject* o2 = (orcaObject*)t2.vp;
 
-		// object
-		if (t1.t == TYPE_OBJ && t2.t == TYPE_OBJ) {
-			orcaObject* o1 = (orcaObject*)t1.vp;
-			orcaObject* o2 = (orcaObject*)t2.vp;
+				// internal object
+				if (dynamic_cast<orcaList*>(o1) && dynamic_cast<orcaList*>(o2)) {
+					return true;
+				}
+				else if (dynamic_cast<orcaTuple*>(o1) && dynamic_cast<orcaTuple*>(o2)) {
+					return true;
+				}
+				else if (dynamic_cast<orcaMap*>(o1) && dynamic_cast<orcaMap*>(o2)) {
+					return true;
+				}
 
-			// internal object
-			if (dynamic_cast<orcaList*>(o1) && dynamic_cast<orcaList*>(o2)) {
+				return o1->get_original() == o2->get_original();
+			}
+
+			// not object
+			// in case of same type_t
+			if (t1.t == t2.t) {
 				return true;
 			}
-			else if (dynamic_cast<orcaTuple*>(o1) && dynamic_cast<orcaTuple*>(o2)) {
+
+			if (t1.t == TYPE_INT && t2.t == TYPE_BIGNUM) {
 				return true;
 			}
-			else if (dynamic_cast<orcaMap*>(o1) && dynamic_cast<orcaMap*>(o2)) {
+			else if (t1.t == TYPE_BIGNUM && t2.t == TYPE_INT) {
 				return true;
 			}
 
-			return o1->get_original() == o2->get_original();
+			return false;
+		  }
+		case TYPE_OBJ:		break;
+		default:			return false;
 		}
-
-		// not object
-		// in case of same type_t
-		if (t1.t == t2.t) {
-			return true;
-		}
-
-		if (t1.t == TYPE_INT && t2.t == TYPE_BIGNUM) {
-			return true;
-		}
-		else if (t1.t == TYPE_BIGNUM && t2.t == TYPE_INT) {
-			return true;
-		}
-
-		return false;
 	}
-
-	if (is<TYPE_OBJ>(*this)) {
+	else if (is<TYPE_OBJ>(*this)) {
 		orcaData d = o()->operator_eq(vm, rhs);
 		if (!is<TYPE_NIL>(d)) {
 			return d;
 		}
 	}
-	else if (is<TYPE_OBJ>(rhs)) {
+
+	if (is<TYPE_OBJ>(rhs)) {
 		orcaData d = rhs.o()->operator_eq(vm, *this);
 		if (!is<TYPE_NIL>(d)) {
 			return d;
+		}
+
+		if (is<TYPE_OBJ>(*this)) { // if not defined, chose by addr
+			return (void*)this == (void*)rhs.o();
 		}
 	}
 

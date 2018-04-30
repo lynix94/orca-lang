@@ -1504,7 +1504,6 @@ do_assign_list:
 				p1 = m_stack->pop();
 				if (is<TYPE_STR>(p1) == false) {
 					throw orcaException(this, "orca.type", "eval parameter should be a string");
-					break;
 				}
 
 				d = g_parser->eval(this, p1.s());
@@ -1525,32 +1524,40 @@ do_assign_list:
 
 				break;
 
-			case OP_JMP_TRUE: {
+			case OP_JMP_TRUE:
 				PRINT2("\t\t%p : jmp if true (to: %x)\n", c, TO_INT(&c[1]));
 				d = m_stack->pop();
-				if (is<TYPE_BOOL>(d) && d.b() == true) {
-					c = code + TO_INT(&c[1]);
-					goto fast_jmp;
+				if (is<TYPE_BOOL>(d)) {
+					if (d.b() == true) {
+						c = code + TO_INT(&c[1]);
+						goto fast_jmp;
+					}
+					else {
+						c += sizeof(int) + FJ_INC;
+						goto fast_jmp;
+					}
 				}
 				else {
-					c += sizeof(int) + FJ_INC;
-					goto fast_jmp;
+					throw orcaException(this, "orca.type", "boolean type is required");
 				}
 
 				break;
-			  }
 
 			case OP_JMP_FALSE:	
 				PRINT2("\t\t%p : jmp if false (to: %x)\n", c, TO_INT(&c[1]));
-			
 				d = m_stack->pop();
-				if (is<TYPE_BOOL>(d) && d.b() == false) {
-					c = code + TO_INT(&c[1]);
-					goto fast_jmp;
+				if (is<TYPE_BOOL>(d)) {
+					if (d.b() == false) {
+						c = code + TO_INT(&c[1]);
+						goto fast_jmp;
+					}
+					else  {
+						c += sizeof(int) + FJ_INC;
+						goto fast_jmp;
+					}
 				}
-				else  {
-					c += sizeof(int) + FJ_INC;
-					goto fast_jmp;
+				else {
+					throw orcaException(this, "orca.type", "boolean type is required");
 				}
 
 				break;
