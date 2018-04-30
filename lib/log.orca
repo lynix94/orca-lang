@@ -1,15 +1,25 @@
+using log;
+using datetime;
+
 def name := 'log';
 def flag := {,};
 def '<-' := my.print_log;
-def header_format;
 
-def print_flag(header)
+static def printer := io.print;
+
+static def header()
 {
-	if header == nil {
-		header = ..name;
-	}
+	return '[%s] ' % datetime.now();
+}
 
-	print: '[%s - %s]' % (header, ..'<-');
+static def print_log(msg)
+{
+	log.printer(log.header() + msg);
+}
+
+def print_flag()
+{
+	print: '[%s - %s]' % (..name, ..'<-');
 
 	for k in ..flag.begin() {
 		item = nil;
@@ -17,8 +27,8 @@ def print_flag(header)
 			item = k.second();
 		}
 
-		if item {
-			item.print_flag(header + '.' + k.first());
+		if item != nil {
+			item.print_flag(..name + '.' + k.first());
 		}
 	}
 }
@@ -37,16 +47,6 @@ def '.'(name)
 	}
 
 	return ..flag[name];
-}
-
-def print_log(msg)
-{
-	print(msg);
-}
-
-def set_header(format)
-{
-	..header_format = format;
 }
 
 
