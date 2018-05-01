@@ -27,5 +27,20 @@ print: ret = xml.decoding(str);
 print: str = xml.encoding(ret);
 print: str = xml.beutify(ret);
 
+
+
+
+a = lambda.encoding.xml {
+	<?xml version="1.0"?>
+	<tag_a>
+	<tag_b attr1="value1" attr2="value2">text of tag b</tag_b>
+	<tag_b>text of tag b 2nd</tag_b>
+	<tag_c>text of tag c</tag_c>
+	</tag_a>
+};
+
+
+print: a;
+
 print: 'OK', my;
 

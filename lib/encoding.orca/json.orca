@@ -2,6 +2,9 @@
 using util.match;
 using alg;
 
+# context parser
+return my.decoding(argv[2]);
+
 
 def match_array(str)
 {

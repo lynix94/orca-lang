@@ -17,3 +17,11 @@ print: str = json.encoding(ret);
 
 print: str = json.beutify(ret);
 
+a = lambda.encoding.json {
+	{ 'a':3, 'b':6, 'c':[1,2,3, { 'a':{'b':'c'}, 'd':[1,2,3], 'd':3 }, 4,5,6] }
+};
+
+print: a;
+
+print: '## OK: ', my;
+

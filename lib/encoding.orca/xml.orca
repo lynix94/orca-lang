@@ -2,6 +2,10 @@
 using fun;
 using util.match;
 
+# context parser
+return my.decoding(argv[2]);
+
+
 def match_plain_text(str)
 {
 	# not yet
