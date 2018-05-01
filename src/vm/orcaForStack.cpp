@@ -75,7 +75,7 @@ bool orcaForStack::push(const char* code, int lv, orcaObject* obj,
 
 		orcaData next, value;
 		if (obj->has_member((char*)"next", next) == false) {
-			throw orcaException(vm, "orca.type", string("not iteratable type ") + obj->dump_str());
+			throw orcaException(vm, "orca.type", string("not iterable type ") + obj->dump_str());
 		}
 
 		try {
@@ -170,7 +170,7 @@ bool orcaForStack::push_2(const char* code, int lv1, int lv2,
 
 		orcaData next, value;
 		if (obj->has_member((char*)"next", next) == false) {
-			throw orcaException(vm, "orca.type", string("not iteratable type ") + obj->dump_str());
+			throw orcaException(vm, "orca.type", string("not iterable type ") + obj->dump_str());
 		}
 
 		try {
@@ -222,7 +222,7 @@ bool orcaForStack::push_sub(const char* code, int lv, orcaObject* obj,
 
 	orcaData next, value;
 	if (obj->has_member((char*)"next", next) == false) {
-		throw orcaException(vm, "orca.type", string("not iteratable type ") + obj->dump_str());
+		throw orcaException(vm, "orca.type", string("not iterable type ") + obj->dump_str());
 	}
 
 	try {

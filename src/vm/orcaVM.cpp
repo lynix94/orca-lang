@@ -2832,7 +2832,7 @@ do_assign_list:
 						orcaData next, value;
 						if (iterator->has_member((char*)"next", next) == false) {
 							throw orcaException(this, "orca.type",
-												string("not iteratable type ") + 
+												string("not iterable type ") + 
 												iterator->dump_str());
 						}
 

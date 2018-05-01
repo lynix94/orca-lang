@@ -68,7 +68,7 @@ public:
 		d.v.type.vp = m_mp;
 		insert_static("map", d);
 
-		insert_static_native_function("is_iteratable", (object_fp)&orcaTypes::ex_iteratable);
+		insert_static_native_function("is_iterable", (object_fp)&orcaTypes::ex_iterable);
 		insert_static_native_function("is_indexable", (object_fp)&orcaTypes::ex_indexable);
 	}
 
@@ -79,7 +79,7 @@ public:
 		delete m_mp;
 	}
 
-	orcaData ex_iteratable(orcaVM* vm, int n) 
+	orcaData ex_iterable(orcaVM* vm, int n) 
 	{
 		if (n < 1) vm->need_param();
 
