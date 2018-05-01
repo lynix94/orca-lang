@@ -757,7 +757,7 @@ orcaData orcaData::operator_le(orcaVM* vm, orcaData& rhs) /*{{{*/
 		}
 	}
 
-	orcaData ret = operator_lt(vm, rhs).Boolean();
+	orcaData ret = operator_lt(vm, rhs);
 	if (is<TYPE_BOOL>(ret) && ret.Boolean() == false) {
 		ret = operator_eq(vm, rhs);
 	}

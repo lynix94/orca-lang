@@ -463,6 +463,27 @@ inline T* castobj(orcaData d)
 	return dynamic_cast<T*>(d.Object());
 }
 
+inline bool istrue(orcaData d)
+{
+	switch(d.get_type())
+	{
+	case TYPE_NIL:		return false;
+	case TYPE_INT:
+	case TYPE_REAL:		return d.Integer()!=0?true:false;
+	case TYPE_BIGNUM:	return d.Double()!=0?true:false;
+	case TYPE_BOOL:		return d.b();
+	}
+
+	return true;
+}
+
+inline bool isfalse(orcaData d)
+{
+	return !istrue(d);
+}
+
+
+
 string format_str(orcaVM* vm, string& format, vector<orcaData>& params);
 string format_str(orcaVM* vm, string& format, orcaData d);
 string get_bn_string(mpz_t& bn);
