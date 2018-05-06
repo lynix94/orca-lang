@@ -712,6 +712,17 @@ orcaData orcaData::operator_lt(orcaVM* vm, orcaData& rhs) /*{{{*/
 				orcaObject* o1 = this->o();
 				orcaObject* o2 = (orcaObject*)rhs.type_get().vp;
 
+				// internal object
+				if (dynamic_cast<orcaList*>(o1) && dynamic_cast<orcaList*>(o2)) {
+					return true;
+				}
+				else if (dynamic_cast<orcaTuple*>(o1) && dynamic_cast<orcaTuple*>(o2)) {
+					return true;
+				}
+				else if (dynamic_cast<orcaMap*>(o1) && dynamic_cast<orcaMap*>(o2)) {
+					return true;
+				}
+
 				return o1->isinstanceof(o2);
 			}
 
@@ -779,6 +790,18 @@ orcaData orcaData::operator_gt(orcaVM* vm, orcaData& rhs) /*{{{*/
 		}
 		else if (is<TYPE_OBJ>(rhs)) {
 			o2 = (orcaObject*)rhs.o();
+
+			// internal object
+			if (dynamic_cast<orcaList*>(o1) && dynamic_cast<orcaList*>(o2)) {
+				return true;
+			}
+			else if (dynamic_cast<orcaTuple*>(o1) && dynamic_cast<orcaTuple*>(o2)) {
+				return true;
+			}
+			else if (dynamic_cast<orcaMap*>(o1) && dynamic_cast<orcaMap*>(o2)) {
+				return true;
+			}
+
 			return o2->isinstanceof(o1);
 		}
 

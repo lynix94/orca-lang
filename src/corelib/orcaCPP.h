@@ -40,6 +40,10 @@ public:
 	{
 		set_name("cpp");
 
+		// using working path to prevent security violation
+		m_path = "./";
+
+#if 0
 		char* cp = getenv("ORCA_HOME");
 		if (cp != NULL) {
 			m_path = cp;
@@ -53,11 +57,12 @@ public:
 			m_path = "/tmp/";
 #endif
 		}
+#endif
 	}
 
 	virtual orcaData operator()(orcaVM* vm, int n) 
 	{
-		if (n < 3) vm->need_param();
+		if (n < 4) vm->need_param();
 
 		string name = vm->get_param(0).String();
 		orcaData dt = vm->get_param(1);
@@ -65,7 +70,8 @@ public:
 		string mod = m_path + dl_get_filename(name);
 		if (need_recompile(vm, mod, dt)) {
 			string code = vm->get_param(2).String();
-			if (compile(name.c_str(), mod.c_str(), code)==false) {
+			orcaTuple* tp = castobj<orcaTuple>(vm->get_param(3));
+			if (compile(name.c_str(), mod.c_str(), code, tp)==false) {
 				throw orcaException(vm, "orca.context", 
 										"context module compile failed");
 			}
@@ -82,7 +88,7 @@ public:
 			return true;
 		}
 
-		orcaDatetime* dtp = dynamic_cast<orcaDatetime*>(dt.Object());
+		orcaDatetime* dtp = castobj<orcaDatetime>(dt);
 		if (dtp == NULL) {
 			return true;
 		}
@@ -96,7 +102,7 @@ public:
 		return false;
 	}
 
-	bool compile(const char* name, const char* mod, string& src_code)
+	bool compile(const char* name, const char* mod, string& src_code, orcaTuple* tp)
 	{
 		string file_name = m_path + name + ".cpp";
 
@@ -129,8 +135,11 @@ public:
 	class %s : public orcaObject\n\
 	{\n\
 	public:\n\
-		orcaData udf(orcaVM* vm, vector<orcaData>& argv)\n\
+		orcaData udf(orcaVM* vm, vector<orcaData>& __argv)\n\
 		{\n\
+			// parameter processing\n\
+			%s\n\n\
+			// User defined code\n\
 			%s\n\n\
 		}\n\n\
 		orcaData operator()(orcaVM* vm, int param_n)\n\
@@ -152,10 +161,19 @@ public:
 		return sp;\n\
 	}\n\n";
 
-		int len = strlen(format) + strlen(name)*4 + header.length() + code.length() + 256;
+		string params = "";
+		vector<orcaData>* vp = tp->raw_value();
+
+		char param_buff[1024];
+		for (int i=0; i<vp->size(); i++) {
+			sprintf(param_buff, "orcaData %s = __argv[%d];\n", (*vp)[i].String().c_str(), i);
+			params += param_buff;
+		}
+
+		int len = params.length() + strlen(format) + strlen(name)*4 + header.length() + code.length() + 256;
 		char* buff = (char*)malloc(len);
 
-		sprintf(buff, format, header.c_str(), name, code.c_str(), name, name, name);
+		sprintf(buff, format, header.c_str(), name, params.c_str(), code.c_str(), name, name, name);
 
 		fs::remove(mod);
 		FILE* fp = fopen(file_name.c_str(), "w");
@@ -165,9 +183,10 @@ public:
 
 		int ret = fwrite(buff, 1, strlen(buff), fp);
 		fclose(fp);
+		free(buff);
 
 #ifdef LINUX
-		string cmd = string("g++ -shared -o ") + mod + " " + file_name + 
+		string cmd = string("g++ -fPIC -shared -o ") + mod + " " + file_name + 
 							" -I${ORCA_HOME}/include/orca -L${ORCA_HOME}/lib -lorca" + cflags + ldflags;
 		printf("cpp external module compile: %s\n", cmd.c_str());
 		ret = ::system(cmd.c_str());
