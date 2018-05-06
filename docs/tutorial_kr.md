@@ -3,11 +3,11 @@
 Orca Programming Language Tutorial
 ==================================
 
-version 0.5
+version 0.6
 -----------
 
 written by Lee, Ki-Yeul (kiyeul.lee@gmail.com)  
-visit http://orca-lang.or.kr for more information.
+
 
 Table of Contents
 =================
@@ -346,19 +346,19 @@ $ print: a.hash(100);
 93
 ```
 
-chomp(by)는 문자열을 by들로 나누어 리스트에 담아 리턴한다. by에는 스트링이 올 수도 있고 정규표현식이 올 수도 있다.
+split(by, n)는 문자열을 by들로 나누어 리스트에 담아 리턴한다. by에는 스트링이 올 수도 있고 정규표현식이 올 수도 있다. n 은 가르는 최대 갯수이다.
 
 ```
 $ a = 'aaaa-bbbb-cccc-dddd';
-$ print: a.chomp('-');
+$ print: a.split('-');
 [ 'aaaa','bbbb','cccc','dddd' ]
 $ 
 $ a = 'aaaa-bbbb_cccc:dddd';
-$ print: a.chomp(r'[^a-zA-Z]');
+$ print: a.split(r'[^a-zA-Z]');
 [ 'aaaa','bbbb','cccc','dddd' ]
 $ 
 $ a = 'aaaa-bbbb_cccc-dddd';
-$ print: a.chomp(r'[-_]');
+$ print: a.split(r'[-_]');
 [ 'aaaa','bbbb','cccc','dddd' ]
 $ 
 ```
@@ -934,7 +934,7 @@ factor(10)은 %\[x|x<-1~10, 10%x == 0\] 이라는 조건제시법을 리턴한�
 
 
 ```
-decode def qsort(a)
+def.decode qsort(a)
 {
   [] ->
     {
@@ -952,7 +952,7 @@ $ print: .qsort([-7, 1.2, 30, 4]);
 
 decode 함수인 qsort 는 리스트를 입력받아서 비어있으면 그냥 리턴하고, 비어있지 않다면 맨 앞의 원소를 떼어낸 후(예제에선 x), 나머지 들중에서 x보다 작은것은 앞쪽에, 큰것은 뒤쪽에 배열한 후 다시 각각 배열한 앞, 뒤쪽의 원소들에 대해서도 quick sort를 똑같이 수행한다. (리스트가 빌 때까지)
 
-이것은 quick sort 의 알고리즘 정의와 정확히 똑같이 정의될 수 있는 것으로, 조건제시법과 decode def 함수를 통해 간결하게 구현할 수 있다.
+이것은 quick sort 의 알고리즘 정의와 정확히 똑같이 정의될 수 있는 것으로, 조건제시법과 def.decode 함수를 통해 간결하게 구현할 수 있다.
 
 조건제시법의 발생자는 정수뿐만 아니라 실수 및 다른 자료형도 가능하다 단, 다른 자료형일 때는, 시작과 끝값외에도 step 을 지정해주어야 한다.
 
@@ -1585,7 +1585,7 @@ done
 그런데, 단순한 재귀 함수인데 def print_list(a), decode(a) 가 같이 있는게 가독성이 떨어지기 때문에, 위의 구문과 동일하게,
 
 ```
-decode def print_list(a)
+def.decode print_list(a)
 {
   [] -> print: 'done';
   %head:%tail -> {
@@ -1597,10 +1597,10 @@ decode def print_list(a)
 
 이렇게 표기할 수 있다.
 
-리스트에 대한 decode def 구문을 통해 함수형 프로그래밍을 흉내내 볼 수 있다. 함수형 프로그래밍에 가장 자주 언급되는 quick sort 를 오르카로 구성해보자. 이 decode 구문안에는 조건제시법이 쓰이기 때문에, 이 함수에 대한 설명은 다음 조건제시법 파트에서 다시한번 자세히 설명하겠다. 여기서는 일단 구경만...
+리스트에 대한 def.decode 구문을 통해 함수형 프로그래밍을 흉내내 볼 수 있다. 함수형 프로그래밍에 가장 자주 언급되는 quick sort 를 오르카로 구성해보자. 이 decode 구문안에는 조건제시법이 쓰이기 때문에, 이 함수에 대한 설명은 다음 조건제시법 파트에서 다시한번 자세히 설명하겠다. 여기서는 일단 구경만...
 
 ```
-decode def qsort(a)
+def.decode qsort(a)
 {
   [] ->
     {
@@ -1625,7 +1625,7 @@ $ print: .qsort([-7, 1.2, 30, 4]);
 이것을 기존의 (개선되기 전의) decode 구문으로 파싱하려 시도할 때,
 
 ```
-decode def tolist(str)
+def.decode tolist(str)
 {
 	'[', %body, ']' -> 
 		{
@@ -1658,7 +1658,7 @@ decode def tolist(str)
 ```
 using match;
 
-decode def tolist(str)
+def.decode tolist(str)
 {
 	'[', %body = match.bracket, ']' -> 
 		{
@@ -1988,77 +1988,71 @@ $ sample.foo();
 가상멤버
 ----
 
-오르카의 객체 및 자료들은 가상의 멤버들을 가지고 있다. 만일 이 멤버들이 프로그래머에 의해 명시적으로 정의되었다면 그 정의를 따르지만, 정의되어 있지 않다면 사전정의된 방식으로 동작한다. 아래는 각 가상멤버들에 대한 설명이다.
+오르카의 객체 및 자료들은 가상의 멤버들을 가지고 있다. 만일 이 멤버들이 프로그래머에 의해 명시적으로 정의되었다면 그 정의를 따르지만, 정의되어 있지 않다면 사전정의된 방식으로 동작한다. 아래는 각 가상멤버들에 대한 설명이다. 가상멤버는 가독성과 구분을 위해 대문자로 표현했다.
 
-### type
+### TYPE
 
 type type은 객체의 형식을 나타내는 자료형으로, 객체의 형과 상속관계 검사를 일관성있게 처리하기 위해 도입되었다.
 
-오르카의 변수나 상수에 대해 .type 을 붙이면 이 자료의 형을 의미하게된다.
+오르카의 변수나 상수에 대해 .TYPE 을 붙이면 이 자료의 형을 의미하게된다.
 
 먼저 자료의 type 검사는 다음과 같이할 수 있다.
 
 
 ```
 a = 1;
-a.type == 2.type; 
+a.TYPE == 2.TYPE; 
 ```
 
 위는 1의 타입과 2의 타입이 같은 지를 검사하는 구문인데, 정수형으로 같기 때문에 true가 리턴된다.
 
 ```
-a.type == 2;
-```
-or
-```
-a.type == type.int;
+a.TYPE == type.int;
 ```
 
 도 같은 결과를 얻는다.
 
 ```
-a.type != 2.type
+a.TYPE != 2.TYPE;
 ```
 
 는 반대로 false를 리턴한다.
 
-type 의 < 연산은 상속관계를 의미한다.
+type 간의 < 연산은 상속관계를 의미한다.
 
 ```
-a.type < b 
+a.TYPE < b.TYPE;
 ```
-(or a.type < b.type)
+위의 연산은 a가 b를 상속했으면 true, 아니면 false를 리턴한다.
 
-(or a.type < b.type) 의 연산은 a가 b를 상속했으면 true, 아니면 false를 리턴한다.
 
-type의 <= 연산은 인스턴스 관계를 의미한다.
 
-```
-a.type <= b
-```
-(or a.type <= b.type)
-
-(or a.type <= b.type) 의 연산은 a가 b의 인스턴스인지를 알려준다.
-
-### typename
-
-typename은 자료의 type을 스트링 형태로 리턴한다. 형검사는 .type 을 이용하지만 때에 따라 스트링으로 처리하고자 할 때는 이 멤버를 사용한다.
+object < object.TYPE < 연산은 인스턴스 관계를 의미한다.
 
 ```
-$ print: 1.typename;
+a < b.TYPE
+```
+위 연산은 a가 b의 인스턴스인지를 알려준다.
+
+### TYPENAME
+
+TYPENAME은 자료의 type을 스트링 형태로 리턴한다. 형검사는 .TYPE 을 이용하지만 때에 따라 스트링으로 처리하고자 할 때는 이 멤버를 사용한다.
+
+```
+$ print: 1.TYPENAME;
 int
 
-$ print: r'regex'.typename;
+$ print: r'regex'.TYPENAME;
 regex
 
-$ print: io.typename;
+$ print: io.TYPENAME;
 object io
 
-$ print: [1,2,3].typename;
+$ print: [1,2,3].TYPENAME;
 list
 ```
 
-### static_members
+### STATIC_MEMBERS
 
 이는 객체의 static member들을 map 형태로 구성하여 리턴한다. map형태라고 한 이유는, 실제 map이 아니라 map과 유사한 인터페이스를 제공하기 때문이다. 즉,
 
@@ -2069,11 +2063,11 @@ list
      def non_static;
    }
 
-   a = my.foo.static_members;
+   a = my.foo.STATIC_MEMBERS;
    print: a;
    a['new_member'] = 1;
    print: a;
-   print: my.foo.static_members;
+   print: my.foo.STATIC_MEMBERS;
    print: my.foo.new_member;
 ```
 
@@ -2088,28 +2082,28 @@ list
 
 의 결과가 출력되는데, 이와 같이 이 객체는 map과 인터페이스가 같지만, 그 내용을 변경하면 원본객체의 멤버들에도 변경이 가해진다.
 
-static\_members 는 has\_key, erase_key, keys, values, begin, last, end, find 인터페이스를 제공한다. begin, last, end, find 는 멤버들에 대한 반복자를 리턴한다.
+STATIC_MEMBERS 는 has\_key, erase_key, keys, values, begin, last, end, find 인터페이스를 제공한다. begin, last, end, find 는 멤버들에 대한 반복자를 리턴한다.
 
-### members
+### MEMBERS
 
-static\_members 는 static 멤버들만 반환한다면, members는 static, non-static 멤버들을 모두 반환한다. 상세한 동작은 static\_members와 같다.
+STATIC_MEMBERS는 static 멤버들만 반환한다면, MEMBERS 는 static, non-static 멤버들을 모두 반환한다. 상세한 동작은 STATIC_MEMBERS 와 같다.
 
-### parents
+### PARENTS
 
-parents는 객체가 상속한 parents들을 리스트 형태로 반환한다. parents는 push\_back, pop\_back, push\_front, pop\_front, begin, end, last, find 인터페이스를 제공한다.
+PARENTS는 객체가 상속한 parents들을 리스트 형태로 반환한다. parents는 push\_back, pop\_back, push\_front, pop\_front, begin, end, last, find 인터페이스를 제공한다.
 
-### id
+### ID
 
 id는 객체가 힙상에 존재하는 경우라면 그 객체의 고유주소를 리턴한다.
 
 ```
-$   print: 1.id;
+$   print: 1.ID;
 0
 
-$    print: 'str'.id;
+$    print: 'str'.ID;
 167178248
 
-$    print: io.id;
+$    print: io.ID;
 166676848
 ```
 
@@ -2268,14 +2262,14 @@ def complex
 
 사칙연산은 ‘+’, ‘-‘, ‘*’, ‘/’ 로 되어있고, 파라미터는 오른쪽에 위치하는 인수이다. 비교 연산자의 경우 ‘==’, ‘<’만 정의하면 ‘!=’, ‘<=’, ‘>’, ‘>=’는 두 개를 조합해서 해결해준다.
 
-연산자 오버로딩 함수로서 ‘.attr’, ‘.attr_last’, ‘.attr=’이 추가되었다.
+연산자 오버로딩 함수로서 ‘.’, ‘.$’, ‘.=’이 추가되었다.
 
-먼저 .attr은 어떤 객체 a에서 멤버 b를 요청할 때, 만일 b가 멤버중에 속하지 않으면 (자신 뿐만 아니라 부모 객체에도 없으면) .attr이 호출된다. 파라미터는 요청되는 멤버의 이름이다.
+먼저 .은 어떤 객체 a에서 멤버 b를 요청할 때, 만일 b가 멤버중에 속하지 않으면 (자신 뿐만 아니라 부모 객체에도 없으면) .이 호출된다. 파라미터는 요청되는 멤버의 이름이다.
 
 ```
 def day_of_month
 {
-	def ‘.attr’(name)
+	def ‘.’(name)
 	{
 		decode(name)
 		{
@@ -2309,17 +2303,19 @@ recent call-stack trace
 
 보기와 같이 p.April을 요청하면 .attr('April') 가 호출되었다.
 
-.attr=은 어떤 객체 a의 멤버 b에 어떤 값을 대입할 때, 만일 b란 이름의 멤버가 존재하지 않으면 .attr=이 호출된다.
+.=은 어떤 객체 a의 멤버 b에 어떤 값을 대입할 때, 만일 b란 이름의 멤버가 존재하지 않으면 .=이 호출된다.
 
-.attr=(name, object) 와 같은 형태로서
+.=(name, object) 와 같은 형태로서
 
-a.b = 10; 이 란 문장이 있을 때 a가 .attr=을 재정의 했고, b란 멤버가 없으면 .attr=('b', 10) 이 호출된다.
+a.b = 10; 이 란 문장이 있을 때 a가 .=을 재정의 했고, b란 멤버가 없으면 .=('b', 10) 이 호출된다.
 
-.attr_last는 좀 특이한데 만일 이 함수가 재정의 되지 않으면 객체를 참조할 때 .attr만이 호출되지만 만일 재정의 됐다치면,
+.$ 는 좀 특이한데 만일 이 함수가 재정의 되지 않으면 객체를 참조할 때 .만이 호출되지만 만일 재정의 됐다치면,
 
-어떤 객체 a에서 멤버를 참조할 때, a.b.c 이면 먼저 .attr('b')가 호출되지만 a.b 이면 .attr\_last('b')가 호출된다. 참조하는 멤버가 객체 path\[표현식의 가장 마지막일때만 .attr\_last가 호출된다.
+어떤 객체 a에서 멤버를 참조할 때, a.b.c 이면 먼저 .('b')가 호출되지만 a.b 이면 .$('b')가 호출된다.
 
-굳이 이것을 구분한 이유는 remote 객체 억세스를 위한 것이 었는데, remotec 모듈의 소스를 보면 이를 이용해서 리모트 머신 a의 root.b.c 를 참조할 때, a.b.c 를 사용하면 말단의 c 만 가져오게 했다. (만일 .attr만 있다면 a.b 하는 순간 b 전체가 이쪽으로 올 것이다. 필요한 것은 a.b 밑의 c만 필요한 상황에서...)
+참조하는 멤버가 객체 path 표현식의 가장 마지막일때만 .$가 호출된다.
+
+굳이 이것을 구분한 이유는 remote 객체 억세스를 위한 것이 었는데, remotec 모듈의 소스를 보면 이를 이용해서 리모트 머신 a의 root.b.c 를 참조할 때, a.b.c 를 사용하면 말단의 c 만 가져오게 했다. (만일 .만 있다면 a.b 하는 순간 b 전체가 이쪽으로 올 것이다. 필요한 것은 a.b 밑의 c만 필요한 상황에서...)
 
 추가로 인덱싱 연산자도 재정의 할 수 있다. ‘\[\]’ 와 ‘\[\]=’ 이 그것이다. 만일 obj 가 \[\] 와 \[\]= 을 재정의 했다면,
 
@@ -2594,21 +2590,21 @@ UDS 객체
 가장 간단한 예로, 다음의 예를 먼저 보고 설명한다.
 
 ```
-a = def.cpp{
+a = lambda.cpp(msg){
   // this is cpp code
-  cout << "hello, " << argv\[0\].String() << endl;
+  cout << "hello, " << msg.String() << endl;
 };
 
 a('world');
 ```
 
-위의 코드는 hello, world를 출력하는데, def.cpp{ ... } 로 정의된 객체의 내부 코드가 CPP 언어로 되어 있는것에 주의하자. %name{ statement } 가 선언되면 오르카는 name 모듈에게 statement 코드를 넘겨주고, 추가적으로 현재의 시간정보와 모듈의 유니크한 이름 을 넘겨준다.
+위의 코드는 hello, world를 출력하는데, lambda.cpp{ ... } 로 정의된 객체의 내부 코드가 CPP 언어로 되어 있는것에 주의하자. def.name 나 lambda.name 가 선언되면 오르카는 name 모듈에게 statement 코드를 넘겨주고, 추가적으로 현재의 시간정보와 모듈의 유니크한 이름 을 넘겨준다.
 
-즉, cpp(statement, unique\_name, currnet\_datetime) 을 호출한다. cpp 모듈은 unique\_name 과 current\_datetime 정보를 사용하여, 컴파일된 확장 라이브러리가 있는지 혹은 소스코드가 확장라이브러리보다 나 중에 바뀌었는지 확인한 후 필요하면 이를 재컴파일하고 확장라이브러리를 열어서 실행한다.
+즉, cpp(name, timestamp, source_code, params_name_list) 을 호출한다. cpp 모듈은 name 과 timestamp 정보를 사용하여, 컴파일된 확장 라이브러리가 있는지 혹은 소스코드가 확장라이브러리보다 나 중에 바뀌었는지 확인한 후 필요하면 이를 재컴파일하고 확장라이브러리를 열어서 실행한다.
 
-마치 C언어 내부의 인라인 어셈블리어와 비슷하지만 결정적으로 다른것은, 특정 문법에 고정된 것이 아니라 사용자가 재정의 할 수 있도록 >범용적인 구성으로 되어 있고, 연산의 결과가 객체로서 오르카에게 전달되도록 되기 때문에, 인라인 어셈블리어의 남용시 겪게 되는 가독성 저하 및 부수효과도 방지된다.
+마치 C언어 내부의 인라인 어셈블리어와 비슷하지만 결정적으로 다른것은, 특정 문법에 고정된 것이 아니라 사용자가 재정의 할 수 있도록 범용적인 구성으로 되어 있고, 연산의 결과가 객체로서 오르카에게 전달되도록 되기 때문에, 인라인 어셈블리어의 남용시 겪게 되는 가독성 저하 및 부수효과도 방지된다.
 
-오르카에서 기본제공되는 user defined statement 처리 모듈은 cpp, lisp, sh, awk 가 있다. 이들의 상세 내역은 모듈 레퍼런스에서 참조할 수 있고, 실제 내부 모습은 오르카 라이브러리 폴더에서 확인할 수 있다. 사용자는 이들의 방식과 유사하게 자신만의, DSL을 오르카 언어 내부에서 사용할 수 있다.
+오르카에서 기본제공되는 user defined statement 처리 모듈은 cpp, lisp, sh 가 있다. 이들의 상세 내역은 모듈 레퍼런스에서 참조할 수 있고, 실제 내부 모습은 오르카 라이브러리 폴더에서 확인할 수 있다. 사용자는 이들의 방식과 유사하게 자신만의, DSL을 오르카 언어 내부에서 사용할 수 있다.
 
 기본적으로 제공되는 모듈은 cpp, sh, lisp 이 있는데 sh 은 인터프리터와 같이 동작하고(매번 재처리), cpp, lisp 은 컴파일러와 같이 동작 한다. 세 모듈의 구현내역을 참조하면 독자적인 사용자정의구문을 지원하는 모듈을 작성할 수 있을 것이다.
 

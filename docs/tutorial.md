@@ -1,11 +1,11 @@
 Orca Programming Language Tutorial
 ==================================
 
-version 0.5
+version 0.6
 -----------
 
 written by Lee, Ki-Yeul (kiyeul.lee@gmail.com)  
-visit http://orca-lang.or.kr for more information.
+
 
 Table of Contents
 =================
@@ -318,19 +318,19 @@ $ print: a.hash(100);
 93
 ```
 
-chomp(by) divides string by parameter and makes list which have devieded results. 'by' could be string or regular expression.
+split(by, n) divides string by parameter and makes list which have devieded results. 'by' could be string or regular expression. n limits maximum count of split.
 
 ```
 $ a = 'aaaa-bbbb-cccc-dddd';
-$ print: a.chomp('-');
+$ print: a.splint('-');
 [ 'aaaa','bbbb','cccc','dddd' ]
 $ 
 $ a = 'aaaa-bbbb_cccc:dddd';
-$ print: a.chomp(r'[^a-zA-Z]');
+$ print: a.split(r'[^a-zA-Z]');
 [ 'aaaa','bbbb','cccc','dddd' ]
 $ 
 $ a = 'aaaa-bbbb_cccc-dddd';
-$ print: a.chomp(r'[-_]');
+$ print: a.split(r'[-_]');
 [ 'aaaa','bbbb','cccc','dddd' ]
 $ 
 ```
@@ -398,6 +398,14 @@ string supports python style format string. It's made by overiding the % operato
 $ 'i: %d, f: %f, e: %e, s: %s' % (100, 12.34, 12.34, 'hello, world!');
 i: 100, f: 12.340000, e: 1.234000e+01, s: hello, world!
 ```
+
+
+
+
+
+# TODO - dictionay format string 
+
+
 
 regular expression
 ------------------
@@ -863,7 +871,7 @@ $
 It works well :) And then see another famous functional programming example. Quick sort.
 
 ```
-decode def qsort(a)
+def.decode qsort(a)
 {
   [] ->
     {
@@ -1091,6 +1099,12 @@ mtx {
 ```
 
 This statement could be used to all pairing cases. likes making CS, resource open/close, timer start/end.. etc
+
+
+
+# TODO - parallel call
+
+
 
 parallel do
 -----------
@@ -1377,10 +1391,10 @@ This code print out.
 done
 ```
 
-But this code is so complex, So you can use decode def for conveniance. Below code is same as above example.
+But this code is so complex, So you can use def.decode for conveniance. Below code is same as above example.
 
 ```
-decode def print_list(a)
+def.decode print_list(a)
 {
   [] -> print: 'done';
   %head:%tail -> {
@@ -1401,7 +1415,7 @@ If you want read it and convers it to list. (dont think about eval(), just decod
 If you parse it by decode statement (old version) programmer may try it like this,
 
 ```
-decode def tolist(str)
+def.decode tolist(str)
 {
 	'[', %body, ']' -> 
 		{
@@ -1433,7 +1447,7 @@ So, If you use user defined match function like below,
 ```
 using match;
 
-decode def tolist(str)
+def.decode tolist(str)
 {
 	'[', %body = match.bracket, ']' -> 
 		{
@@ -1464,7 +1478,7 @@ and action code is called. and tolist(body) is called and second rule is matched
 and finally, list \[1, \[2\], 3\] is return.  
 like this orca can traits nested string very easily. 
 
-# TODO
+# 
 
 function and object
 ===================
@@ -1749,9 +1763,9 @@ virtual member
 
 Orca objects have it's default virtual members. If this members are not defined explicit, It works pre-defined way.
 
-belows are virtual members and It's meaning.
+belows are virtual members and It's meaning. virtual members are represented with upper case letters.
 
-### type
+### TYPE
 
 type type is data which explain object type. You can use this for type traits. If you refer this as member of variable, It returns object type.
 
@@ -1759,62 +1773,62 @@ first, you can check data type of object like this.
 
 ```
 a = 1;
-a.type == 2.type; 
+a.TYPE== 2.TYPE; 
 ```
 
 above code check 1 and 2 has same type. 1 and 2 are same integer so it returns true.
 
 ```
-a.type == 2;
+a.TYPE == 2.TYPE;
 ```
 or
 ```
-a.type == type.int;
+a.TYPE == type.int;
 ```
 
 has same results.
 
 ```
-a.type != 2.type
+a.TYPE != 2.TYPE
 ```
 
-and above codes return false. < operator of type means inheritance.
+and above codes return false. < operator between TYPES  means inheritance.
 
 ```
-a.type < b 
+a.TYPE < b.TYPE
 ```
-(or a.type < b.type)
+above code return true if a inherits b. if not, it returns false. 
 
-above code return true if a inherits b. if not, it returns false. <= operator of type means instance.
+
+
+object < object.TYPE means instance.
 
 ```
-a.type <= b
+a < b.TYPE
 ```
-(or a.type <= b.type)
-
 if a is instance of b, It returns true.
 
-### typename
+### TYPENAME
 
-typename return type of data as string
+TYPENAME return type of data as string
 
-```
-$ print: 1.typename;
+```S
+$ print: 1.TYPENAME;
 int
 
-$ print: r'regex'.typename;
+$ print: r'regex'.TYPENAME;
 regex
 
-$ print: io.typename;
+$ print: io.TYPENAME;
 object io
 
-$ print: [1,2,3].typename;
+$ print: [1,2,3].TYPENAME;
 list
 ```
 
-### static_members
+### STATIC_MEMBERS
 
-this member returns static members of object as map interface object. map interface object means that It's not map but It supports some map interfaces.
+this returns static members of object as map interface object. map interface object means that It's not a map but It supports some map interfaces.
 
 ```
    def foo
@@ -1823,11 +1837,11 @@ this member returns static members of object as map interface object. map interf
      def non_static;
    }
 
-   a = my.foo.static_members;
+   a = my.foo.STATIC_MEMBERS;
    print: a;
    a['new_member'] = 1;
    print: a;
-   print: my.foo.static_members;
+   print: my.foo.STATIC_MEMBERS;
    print: my.foo.new_member;
 ```
 
@@ -1840,30 +1854,30 @@ if you run above codes.
 1
 ```
 
-are printed. This static\_member is worked like map but if you change It(static\_member object)'s contents original static members in object foo is changed.
+are printed. This STATIC_MEMBERS is worked like map but if you change It(static\_member object)'s contents original static members in object foo is changed.
 
-static\_members provides has\_key, erase_key, keys, values, begin, last, end, find interfaces. begin, last, end and find return iterator of static members.
+STATIC_MEMBERS provides has\_key, erase_key, keys, values, begin, last, end, find interfaces. begin, last, end and find return iterator of static members.
 
-### members
+### MEMBERS
 
-static\_members return only static members of object. but, members member returns all static, non-static members other aspects are same as static\_members.
+STATIC_MEMBERS return only static members of object. but, MEMBERS returns all static, non-static members other aspects are same as STATIC_MEMBERS
 
-### parents
+### PARENTS
 
-parents virtual member return parents list of object as list interface object. It provides push\_back, pop\_back, push\_front, pop\_front, begin, end, last, find interface.
+PARENTS virtual member return parents list of object as list interface object. It provides push\_back, pop\_back, push\_front, pop\_front, begin, end, last, find interface.
 
-### id
+### ID
 
-id return unique number of object If it's remain in heap memory.
+ID return unique number of object If it's remain in heap memory.
 
 ```
-$   print: 1.id;
+$   print: 1.ID;
 0
 
-$    print: 'str'.id;
+$    print: 'str'.ID;
 167178248
 
-$    print: io.id;
+$    print: io.ID;
 166676848
 ```
 
@@ -1942,7 +1956,9 @@ def for_each(list, functor) {
 my.for_each([1..10], def.lambda(...argv){ print(argv[0]); });
 ```
 
-# below is same with above statement
+
+
+below is same with above statement
 
 ```
 my.for_each: [1..10], def.lambda (...argv) {
@@ -2022,12 +2038,14 @@ def complex
 
 '+', '-', '*', '/', '<', '==' is overloading funciton and parameter is It's arguments that be placed in right side of operator.
 
-If you define '==' and '<', orca do '<=', '>', '>=' and '!=' automatically by using combination of '==' and '<'. and orca provides '.attr', '.attr_last', '.attr=' as new overloading operators/ first, .attr('b') is called if a.b is referred but a has no member named 'b'.
+If you define '==' and '<', orca do '<=', '>', '>=' and '!=' automatically by using combination of '==' and '<'. and orca provides '.', '.$', '.=' as new overloading operators.
+
+first, "."('b') is called if a.b is referred but a has no member named 'b'.
 
 ```
 def day_of_month
 {
-	def ".attr"(name)
+	def "."(name)
 	{
 		decode(name)
 		{
@@ -2061,11 +2079,11 @@ recent call-stack trace
 
 like above, expression p.Apill finally called .attr('April')
 
-.attr=('b', 3) is called if a.b = 3 reffered but a has no member named 'b'
+.=('b', 3) is called if a.b = 3 reffered but a has no member named 'b'
 
-.attr_last is something different. If this function is not defined only .attr is called. but If this function is defined,
+.$ is something different. If this function is not defined only . is called. but If this function is defined,
 
-If expresion a.b.c is reffered, a.'.attr'('b') is called because b is not last path of path expression(a.b.c, c is last) and If expression a.b is reffred, a.'.attr_last'('b') is called because b is last path of path expression(a.b) This is used for remote access, You can see useful usage of this in remotec.orca and remoted.orca.
+If expresion a.b.c is reffered, a.'.'('b') is called because b is not last path of path expression(a.b.c, c is last) and If expression a.b is reffred, a.'.$'('b') is called because b is last path of path expression(a.b) This is used for remote access, You can see useful usage of this in remotec.orca and remoted.orca.
 
 And you can overiding indexing operators. "\[\]" and "\[\]=" are those.
 
@@ -2332,19 +2350,19 @@ by UDS, Orca can contain DSL in it's source code.
 for a simple example, let's see below,
 
 ```
-a = def.cpp {
+a = lambda.cpp(msg) {
   // this is cpp code
-  cout << "hello, " << argv[0].String() << endl;
+  cout << "hello, " << msg.String() << endl;
 };
 
 a('world');
 ```
 
-this code prints 'hello, world'. and internal codes in def.cpp { ... } is written by C++ language. If %name{ statement } is appear, Orca call name module and pass statement code, timestamp of source code and unique name. That means orca call cpp(statement, unique\_name, source\_datetime)
+this code prints 'hello, world'. and internal codes in lambda.cpp { ... } is written by C++ language. If def.name or lambda.name is appear, Orca call name module and pass statement code, timestamp of source code and unique name. That means orca call cpp(name, timestamp, source_code, parameter_name_list)
 
-cpp module check unique\_name and source\_datetime. If there is no dynamic extension library or source\_datetime is newer than dynamic library, cpp module recompile statement and save it as unique\_name.so And finally, open that dynamic library and get result object.
+cpp module check name and timestamp. If there is no dynamic extension library or source\_datetime is newer than dynamic library, cpp module recompile statement and save it as name.so And finally, open that dynamic library and get result object.
 
 This is simillar to inline assembly in C language. but It's different because This UDS can be used for other languages or context which user want to handle. And another difference is result of UDS is independent object, so It doesn't harm readability.
 
-Default supported UDS module libraries in orca are cpp, lisp and sh. You can see these in lib folder and understand how it works.
+Default supported UDS module libraries in orca are cpp, lang.lisp and lang.sh. You can see these in lib folder and understand how it works.
 
