@@ -472,6 +472,7 @@ inline bool istrue(orcaData d)
 	case TYPE_REAL:		return d.Integer()!=0?true:false;
 	case TYPE_BIGNUM:	return d.Double()!=0?true:false;
 	case TYPE_BOOL:		return d.b();
+	case TYPE_STR:		return d.s().length()>0?true:false;
 	}
 
 	return true;

@@ -138,19 +138,19 @@ if (.foo.TYPE < io.TYPE) == false {
 }
 
 
-if type.is_iteratable([,]) == false {
+if type.is_iterable([,]) == false {
 	throw test.type <- 'type testing is failed';
 }
 
-if type.is_iteratable((,)) == false {
+if type.is_iterable((,)) == false {
 	throw test.type <- 'type testing is failed';
 }
 
-if type.is_iteratable({,}) == false {
+if type.is_iterable({,}) == false {
 	throw test.type <- 'type testing is failed';
 }
 
-if type.is_iteratable({,}.begin()) == false {
+if type.is_iterable({,}.begin()) == false {
 	throw test.type <- 'type testing is failed';
 }
 
