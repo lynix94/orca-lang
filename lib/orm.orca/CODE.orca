@@ -1,8 +1,4 @@
 
-using strings;
-using orm;
-
-
 def conn;
 
 def set_conn(conn)
@@ -19,13 +15,15 @@ def row_iter
 {
 	def model;
 	def res;
-	def keys;
-	def template {}
+	def keys := [];
+	def instance {}
 
 	def init(model, res) {
 		..model = model;
 		..res = res;
-		..keys = model._attrs.keys();
+		for m in model.MEMBERS.begin() {
+			..keys.push_back(m.first());
+		}
 	}
 
 	def next() {
@@ -34,71 +32,13 @@ def row_iter
 	}
 
 	# make value
-	t = .template.clone();
+	t = .instance.clone();
 
 	for i in [0..my.keys.size()-1] {
 		t.MEMBERS[.keys[i]] = .res()[i];
 	}
 
 	return t;
-}
-
-
-def query
-{
-	def qstr := '';
-
-	def init(name) {
-		..qstr = name;
-	}
-
-	def repr() {
-		return ..qstr;
-	}
-
-	def string() {
-		return ..qstr;
-	}
-
-	def '<'(p) {
-		q = '(%s < %s)' % (..qstr, p.repr());
-		return owner.clone(q);
-	}
-
-	def '<='(p) {
-		q = '(%s <= %s)' % (..qstr, p.repr());
-		return owner.clone(q);
-	}
-
-	def '>'(p) {
-		q = '(%s > %s)' % (..qstr, p.repr());
-		return owner.clone(q);
-	}
-
-	def '>='(p) {
-		q = '(%s >= %s)' % (..qstr, p.repr());
-		return owner.clone(q);
-	}
-
-	def '=='(p) {
-		q = '(%s == %s)' % (..qstr, p.repr());
-		return owner.clone(q);
-	}
-
-	def '!='(p) {
-		q = '(%s != %s)' % (..qstr, p.repr());
-		return owner.clone(q);
-	}
-
-	def '&&'(p) {
-		q = '(%s and %s)' % (..qstr, p.repr());
-		return owner.clone(q);
-	}
-
-	def '||'(p) {
-		q = '(%s or %s)' % (..qstr, p.repr());
-		return owner.clone(q);
-	}
 }
 
 

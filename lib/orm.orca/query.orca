@@ -1,0 +1,113 @@
+
+def qstr := '';
+
+def type := '';
+def meta;		// unique, default, index
+
+def init(name) {
+	..qstr = name;
+}
+
+def repr() {
+	return ..qstr;
+}
+
+def string() {
+	return ..qstr;
+}
+
+
+#
+# meta
+#
+def add_meta(meta)
+{
+	if ..meta == nil {
+		..meta = [];
+	}
+
+	if ..meta.find(meta) == ..meta.end() {
+		..meta.push_back(meta);
+	}
+
+	return owner;
+}
+
+def unique()
+{
+	return ..add_meta('unique');
+}
+
+def not_null()
+{
+	return ..add_meta('not null');
+}
+
+def index()
+{
+	return ..add_meta('index');
+}
+
+def set_default(value)
+{
+	if ..meta == nil {
+		..meta = [];
+	}
+
+	if ..meta.find(r'default.*') == ..meta.end() {
+		..meta.push_back('default(%s)' % repr(value));
+	}
+
+	return owner;
+}
+
+def primary_key()
+{
+	return ..add_meta('primary key');
+}
+
+
+#
+# operator
+#
+def '<'(p) {
+	q = '(%s < %s)' % (..qstr, p.repr());
+	return owner.clone(q);
+}
+
+def '<='(p) {
+	q = '(%s <= %s)' % (..qstr, p.repr());
+	return owner.clone(q);
+}
+
+def '>'(p) {
+	q = '(%s > %s)' % (..qstr, p.repr());
+	return owner.clone(q);
+}
+
+def '>='(p) {
+	q = '(%s >= %s)' % (..qstr, p.repr());
+	return owner.clone(q);
+}
+
+def '=='(p) {
+	q = '(%s == %s)' % (..qstr, p.repr());
+	return owner.clone(q);
+}
+
+def '!='(p) {
+	q = '(%s != %s)' % (..qstr, p.repr());
+	return owner.clone(q);
+}
+
+def '&&'(p) {
+	q = '(%s and %s)' % (..qstr, p.repr());
+	return owner.clone(q);
+}
+
+def '||'(p) {
+	q = '(%s or %s)' % (..qstr, p.repr());
+	return owner.clone(q);
+}
+
+

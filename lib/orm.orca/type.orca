@@ -1,27 +1,34 @@
 
+using orm;
 
 
 
-def text(len, init)
+def text(len)
 {
-
+	q = orm.query.clone();
+	q.type = 'string';
+	return q;
 }
 
 def email()
 {
-
-
+	q = orm.query.clone();
+	q.type = 'string';
+	return q;
 }
 
-def int(init)
+def int()
 { 
-
+	q = orm.query.clone();
+	q.type = 'int';
+	return q;
 }
 
-def fereign(f)
+def foreign(f)
 {
-
-
+	q = orm.query.clone();
+	q.type = f;
+	return q;
 }
 
 

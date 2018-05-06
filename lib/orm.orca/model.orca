@@ -9,23 +9,11 @@ def _where;
 def _orderby;
 def _project;
 def _groupby;
-def _attrs;
+def _meta := {,};
 
 def init(name) {
 	.._name = name;
-	.._attrs = {,};
-}
-
-def "."(name) {
-	if .._attrs.has_key(name) {
-		return .._attrs[name];
-	}
-
-	return nil;
-}
-
-def add_attr(name) {
-	.._attrs[name] = orm.query.clone(name);
+	#.._attrs = {,};
 }
 
 def where(q) {
@@ -49,44 +37,59 @@ def groupby(g) {
 }
 
 def result() {
-	if .._project.TYPE == nil.TYPE {
-		select_list = strings.join(', ', .._attrs.keys()...);
+	if .._project == nil {
+		attrs = [];
+		print: ..MEMBERS.begin();
+		for m in ..MEMBERS.begin() {
+			if m.second() < orm.query.TYPE {
+				attrs.push_back(m.first());
+			}
+		}
+		
+		select_list = strings.join(', ', attrs...);
 	}
 	else {
 		select_list = .._project;
 	}
 
-	query = 'select %s from %s where %s' % (select_list, .._name, .._where);
+	if .._where != nil {
+		query = 'select %s from %s where %s' % (select_list, .._name, .._where);
+	}
+	else {
+		query = 'select %s from %s' % (select_list, .._name);
+	}
+	
 	if .._orderby.TYPE != nil.TYPE {
 		query += ' order by %s' % .._orderby;
 	}
 
 	print: query;
-	res = ..owner.conn.execute(query);
+	res = orm.conn.execute(query);
 
 	return orm.row_iter.clone(owner, res);
 }
 
 #
-# about meta.
+# about meta processing for multi column index
 #
 def primary_key(...argv)
 {
-
-
+	.._meta['primary key'] = argv;
 }
-
 
 def index(...argv)
 {
-
-
+	.._meta['index_%s' % strings.join('_', argv...)] = argv;
 }
 
 def unique(...argv)
 {
+	.._meta['unique_%s' % strings.join('_', argv...)] = argv;
+}
 
-
+def unique_index(...argv)
+{
+	.._meta['uindex_%s' % strings.join('_', argv...)] = argv;
 }
 
 
@@ -94,23 +97,121 @@ def unique(...argv)
 #
 # about io.
 #
+def initialize()
+{
+	for m in ..MEMBERS.begin() {
+		if m.second() < orm.query.TYPE {
+			m.second().qstr = m.first();
+		}
+	}
+
+	.._name = ..NAME;
+}
+
 def create_table()
 {
+	..initialize();
+	owner();
+
+	attrs = [];
+	for m in ..MEMBERS.begin() {
+		if m.second() < orm.query.TYPE {
+			attr = m.second();
+			#if attr.meta < type.list {
+			meta = '';
+			if attr.meta != nil && attr.meta.size() > 0 {
+				meta = strings.join(' ', attr.meta...);
+			}
+
+			attrs.push_back('%s %s %s' % (attr.qstr, attr.type, meta));
+		}
+	}
+
+	for k, v in .._meta {
+		if k.starts_with('unique_') {
+			attrs.push_back('constraint %s unique %s' % (k, repr(v)));
+		}
+		elif k == 'primary key' {
+			attrs.push_back('primary key %s' % repr(.._meta['primary key']));
+		}
+	}
+
+	attr_list = strings.join(', ', attrs...);
 	
 
+	query = 'create table %s (%s)' % (.._name, attr_list);
+	print: query;
 
+	try {
+		res = orm.conn.execute(query);
+	}
+	catch db.execute -> msg {
+		print: msg;
+	}
+
+	for k, v in .._meta {
+		if k.starts_with('index_') {
+			query = 'create index %s on %s%s' % (k, .._name, repr(v));
+		}
+		elif k.starts_with('uindex_') {
+			query = 'create unique index %s on %s%s' % (k, .._name, repr(v));
+		}
+		else {
+			continue;
+		}
+
+		print: query;
+
+		try {
+			res = orm.conn.execute(query);
+		}
+		catch db.execute -> msg {
+			print: msg;
+		}
+	}
+
+	print: res();
 }
 
-def save()
+
+def new()
 {
+	def instance
+	{
+		def save()
+		{
+			attr_list = [];
+			value_list = [];
+			for m in ..MEMBERS.begin() {
+				if m.first() == '__name__' || m.first() == 'save' {
+					continue;
+				}
 
+				attr_list.push_back(m.first());
+				value_list.push_back(repr(m.second()));
+			}
 
+			attrs = strings.join(', ', attr_list...);
+			values = strings.join(', ', value_list...);
+
+			query = 'insert into %s(%s) values(%s)' % (..__name__, attrs, values);
+			print: query;
+			res = orm.conn.execute(query);
+		}
+	}
+
+	ins = .instance.clone();
+	ins.MEMBERS['__name__'] = .._name;
+	for m in ..MEMBERS.begin() {
+		if m.second() < orm.query.TYPE {
+			ins.MEMBERS[m.first()] = nil;
+		}
+	}
+	
+	return ins;
 }
 
-def objects()
-{
 
-}
 
 
 
