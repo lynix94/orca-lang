@@ -3,7 +3,7 @@ using thread;
 using time;
 using pack;
 using fun;
-using random;
+using math.random;
 
 using distribute.fs;
 using net.osp;

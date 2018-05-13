@@ -4,7 +4,7 @@
 
   orcaOrca.h - language specific
 
-  Copyright (C) 2009-2011 Lee, Ki-Yeul
+  Copyright (C) 2009-2018 Lee, Ki-Yeul
 
 **********************************************************************/
 
@@ -14,6 +14,7 @@
 #include "porting.h"
 #include "orcaObject.h"
 #include "orcaGlobal.h"
+#include "orcaDL.h"
 
 class orcaOrca : public orcaObject 
 {
@@ -24,6 +25,7 @@ public:
 		insert_static_native_function("load", (object_fp)&orcaOrca::ex_load);
 		insert_static_native_function("unload", (object_fp)&orcaOrca::ex_unload);
 		insert_static_native_function("trace", (object_fp)&orcaOrca::ex_trace);
+		insert_static_native_function("dlopen", (object_fp)&orcaOrca::ex_dlopen);
 	}
 
 	orcaData ex_load(orcaVM* vm, int n) 
@@ -65,6 +67,23 @@ public:
 	orcaData ex_trace(orcaVM* vm, int n) 
 	{
 		return vm->m_last_trace_info;
+	}
+
+	orcaData ex_dlopen(orcaVM* vm, int n) 
+	{
+		if (n < 1) vm->need_param();
+
+		string& file = vm->get_param(0).String();
+
+		DLHANDLE handle = dlopen(file.c_str(), RTLD_NOW);
+
+		if (handle == NULL) {
+			throw orcaException(vm, "orca.name", string("file ") + file + " not exists");
+		}
+
+		orcaDL* dl = new orcaDL();
+		dl->set_handle(handle);
+		return dl;
 	}
 };
 

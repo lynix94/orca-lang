@@ -1,6 +1,6 @@
 using distribute.fs;
 using distribute.dfsd;
-using random;
+using math.random;
 using time;
 using os;
 

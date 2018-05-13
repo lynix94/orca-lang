@@ -1,4 +1,4 @@
-using random;
+using math.random;
 
 def init_once
 {

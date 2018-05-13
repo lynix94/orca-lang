@@ -4,7 +4,7 @@
 
   orcaDL.h - dynamic binding
 
-  Copyright (C) 2009-2011 Lee, Ki-Yeul
+  Copyright (C) 2009-2018 Lee, Ki-Yeul
 
 **********************************************************************/
 
@@ -56,26 +56,14 @@ public:
 	{
 		set_name("dl");
 
-		insert_native_function("open", (object_fp)&orcaDL::ex_open);
 		insert_native_function("func", (object_fp)&orcaDL::ex_func);
 		insert_native_function("obj", (object_fp)&orcaDL::ex_obj);
 
 	}
 
-	orcaData ex_open(orcaVM* vm, int n) 
+	void set_handle(DLHANDLE handle)
 	{
-		string& file = vm->get_param(0).String();
-
-		DLHANDLE handle = dlopen(file.c_str(), RTLD_NOW);
-
-		if (handle == NULL) {
-			throw orcaException(vm, "orca.name", string("file ") + file + " not exists");
-		}
-
-		orcaDL* dl = new orcaDL();
-		dl->m_handle = handle;
-
-		return dl;
+		m_handle = handle;
 	}
 
 	orcaData ex_func(orcaVM* vm, int n) 

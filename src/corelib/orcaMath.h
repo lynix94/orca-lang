@@ -15,6 +15,7 @@
 
 #include "porting.h"
 #include "orcaObject.h"
+#include "orcaRandom.h"
 
 class orcaMath : public orcaObject 
 {
@@ -49,6 +50,8 @@ public:
 		insert_static_native_function("fabs", (object_fp)&orcaMath::ex_fabs);
 		insert_static_native_function("floor", (object_fp)&orcaMath::ex_floor);
 		insert_static_native_function("fmod", (object_fp)&orcaMath::ex_fmod);
+
+		insert_static("random", new orcaRandom());
 	}
 
 	orcaData ex_sin(orcaVM* vm, int n) 

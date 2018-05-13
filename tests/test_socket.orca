@@ -2,7 +2,7 @@ using socket;
 using thread;
 using time;
 
-using random;
+using math.random;
 def port;
 
 random.seed();

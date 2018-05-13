@@ -1,4 +1,4 @@
-using stopwatch;
+using time.stopwatch;
 
 test_vectors = [
   'test_arith',

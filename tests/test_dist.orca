@@ -1,7 +1,7 @@
 using distribute.remoted;
 using distribute.remotec;
 using distribute.dist;
-using random;
+using math.random;
 using time;
 
 random.seed();

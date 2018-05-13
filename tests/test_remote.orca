@@ -1,6 +1,6 @@
 using distribute.remoted;
 using distribute.remotec;
-using random;
+using math.random;
 using time;
 
 random.seed();

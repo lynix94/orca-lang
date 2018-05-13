@@ -1,6 +1,5 @@
 using socket;
 using pack;
-using fdselect;
 using time;
 
 using distribute.remotec;
@@ -284,7 +283,7 @@ def is_done(timeout)
 		return true;
 	}
 
-	if fdselect.readable(..server.sock.get(), timeout) {
+	if io.fdreadable(..server.sock.get(), timeout) {
 		..flag_running = false;
 		..server.recv();
 		return true;

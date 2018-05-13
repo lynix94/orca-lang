@@ -1,6 +1,5 @@
-using fdselect;
 using socket;
-using random;
+using math.random;
 using thread;
 using time;
 
@@ -17,7 +16,7 @@ def server {
 	sock.listen();
 
 	while true {
-		fd = fdselect.fdselect([sock.get()], [], [], 1.0);
+		fd = io.fdselect([sock.get()], [], [], 1.0);
 
 		if fd[0] == [sock.get()] {
 			new_cl = sock.accept();

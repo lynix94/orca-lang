@@ -14,21 +14,17 @@
 #include "orcaRoot.h"
 #include "orcaIO.h"
 #include "orcaOS.h"
-#include "orcaFile.h"
-#include "orcaDL.h"
 #include "orcaThread.h"
 #include "orcaSocket.h"
 #include "orcaIPC.h"
-#include "orcaSelect.h"
+#include "orcaSelector.h"
 #include "orcaDatetime.h"
 #include "orcaDate.h"
 #include "orcaTime.h"
 #include "orcaPack.h"
-#include "orcaStopWatch.h"
 #include "orcaBase64.h"
 #include "orcaType.h"
 #include "orcaOrca.h"
-#include "orcaRandom.h"
 #include "orcaUtil.h"
 #include "orcaMath.h"
 #include "orcaOperator.h"
@@ -61,21 +57,16 @@ orcaRoot::orcaRoot()
 	rc_inc(); // for permanant life
 
 	insert_static("io", new orcaIO());
-	insert_static("file", new orcaFile());
 	insert_static("os", new orcaOS());
-	insert_static("dl", new orcaDL());
 	insert_static("thread", new orcaThread());
 	insert_static("socket", new orcaSocketModule());
-	insert_static("fdselect", new orcaSelect());
 	insert_static("ipc", new orcaIPC());
 	insert_static("time", new orcaTime());
 	insert_static("date", new orcaDate());
 	insert_static("datetime", new orcaDatetime());
 	insert_static("pack", g_pack = new orcaPack());
-	insert_static("stopwatch", new orcaStopWatch());
 	insert_static("type", new orcaTypes());
 	insert_static("orca", new orcaOrca());
-	insert_static("random", new orcaRandom());
 	insert_static("math", new orcaMath());
 	insert_static("operator", new orcaOperator());
 	insert_static("sorted", new orcaSorted());

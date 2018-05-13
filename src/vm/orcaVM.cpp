@@ -78,7 +78,7 @@ namespace fs = boost::filesystem;
 #include "orcaPack.h"
 #include "orcaDatetime.h"
 #include "orcaSocket.h"
-#include "orcaSelect.h"
+#include "orcaSelector.h"
 
 #include "orcaVM.h"
 

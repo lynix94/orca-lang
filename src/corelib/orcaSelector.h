@@ -2,34 +2,17 @@
 
 /**********************************************************************
 
-  orcaSelect.h -
+  orcaSelector.h -
 
-  Copyright (C) 2009-2011 Lee, Ki-Yeul
+  Copyright (C) 2009-2018 Lee, Ki-Yeul
 
 **********************************************************************/
 
-#ifndef _DEF_ORCA_SELECT
-#define _DEF_ORCA_SELECT
+#ifndef _DEF_ORCA_SELECTOR
+#define _DEF_ORCA_SELECTOR
 
 #include "porting.h"
 #include "orcaObject.h"
-
-class orcaSelect : public orcaObject 
-{
-public:
-	DEFAULT_NATIVE_DEFINE(orcaSelect);
-
-	orcaSelect()
-	{
-		set_name("fdselect");
-		insert_native_function("fdselect", (object_fp)&orcaSelect::ex_select);
-		insert_native_function("readable", (object_fp)&orcaSelect::ex_readable);
-	}
-
-	orcaData ex_select(orcaVM* vm, int n);
-	orcaData ex_readable(orcaVM* vm, int n);
-};
-
 
 class orcaSelector : public orcaObject 
 {

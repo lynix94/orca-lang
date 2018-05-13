@@ -28,6 +28,8 @@ public:
 		insert_static("put", new ex_put());
 		insert_static("open", new ex_open());
 		insert_static("input", new ex_input());
+		insert_static_native_function("fdselect", (object_fp)&orcaIO::ex_fdselect);
+		insert_static_native_function("fdreadable", (object_fp)&orcaIO:: ex_fdreadable);
 	}
 
 	class ex_print : public orcaObject 
@@ -113,6 +115,9 @@ public:
 			return buff;
 		}
 	};
+
+	orcaData ex_fdselect(orcaVM* vm, int n);
+	orcaData ex_fdreadable(orcaVM* vm, int n);
 };
 
 
