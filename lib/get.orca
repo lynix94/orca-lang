@@ -1,0 +1,69 @@
+using os;
+using strings;
+
+def usage()
+{
+	print: 'USAGE:  orca get GITHUB_PATH';
+	print: ' ex) orca get https://github.com/lynix94/raft/raft';
+}
+
+if argv == nil || argv.size() < 1{
+	.usage();
+	return;
+}
+
+
+toks = argv[0].split('/');
+#print(toks);
+
+if toks[0] != 'https:' {
+	.usage();
+	return;
+}
+
+if toks[1] != 'github.com' {
+	.usage();
+	return;
+}
+
+if toks.size() < 4 {
+	.usage();
+	return;
+}
+
+zip_url = 'https://' + strings.join('/', toks[1:4]...) + '/archive/master.zip';
+print: 'zip url: ', zip_url;
+
+full_path = toks[1:];
+#print: full_path;
+sub_path = toks[4:];
+#print: sub_path;
+
+repo_name = toks[3];
+mod_name = toks[-1];
+
+lib_base = os.getenv('ORCA_PATH');
+tail = lib_base;
+for tok in full_path[:-1] {
+	tail += '/' + tok;
+	os.mkdir(tail);
+}
+
+;wget -q ${zip_url} -O __orca_tmp__.zip
+;unzip __orca_tmp__.zip
+
+src_path = repo_name + '-master/' + strings.join('/', sub_path...) + '.orca';
+dst_path = lib_base + '/' + strings.join('/', full_path...) + '.orca';
+
+print: 'rm -rf ${dst_path}';
+;rm -rf ${dst_path}
+
+print: 'mv ${src_path} ${dst_path}';
+;mv ${src_path} ${dst_path}
+
+;rm -rf __orca_tmp__.zip
+;rm -rf ${repo_name + '-master'}
+
+
+
+

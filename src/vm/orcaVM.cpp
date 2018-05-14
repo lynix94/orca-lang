@@ -848,15 +848,31 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 
 		case OP_USING: {
 				PRINT1("\t\t  using: %s\n", &c[i+2]);
-				char buff[1024];
+				bool ret = false;
+				int idx = 0;
+				string mod_path = &c[i+2];
 
-				for(j=0; c[i+2 + j] != '.' && j<c[i+1]; j++) {
-					buff[j] = c[i+2 + j];
+				idx = mod_path.find_last_of("/");
+				if (idx > 0) { // absolute path
+					string dir = mod_path.substr(0, idx);
+					string base = mod_path.substr(idx);
+
+					int idx2 = mod_path.find_last_of(".");
+					if (idx2 > idx)
+						ret = load(mod_path.substr(0, idx2));
+					else
+						ret = load(mod_path);
+				}
+				else { // pure name
+					idx = mod_path.find(".");
+					if (idx > 0)
+						ret = load(mod_path.substr(0, idx));
+					else
+						ret = load(mod_path);
 				}
 
-				buff[j] = 0;
-				if (load(buff) == false) {
-					printf("module (%s) load failure\n", buff);
+				if (ret == false) {
+					printf("module (%s) load failure\n", mod_path.c_str());
 					throw orcaException(this, "orca.module", "module launch failure");
 				}
 			}
@@ -865,21 +881,32 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 
 		case OP_USING_EXT: {
 				PRINT2("\t\t  using context: %s, %s\n", &c[i+3], &c[i+2 + c[i+1] + 1]);
-
-				char buff[1024];
-				char new_name[1024];
+				bool ret = false;
+				int idx = 0;
+				string mod_path = &c[i+2];
 				const char *by = &c[i+2 + c[i+1]+1];
 
-				for(j=0; c[i+3 + j] != '.' && j<c[i+1]; j++) {
-					buff[j] = c[i+3 + j];
+				idx = mod_path.find_last_of("/");
+				if (idx > 0) { // absolute path
+					string dir = mod_path.substr(0, idx);
+					string base = mod_path.substr(idx);
+
+					int idx2 = mod_path.find_last_of(".");
+					if (idx2 > idx)
+						ret = load(mod_path.substr(0, idx2) + ".orca." + by);
+					else
+						ret = load(mod_path + ".orca." + by);
+				}
+				else { // pure name
+					idx = mod_path.find(".");
+					if (idx > 0)
+						ret = load(mod_path.substr(0, idx) + ".orca." + by);
+					else
+						ret = load(mod_path + ".orca." + by);
 				}
 
-				buff[j] = 0;
-
-				
-				sprintf(new_name, "%s.orca.%s", buff, by);
-				if (load(new_name) == false) {
-					printf("module (%s) load failure\n", new_name);
+				if (ret == false) {
+					printf("module (%s) load failure\n", mod_path.c_str());
 					throw orcaException(this, "orca.module", "module launch failure");
 				}
 			}
@@ -3368,6 +3395,7 @@ bool orcaVM::load(const string& input_path, orcaObject* owner, string owner_path
 	string sub_postfix;  // could be orca, html & others
 	string kw_path;	    // result module path with .kw suffix
 	string candidate_path;	// source file path (with or without suffix)
+	string mod_path;	// module path without suffix
 
 	// #1. check if already loaded
 	if (owner == NULL) owner = g_root;
@@ -3376,9 +3404,11 @@ bool orcaVM::load(const string& input_path, orcaObject* owner, string owner_path
 	string parent_path = fs::path(input_path).parent_path().string();
 	if (parent_path.length() > 0) {
 		kw_path = parent_path + "/" + mod_name + ".kw";
+		mod_path = parent_path + "/" + mod_name;
 	}
 	else {
 		kw_path = mod_name + ".kw";
+		mod_path = mod_name;
 	}
 
 	if (owner->has_member(mod_name.c_str())) {	// alreay loaded
@@ -3419,13 +3449,14 @@ bool orcaVM::load(const string& input_path, orcaObject* owner, string owner_path
 		// iterate module path and find
 		vector<fs::path>::iterator it = m_module_path.begin();
 		for(; it != m_module_path.end(); ++it) {
-			candidate_path = (*it).string() + "/" + mod_name;
+			candidate_path = (*it).string() + "/" + mod_path;
 			kw_path = candidate_path + ".kw";
 
 			if (!fs::exists(candidate_path)) {
 				candidate_path += ".orca";
 			}
 
+			//printf(">> candidate_path: %s\n", candidate_path.c_str());
 			if (fs::exists(candidate_path)) {
 				flag = true;
 				break;

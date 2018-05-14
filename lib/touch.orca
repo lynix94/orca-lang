@@ -40,6 +40,7 @@ using html;
 using orm;
 using orm.model;
 using orm.type;
+using get;
 
 
 using os;
@@ -95,6 +96,7 @@ os.touch('./html.orca');
 os.touch('./orm.orca/CODE.orca');
 os.touch('./orm.orca/type.orca');
 os.touch('./orm.orca/model.orca');
+os.touch('./get.orca');
 
 
 

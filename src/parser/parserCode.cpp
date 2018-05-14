@@ -376,15 +376,20 @@ void parserCode::using_object(const char* s, const char* by) /*{{{*/
 		copy(by, by+strlen(by)+1, back_inserter(m_def));
 	}
 
-	const char* cp = s + strlen(s);
-	for(; cp > s; cp--) {
-		if (*cp == '.') {
-			cp++;
-			break;
-		}
+	string path = s;
+	string basename = s;
+	int idx = path.find_last_of("/");
+	if (idx > 0) {
+		basename = path.substr(idx+1);
 	}
 
-	m_space[cp] = s;
+	idx = basename.find_last_of(".");
+	if (idx > 0) {
+		m_space[basename.substr(idx+1)] = basename;
+	}
+	else {
+		m_space[basename] = basename;
+	}
 }
 /*}}}*/
 
