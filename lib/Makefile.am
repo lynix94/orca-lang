@@ -1,6 +1,6 @@
 
 orcalibdir = $(prefix)/lib/orca
-orcalib_DATA = alg.kw alg.orca fun.kw fun.orca gui.kw gui.orca run.kw run.orca log.kw log.orca html.orca html.kw get.orca get.kw
+orcalib_DATA = alg.kw alg.orca fun.kw fun.orca gui.kw gui.orca run.kw run.orca log.kw log.orca get.orca get.kw
 
 orcalibsonardir = $(prefix)/lib/orca/sonar.orca
 orcalibsonar_DATA = sonar.orca/CODE.kw sonar.orca/CODE.orca
@@ -41,4 +41,6 @@ orcalibstorage_DATA = storage.orca/CODE.kw storage.orca/CODE.orca storage.orca/c
 orcalibormdir = $(prefix)/lib/orca/orm.orca
 orcaliborm_DATA = orm.orca/CODE.kw orm.orca/CODE.orca orm.orca/model.kw orm.orca/model.orca orm.orca/type.orca orm.orca/type.kw
 
+orcalibhtmldir = $(prefix)/lib/orca/html.orca
+orcalibhtml_DATA = html.orca/CODE.kw html.orca/CODE.orca html.orca/form.kw html.orca/form.orca html.orca/jqueryui.kw html.orca/jqueryui.orca 
 

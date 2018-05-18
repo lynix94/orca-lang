@@ -1,0 +1,73 @@
+using html;
+using html.form;
+using sorted;
+using strings;
+
+#print: argv;
+name = argv[0];
+ts = argv[1];
+body = argv[2];
+params = argv[3];
+
+
+return .process_context(body);
+
+
+def js(...argv)
+{
+	return ..process_context(argv[2]);
+}
+
+
+def process_context(body)
+{
+	def html_object(req)
+	{
+		def __template;
+
+		def init(body)
+		{
+			..__template = body;
+		}
+
+		if my.MEMBERS.has_key('prepare') {
+			ret = my.prepare(req);
+			if ret.TYPE == ''.TYPE {
+				return ret;
+			}
+		}
+
+		keys = .__template.list_format();
+		#print: keys;
+
+		dict = {,};
+		for key in sorted(keys) {
+			if my.MEMBERS.has_key(key) {
+				value = my.MEMBERS[key](req);
+				dict[key] = value;
+			}
+			else {
+				dict[key] = '';
+			}
+		}
+
+		bdr = strings.builder();
+		bdr.push_back(my.__template % dict);
+
+		for it in my.MEMBERS.begin() {
+			if it.first().starts_with('script_') {
+				bdr.push_back(it.second()(req));
+			}
+		}
+
+		return bdr;
+	}
+
+	ret = my.html_object.clone(body);
+	return ret;
+}
+
+
+
+
+

@@ -1,0 +1,117 @@
+using html;
+using html.form;
+using sorted;
+using strings;
+
+
+def fill_and_get(param)
+{
+	result = {,};
+	for it in ..MEMBERS.begin() {
+		if it.second() < form.input.input_tag.TYPE {
+			k = it.first();
+			if param.has_key(k) {
+				result[k] = param[k];
+			}
+			else {
+				result[k] = nil;
+			}
+		}
+	}
+
+	return result;
+}
+
+def input
+{
+	def serno := 1;
+
+	def input_tag(label)
+	{
+		def id;
+		def name;
+		def type;
+		def label;
+		def serno;
+
+		.label = label;
+
+		return my;
+	}
+
+	def "."(type)
+	{
+		ret = ..input_tag.clone();
+		ret.type = type;
+		ret.serno = ..serno;
+		..serno += 1;
+
+		return ret;
+	}
+}
+
+def as_p(v)
+{
+	switch v.type
+	{
+	case 'text', 'password':
+		ret = '<p><label for="%s">%s:</label><input id="%s" name="%s" type="%s" /></p>\n' % (v.id, v.name, v.id, v.name, v.type);
+
+	case 'submit', 'button', 'reset':
+		ret = '<p><input id="%s" name="%s" type="%s" value="%s" /></p>\n' % (v.id, v.name, v.type, v.label);
+	}
+
+	return ret;
+}
+
+
+def render(form_result, decorator, method, action)
+{
+	if method == nil {
+		method = 'POST';
+	}
+
+	if action == nil {
+		action = '.';
+	}
+
+	if decorator == nil {
+		decorator = ..as_p;
+	}
+
+	bdr = strings.builder();
+	bdr.push_back('<form method="%s" action="%s">\n' % (method, action));
+
+	ret = ..render_item(form_result, decorator);
+	bdr.push_back(ret);
+
+	bdr.push_back('</form>\n');
+	return bdr;
+}
+
+
+def render_item(form_result, decorator)
+{
+	if decorator == nil {
+		decorator = ..as_p;
+	}
+
+	bdr = strings.builder();
+
+	keys = [];
+	for it in ..MEMBERS.begin() {
+		if it.second() < form.input.input_tag.TYPE {
+			it.second().id = it.first();
+			it.second().name = it.first();
+			keys.push_back(it.second());
+		}
+	}
+
+	for v in sorted(keys, lambda(a, b) { return a.serno < b.serno; }) {
+		ret = decorator(v);
+		bdr.push_back(ret);
+	}
+
+	return bdr;
+}
+

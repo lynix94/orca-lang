@@ -1,0 +1,69 @@
+using strings;
+
+def autocomplete(id, source, action)
+{
+	def __template := '''
+		 <script type="text/javascript">
+				$(function() {
+				$('%{id}').autocomplete({
+					source: %{source}
+					minLength: 0,
+					select: function( event, ui ) {
+					%{action};
+					return false;
+				}
+				}).focus(function(){
+					$(this).autocomplete('search', $(this).val())});
+				});
+			</script>
+			<input type="text" id="%{id}"> 
+		''';
+
+	return my.__template % {'id':id, 'action':action(), 'source':source };
+}
+
+def radio(id, button_list, action)
+{
+	def __template := '''
+			<script type="text/javascript">
+				$(function() {
+				$('#%{id}').buttonset();
+				$('#%{id} :radio').click(function() {
+					%{action};
+				});
+				});
+			</script>
+
+			<ul id='%{id}' style="display:inline">
+				%{button_list}
+			</ul>
+		''';
+
+	buttons = strings.builder();
+	for button in button_list {
+		buttons.push_back("<input type='radio' id='%s' name='radio'><label for='%s'>%s</label>\n" % (button, button, button));
+	}
+
+	return my.__template % {'id':id, 'action':action(), 'button_list':buttons };
+}
+
+def button(id, action)
+{
+	def __template := '''
+			<script type="text/javascript">
+				$(function() {
+					$('#%{id}').button().click(
+						function() {
+							%{action}
+						}
+					);
+				});
+			</script>
+
+			<button id='%{id}' float>%{id}</button>
+		''';
+
+	return my.__template % {'id':id, 'action':action() };
+}
+
+

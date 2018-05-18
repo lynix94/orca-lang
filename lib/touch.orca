@@ -36,11 +36,13 @@ using storage;
 using storage.cached;
 using gui;
 using alg;
-using html;
 using orm;
 using orm.model;
 using orm.type;
 using get;
+using html;
+using html.form;
+using html.jqueryui;
 
 
 using os;
@@ -97,6 +99,9 @@ os.touch('./orm.orca/CODE.orca');
 os.touch('./orm.orca/type.orca');
 os.touch('./orm.orca/model.orca');
 os.touch('./get.orca');
+os.touch('./html.orca/CODE.orca');
+os.touch('./html.orca/form.orca');
+os.touch('./html.orca/jqueryui.orca');
 
 
 
