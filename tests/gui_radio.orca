@@ -3,7 +3,7 @@ using gui.window;
 using gui.vbox;
 using gui.label;
 using gui.radio;
-using util.upper;
+using util.find_owner;
 
 def main : window
 {
@@ -22,7 +22,7 @@ def main : window
 			my.event['toggled'] = 
 				lambda(...argv){ 
 					if argv[0] {
-						upper('box').print.attr['text'] = ..attr['text'];
+						find_owner('box').print.attr['text'] = ..attr['text'];
 					}
 				};
 		}
@@ -34,7 +34,7 @@ def main : window
 			my.event['toggled'] = 
 				lambda(...argv){ 
 					if argv[0] {
-						upper('box').print.attr['text'] = ..attr['text'];
+						find_owner('box').print.attr['text'] = ..attr['text'];
 					}
 				};
 		}
@@ -46,7 +46,7 @@ def main : window
 			my.event['toggled'] = 
 				lambda(...argv){ 
 					if argv[0] {
-						upper('box').print.attr['text'] = ..attr['text'];
+						find_owner('box').print.attr['text'] = ..attr['text'];
 					}
 				};
 		}

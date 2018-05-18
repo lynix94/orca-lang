@@ -7,7 +7,7 @@ using gui.label;
 using gui.tree;
 using gui.button;
 using gui.statusbar;
-using util.upper;
+using util.find_owner;
 
 def main : window
 {
@@ -29,7 +29,7 @@ def main : window
 				# argv: ( toggled, tree_iterator )
 				# argv[1]: tree_iterator 
 				# argv[1](): tree item value  [ bool, name ]
-				upper('box').result.attr['text'] = argv[1]()[1] + ' toggled';
+				find_owner('box').result.attr['text'] = argv[1]()[1] + ' toggled';
 
 				my.toggle_child(argv[1], argv[0]);
 
@@ -65,7 +65,7 @@ def main : window
 			b.push_child([false, 'lisp']);
 
 			my.event['changed'] = lambda(...argv){
-				upper('box').change.attr['text'] = string(argv[0]) + argv[0]();
+				find_owner('box').change.attr['text'] = string(argv[0]) + argv[0]();
 				..current = argv;
 			};
 		}
@@ -80,14 +80,14 @@ def main : window
 				my.attr['text'] = 'submit sibling';
 
 				my.event['clicked'] = lambda(){
-					it = upper('box').items.current;
-					new = upper('input_sibling').new.attr['text'];
+					it = find_owner('box').items.current;
+					new = find_owner('input_sibling').new.attr['text'];
 					if new.length() <= 0 {
 						 return;
 					}
 
 					if it == nil {
-						upper('box').items.push_back([false, new]);
+						find_owner('box').items.push_back([false, new]);
 					}
 					else {
 						it.insert([false, new]);
@@ -106,14 +106,14 @@ def main : window
 				my.attr['text'] = 'submit child';
 
 				my.event['clicked'] = lambda(){
-					it = upper('box').items.current;
-					new = upper('input_child').new.attr['text'];
+					it = find_owner('box').items.current;
+					new = find_owner('input_child').new.attr['text'];
 					if new.length() <= 0 {
 						return;
 					}
 
 					if it == nil {
-						upper('box').items.push_back([false, new]);
+						find_owner('box').items.push_back([false, new]);
 					}
 					else {
 						it.push_child([false, new]);

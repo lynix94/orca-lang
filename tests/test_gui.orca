@@ -8,7 +8,7 @@ using gui.button;
 using gui.scroll;
 using gui.text;
 
-using util.upper;
+using util.find_owner;
 using fun.bind_1st;
 
 using gui_button;
@@ -95,10 +95,10 @@ def main : window
 			a.make();
 
 			a.launch.attr['text'] = i[0];
-			a.launch.event['clicked'] = bind_1st(upper('main').pop_window, i[1]);
+			a.launch.event['clicked'] = bind_1st(find_owner('main').pop_window, i[1]);
 
 			a.source.attr['text'] = i[2];
-			a.source.event['clicked'] = bind_1st(upper('main').src_window, i[3]);
+			a.source.event['clicked'] = bind_1st(find_owner('main').src_window, i[3]);
 			my.MEMBERS['tmp' +  count] = a;
 			count += 1;
 

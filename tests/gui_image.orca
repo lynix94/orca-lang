@@ -3,7 +3,7 @@ using gui.window;
 using gui.vbox;
 using gui.label;
 using gui.image;
-using util.upper;
+using util.find_owner;
 
 def main : window
 {

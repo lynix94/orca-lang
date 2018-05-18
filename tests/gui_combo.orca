@@ -3,7 +3,7 @@ using gui.window;
 using gui.vbox;
 using gui.label;
 using gui.combo;
-using util.upper;
+using util.find_owner;
 
 def main : window
 {
@@ -23,7 +23,7 @@ def main : window
 			my.push_back: 'windows';
 			my.push_back: 'solaris';
 
-			my.event['changed'] = lambda(a) { upper('box').print.attr['text'] = a; };
+			my.event['changed'] = lambda(a) { find_owner('box').print.attr['text'] = a; };
 		}
 	}
 }

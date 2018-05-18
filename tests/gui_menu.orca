@@ -6,7 +6,7 @@ using gui.menubar;
 using gui.text;
 using gui.scroll;
 using gui.dialog;
-using util.upper;
+using util.find_owner;
 
 def main : window
 {
@@ -17,17 +17,17 @@ def main : window
 		def menu : menubar
 		{
 			file = [ 'open', lambda(){ 
-								name = dialog.fileopen(upper('main'));
+								name = dialog.fileopen(find_owner('main'));
 								str= os.read(name);
-								upper('box').hs.edit.attr['text'] = str;
+								find_owner('box').hs.edit.attr['text'] = str;
 							},
 					'save', lambda(){ 
-								str= upper('box').hs.edit.attr['text'];
-								name = dialog.filesave(upper('main'));
+								str= find_owner('box').hs.edit.attr['text'];
+								name = dialog.filesave(find_owner('main'));
 								os.write(name, str);
 							},
 					'exit', lambda(){ 
-								upper('main').quit(); 
+								find_owner('main').quit(); 
 							}
 					];
 

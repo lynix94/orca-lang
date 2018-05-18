@@ -7,7 +7,7 @@ using gui.label;
 using gui.list;
 using gui.button;
 using gui.statusbar;
-using util.upper;
+using util.find_owner;
 
 def main : window
 {
@@ -38,7 +38,7 @@ def main : window
 				}
 
 				print: string(.selected);
-				print: upper('box').result;
+				print: find_owner('box').result;
 
 
 				result = '[ Your selections ]\n';
@@ -46,7 +46,7 @@ def main : window
 					result += '%s\n' % a.first();
 				}
 	
-				upper('box').result.attr['text'] = result;
+				find_owner('box').result.attr['text'] = result;
 			}
 
 			my.attr['column'] = [('choose', 'toggle', .handle_toggle), 'name'];
@@ -58,7 +58,7 @@ def main : window
 			my.push_back([false, 'programming']);
 
 			my.event['changed'] = lambda(...argv){
-				upper('box').change.attr['text'] = string(argv[0]) + argv[0]();
+				find_owner('box').change.attr['text'] = string(argv[0]) + argv[0]();
 			};
 		}
 
@@ -74,8 +74,8 @@ def main : window
 				my.attr['wh'] = (100, 20);
 				my.attr['text'] = 'submit';
 				my.event['clicked'] = lambda(){
-					new = upper('input').new.attr['text'];
-					upper('box').items.push_back([false, new]);
+					new = find_owner('input').new.attr['text'];
+					find_owner('box').items.push_back([false, new]);
 				};
 			}
 		}

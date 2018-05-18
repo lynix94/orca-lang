@@ -3,7 +3,7 @@ using gui.window;
 using gui.vbox;
 using gui.label;
 using gui.check;
-using util.upper;
+using util.find_owner;
 
 def main : window
 {
@@ -20,7 +20,7 @@ def main : window
 		{
 			my.attr['text'] = 'check me';
 			my.event['toggled'] = lambda(a) { 
-					upper('box').print.attr['text'] = 'check result: %s' % a;
+					find_owner('box').print.attr['text'] = 'check result: %s' % a;
 				};
 		}
 	}

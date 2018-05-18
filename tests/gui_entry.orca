@@ -4,7 +4,7 @@ using gui.vbox;
 using gui.label;
 using gui.entry;
 using gui.button;
-using util.upper;
+using util.find_owner;
 
 def main : window
 {
@@ -27,7 +27,7 @@ def main : window
 			my.attr['text'] = 'ok';
 			my.event['clicked'] = 
 				lambda(){ 
-					upper('box').print.attr['text'] = upper('box').input.attr['text'];
+					find_owner('box').print.attr['text'] = find_owner('box').input.attr['text'];
 				};
 		}
 	}

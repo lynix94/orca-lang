@@ -27,7 +27,7 @@ def lock(obj)
 	def mutex := ipc.mutex.clone();
 }
 
-def upper(name)
+def find_owner(name)
 {
 	op = caller.owner;
 
@@ -45,4 +45,6 @@ def upper(name)
 
 	return nil;
 }
+
+
 

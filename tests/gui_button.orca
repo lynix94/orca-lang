@@ -3,7 +3,7 @@ using gui.window;
 using gui.fixed;
 using gui.button;
 using gui.label;
-using util.upper;
+using util.find_owner;
 
 def main : window
 {
@@ -24,7 +24,7 @@ def main : window
 			my.attr['wh'] = (100, 50);
 			my.attr['text'] = '+';
 			my.event['clicked'] = lambda() { 
-				upper('box').counter.attr['text'] += 1;
+				find_owner('box').counter.attr['text'] += 1;
 			};
 		}
 
@@ -34,7 +34,7 @@ def main : window
 			my.attr['wh'] = (100, 50);
 			my.attr['text'] = '-';
 			my.event['clicked'] = lambda() { 
-				upper('box').counter.attr['text'] -= 1;
+				find_owner('box').counter.attr['text'] -= 1;
 			};
 		}
 	}
