@@ -42,6 +42,7 @@ using orm.type;
 using get;
 using html;
 using html.form;
+using html.form.input;
 using html.jqueryui;
 
 
@@ -100,7 +101,8 @@ os.touch('./orm.orca/type.orca');
 os.touch('./orm.orca/model.orca');
 os.touch('./get.orca');
 os.touch('./html.orca/CODE.orca');
-os.touch('./html.orca/form.orca');
+os.touch('./html.orca/form.orca/CODE.orca');
+os.touch('./html.orca/form.orca/input.orca');
 os.touch('./html.orca/jqueryui.orca');
 
 

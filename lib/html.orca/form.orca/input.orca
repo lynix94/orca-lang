@@ -1,0 +1,364 @@
+using html;
+using html.form;
+using html.form.input;
+
+
+def serno := 1;
+
+def input_base
+{
+	def id;
+	def name;
+	def type;
+	def label;
+	def serno;
+
+	def conf_required := false;
+	def conf_max_len := 0;
+	def conf_initial;
+	def conf_widget;
+	def conf_help_hext;
+	def conf_error_message;
+
+	def check_valid(value) # return error string if invalid
+	{
+		if ..conf_max_len > 0 && value.size() > ..conf_max_len {
+			return 'exceed max limit';
+		}
+
+		if value == nil && ..conf_required == true {
+			return 'value is required';
+		}
+
+		return nil;
+	}
+
+	def required()
+	{
+		return owner;
+	}
+
+	def max_len(n)
+	{
+
+		return owner;
+	}
+
+	def initial(v)
+	{
+
+		return owner;
+	}
+
+	def widget(w)
+	{
+
+		return owner;
+	}
+
+	def help_text(msg)
+	{
+
+		return owner;
+	}
+
+	def error_message(msg)
+	{
+
+
+		return owner;
+	}
+}
+
+
+def __clone(obj, label)
+{
+	ret = obj.clone();
+	ret.label = label;
+	ret.serno = ..serno;
+	ret.type = 'text'; # default
+	..serno += 1;
+
+	return ret;
+}
+
+
+
+# pre-defined (in html spec) input type
+def button(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'button';
+	return ret;
+}
+
+def checkbox(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'checkbox';
+	return ret;
+}
+
+def color(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'color';
+	return ret;
+}
+
+def date(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'date';
+	return ret;
+}
+
+def datetime(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'datetime-local';
+	return ret;
+}
+
+def email(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'email';
+	return ret;
+}
+
+def file(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'file';
+	return ret;
+}
+
+def hidden(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'hidden';
+	return ret;
+}
+
+def image(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'image';
+	return ret;
+}
+
+def month(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'month';
+	return ret;
+}
+
+def number(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'number';
+	return ret;
+}
+
+def password(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'password';
+	return ret;
+}
+
+def radio(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'radio';
+	return ret;
+}
+
+def range(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'range';
+	return ret;
+}
+
+def reset(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'reset';
+	return ret;
+}
+
+def search(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'search';
+	return ret;
+}
+
+def submit(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'submit';
+	return ret;
+}
+
+def tel(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'tel';
+	return ret;
+}
+
+def text(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def time(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'time';
+	return ret;
+}
+
+def url(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'url';
+	return ret;
+}
+
+def week(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.type = 'week';
+	return ret;
+}
+
+
+
+# extended input type
+def integer(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def float(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def filepath(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def ip(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+
+def boolean(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def null_boolean(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def choice(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def typed_choice(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def multiple_choice(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def typed_multiple_choice(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def decimal(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def duration(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def regex(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def slug(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def uuid(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def combo(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def multivalue(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def split_datetime(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def model_choice(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+
+def model_multiple_choice(label) : input.input_base
+{
+	ret =..__clone(my, label);
+	return ret;
+}
+

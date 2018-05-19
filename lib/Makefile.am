@@ -44,3 +44,6 @@ orcaliborm_DATA = orm.orca/CODE.kw orm.orca/CODE.orca orm.orca/model.kw orm.orca
 orcalibhtmldir = $(prefix)/lib/orca/html.orca
 orcalibhtml_DATA = html.orca/CODE.kw html.orca/CODE.orca html.orca/form.kw html.orca/form.orca html.orca/jqueryui.kw html.orca/jqueryui.orca 
 
+orcalibformdir = $(prefix)/lib/orca/html.orca/form.orca
+orcalibhtml_DATA = html.orca/form.orca/CODE.kw html.orca/form.orca/CODE.orca html.orca/form.orca/input.kw html.orca/form.orca/input.orca
+

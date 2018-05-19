@@ -6,9 +6,10 @@ using strings;
 
 def fill_and_get(param)
 {
+	errors = {,};
 	result = {,};
 	for it in ..MEMBERS.begin() {
-		if it.second() < form.input.input_tag.TYPE {
+		if it.second().TYPE < form.input.input_base.TYPE {
 			k = it.first();
 			if param.has_key(k) {
 				result[k] = param[k];
@@ -16,49 +17,34 @@ def fill_and_get(param)
 			else {
 				result[k] = nil;
 			}
+
+			err = my.check_valid(k, result[k]);
+			if err != nil {
+				errors[k] = err;
+			}
 		}
 	}
 
-	return result;
-}
+	return (result, errors);
 
-def input
-{
-	def serno := 1;
 
-	def input_tag(label)
+	def check_valid(key, value)
 	{
-		def id;
-		def name;
-		def type;
-		def label;
-		def serno;
-
-		.label = label;
-
-		return my;
-	}
-
-	def "."(type)
-	{
-		ret = ..input_tag.clone();
-		ret.type = type;
-		ret.serno = ..serno;
-		..serno += 1;
-
-		return ret;
+		input = owner.owner.MEMBERS[key];
+		return input.check_valid(value);
 	}
 }
 
-def as_p(v)
+def as_p(v, value)
 {
 	switch v.type
 	{
-	case 'text', 'password':
-		ret = '<p><label for="%s">%s:</label><input id="%s" name="%s" type="%s" /></p>\n' % (v.id, v.name, v.id, v.name, v.type);
-
 	case 'submit', 'button', 'reset':
 		ret = '<p><input id="%s" name="%s" type="%s" value="%s" /></p>\n' % (v.id, v.name, v.type, v.label);
+
+	default:
+		ret = '<p><label for="%s">%s:</label><input id="%s" name="%s" type="%s" value="%s"/></p>\n' % (v.id, v.label, v.id, v.name, v.type, value);
+
 	}
 
 	return ret;
@@ -82,7 +68,7 @@ def render(form_result, decorator, method, action)
 	bdr = strings.builder();
 	bdr.push_back('<form method="%s" action="%s">\n' % (method, action));
 
-	ret = ..render_item(form_result, decorator);
+	ret = ..render_item(form_result[0], decorator);
 	bdr.push_back(ret);
 
 	bdr.push_back('</form>\n');
@@ -100,7 +86,7 @@ def render_item(form_result, decorator)
 
 	keys = [];
 	for it in ..MEMBERS.begin() {
-		if it.second() < form.input.input_tag.TYPE {
+		if it.second().TYPE < form.input.input_base.TYPE {
 			it.second().id = it.first();
 			it.second().name = it.first();
 			keys.push_back(it.second());
@@ -108,7 +94,12 @@ def render_item(form_result, decorator)
 	}
 
 	for v in sorted(keys, lambda(a, b) { return a.serno < b.serno; }) {
-		ret = decorator(v);
+		value = nil;
+		if form_result.has_key(v.id) {
+			value = form_result[v.id];
+		}
+
+		ret = decorator(v, value);
 		bdr.push_back(ret);
 	}
 
