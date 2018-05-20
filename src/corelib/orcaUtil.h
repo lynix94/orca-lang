@@ -189,6 +189,8 @@ public:
 		set_name("stringutil");
 		insert_static_native_function("html_escape", (object_fp)&orcaStringUtil::ex_html_escape);
 		insert_static_native_function("html_unescape", (object_fp)&orcaStringUtil::ex_html_unescape);
+		insert_static_native_function("url_escape", (object_fp)&orcaStringUtil::ex_url_escape);
+		insert_static_native_function("url_unescape", (object_fp)&orcaStringUtil::ex_url_unescape);
 	}
 
 	orcaData ex_html_escape(orcaVM* vm, int n) 
@@ -253,6 +255,84 @@ public:
 			}
 
 			ss << s[i];
+		}
+
+		return ss.str();
+	}
+
+	orcaData ex_url_escape(orcaVM* vm, int n) 
+	{
+		if (n < 1) vm->need_param();
+		string s = vm->get_param(0).String();
+
+		char buff[16];
+		stringstream ss;
+		for (int i=0; i<s.length(); i++) {
+			unsigned char c = (unsigned char)s[i];
+			if ((c >= 'a' && c <= 'z') ||
+				(c >= 'A' && c <= 'Z') ||
+				(c >= '0' && c <= '9') ||
+				(c == '.' || c == '-'))
+			{
+				ss << c;
+				continue;
+			}
+
+			sprintf(buff, "%%%02X", c);
+			ss << buff;
+		}
+
+		return ss.str();
+	}
+
+	orcaData ex_url_unescape(orcaVM* vm, int n) 
+	{
+		if (n < 1) vm->need_param();
+		string s = vm->get_param(0).String();
+
+		stringstream ss;
+		for (int i=0; i<s.length(); i++) {
+			if (s[i] == '%') {
+				if (i+2 >= s.length()) {
+					throw orcaException(vm, "url decoding failed");
+				}
+
+				unsigned int h = (unsigned int)s[i+1];
+				unsigned int l = (unsigned int)s[i+2];
+				unsigned int val;
+
+				if (h >= '0' && h <= '9') {
+					val = (h - '0') << 4;
+				}
+				else if (h >= 'a' && h <= 'f') {
+					val = (h - 'a' + 10) << 4;
+				}
+				else if (h >= 'A' && h <= 'F') {
+					val = (h - 'A' + 10) << 4;
+				}
+				else {
+					throw orcaException(vm, "url decoding failed");
+				}
+
+				if (l >= '0' && l <= '9') {
+					val += (l - '0');
+				}
+				else if (l >= 'a' && l <= 'f') {
+					val += (l - 'a' + 10);
+				}
+				else if (l >= 'A' && l <= 'F') {
+					val += (l - 'A' + 10);
+				}
+				else {
+					throw orcaException(vm, "url decoding failed");
+				}
+
+				ss << (char)val;
+				i += 2;
+			}
+			else {
+				ss << s[i];
+			}
 		}
 
 		return ss.str();
