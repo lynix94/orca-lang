@@ -6,7 +6,7 @@ def escape := __clib__.stringutil.url_escape;
 def unescape := __clib__.stringutil.url_unescape;
 
 
-def _parse(src)
+def parse_query(src)
 {
 	param = {,};
 
@@ -28,7 +28,7 @@ def _parse(src)
 }
 
 
-def compose(param)
+def compose_query(param)
 {
 	kvs = [];
 	for k, v in param {

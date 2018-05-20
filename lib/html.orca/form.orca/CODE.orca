@@ -97,7 +97,7 @@ def render_item(form_result, decorator)
 		value = nil;
 
 		if form_result != nil && form_result[0].has_key(v.id) {
-			value = form_result[v.id];
+			value = form_result[0][v.id];
 		}
 
 		ret = decorator(v, value);
