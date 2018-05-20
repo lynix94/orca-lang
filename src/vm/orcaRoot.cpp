@@ -84,6 +84,7 @@ orcaRoot::orcaRoot()
 	clib->insert_static("lru", new orcaUtilLru());
 	clib->insert_static("sqlite3", new orcaSqlite3());
 	clib->insert_static("base64", new orcaBase64());
+	clib->insert_static("stringutil", new orcaStringUtil());
 
 #if defined(LINUX)
 #if defined(USE_GTK)

@@ -2,6 +2,7 @@ using html;
 using html.form;
 using sorted;
 using strings;
+using __clib__;
 
 #print: argv;
 name = argv[0];
@@ -68,6 +69,8 @@ def process_context(body)
 }
 
 
+def escape := __clib__.stringutil.html_escape;
+def unescape := __clib__.stringutil.html_unescape;
 
 
 

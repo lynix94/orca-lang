@@ -178,5 +178,87 @@ public:
 	orca_lru<orcaData, orcaData> m_lru;
 };
 
+
+class orcaStringUtil : public orcaObject 
+{
+public:
+	DEFAULT_NATIVE_DEFINE(orcaStringUtil);
+
+	orcaStringUtil()
+	{
+		set_name("stringutil");
+		insert_static_native_function("html_escape", (object_fp)&orcaStringUtil::ex_html_escape);
+		insert_static_native_function("html_unescape", (object_fp)&orcaStringUtil::ex_html_unescape);
+	}
+
+	orcaData ex_html_escape(orcaVM* vm, int n) 
+	{
+		if (n < 1) vm->need_param();
+		string s = vm->get_param(0).String();
+
+		stringstream ss;
+		for (int i=0; i<s.length(); i++) {
+			switch (s[i])
+			{
+			case '\"':	ss << "&quot;"; break;
+			case '<':	ss << "&lt;"; break;
+			case '>':	ss << "&gt;"; break;
+			case '&':	ss << "&amp;";	break;
+			default:	ss << s[i];
+			}
+		}
+
+		return ss.str();
+	}
+
+	orcaData ex_html_unescape(orcaVM* vm, int n) 
+	{
+		if (n < 1) vm->need_param();
+		string s = vm->get_param(0).String();
+
+		stringstream ss;
+		for (int i=0; i<s.length(); i++) {
+			if (s[i] == '&') {
+				if (i+5 < s.length() &&
+					strncmp(s.c_str() + i + 1, "quot;", 5) == 0)
+				{
+					ss << '\"';
+					i += 5;
+					continue;
+				}
+
+				if (i+4 < s.length() &&
+					strncmp(s.c_str() + i + 1, "amp;", 4) == 0)
+				{
+					ss << '&';
+					i += 4;
+					continue;
+				}
+
+				if (i+3 < s.length() &&
+					strncmp(s.c_str() + i + 1, "lt;", 3) == 0)
+				{
+					ss << '<';
+					i += 3;
+					continue;
+				}
+
+				if (i+3 < s.length() &&
+					strncmp(s.c_str() + i + 1, "gt;", 3) == 0)
+				{
+					ss << '>';
+					i += 3;
+					continue;
+				}
+			}
+
+			ss << s[i];
+		}
+
+		return ss.str();
+	}
+};
+
+
 #endif
 

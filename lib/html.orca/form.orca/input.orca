@@ -127,10 +127,16 @@ def email(label) : input.input_base
 	return ret;
 }
 
-def file(label) : input.input_base
+def file(label) : input.input_base # file object
 {
 	ret =..__clone(my, label);
 	ret.type = 'file';
+	return ret;
+}
+
+def filepath(label) : input.input_base # file path
+{
+	ret =..__clone(my, label);
 	return ret;
 }
 
@@ -238,8 +244,6 @@ def week(label) : input.input_base
 	return ret;
 }
 
-
-
 # extended input type
 def integer(label) : input.input_base
 {
@@ -253,110 +257,7 @@ def float(label) : input.input_base
 	return ret;
 }
 
-def filepath(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
 def ip(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-
-def boolean(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-def null_boolean(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-def choice(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-def typed_choice(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-def multiple_choice(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-def typed_multiple_choice(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-def decimal(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-def duration(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-def regex(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-def slug(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-def uuid(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-def combo(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-def multivalue(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-def split_datetime(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-def model_choice(label) : input.input_base
-{
-	ret =..__clone(my, label);
-	return ret;
-}
-
-def model_multiple_choice(label) : input.input_base
 {
 	ret =..__clone(my, label);
 	return ret;
