@@ -143,6 +143,8 @@ public:
 	void regist_code(const string& name, char* code, int size);
 	void remove_code(const string& name);
 	void remove_define(const string& name);
+	void remove_code_tree(const string& name);
+	void remove_define_tree(const string& name);
 	const char* get_base(const char* code, int* size = NULL);
 	string get_name(const char* code);
 	const char* get_addr(const string& name, int* size = NULL);

@@ -53,12 +53,14 @@ public:
 		string mod = vm->get_param(0).String();
 		orcaData out;
 		if (op->has_member(mod.c_str(), out) == false) {
-			throw orcaException(vm, "orca.lang", "unload failsed");
+			throw orcaException(vm, "orca.lang", "unload failed");
 		}
 
+		op->remove_member(mod.c_str());
+
 		if (is<TYPE_OBJ>(out)) {
-			g_codes->remove_code(mod);
-			g_codes->remove_define(mod);
+			g_codes->remove_code_tree(mod);
+			g_codes->remove_define_tree(mod);
 		}
 
 		return NIL;

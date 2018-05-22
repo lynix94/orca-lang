@@ -20,6 +20,8 @@
 #include "orcaException.h"
 #include "orcaTime.h"
 
+#include "kyString.h"
+
 using namespace std;
 
 pthread_mutex_t g_rc_mutex;
@@ -337,7 +339,7 @@ void orcaCodeContainer::remove_code(const string& name)
 {
 	map<string, const char*>::iterator mi = m_codes.find(name);
 	if (mi == m_codes.end()) {
-		throw orcaException(NULL, "orca.lang", "remove code failed");
+		return;
 	}
 
 	const char* code = mi->second;
@@ -348,20 +350,41 @@ void orcaCodeContainer::remove_code(const string& name)
 	m_codes.erase(mi);
 	m_code_name.erase(mi1);
 	m_code_name.erase(mi2);
-	return;
 }
+
+void orcaCodeContainer::remove_code_tree(const string& name)
+{
+	map<string, const char*>::iterator mi = m_codes.lower_bound(name);
+	for (; mi != m_codes.end(); ++mi) {
+		if (!kyString::starts_with(mi->first, name)) {
+			break;
+		}
+		remove_code(mi->first);
+	}
+}
+
 
 void orcaCodeContainer::remove_define(const string& name)
 {
 	map<string, const char*>::iterator mi = m_defines.find(name);
 	if (mi == m_defines.end()) {
-		throw orcaException(NULL, "orca.lang", "remove define failed");
+		return; 
 	}
 
 	const char* define = mi->second;
 	delete[] define;
 	m_defines.erase(mi);
-	return;
+}
+
+void orcaCodeContainer::remove_define_tree(const string& name)
+{
+	map<string, const char*>::iterator mi = m_defines.lower_bound(name);
+	for (; mi != m_defines.end(); ++mi) {
+		if (!kyString::starts_with(mi->first, name)) {
+			break;
+		}
+		remove_define(mi->first);
+	}
 }
 
 const char* orcaCodeContainer::get_base(const char* code, int* size)
