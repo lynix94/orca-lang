@@ -191,18 +191,25 @@ def do_what(msg)
 		}
 	}
 	
+	#print: handler;
 	if handler == nil {
 		..send_error('404 Not Found');
 		return;
 	}
 
-	ret = handler(req);
-	switch ret.TYPE
-	{
-	case type.tuple, type.list:
-		..send_response(ret[0], ret[1]);
-	default:
-		..send_response('', ret);
+	try {
+		ret = handler(req);
+
+		switch ret.TYPE
+		{
+		case type.tuple, type.list:
+			..send_response(ret[0], ret[1]);
+		default:
+			..send_response('', ret);
+		}
+	}
+	catch dummy -> msg {
+		..send_response('', 'exception...%s' % string(msg));
 	}
 }
 

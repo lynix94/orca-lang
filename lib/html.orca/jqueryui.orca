@@ -44,7 +44,7 @@ def radio(id, button_list, action)
 		buttons.push_back("<input type='radio' id='%s' name='radio'><label for='%s'>%s</label>\n" % (button, button, button));
 	}
 
-	return my.__template % {'id':id, 'action':action(), 'button_list':buttons };
+	return my.__template % {'id':id, 'action':action(), 'button_list':buttons.string() };
 }
 
 def button(id, action)

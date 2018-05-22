@@ -1,12 +1,14 @@
 using socket;
 using thread;
 using sonar;
+using time;
 
 print: '## httpd start: ', argv;
 
 argv[0].split(':') -> ip, port;
 
 def sock;
+def quit := false;
 
 .sock = socket.create();
 .sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1);
@@ -17,8 +19,11 @@ do {
 	sock = .sock.accept();
 	cl = sonar.core.client.clone(sock);
 	thread.run(cl.run);
-} while(true);
+} while(.quit == false);
 
+print: '## httpd shutdown';
+
+time.sleep(2);
 .sock.close();
 return;
 

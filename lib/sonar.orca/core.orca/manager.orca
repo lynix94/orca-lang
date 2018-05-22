@@ -1,6 +1,9 @@
 using sonar;
 using os;
 using io.open;
+using time;
+using socket;
+using thread;
 
 
 def create_app(basepath, appname)
@@ -27,16 +30,31 @@ def execute(...argv)
 	switch argv[0]
 	{
 	case 'runserver':
-		print: '# run server';
+		print: '# runserver';
+		if argv.size() < 2 {
+			print: 'insufficient parameter: address is needed';
+			return;
+		}
+
+		while true {
+			os.system('orca manage run %s &' % argv[1]);
+			while true {
+				time.sleep(10);
+			}
+		}
+
+	case 'run':
+		print: '# run';
 		if argv.size() < 2 {
 			print: 'insufficient parameter: address is needed';
 			return;
 		}
 
 		..server(argv[1]);
+		print: 'server shutdowned';
 
 	case 'newapp':
-		print: '# new app';
+		print: '# newapp';
 		if argv.size() < 2 {
 			print: 'insufficient parameter: app name is required';
 			return;
@@ -44,8 +62,8 @@ def execute(...argv)
 
 		..create_app('.', argv[1]);
 
-	case 'syncdb':
-		print: '# sync db';
+	case 'migrate':
+		print: '# migrate';
 	
 	default:
 		print: '# nothing todo';
@@ -61,7 +79,23 @@ def server(addr)
 	print: addr;
 	my.addr = addr;
 
+	print: 'server start...';
 	sonar.core.httpd(addr);
+	print: 'server shutdown...';
+	time.sleep(2);
+	return;
+
+	def quit()
+	{
+		sonar.core.httpd.quit = true;
+		
+		sock = socket.create();
+		..addr.split(':') -> ip, port;
+		sock.connect(ip, port);
+		sock.send('GET / HTTP/1.1\n\n'); # dummy request
+		time.sleep(2);
+		sock.close();
+	}
 }
 
 

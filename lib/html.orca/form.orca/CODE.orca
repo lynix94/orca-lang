@@ -72,7 +72,7 @@ def render(form_result, decorator, method, action)
 	bdr.push_back(ret);
 
 	bdr.push_back('</form>\n');
-	return bdr;
+	return bdr.string();
 }
 
 
@@ -104,6 +104,6 @@ def render_item(form_result, decorator)
 		bdr.push_back(ret);
 	}
 
-	return bdr;
+	return bdr.string();
 }
 

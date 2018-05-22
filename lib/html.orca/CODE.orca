@@ -61,7 +61,7 @@ def process_context(body)
 			}
 		}
 
-		return bdr;
+		return bdr.string();
 	}
 
 	ret = my.html_object.clone(body);

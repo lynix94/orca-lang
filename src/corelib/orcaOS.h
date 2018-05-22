@@ -11,6 +11,7 @@
 #ifndef _DEF_ORCA_OS
 #define _DEF_ORCA_OS
 
+#include <sstream>
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
@@ -145,6 +146,7 @@ public:
 		set_name("os");
 
 		insert_static_native_function("run", (object_fp)&orcaOS::ex_run);
+		insert_static_native_function("system", (object_fp)&orcaOS::ex_system);
 		insert_static_native_function("getenv", (object_fp)&orcaOS::ex_getenv);
 
 		// file work
@@ -170,36 +172,44 @@ public:
 		insert_static_native_function("last_write_time", (object_fp)&orcaOS::ex_last_write_time);
 	}
 
-	orcaData ex_run(orcaVM* vm, int n) 
+	orcaData ex_run(orcaVM* vm, int n)  // TODO channel output to argv[1]
 	{
+		if (n < 1) vm->need_param();
 		string& cmd = vm->get_param(0).String();
+
 		FILE* fp = popen(cmd.c_str(), "r");
 		if (fp == NULL) {
 			return NIL;
 		}
 
 		// check __cout__
-		bool update = false;
+		bool cout_update = false;
 		orcaData ret;
 		if (vm->get_caller().o()->has_member("__cout__", ret)) {
 			if (is<TYPE_NIL>(ret) || is<TYPE_STR>(ret)) {
-				update = true;
+				cout_update = true;
 			}
 		}
 
 		// read and print
-		string str;
+		stringstream ss;
 		char buff[1024];
 		while(fgets(buff, 1024, fp)) {
-			if (update)  str += buff;
+			if (cout_update)  ss << buff;
 			printf("%s", buff);
 		}
 
-		if (update) {
-			vm->get_caller().o()->update_member("__cout__", str);
+		if (cout_update) {
+			vm->get_caller().o()->update_member("__cout__", ss.str());
 		}
 
 		return NIL;
+	}
+
+	orcaData ex_system(orcaVM* vm, int n) 
+	{
+		if (n < 1) vm->need_param();
+		return ::system(vm->get_param(0).String().c_str());
 	}
 
 	orcaData ex_getenv(orcaVM* vm, int n) 
