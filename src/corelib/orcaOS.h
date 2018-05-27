@@ -58,6 +58,10 @@ class orcaOS : public orcaObject
 public:
 	orcaOS();
 
+	orcaData ex_getpid(orcaVM* vm, int n);
+	orcaData ex_getppid(orcaVM* vm, int n);
+	orcaData ex_fork(orcaVM* vm, int n);
+
 	orcaData ex_run_cout(orcaVM* vm, int n);
 	orcaData ex_run(orcaVM* vm, int n);
 	orcaData ex_system(orcaVM* vm, int n); 

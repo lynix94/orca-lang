@@ -14,6 +14,8 @@
 #include <time.h>
 #include <utime.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "porting.h"
 #include "orcaOS.h"
@@ -113,6 +115,10 @@ orcaOS::orcaOS()
 {
 	set_name("os");
 
+	insert_static_native_function("getpid", (object_fp)&orcaOS::ex_getpid);
+	insert_static_native_function("getppid", (object_fp)&orcaOS::ex_getppid);
+	insert_static_native_function("fork", (object_fp)&orcaOS::ex_fork);
+
 	insert_static_native_function("run_cout", (object_fp)&orcaOS::ex_run_cout);
 	insert_static_native_function("run", (object_fp)&orcaOS::ex_run);
 	insert_static_native_function("system", (object_fp)&orcaOS::ex_system);
@@ -139,6 +145,22 @@ orcaOS::orcaOS()
 	insert_static_native_function("write", (object_fp)&orcaOS::ex_write);
 	insert_static_native_function("file_size", (object_fp)&orcaOS::ex_file_size);
 	insert_static_native_function("last_write_time", (object_fp)&orcaOS::ex_last_write_time);
+}
+
+
+orcaData orcaOS::ex_getpid(orcaVM* vm, int n) 
+{
+	return getpid();
+}
+
+orcaData orcaOS::ex_getppid(orcaVM* vm, int n) 
+{
+	return getppid();
+}
+
+orcaData orcaOS::ex_fork(orcaVM* vm, int n) 
+{
+	return fork();
 }
 
 orcaData orcaOS::ex_run_cout(orcaVM* vm, int n)
