@@ -838,6 +838,7 @@ void parserControl::channel_in_end(int num)/*{{{*/
 {
 	// call if check ok
 	g_op->call(num);
+	g_op->fast_pop_stack(); // remove unused stack
 	code_top->push_char(OP_SELECT_SIGNAL);
 
 	// 2pass set

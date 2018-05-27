@@ -105,6 +105,7 @@ orcaData orcaQueue::ex_channel_out(orcaVM* vm, int n)
 		(*it).rc_dec();
 		m_value.pop_front();
 	}
+	putable_cond.signal();
 	mutex.unlock();
 
 	return tup;
@@ -121,6 +122,7 @@ orcaData orcaQueue::ex_channel_in(orcaVM* vm, int n)
 		orcaData val = vm->get_param(i);
 		m_value.push_back(val);
 		val.rc_inc();
+		getable_cond.signal();
 		mutex.unlock();
 	}
 
@@ -156,6 +158,7 @@ orcaData orcaQueue::ex_pop(orcaVM* vm, int n)
 	orcaData d = *m_value.begin();
 	d.rc_dec();
 	m_value.pop_front();
+	putable_cond.signal();
 	mutex.unlock();
 
 	return d;
@@ -190,6 +193,7 @@ orcaData orcaQueue::ex_push(orcaVM* vm, int n)
 
 	m_value.push_back(d);
 	d.rc_inc();
+	getable_cond.signal();
 	mutex.unlock();
 
 	return true;

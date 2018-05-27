@@ -535,7 +535,7 @@ shell_stmt:/*{{{*/
 		{
 			g_op->push_reserved(OP_PUSH_ROOT);
 			g_op->find_member("os");
-			g_op->find_member("run");
+			g_op->find_member("run_cout");
 		}
 	shell_string 
 		{	

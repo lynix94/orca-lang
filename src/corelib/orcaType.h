@@ -14,7 +14,10 @@
 #include "porting.h"
 #include "orcaStack.h"
 #include "orcaObject.h"
+#include "orcaList.h"
+#include "orcaTuple.h"
 #include "orcaMap.h"
+
 
 class orcaTypes : public orcaObject 
 {
