@@ -30,6 +30,8 @@ public:
 	orcaObject* v_clone();
 
 	orcaDirIter(string& path);
+
+	orcaData operator()(orcaVM* vm, int n);
 	orcaData ex_next(orcaVM* vm, int n);
 
 private:
@@ -46,10 +48,11 @@ public:
 	orcaObject* v_clone();
 	orcaDirTraverse(string& path);
 
+	orcaData operator()(orcaVM* vm, int n);
 	orcaData ex_next(orcaVM* vm, int n);
 
 private:
-	vector<fs::directory_iterator*> m_iter;
+	deque<fs::directory_iterator*> m_iter;
 	fs::directory_iterator m_end;
 };
 

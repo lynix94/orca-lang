@@ -47,17 +47,29 @@ orcaDirIter::orcaDirIter(string& path)
 	insert_native_function("next", (object_fp)&orcaDirIter::ex_next);
 }
 
+orcaData orcaDirIter::operator()(orcaVM* vm, int n)
+{
+	if (*m_iter == m_end) {
+		throw orcaException(vm, "orca.iter", "out of range");
+	}
+
+	return (*m_iter)->path().string();
+}
+
+
 
 orcaData orcaDirIter::ex_next(orcaVM* vm, int n)
 {
-	if (*m_iter == m_end) {
-		throw orcaException(vm, "done", "done");
+	if (n > 0) {
+		throw orcaException(vm, "orca.iter", "read only iterator");
 	}
 
-	string str = (*m_iter)->path().string();
 	++(*m_iter);
+	if (*m_iter == m_end) {
+		throw orcaException(vm, "orca.iter", "out of range");
+	}
 
-	return str;
+	return this;
 }
 
 
@@ -85,29 +97,49 @@ orcaDirTraverse::orcaDirTraverse(string& path)
 	insert_native_function("next", (object_fp)&orcaDirTraverse::ex_next);
 }
 
+orcaData orcaDirTraverse::operator()(orcaVM* vm, int n)
+{
+	if (m_iter.empty()) {
+		throw orcaException(vm, "orca.iter", "out of range");
+	}
+
+	fs::directory_iterator* iter = m_iter[0];
+	if (*iter == m_end) {
+		throw orcaException(vm, "orca.iter", "out of range");
+	}
+
+	return (*iter)->path().string();
+}
+
 orcaData orcaDirTraverse::ex_next(orcaVM* vm, int n)
 {
 retry:
 	if (m_iter.empty()) {
-		throw orcaException(vm, "done", "done");
+		throw orcaException(vm, "orca.iter", "out of range");
 	}
 
-	fs::directory_iterator* iter = m_iter[m_iter.size()-1];
-	
+	fs::directory_iterator* iter = m_iter[0];
+
+	++(*iter);
 	if (*iter == m_end) {
-		m_iter.pop_back();
+		m_iter.pop_front();
 		delete iter;
 		goto retry;
 	}
 
 	string str = (*iter)->path().string();
-	++(*iter);
 
 	if (fs::is_directory(str)) {
-		m_iter.push_back(new fs::directory_iterator(str));
+		fs::directory_iterator* it = new fs::directory_iterator(str);
+		if (*it == m_end) { // in case of empty dir, don't add
+			delete it;
+		}
+		else {
+			m_iter.push_back(new fs::directory_iterator(str));
+		}
 	}
 
-	return str;
+	return this;
 }
 
 
