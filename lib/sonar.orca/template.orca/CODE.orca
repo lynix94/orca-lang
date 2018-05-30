@@ -2,16 +2,9 @@
 def template_manage :=
 '''
 using sonar;
-using settings;
-using urls;
-
 if argv == nil {
-	return;
+	argv = type.tuple();
 }
-
-settings();
-urls();
-
 sonar.core.manager.execute(argv...);
 ''';
 

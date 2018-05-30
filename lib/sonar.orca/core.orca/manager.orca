@@ -1,5 +1,6 @@
 using sonar;
 using os;
+using ipc;
 using io.open;
 using time;
 using socket;
@@ -37,21 +38,17 @@ def execute(...argv)
 		}
 
 		while true {
-			os.system('orca manage run %s &' % argv[1]);
-			while true {
-				time.sleep(10);
+			pid = os.fork();
+			if pid == 0 {
+				..server(argv[1]);
+				return;
+			}
+		
+			if sonar.core.reloader(os.cwd()) == true {
+				ipc.kill(pid, ipc.SIGINT);
+				time.sleep(1);
 			}
 		}
-
-	case 'run':
-		print: '# run';
-		if argv.size() < 2 {
-			print: 'insufficient parameter: address is needed';
-			return;
-		}
-
-		..server(argv[1]);
-		print: 'server shutdowned';
 
 	case 'newapp':
 		print: '# newapp';
@@ -80,22 +77,14 @@ def server(addr)
 	my.addr = addr;
 
 	print: 'server start...';
-	sonar.core.httpd(addr);
-	print: 'server shutdown...';
-	time.sleep(2);
-	return;
+	
+	orca.load('settings');
+	root.settings();
 
-	def quit()
-	{
-		sonar.core.httpd.quit = true;
-		
-		sock = socket.create();
-		..addr.split(':') -> ip, port;
-		sock.connect(ip, port);
-		sock.send('GET / HTTP/1.1\n\n'); # dummy request
-		time.sleep(2);
-		sock.close();
-	}
+	orca.load('urls');
+	root.urls();
+
+	sonar.core.httpd(addr);
 }
 
 
