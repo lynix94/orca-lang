@@ -451,7 +451,7 @@ void parserOP::push_string(const char* s)
 	}
 	else {
 		code_top->push_char(OP_PUSH_LONG_STR);
-		code_top->push_string(s);
+		code_top->push_long_string(s);
 	}
 }
 

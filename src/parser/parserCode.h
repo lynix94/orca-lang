@@ -57,7 +57,9 @@ public:
 	void push_double(double val);
 	void push_raw_string(const char* val);
 	void push_string(const char* val);
+	void push_long_string(const char* val);
 	void push_string(string& val);
+	void push_long_string(string& val);
 	void push_code(vector<char>& code);
 	void set_int(int val, int offset);
 	void set_char(char val, int offset);

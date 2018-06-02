@@ -488,26 +488,36 @@ void parserCode::push_raw_string(const char* val)/*{{{*/
 
 void parserCode::push_string(const char* val)/*{{{*/
 {
-	if (strlen(val) < CHAR_MAX) {
-		push_char(strlen(val)+1);
-	}
-	else {
-		push_int(strlen(val)+1);
+	if (strlen(val) >= CHAR_MAX) {
+		throw "too long name";
 	}
 
+	push_char(strlen(val)+1);
 	copy(val, val+strlen(val)+1, back_inserter(m_code));
 }
 /*}}}*/
 
 void parserCode::push_string(string& val)/*{{{*/
 {
-	if (val.length() < CHAR_MAX) {
-		push_char(val.length()+1);
-	}
-	else {
-		push_int(val.length()+1);
+	if (val.length() >= CHAR_MAX) {
+		throw "too long name";
 	}
 
+	push_char(val.length()+1);
+	copy(val.begin(), val.end()+1, back_inserter(m_code));
+}
+/*}}}*/
+
+void parserCode::push_long_string(const char* val)/*{{{*/
+{
+	push_int(strlen(val)+1);
+	copy(val, val+strlen(val)+1, back_inserter(m_code));
+}
+/*}}}*/
+
+void parserCode::push_long_string(string& val)/*{{{*/
+{
+	push_int(val.length()+1);
 	copy(val.begin(), val.end()+1, back_inserter(m_code));
 }
 /*}}}*/
