@@ -26,8 +26,17 @@ class orcaDirIter : public orcaObject
 {
 public:
 	orcaDirIter(void* vp) { } 
-	virtual ~orcaDirIter();
-	orcaObject* v_clone();
+	virtual ~orcaDirIter()
+	{
+		delete m_iter;
+	}
+
+	orcaObject* v_clone()
+	{
+		orcaDirIter* ip = new orcaDirIter(NULL);
+		ip->m_iter = m_iter;
+		return ip;
+	}
 
 	orcaDirIter(string& path);
 
@@ -44,8 +53,21 @@ class orcaDirTraverse : public orcaObject
 {
 public:
 	orcaDirTraverse(void* vp) { } 
-	virtual ~orcaDirTraverse();
-	orcaObject* v_clone();
+	virtual ~orcaDirTraverse()
+	{
+		while (!m_iter.empty()) {
+			delete m_iter[m_iter.size()-1];
+			m_iter.pop_back();
+		}
+	}
+
+	orcaObject* v_clone()
+	{
+		orcaDirTraverse* ip = new orcaDirTraverse(NULL);
+		ip->m_iter = m_iter;
+		return ip;
+	}
+
 	orcaDirTraverse(string& path);
 
 	orcaData operator()(orcaVM* vm, int n);

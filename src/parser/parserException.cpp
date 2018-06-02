@@ -83,37 +83,47 @@ void parserException::do_finally()
 	ex.finally_addr.clear();
 }
 
-void parserException::catch_start(const char* s, vector<const char*>* vp) 
+void push_short(vector<char>& dst, short val)
+{
+	char* b = s2l(val);
+	copy(b, b+sizeof(short), back_inserter(dst));
+}
+
+void parserException::catch_start(const char* s, const char* lvar, vector<const char*>* vp)
 {
 	st_exc& ex = m_ex[m_ex.size() - 1];
 
-	if (s != NULL) {
-		ex.init_code.push_back(strlen(s)+1); // name len
-		copy(s, s+strlen(s)+1, back_inserter(ex.init_code)); // name
+	if (strlen(s) > 250) {
+		throw "too long catch label";
+	}
 
-		if (vp) {
-			ex.init_code.push_back(vp->size()); // var num
-			for(int i=0; i<vp->size(); i++) { // vars
-				int idx = code_top->find_lvar((*vp)[i]);
-				ex.init_code.push_back(idx);
-			}
+	ex.init_code.push_back(strlen(s)+1); // filter len
+	copy(s, s+strlen(s)+1, back_inserter(ex.init_code)); // filter
+
+
+	if (vp) {
+		push_short(ex.init_code, vp->size() + 1); 
+		if (lvar != NULL) {
+			int idx = code_top->find_lvar(lvar);
+			push_short(ex.init_code, idx);
 		}
 		else {
-			ex.init_code.push_back(0); // var num: 0
+			ex.init_code.push_back(-1);
+		}
+
+		for (int i=0; i<vp->size(); i++) { // vars
+			int idx = code_top->find_lvar((*vp)[i]);
+			push_short(ex.init_code, idx);
 		}
 	}
-	else { 
-		ex.init_code.push_back(0); // name len: 0)
-
-		if (vp) {
-			ex.init_code.push_back(vp->size());  // var num
-			for(int i=0; i<vp->size(); i++) { // vars
-				int idx = code_top->find_lvar((*vp)[i]);
-				ex.init_code.push_back(idx);
-			}
+	else {
+		push_short(ex.init_code, 1);
+		if (lvar != NULL) {
+			int idx = code_top->find_lvar(lvar);
+			push_short(ex.init_code, idx);
 		}
 		else {
-			ex.init_code.push_back(0); // var num: 0
+			push_short(ex.init_code, -1);
 		}
 	}
 

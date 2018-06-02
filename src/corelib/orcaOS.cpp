@@ -27,17 +27,6 @@
 #endif
 
 
-orcaDirIter::~orcaDirIter()
-{
-	delete m_iter;
-}
-
-orcaObject* orcaDirIter::v_clone() 
-{
-	orcaDirIter* ip = new orcaDirIter(NULL);
-	ip->m_iter = m_iter;
-	return ip;
-}
 
 orcaDirIter::orcaDirIter(string& path)
 {
@@ -70,22 +59,6 @@ orcaData orcaDirIter::ex_next(orcaVM* vm, int n)
 	}
 
 	return this;
-}
-
-
-orcaDirTraverse::~orcaDirTraverse()
-{
-	while (!m_iter.empty()) {
-		delete m_iter[m_iter.size()-1];
-		m_iter.pop_back();
-	}
-}
-
-orcaObject* orcaDirTraverse::v_clone() 
-{
-	orcaDirTraverse* ip = new orcaDirTraverse(NULL);
-	ip->m_iter = m_iter;
-	return ip;
 }
 
 

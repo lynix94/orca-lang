@@ -51,8 +51,8 @@ try {
 		throw test.scope <- 'abnormal scope termination';
 	}
 }
-catch scope -> msg {
-	print: 'caught: ', msg;
+catch scope as e {
+	print: 'caught: ', e.what();
 }
 
 

@@ -16,14 +16,20 @@
 class LIBORCA_API orcaQueue : public orcaObject
 {
 public:
-	orcaQueue();
-	orcaQueue(void* vp) {}
-	orcaObject* v_clone()
+	orcaQueue(void*) {}
+	virtual ~orcaQueue()
 	{
-		return new orcaQueue();
+		list<orcaData>::iterator it;
+		for (it=m_value.begin(); it!=m_value.end(); ++it) {
+			(*it).rc_dec();
+		}
+	}
+	orcaQueue* v_clone()
+	{
+		return new orcaQueue(NULL);
 	}
 
-	virtual ~orcaQueue();
+	orcaQueue();
 
 	// member function
 	orcaData ex_init(orcaVM* vm, int n);

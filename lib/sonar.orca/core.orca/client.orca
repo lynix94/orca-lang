@@ -208,8 +208,8 @@ def do_what(msg)
 			..send_response('', ret);
 		}
 	}
-	catch dummy -> msg {
-		..send_response('', 'exception...%s' % string(msg));
+	catch dummy as e {
+		..send_response('', 'exception...%s' % e.what());
 	}
 }
 

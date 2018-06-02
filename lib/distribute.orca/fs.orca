@@ -100,7 +100,7 @@ def unmount(path, flag)
 
 		mi.erase();
 	}
-	catch {
+	catch any {
 		// nil..
 	}
 }
@@ -151,7 +151,7 @@ def check_in_table(path)
 			}
 		}
 	}
-	catch {
+	catch any {
 		// nil..
 	}
 	

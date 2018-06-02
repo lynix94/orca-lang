@@ -97,6 +97,12 @@ orcaIPC::~orcaIPC()
 	}
 }
 
+orcaObject* orcaIPC::v_clone()
+{
+	return new orcaIPC(NULL);
+}
+
+
 orcaData orcaIPC::ex_signal(orcaVM* vm, int n) 
 {
 	if (n < 2) vm->need_param();
@@ -121,18 +127,6 @@ orcaData orcaIPC::ex_kill(orcaVM* vm, int n)
 	return kill(vm->get_param(0).Integer(), vm->get_param(1).Integer());
 }
 
-orcaObject* orcaIPC::v_clone()
-{
-	orcaIPC* ip = new orcaIPC(NULL);
-	return ip;
-}
-
-
-orcaObject* orcaMutex::v_clone() 
-{
-	orcaMutex* mp = new orcaMutex(NULL);
-	return mp;
-}
 
 orcaMutex::orcaMutex() 
 {
@@ -168,11 +162,6 @@ orcaCond::orcaCond()
 	insert_native_function("signal", (object_fp)&orcaCond::ex_signal);
 }
 
-orcaObject* orcaCond::v_clone() 
-{
-	orcaCond* cp = new orcaCond(NULL);
-	return cp;
-}
 
 // true : signaled, false : timeout
 orcaData orcaCond::ex_wait(orcaVM* vm, int n) 
@@ -229,12 +218,6 @@ orcaSemaphore::orcaSemaphore() : m_inited(false)
 	insert_native_function("del", (object_fp)&orcaSemaphore::ex_del);
 }
 
-
-orcaObject* orcaSemaphore::v_clone() 
-{
-	orcaSemaphore* sp = new orcaSemaphore(NULL);
-	return sp;
-}
 
 orcaData orcaSemaphore::ex_set(orcaVM* vm, int n) 
 {

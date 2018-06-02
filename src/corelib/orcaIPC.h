@@ -31,9 +31,7 @@ public:
 class orcaMutex : public orcaObject 
 {
 public:
-	orcaMutex(void* vp) {}
-	virtual ~orcaMutex() { }
-	orcaObject* v_clone();
+	DEFAULT_NATIVE_DEFINE(orcaMutex);
 	orcaMutex();
 
 	orcaData ex_lock(orcaVM* vm, int n);
@@ -47,11 +45,8 @@ private:
 class orcaCond : public orcaObject 
 {
 public:
-	orcaCond(void* vp) {}
-	virtual ~orcaCond() {}
-
+	DEFAULT_NATIVE_DEFINE(orcaCond);
 	orcaCond();
-	orcaObject* v_clone();
 
 	// true : signaled, false : timeout
 	orcaData ex_wait(orcaVM* vm, int n);
@@ -66,9 +61,12 @@ class orcaSemaphore : public orcaObject
 public:
 	orcaSemaphore(void* vp) : m_inited(false) {}
 	virtual ~orcaSemaphore() {}
+	orcaObject* v_clone() 
+	{
+		return new orcaSemaphore(NULL);
+	}
 
 	orcaSemaphore();
-	orcaObject* v_clone();
 
 	orcaData ex_set(orcaVM* vm, int n);
 	orcaData ex_inc(orcaVM* vm, int n);

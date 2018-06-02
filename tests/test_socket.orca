@@ -20,7 +20,7 @@ def server {
 	try {
 		client.recv();
 	}
-	catch {
+	catch any {
 		sock.close();
 		return;
 	}

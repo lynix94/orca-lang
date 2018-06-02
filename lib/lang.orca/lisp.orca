@@ -64,7 +64,7 @@ def init_once
 		orca_home = os.getenv('ORCA_HOME');
 		..path = orca_home + '/tmp/';
 	}
-	catch { }
+	catch any { }
 
 	if os.isdir(..path) {
 		return;
@@ -305,7 +305,7 @@ def.parse parse_code(src)
 					
 						..owner.umap[argv[2][-1]] = mod;
 					}
-					catch {
+					catch any {
 	
 					}
 				}

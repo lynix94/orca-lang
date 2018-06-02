@@ -48,6 +48,13 @@ public:
 	public:
 		orcaStringBuilder(void* vp) {}
 
+		virtual ~orcaStringBuilder()
+		{
+			for (int i=0; i<items.size(); i++) {
+				items[i].rc_dec();
+			}
+		}
+
 		orcaObject* v_clone() {
 			return new orcaStringBuilder((void*)NULL);
 		}
@@ -58,13 +65,6 @@ public:
 			insert_native_function("push_back", (object_fp)&orcaStringBuilder::ex_push_back);
 			insert_native_function("string", (object_fp)&orcaStringBuilder::ex_string);
 			insert_native_function("clear", (object_fp)&orcaStringBuilder::ex_clear);
-		}
-
-		virtual ~orcaStringBuilder()
-		{
-			for (int i=0; i<items.size(); i++) {
-				items[i].rc_dec();
-			}
 		}
 
 		virtual orcaData operator()(orcaVM* vm, int n)

@@ -286,7 +286,7 @@ ${header}
 			try {
 				body = fs.read(uri);
 			}
-			catch {
+			catch any {
 				..send_error('404 Not Found');
 				return;
 			}

@@ -30,8 +30,8 @@ try {
 		i += 1;
 	}
 }
-catch db -> msg {
-	print: msg;
+catch db as e {
+	print: e.what();
 }
 
 os.remove('tmp.db');

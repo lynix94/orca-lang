@@ -94,9 +94,7 @@ bool orcaForStack::push(const char* code, int lv, orcaObject* obj,
 				throw e;
 			}
 
-			for (int i=0; i<e.argc(); i++) {
-				vm->m_stack->pop();
-			}
+			e.rc_dec();
 
 			get_current_vm()->m_curr = curr;
 			return false;
@@ -197,9 +195,7 @@ bool orcaForStack::push_2(const char* code, int lv1, int lv2,
 				throw e;
 			}
 
-			for (int i=0; i<e.argc(); i++) {
-				vm->m_stack->pop();
-			}
+			e.rc_dec();
 
 			get_current_vm()->m_curr = curr;
 			return false;
@@ -247,9 +243,7 @@ bool orcaForStack::push_sub(const char* code, int lv, orcaObject* obj,
 			throw e;
 		}
 
-		for (int i=0; i<e.argc(); i++) {
-			vm->m_stack->pop();
-		}
+		e.rc_dec();
 
 		get_current_vm()->m_curr = curr;
 		return false;
@@ -398,9 +392,7 @@ const char* orcaForStack::cont(int* lv1, orcaData* d1, int *lv2, orcaData* d2)
 				throw e;
 			}
 
-			for (int i=0; i<e.argc(); i++) {
-				vm->m_stack->pop();
-			}
+			e.rc_dec();
 
 			get_current_vm()->m_curr = f->m_curr_back;
 			return 0;

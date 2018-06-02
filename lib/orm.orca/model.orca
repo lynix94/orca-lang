@@ -145,8 +145,8 @@ def create_table()
 	try {
 		res = orm.conn.execute(query);
 	}
-	catch db.execute -> msg {
-		print: msg;
+	catch db.execute as e {
+		print: e.what();
 	}
 
 	for k, v in .._meta {
@@ -165,8 +165,8 @@ def create_table()
 		try {
 			res = orm.conn.execute(query);
 		}
-		catch db.execute -> msg {
-			print: msg;
+		catch db.execute as e {
+			print: e.what();
 		}
 	}
 

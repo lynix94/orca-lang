@@ -66,6 +66,8 @@ liborca_la_SOURCES = \
 		$(VM_DIR)/orcaForStack.cpp \
 		$(VM_DIR)/orcaDecodeStack.cpp \
 		$(VM_DIR)/orcaVM.cpp \
+		$(VM_DIR)/orcaException.cpp \
+		$(VM_DIR)/orcaExceptionObject.cpp \
 		$(VM_DIR)/orcaGlobal.cpp \
 		$(VM_DIR)/orcaParserObject.cpp \
 		$(VM_DIR)/orcaSelectStack.cpp \

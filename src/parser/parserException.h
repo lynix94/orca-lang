@@ -24,7 +24,7 @@ public:
 	void goto_end();
 	void goto_finally();
 	void do_finally();
-	void catch_start(const char* name, vector<const char*>* vp = NULL);
+	void catch_start(const char* filter, const char* lvar = NULL, vector<const char*>* vp = NULL);
 	void do_throw(const char* s, int argc);
 
 private:

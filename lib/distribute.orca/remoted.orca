@@ -229,7 +229,7 @@ def client
 					..push_obj(obj);
 					..send: '<ok:find>';
 				}
-				catch {
+				catch any {
 					..send: '<nok:1>${name} not found';
 				}
 

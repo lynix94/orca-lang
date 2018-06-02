@@ -25,13 +25,6 @@ orcaQueue::orcaQueue()
 	insert_native_function("pop", (object_fp)&orcaQueue::ex_pop);
 }
 
-orcaQueue::~orcaQueue()
-{
-	list<orcaData>::iterator it;
-	for (it=m_value.begin(); it!=m_value.end(); ++it) {
-		(*it).rc_dec();
-	}
-}
 
 orcaData orcaQueue::ex_init(orcaVM* vm, int n) 
 {

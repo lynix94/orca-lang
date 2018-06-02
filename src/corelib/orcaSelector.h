@@ -26,8 +26,7 @@ public:
 	}
 
 	orcaObject* v_clone() {
-		orcaSelector* fp = new orcaSelector(NULL);
-		return fp;
+		return new orcaSelector(NULL);
 	}
 
 	orcaSelector()

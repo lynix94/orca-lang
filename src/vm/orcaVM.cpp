@@ -4,7 +4,7 @@
 
   orcaVM.cpp - main orcaVM routine
 
-  Copyright (C) 2009~ Lee, Ki-Yeul
+  Copyright (C) 2009-2018 Lee, Ki-Yeul
 
 **********************************************************************/
 
@@ -66,6 +66,7 @@ namespace fs = boost::filesystem;
 #include "orcaSelectStack.h"
 #include "orcaDecodeStack.h"
 #include "orcaException.h"
+#include "orcaExceptionObject.h"
 #include "orcaParserObject.h"
 #include "orcaObjectMembers.h"
 #include "orcaObjectParents.h"
@@ -1122,7 +1123,7 @@ void orcaVM::parallel_for(const char* code, const char* offset, int* run_count, 
 }
 /*}}}*/
 
-void orcaVM::parallel_call(orcaData f, vector<orcaData>& params)
+void orcaVM::parallel_call(orcaData f, vector<orcaData>& params)/*{{{*/
 {
 	g_thread_pool->m_mutex_pool.lock();
 
@@ -1144,6 +1145,7 @@ void orcaVM::parallel_call(orcaData f, vector<orcaData>& params)
 
 	g_thread_pool->m_mutex_pool.unlock();
 }
+/*}}}*/
 
 void orcaVM::exec_code(const char* code, const char* offset)/*{{{*/
 {
@@ -3166,25 +3168,29 @@ do_assign_list:
 				catch_t* ct;
 				ct = cl->compare(e.who());
 				if (ct != NULL) {
-					for(int i=0 ; i<ct->lv.size(); i++) {
-						if (i >= e.params.size()) {
+					for (int i=1; i<ct->lv.size(); i++) {
+						if (i > e.params.size()) {
 							m_local->set(ct->lv[i], NIL);
 						}
 						else {
-							m_local->set(ct->lv[i], e.params[i]);
+							m_local->set(ct->lv[i], e.params[i-1]);
 						}
 					}
-
-					// internal exception (made by c++)
-					if (strlen(e.what()) != 0 && ct->lv.size() > 0) {
-						m_local->set(ct->lv[0], e.what());
+ 
+					if (ct->lv[0] >= 0) { // set as NAME
+						orcaExceptionObject* eo = new orcaExceptionObject();
+						eo->e = e;	
+						m_local->set(ct->lv[0], eo);
+					}
+					else {
+						e.rc_dec(); // not refered by object
 					}
 
 					m_curr = cl->m_my;
 					c = code + ct->address;
 					cl->clear();	// to avoid re-catch in same block
-					e.clear();
 	
+					m_cptr = &c; // recover
 					goto fast_jmp;
 				}
 
@@ -3802,8 +3808,13 @@ int orca_launch_module(orcaVM* vm, char* module, int argc, char** argv)/*{{{*/
 
 		printf("uncaught exception: %s - %s\n", e.who(), e.what());
 		cout << e.m_stack_trace << endl;
-		//vm->m_stack->dump();
-		//vm->m_local->dump();
+#if 0
+		for (int i=0; i<e.params.size(); i++) {
+			e.params[i].dump();
+		}
+		vm->m_stack->dump();
+		vm->m_local->dump();
+#endif
 
 		exit(-1);
 	}

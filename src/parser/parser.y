@@ -607,27 +607,35 @@ catch_stmt:/*{{{*/
 		{
 			g_ex->goto_finally();
 		}
+	| CATCH object_path name name
+		{
+			if (strcmp($3, "as") != 0) {
+				throw g_parser->strdup("as is expected");
+			}
+
+			g_ex->catch_start($2, $4);
+		}
+	statement_block
+		{
+			g_ex->goto_finally();
+		}
 	| CATCH object_path RIGHT_ARROW name_list
 		{
 			name_list_t* vp = (name_list_t*)$4;
-			g_ex->catch_start($2, vp);
+			g_ex->catch_start($2, NULL, vp);
 		}
 	statement_block
 		{
 			g_ex->goto_finally();
 		}
-	| CATCH 
+	| CATCH object_path name name RIGHT_ARROW name_list
 		{
-			g_ex->catch_start(NULL);
-		}
-	statement_block
-		{
-			g_ex->goto_finally();
-		}
-	| CATCH RIGHT_ARROW name_list
-		{
-			name_list_t* vp = (name_list_t*)$3;
-			g_ex->catch_start(NULL, vp);
+			if (strcmp($3, "as") != 0) {
+				throw g_parser->strdup("as is expected");
+			}
+
+			name_list_t* vp = (name_list_t*)$6;
+			g_ex->catch_start($2, $4, vp);
 		}
 	statement_block
 		{
@@ -639,11 +647,16 @@ catch_stmt:/*{{{*/
 throw_stmt:/*{{{*/
 	THROW object_path ';'
 		{
+			g_op->push_integer(0); // reserve
 			g_ex->do_throw($2, 0);
 		}
-	| THROW object_path LEFT_ARROW expression_list ';'
+	| THROW object_path
 		{
-			g_ex->do_throw($2, $4);
+			g_op->push_integer(0); // reserve
+		}
+	  LEFT_ARROW expression_list ';'
+		{
+			g_ex->do_throw($2, $5);
 		}
 	;
 /*}}}*/
