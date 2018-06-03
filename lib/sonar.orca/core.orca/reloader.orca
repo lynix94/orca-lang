@@ -1,10 +1,72 @@
 
+using os;
 using time;
 
-print: argv;
+#print: argv;
+if argv == nil || argv.size() < 1 {
+	return false;
+}
 
 
-time.sleep(10);
-return true;
+def prev_list := nil;
+
+curr_list = my.get_fileinfo(argv[0]);
+#print: curr_list;
+if my.prev_list == nil {
+	my.prev_list = curr_list;
+	return false;
+}
+
+ret = my.compare(my.prev_list, curr_list);
+my.prev_list = curr_list;
+
+return !ret; # true means same -> don't reload
+
+
+
+def get_fileinfo(path)
+{
+	src_list = {,};
+	it = os.dir_traverser(path);
+	for i in it {
+		if os.isdir(i()) {
+			continue;
+		}
+
+		basename = os.path.basename(i());
+		if basename.find('orca') > 0 {
+			if basename.find('kw') > 0 {
+				continue;
+			}
+
+			if basename.starts_with('.') {
+				continue;
+			}
+
+			src_list[i()] = os.last_write_time(i());
+		}
+	}
+
+	return src_list;
+}
+
+def compare(prev, curr)
+{
+	if prev.size() != curr.size() {
+		return false;
+	}
+
+	for k, v in prev {
+		if curr.has_key(k) == false {
+			return false;
+		}
+
+		if curr[k] != v {
+			return false;
+		}
+	}
+
+	return true;
+}
 
 

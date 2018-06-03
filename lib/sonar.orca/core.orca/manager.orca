@@ -44,9 +44,16 @@ def execute(...argv)
 				return;
 			}
 		
-			if sonar.core.reloader(os.cwd()) == true {
-				ipc.kill(pid, ipc.SIGINT);
-				time.sleep(1);
+
+			while true {
+				if sonar.core.reloader(os.cwd()) == true {
+					print: 'reloading...';
+					ipc.kill(pid, ipc.SIGINT);
+					time.sleep(1);
+					break;
+				}
+
+				time.sleep(3);
 			}
 		}
 
