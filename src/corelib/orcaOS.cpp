@@ -16,6 +16,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <fnmatch.h>
 
 #include "porting.h"
 #include "orcaOS.h"
@@ -86,22 +87,13 @@ orcaData orcaDirTraverse::operator()(orcaVM* vm, int n)
 
 orcaData orcaDirTraverse::ex_next(orcaVM* vm, int n)
 {
-retry:
 	if (m_iter.empty()) {
 		throw orcaException(vm, "orca.iter", "out of range");
 	}
 
 	fs::directory_iterator* iter = m_iter[0];
 
-	++(*iter);
-	if (*iter == m_end) {
-		m_iter.pop_front();
-		delete iter;
-		goto retry;
-	}
-
 	string str = (*iter)->path().string();
-
 	if (fs::is_directory(str)) {
 		fs::directory_iterator* it = new fs::directory_iterator(str);
 		if (*it == m_end) { // in case of empty dir, don't add
@@ -109,6 +101,15 @@ retry:
 		}
 		else {
 			m_iter.push_back(new fs::directory_iterator(str));
+		}
+	}
+
+	++(*iter);
+	if (*iter == m_end) {
+		m_iter.pop_front();
+		delete iter;
+		if (m_iter.empty()) {
+			throw orcaException(vm, "orca.iter", "out of range");
 		}
 	}
 
@@ -150,6 +151,8 @@ orcaOS::orcaOS()
 	insert_static_native_function("write", (object_fp)&orcaOS::ex_write);
 	insert_static_native_function("file_size", (object_fp)&orcaOS::ex_file_size);
 	insert_static_native_function("last_write_time", (object_fp)&orcaOS::ex_last_write_time);
+
+	insert_static("path", new orcaPath());
 }
 
 
@@ -529,4 +532,67 @@ orcaData orcaOS::ex_last_write_time(orcaVM* vm, int n)
 	}
 }
 
+
+
+orcaPath::orcaPath() 
+{
+	set_name("path");
+
+	insert_static_native_function("basename", (object_fp)&orcaPath::ex_basename);
+	insert_static_native_function("dirname", (object_fp)&orcaPath::ex_dirname);
+	insert_static_native_function("join", (object_fp)&orcaPath::ex_join);
+
+	insert_static_native_function("fnmatch", (object_fp)&orcaPath::ex_fnmatch);
+}
+
+
+orcaData orcaPath::ex_basename(orcaVM* vm, int n) 
+{
+	if (n < 1) vm->need_param();
+	string path = vm->get_param(0).String();
+
+	size_t idx = path.find_last_of("/");
+	if (idx == string::npos) {
+		return path;
+	}
+
+	return path.substr(idx+1);
+}
+
+orcaData orcaPath::ex_dirname(orcaVM* vm, int n) 
+{
+	if (n < 1) vm->need_param();
+	string path = vm->get_param(0).String();
+
+	size_t idx = path.find_last_of("/");
+	if (idx == string::npos) {
+		return "";
+	}
+
+	return path.substr(0, idx);
+}
+
+orcaData orcaPath::ex_join(orcaVM* vm, int n) 
+{
+	if (n < 1) vm->need_param();
+	stringstream ss;
+
+	for (int i=0; i<n; i++) {
+		ss << vm->get_param(i).String();
+		if (i < n-1) {
+			ss << "/";
+		}
+	}
+
+	return ss.str();
+}
+
+orcaData orcaPath::ex_fnmatch(orcaVM* vm, int n) 
+{
+	if (n < 2) vm->need_param();
+	const char* pat = vm->get_param(0).String().c_str();
+	const char* str = vm->get_param(1).String().c_str();
+	
+	return fnmatch(pat, str, 0) == 0;
+}
 

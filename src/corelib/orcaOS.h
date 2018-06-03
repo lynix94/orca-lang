@@ -81,27 +81,31 @@ private:
 class orcaOS : public orcaObject 
 {
 public:
+	DEFAULT_NATIVE_DEFINE(orcaOS);
 	orcaOS();
 
+	// syscall
 	orcaData ex_getpid(orcaVM* vm, int n);
 	orcaData ex_getppid(orcaVM* vm, int n);
 	orcaData ex_fork(orcaVM* vm, int n);
 
+	// run & system
 	orcaData ex_run_cout(orcaVM* vm, int n);
 	orcaData ex_run(orcaVM* vm, int n);
 	orcaData ex_system(orcaVM* vm, int n); 
 
+	// env
 	orcaData ex_getenv(orcaVM* vm, int n);
 	orcaData ex_cwd(orcaVM* vm, int n);
 	orcaData ex_cd(orcaVM* vm, int n);
 
+	// file system
 	orcaData ex_touch(orcaVM* vm, int n);
 	orcaData ex_dir_iterator(orcaVM* vm, int n);
 	orcaData ex_dir_traverser(orcaVM* vm, int n);
 	orcaData ex_mkdir(orcaVM* vm, int n);
 	orcaData ex_remove(orcaVM* vm, int n);
 	orcaData ex_ls(orcaVM* vm, int n);
-
 	orcaData ex_rename(orcaVM* vm, int n);
 	orcaData ex_copy(orcaVM* vm, int n);
 	orcaData ex_isexists(orcaVM* vm, int n);
@@ -111,6 +115,19 @@ public:
 	orcaData ex_write(orcaVM* vm, int n);
 	orcaData ex_file_size(orcaVM* vm, int n);
 	orcaData ex_last_write_time(orcaVM* vm, int n);
+};
+
+
+class orcaPath : public orcaObject 
+{
+public:
+	DEFAULT_NATIVE_DEFINE(orcaPath);
+	orcaPath();
+
+	orcaData ex_basename(orcaVM* vm, int n);
+	orcaData ex_dirname(orcaVM* vm, int n);
+	orcaData ex_join(orcaVM* vm, int n);
+	orcaData ex_fnmatch(orcaVM* vm, int n);
 };
 
 #endif
