@@ -197,12 +197,12 @@ if a != 9 {
 }
 
 for a in range(1, 30) {
-	if a() == 9 {
+	if a == 9 {
 		print: 'break';
 		break;
 	}
 
-	if a() > 5 {
+	if a > 5 {
 		continue;
 	}
 
@@ -322,17 +322,18 @@ if sum1 != 1+3+5+7+9 || sum2 != 2+4+6+8+10 {
 print: 'range test';
 sum = 0;
 for a in range(0, 10) {
-	sum += a();
-	print: a();
+	sum += a;
+	print: a;
 }
+print: sum;
 if sum != 0+1+2+3+4+5+6+7+8+9 {
 	throw test.control <- 'range for fail';
 }
 
 sum = 0;
 for a in range(0, 10, 2) {
-	sum += a();
-	print: a();
+	sum += a;
+	print: a;
 }
 if sum != 0+2+4+6+8 {
 	throw test.control <- 'range for fail';
@@ -340,8 +341,8 @@ if sum != 0+2+4+6+8 {
 
 sum = 0;
 for a in range(0, 10, 3) {
-	sum += a();
-	print: a();
+	sum += a;
+	print: a;
 }
 if sum != 0+3+6+9 {
 	throw test.control <- 'range for fail';
@@ -349,8 +350,8 @@ if sum != 0+3+6+9 {
 
 sum = 0;
 for a in range(0, -10, -2) {
-	sum += a();
-	print: a();
+	sum += a;
+	print: a;
 }
 if sum != 0-2-4-6-8 {
 	throw test.control <- 'range for fail';
@@ -360,7 +361,7 @@ if sum != 0-2-4-6-8 {
 caugted = false;
 try {
 	for i in range(1, 10, -1) {
-		print: i();
+		print: i;
 	}
 }
 catch orca.range {
@@ -374,7 +375,7 @@ if caugted == false {
 caugted = false;
 try {
 	for i in range(1, -10, 1) {
-		print: i();
+		print: i;
 	}
 }
 catch orca.range {
@@ -387,7 +388,7 @@ if caugted == false {
 caugted = false;
 try {
 	for i in range(1, 10, 0) {
-		print: i();
+		print: i;
 	}
 }
 catch orca.range {
@@ -401,7 +402,7 @@ if caugted == false {
 caugted = false;
 try {
 	for i in range(1, -10, 0) {
-		print: i();
+		print: i;
 	}
 }
 catch orca.range {

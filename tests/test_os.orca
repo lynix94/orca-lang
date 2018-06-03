@@ -13,5 +13,7 @@ os.remove('newdir2');
 os.remove('tmp_file');
 os.remove('tmp_file2');
 
+# TODO: os.path test
+
 print: os.ls('.');
 

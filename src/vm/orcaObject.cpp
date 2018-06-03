@@ -563,7 +563,7 @@ void orcaObject::string_(orcaVM* vm, string& str)
 	if (has_member("string", d)) {
 		vm->push_stack(d);
 		vm->call(0);
-		str += vm->m_stack->pop().String();
+		str += vm->m_stack->pop().string_(vm);
 	}
 	else {
 		char buff[1024];

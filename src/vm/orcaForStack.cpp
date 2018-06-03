@@ -81,6 +81,7 @@ bool orcaForStack::push(const char* code, int lv, orcaObject* obj,
 			delete f;
 			throw orcaException(vm, "orca.type", string("not iterable type ") + obj->dump_str());
 		}
+		
 
 		try {
 			vm->push_stack(obj);
@@ -102,8 +103,19 @@ bool orcaForStack::push(const char* code, int lv, orcaObject* obj,
 
 		if (is<TYPE_OBJ>(next) || is<TYPE_NATIVE>(next)) {
 			f->next = next;
-			out = obj;
 			m_stack.push_back(f);
+
+			orcaData curr;
+			if (obj->has_member((char*)"curr", curr) &&			// ex) range. (if you want to use value directly) 
+				(is<TYPE_OBJ>(curr) || is<TYPE_NATIVE>(curr)))
+			{
+				vm->push_stack(curr);
+				vm->call(0);		// curr()
+				out = vm->m_stack->pop();
+			}
+			else {
+				out = obj;
+			}
 			return true;
 		}
 		else {

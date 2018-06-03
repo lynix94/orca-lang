@@ -147,7 +147,13 @@ public:
 		curr = 0;
 		interval = 1;
 
+		insert_native_function("curr", (object_fp)&orcaRange::ex_curr);
 		insert_native_function("next", (object_fp)&orcaRange::ex_next);
+	}
+
+	orcaData ex_curr(orcaVM* vm, int n)
+	{
+		return curr;
 	}
 
 	orcaData ex_next(orcaVM* vm, int n)
@@ -165,7 +171,7 @@ public:
 			}
 		}
 
-		return this;
+		return curr;
 	}
 
 	orcaData operator()(orcaVM* vm, int n)
