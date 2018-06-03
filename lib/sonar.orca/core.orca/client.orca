@@ -208,8 +208,8 @@ def do_what(msg)
 			..send_response('', ret);
 		}
 	}
-	catch dummy as e {
-		..send_response('', 'exception...%s' % e.what());
+	catch any as e {
+		..send_response('', 'exception %s - %s<br><pre>%s</pre>' % (e.who(), e.what(), e.trace()));
 	}
 }
 
