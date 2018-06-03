@@ -11,35 +11,34 @@ def _project;
 def _groupby;
 def _meta := {,};
 
-def init(name) {
-	.._name = name;
-	#.._attrs = {,};
-}
-
-def where(q) {
+def where(q)
+{
 	.._where = q;
 	return owner;
 }
 
-def orderby(o) {
+def orderby(o)
+{
 	.._orderby = o;
 	return owner;
 }
 
-def project(p) {
+def project(p)
+{
 	.._project = p;
 	return owner;
 }
 
-def groupby(g) {
+def groupby(g)
+{
 	.._groupby = g;
 	return owner;
 }
 
-def result() {
+def result()
+{
 	if .._project == nil {
 		attrs = [];
-		print: ..MEMBERS.begin();
 		for m in ..MEMBERS.begin() {
 			if m.second() < orm.query.TYPE {
 				attrs.push_back(m.first());
@@ -99,13 +98,15 @@ def unique_index(...argv)
 #
 def initialize()
 {
-	for m in ..MEMBERS.begin() {
-		if m.second() < orm.query.TYPE {
-			m.second().qstr = m.first();
+	if .._name == nil {
+		for m in ..MEMBERS.begin() {
+			if m.second() < orm.query.TYPE {
+				m.second().qstr = m.first();
+			}
 		}
-	}
 
-	.._name = ..NAME;
+		.._name = ..NAME;
+	}
 }
 
 def create_table()
@@ -176,31 +177,7 @@ def create_table()
 
 def new()
 {
-	def instance
-	{
-		def save()
-		{
-			attr_list = [];
-			value_list = [];
-			for m in ..MEMBERS.begin() {
-				if m.first() == '__name__' || m.first() == 'save' {
-					continue;
-				}
-
-				attr_list.push_back(m.first());
-				value_list.push_back(repr(m.second()));
-			}
-
-			attrs = strings.join(', ', attr_list...);
-			values = strings.join(', ', value_list...);
-
-			query = 'insert into %s(%s) values(%s)' % (..__name__, attrs, values);
-			print: query;
-			res = orm.conn.execute(query);
-		}
-	}
-
-	ins = .instance.clone();
+	ins = orm.instance.clone();
 	ins.MEMBERS['__name__'] = .._name;
 	for m in ..MEMBERS.begin() {
 		if m.second() < orm.query.TYPE {
@@ -210,9 +187,5 @@ def new()
 	
 	return ins;
 }
-
-
-
-
 
 

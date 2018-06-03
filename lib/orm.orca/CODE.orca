@@ -1,3 +1,5 @@
+using orm;
+using strings;
 
 def conn;
 
@@ -16,7 +18,6 @@ def row_iter
 	def model;
 	def res;
 	def keys := [];
-	def instance {}
 
 	def init(model, res) {
 		..model = model;
@@ -32,7 +33,7 @@ def row_iter
 	}
 
 	# make value
-	t = .instance.clone();
+	t = orm.instance.clone();
 
 	for i in [0..my.keys.size()-1] {
 		t.MEMBERS[.keys[i]] = .res()[i];
@@ -40,6 +41,48 @@ def row_iter
 
 	return t;
 }
+
+
+def instance
+{
+	def save()
+	{
+		attr_list = [];
+		value_list = [];
+		for m in ..MEMBERS.begin() {
+			if m.first().starts_with('__') || m.first() == 'save' || m.first() == 'string' {
+				continue;
+			}
+
+			attr_list.push_back(m.first());
+			value_list.push_back(repr(m.second()));
+		}
+
+		attrs = strings.join(', ', attr_list...);
+		values = strings.join(', ', value_list...);
+
+		query = 'insert into %s(%s) values(%s)' % (..__name__, attrs, values);
+		print: query;
+		res = orm.conn.execute(query);
+	}
+
+	def string()
+	{
+		ret = {,};
+		for m in ..MEMBERS.begin() {
+			if m.first().starts_with('__') || m.first() == 'save' || m.first() == 'string' {
+				continue;
+			}
+
+			ret[m.first()] = m.second();
+		}
+
+		return ret;
+	}
+}
+
+
+
 
 
 
