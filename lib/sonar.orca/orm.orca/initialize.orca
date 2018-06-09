@@ -1,0 +1,19 @@
+
+using os;
+
+for it in root.MEMBERS.begin() {
+	m = it.second();
+	if m.MEMBERS.has_key('models') {
+		models = m.models;
+		for it2 in models.MEMBERS.begin() {
+			m = it2.second();
+			if m.MEMBERS.has_key('initialize') {
+				#print: m.NAME;
+				m.initialize();
+			}
+		}
+	}
+}
+
+
+

@@ -101,8 +101,9 @@ orcaObjectMembersIter::~orcaObjectMembersIter() { }
 
 orcaData orcaObjectMembersIter::operator()(orcaVM* vm, int n)
 {
-	if (m_op == NULL)
+	if (m_op == NULL) {
 		throw orcaException(vm, "orca.iter", "out of range");
+	}
 
 	if (in_static) {
 		orcaTuple* tp = new orcaTuple(2);
@@ -124,8 +125,9 @@ orcaData orcaObjectMembersIter::operator()(orcaVM* vm, int n)
 
 orcaData orcaObjectMembersIter::ex_first(orcaVM* vm, int n)
 {
-	if (m_op == NULL)
+	if (m_op == NULL) {
 		throw orcaException(vm, "orca.iter", "out of range");
+	}
 
 	cp_map<orcaData>::Type::iterator it;
 	cp_map<orcaData>::Type::iterator end;
@@ -138,16 +140,18 @@ orcaData orcaObjectMembersIter::ex_first(orcaVM* vm, int n)
 		end = m_op->m_member.end();
 	}
 
-	if (it == end) 
+	if (it == end) {
 		throw orcaException(vm, "orca.iter", "out of range");
+	}
 	
 	return it->first;
 }
 
 orcaData orcaObjectMembersIter::ex_second(orcaVM* vm, int n)
 {
-	if (m_op == NULL)
+	if (m_op == NULL) {
 		throw orcaException(vm, "orca.iter", "out of range");
+	}
 
 	cp_map<orcaData>::Type::iterator it;
 	cp_map<orcaData>::Type::iterator end;
@@ -160,43 +164,54 @@ orcaData orcaObjectMembersIter::ex_second(orcaVM* vm, int n)
 		end = m_op->m_member.end();
 	}
 
-	if (it == end) 
+	if (it == end) {
 		throw orcaException(vm, "orca.iter", "out of range");
+	}
 	
 	return it->second;
 }
 
 orcaData orcaObjectMembersIter::ex_next(orcaVM* vm, int n)
 {
-	if (m_op == NULL)
+	if (m_op == NULL) {
 		throw orcaException(vm, "orca.iter", "out of range");
+	}
 
 	if (in_static) {
 		assert(m_op->m_static != NULL);
 
 		if (m_sit != m_op->m_static->end())  {
 			++m_sit;
-			if (m_sit != m_op->m_static->end()) 
+			if (m_sit != m_op->m_static->end()) {
 				return this;
+			}
 		}
 	
 		in_static = false;
 		m_mit = m_op->m_member.begin();
+		if (m_mit == m_op->m_member.end()) {
+			throw orcaException(vm, "orca.iter", "out of range");
+		}
+
+		return this;
 	}
 
-	if (m_mit == m_op->m_member.end()) 
+	if (m_mit == m_op->m_member.end()) {
 		throw orcaException(vm, "orca.iter", "out of range");
+	}
 	++m_mit;
-	if (m_mit == m_op->m_member.end()) 
+	if (m_mit == m_op->m_member.end()) {
 		throw orcaException(vm, "orca.iter", "out of range");
+	}
 
 	return this;
 }
 
 orcaData orcaObjectMembersIter::ex_prev(orcaVM* vm, int n)
 {
-	if (m_op == NULL)
+	if (m_op == NULL) {
 		throw orcaException(vm, "orca.iter", "out of range");
+	}
 
 	if (!in_static) {
 		if (m_mit != m_op->m_member.begin()) {
@@ -226,8 +241,9 @@ orcaData orcaObjectMembersIter::ex_prev(orcaVM* vm, int n)
 
 orcaData orcaObjectMembersIter::ex_eq(orcaVM* vm, int n)
 {
-	if (m_op == NULL)
+	if (m_op == NULL) {
 		throw orcaException(vm, "orca.iter", "out of range");
+	}
 
 	if (n<1) vm->need_param();
 	orcaObjectMembersIter* ip = dynamic_cast<orcaObjectMembersIter*>(vm->get_param(0).Object());
@@ -241,7 +257,6 @@ orcaData orcaObjectMembersIter::ex_eq(orcaVM* vm, int n)
 
 	if (in_static) {
 		assert(m_op->m_static != NULL);
-
 		return m_sit == ip->m_sit;
 	}
 
@@ -251,8 +266,9 @@ orcaData orcaObjectMembersIter::ex_eq(orcaVM* vm, int n)
 
 orcaData orcaObjectMembersIter::ex_lt(orcaVM* vm, int n)
 {
-	if (m_op == NULL)
+	if (m_op == NULL) {
 		throw orcaException(vm, "orca.iter", "out of range");
+	}
 
 	if (n<1) vm->need_param();
 	orcaObjectMembersIter* ip = dynamic_cast<orcaObjectMembersIter*>(vm->get_param(0).Object());
@@ -274,8 +290,9 @@ orcaData orcaObjectMembersIter::ex_lt(orcaVM* vm, int n)
 
 orcaData orcaObjectMembersIter::ex_erase(orcaVM* vm, int n)
 {
-	if (m_op == NULL)
+	if (m_op == NULL) {
 		throw orcaException(vm, "orca.iter", "out of range");
+	}
 
 	string name;
 	if (in_static) {

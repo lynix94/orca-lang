@@ -24,6 +24,7 @@ compile
 stamp-h1
 orca
 nohup.out
+vgcore.*
 
 
 

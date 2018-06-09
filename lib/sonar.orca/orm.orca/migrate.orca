@@ -1,0 +1,34 @@
+
+using os;
+
+print: argv;
+if argv == nil || argv.size() < 1 {
+	return false;
+}
+
+curr_list = my.get_fileinfo(argv[0]);
+print: curr_list;
+return;
+
+
+def get_fileinfo(path)
+{
+	src_list = [];
+	it = os.dir_traverser(path);
+	for i in it {
+		if os.isdir(i()) {
+			continue;
+		}
+
+		basename = os.path.basename(i());
+		if basename == ('models.orca') {
+			src_list.push_back(i());
+		}
+	}
+
+	return src_list;
+}
+
+
+
+

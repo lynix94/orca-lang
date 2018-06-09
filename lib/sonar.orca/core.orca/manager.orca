@@ -91,6 +91,8 @@ def server(addr)
 	orca.load('urls');
 	root.urls();
 
+	sonar.orm.initialize(); // model initialize
+
 	sonar.core.httpd(addr);
 }
 
