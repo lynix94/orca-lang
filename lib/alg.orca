@@ -18,7 +18,7 @@ def for_each(first, end, fun)
 			fun(iter());
 			iter.next();
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 }
@@ -32,7 +32,7 @@ def for_each_iterator(first, end, fun)
 			fun(iter);
 			iter.next();
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 }
@@ -49,7 +49,7 @@ def find(first, end, val)
 			}
 			iter.next();
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 
@@ -69,7 +69,7 @@ def find_if(first, end, fun)
 
 			iter.next();
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 
@@ -90,7 +90,7 @@ def remove(first, end, val)
 				iter.next();
 			}
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 }
@@ -109,7 +109,7 @@ def remove_if(first, end, fun)
 				iter.next();
 			}
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 }
@@ -127,7 +127,7 @@ def replace(first, end, old, new)
 
 			iter.next();
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 }
@@ -145,7 +145,7 @@ def replace_if(first, end, fun, new)
 
 			iter.next();
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 }
@@ -158,7 +158,7 @@ def erase(first, end)
 		while iter != end {
 			iter.erase();
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 }
@@ -173,7 +173,7 @@ def copy(first, end, dest)
 			dest.insert(iter());
 			iter.next();
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 }
@@ -188,7 +188,7 @@ def copy_n(first, n, dest)
 			dest.insert(iter());
 			iter.next();
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 }
@@ -207,7 +207,7 @@ def count(first, end, val)
 
 			iter.next();
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 
@@ -228,7 +228,7 @@ def count_if(first, end, fun)
 
 			iter.next();
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 
@@ -263,7 +263,7 @@ def transform(first, end, p1, p2, p3)
 				first2.next();
 			}
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 }
@@ -286,7 +286,7 @@ def equal(first, end, first2, fun)
 			first.next();
 			first2.next();
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 
@@ -304,7 +304,7 @@ def equal_range(first, end, val)
 			
 			first.next();
 		}
-	} catch orca.iter {
+	} catch orca.iter.end {
 		// ignore
 	}
 

@@ -22,8 +22,8 @@ def row_iter
 	def init(model, res) {
 		..model = model;
 		..res = res;
-		for m in model.MEMBERS.iter() {
-			..keys.push_back(m.key());
+		for key in model.MEMBERS {
+			..keys.push_back(key);
 		}
 	}
 
@@ -49,13 +49,13 @@ def instance
 	{
 		attr_list = [];
 		value_list = [];
-		for m in ..MEMBERS.iter() {
-			if m.key().starts_with('__') || m.key() == 'save' || m.key() == 'string' {
+		for key, value in ..MEMBERS {
+			if key.starts_with('__') || key == 'save' || key == 'string' {
 				continue;
 			}
 
-			attr_list.push_back(m.key());
-			value_list.push_back(repr(m.value()));
+			attr_list.push_back(key);
+			value_list.push_back(repr(value));
 		}
 
 		attrs = strings.join(', ', attr_list...);
@@ -69,12 +69,12 @@ def instance
 	def string()
 	{
 		ret = {,};
-		for m in ..MEMBERS.iter() {
-			if m.key().starts_with('__') || m.key() == 'save' || m.key() == 'string' {
+		for key, value in ..MEMBERS {
+			if key.starts_with('__') || key == 'save' || key == 'string' {
 				continue;
 			}
 
-			ret[m.key()] = m.value();
+			ret[key] = value;
 		}
 
 		return ret;

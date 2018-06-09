@@ -14,13 +14,13 @@ def one_to_hundred
 	def next() 
 	{
 		if ..cur > 100 {
-			throw orca.iter;
+			throw orca.iter.end;
 		}
 
 		..cur += 1;
 
 		if ..cur > 100 {
-			throw orca.iter;
+			throw orca.iter.end;
 		}
 
 		return ..cur;

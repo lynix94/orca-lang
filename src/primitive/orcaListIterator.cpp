@@ -30,7 +30,7 @@ orcaListIterator::orcaListIterator(orcaListIter it, orcaListIter begin, orcaList
 
 orcaObject* orcaListIterator::v_clone()
 {
-	orcaListIterator* lp = new orcaListIterator(m_iter, m_begin, m_end);
+	orcaListIterator* lp = new orcaListIterator(m_iter, m_begin, m_end, flag_ready);
 	return lp;
 }
 
@@ -38,8 +38,12 @@ orcaListIterator::~orcaListIterator() { }
 
 orcaData orcaListIterator::operator()(orcaVM* vm, int n)
 {
+	if (flag_ready == false) {
+		throw orcaException(vm, "orca.iter.ready", "not ready");
+	}
+
 	if (m_iter == m_end) {
-		throw orcaException(vm, "orca.iter", "out of range");
+		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
 	if (n>0) {
@@ -54,7 +58,7 @@ orcaData orcaListIterator::operator()(orcaVM* vm, int n)
 orcaData orcaListIterator::ex_next(orcaVM* vm, int n)
 {
 	if (m_iter == m_end) {
-		throw orcaException(vm, "orca.iter", "out of range");
+		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
 	// in case of iter()
@@ -66,7 +70,7 @@ orcaData orcaListIterator::ex_next(orcaVM* vm, int n)
 	++m_iter;
 
 	if (m_iter == m_end) {
-		throw orcaException(vm, "orca.iter", "out of range");
+		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
 	return this;
@@ -75,7 +79,7 @@ orcaData orcaListIterator::ex_next(orcaVM* vm, int n)
 orcaData orcaListIterator::ex_prev(orcaVM* vm, int n)
 {
 	if (m_iter == m_begin) {
-		throw orcaException(vm, "orca.iter", "out of range");
+		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
 	--m_iter;
@@ -87,7 +91,12 @@ orcaData orcaListIterator::ex_eq(orcaVM* vm, int n)
 {
 	if (is<TYPE_OBJ>(vm->get_param(0))) {
 		orcaListIterator* ip = dynamic_cast<orcaListIterator*>(vm->get_param(0).Object());
+
 		if (ip != NULL) {
+			if (flag_ready == false || ip->flag_ready == false) {
+				throw orcaException(vm, "orca.iter.ready", "not ready");
+			}
+
 			return m_iter == ip->m_iter;
 		}
 	}
@@ -97,12 +106,20 @@ orcaData orcaListIterator::ex_eq(orcaVM* vm, int n)
 
 orcaData orcaListIterator::ex_erase(orcaVM* vm, int n)
 {
+	if (flag_ready == false) {
+		throw orcaException(vm, "orca.iter.ready", "not ready");
+	}
+
 	m_iter.raw_erase();
 	return this;
 }
 
 orcaData orcaListIterator::ex_insert(orcaVM* vm, int n)
 {
+	if (flag_ready == false) {
+		throw orcaException(vm, "orca.iter.ready", "not ready");
+	}
+
 	if (n < 1) vm->need_param();
 	
 	for (int i=0; i<n; i++) {

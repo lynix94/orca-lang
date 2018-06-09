@@ -29,7 +29,7 @@ orcaListVIterator::orcaListVIterator(orcaListIter it, orcaListIter begin, orcaLi
 
 orcaObject* orcaListVIterator::v_clone()
 {
-	orcaListVIterator* lp = new orcaListVIterator(m_iter, m_begin, m_end);
+	orcaListVIterator* lp = new orcaListVIterator(m_iter, m_begin, m_end, flag_ready);
 	return lp;
 }
 
@@ -52,6 +52,10 @@ orcaData orcaListVIterator::ex_eq(orcaVM* vm, int n)
 	if (is<TYPE_OBJ>(vm->get_param(0))) {
 		orcaListVIterator* ip = dynamic_cast<orcaListVIterator*>(vm->get_param(0).Object());
 		if (ip != NULL) {
+			if (flag_ready == false || ip->flag_ready == false) {
+				throw orcaException(vm, "orca.iter.ready", "not ready");
+			}
+
 			return m_iter == ip->m_iter;
 		}
 	}

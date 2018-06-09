@@ -38,15 +38,14 @@ bool orcaForStack::push(const char* code, int lv, orcaObject* obj, orcaData& out
 	}
 
 	f.iter = obj;
-	f.iter.rc_inc();
 	f.next = next;
-	f.next.rc_inc();
-	m_stack.push_back(f);
+	push(f);
 
 	int dummy_i;
 	orcaData dummy_d;
 	const char* dummy_code = cont(&lv, &out, &dummy_i, &dummy_d);
 	if (dummy_code == 0) {
+		pop();
 		return false;
 	}
 
@@ -82,13 +81,12 @@ bool orcaForStack::push_2(const char* code, int lv1, int lv2,
 	}
 
 	f.iter = obj;
-	f.iter.rc_inc();
 	f.next = next;
-	f.next.rc_inc();
-	m_stack.push_back(f);
+	push(f);
 	
 	const char* dummy_code = cont(&lv1, &out1, &lv2, &out2);
 	if (dummy_code == 0) {
+		pop();
 		return false;
 	}
 
@@ -97,11 +95,10 @@ bool orcaForStack::push_2(const char* code, int lv1, int lv2,
 
 
 bool orcaForStack::push_sub(const char* code, int lv, orcaObject* obj, 
-							orcaData& out, orcaObject* curr, int per, bool is_iterator)
+							orcaData& out, orcaObject* curr, int per)
 {
 	FOR f(code, lv, -1, curr);
 	f.limit = per;
-	f.is_iterator = is_iterator;
 
 	orcaData next, iter;
 	if (obj->has_member((char*)"iter", iter)) {
@@ -121,21 +118,26 @@ bool orcaForStack::push_sub(const char* code, int lv, orcaObject* obj,
 	}
 
 	f.iter = obj;
-	f.iter.rc_inc();
 	f.next = next;
-	f.next.rc_inc();
-	m_stack.push_back(f);
+	push(f);
 
 	int dummy_i;
 	orcaData dummy_d;
 	const char* dummy_code = cont(&lv, &out, &dummy_i, &dummy_d);
 	if (dummy_code == 0) {
+		pop();
 		return false;
 	}
 
 	return true;
 }
 
+void orcaForStack::push(FOR& f)
+{
+	f.iter.rc_inc();
+	f.next.rc_inc();
+	m_stack.push_back(f);
+}
 
 FOR* orcaForStack::top() 
 {
@@ -160,7 +162,7 @@ const char* orcaForStack::cont(int* lv1, orcaData* d1, int *lv2, orcaData* d2)
 	// check limit (per for parallel for sub group)
 	if (f->limit >= 0) {
 		f->limit--;
-		if (f->limit == 0) {
+		if (f->limit < 0) {
 			return 0;
 		}
 	}
@@ -169,11 +171,10 @@ const char* orcaForStack::cont(int* lv1, orcaData* d1, int *lv2, orcaData* d2)
 		orcaVM* vm = get_current_vm();
 		vm->push_stack(f->next);
 		vm->call(0); // iter.next();
-		orcaData iter = vm->m_stack->pop();
-
+		orcaData result = vm->m_stack->pop();
 		if (f->lv2 > 0) {
 			if (f->is_iter2) {
-				orcaTuple* tp = castobj<orcaTuple>(iter);
+				orcaTuple* tp = castobj<orcaTuple>(result);
 				if (tp == NULL || tp->size() != 2) {
 					throw orcaException(NULL, "orca.type", "iter2 should return tuple (pair)");
 				}
@@ -183,15 +184,15 @@ const char* orcaForStack::cont(int* lv1, orcaData* d1, int *lv2, orcaData* d2)
 			}
 			else {
 				*d1 = f->idx;
-				*d2 = iter;
+				*d2 = result;
 			}
 		}
 		else {
-			*d1 = iter;
+			*d1 = result;
 		}
 	}
 	catch(orcaException& e) {
-		if (string("orca.iter") != e.who()) {
+		if (string("orca.iter.end") != e.who()) {
 			throw e;
 		}
 

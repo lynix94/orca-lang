@@ -95,8 +95,7 @@ public:
 					 orcaObject* owner, string owner_path);
 	void reserve_local(); // for interactive
 	void parallel_do(const char* code, const char* offset);
-	void parallel_for(const char* code, const char* offset, 
-					 int* run_count, orcaObject* op, int per, bool is_iterator);
+	void parallel_for(const char* code, const char* offset, int* run_count, orcaObject* op, int per);
 	void parallel_call(orcaData f, vector<orcaData>& params);
 
 	// for interface

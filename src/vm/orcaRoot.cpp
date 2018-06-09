@@ -156,12 +156,12 @@ public:
 
 		if (to >= from) {
 			if (curr >= to) {
-				throw orcaException(vm, "orca.iter", "out of range");
+				throw orcaException(vm, "orca.iter.end", "out of range");
 			}
 		}
 		else { // descending
 			if (curr <= to) {
-				throw orcaException(vm, "orca.iter", "out of range");
+				throw orcaException(vm, "orca.iter.end", "out of range");
 			}
 		}
 

@@ -11,6 +11,7 @@
 
 #include "orcaObjectMembers.h"
 #include "orcaObjectMembersIter.h"
+#include "orcaObjectMembersIter2.h"
 #include "orcaException.h"
 #include "orcaGlobal.h"
 #include "orcaBoolean.h"
@@ -30,12 +31,7 @@ orcaObjectMembers::orcaObjectMembers(orcaData src) : m_src(src)
 	insert_native_function("keys", (object_fp)&orcaObjectMembers::ex_keys);
 	insert_native_function("values", (object_fp)&orcaObjectMembers::ex_values);
 	insert_native_function("iter", (object_fp)&orcaObjectMembers::ex_iter);
-/*
-	insert_native_function("begin", (object_fp)&orcaObjectMembers::ex_begin);
-	insert_native_function("end", (object_fp)&orcaObjectMembers::ex_end);
-	insert_native_function("last", (object_fp)&orcaObjectMembers::ex_last);
-	insert_native_function("find", (object_fp)&orcaObjectMembers::ex_find);
-*/
+	insert_native_function("iter2", (object_fp)&orcaObjectMembers::ex_iter2);
 
 	is_static = false;
 
@@ -331,13 +327,11 @@ orcaData orcaObjectMembers::ex_iter(orcaVM* vm, int n)
 	else if (is<TYPE_OBJ>(m_src))
 		op = m_src.o();
 		
-	orcaObjectMembersIter* ip = new orcaObjectMembersIter(op, 0);
+	orcaObjectMembersIter* ip = new orcaObjectMembersIter(op);
 	return ip;
 }
 
-
-/*
-orcaData orcaObjectMembers::ex_begin(orcaVM* vm, int n)
+orcaData orcaObjectMembers::ex_iter2(orcaVM* vm, int n)
 {
 	orcaObject* op = NULL;
 	if (isinternal(m_src))
@@ -345,51 +339,7 @@ orcaData orcaObjectMembers::ex_begin(orcaVM* vm, int n)
 	else if (is<TYPE_OBJ>(m_src))
 		op = m_src.o();
 		
-	orcaObjectMembersIter* ip = new orcaObjectMembersIter(op, 0);
+	orcaObjectMembersIter2* ip = new orcaObjectMembersIter2(op);
 	return ip;
 }
-
-
-orcaData orcaObjectMembers::ex_end(orcaVM* vm, int n)
-{
-	orcaObject* op = NULL;
-	if (isinternal(m_src))
-		op = m_internal;
-	else if (is<TYPE_OBJ>(m_src))
-		op = m_src.o();
-		
-	orcaObjectMembersIter* ip = new orcaObjectMembersIter(op, INT_MIN);
-	return ip;
-}
-
-
-orcaData orcaObjectMembers::ex_last(orcaVM* vm, int n)
-{
-	orcaObject* op = NULL;
-	if (isinternal(m_src))
-		op = m_internal;
-	else if (is<TYPE_OBJ>(m_src))
-		op = m_src.o();
-		
-	orcaObjectMembersIter* ip = new orcaObjectMembersIter(op, -1);
-	return ip;
-}
-
-orcaData orcaObjectMembers::ex_find(orcaVM* vm, int n)
-{
-	if (n < 1) vm->need_param();
-
-	string name = vm->get_param(0).String();
-
-	orcaObject* op = NULL;
-	if (isinternal(m_src))
-		op = m_internal;
-	else if (is<TYPE_OBJ>(m_src))
-		op = m_src.o();
-		
-	orcaObjectMembersIter* ip = new orcaObjectMembersIter(op, name);
-	return ip;
-}
-*/
-
 

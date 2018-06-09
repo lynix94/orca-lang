@@ -112,7 +112,6 @@ void thread_pool::work(thread_arg_u arg)
 			if (arg.p_for.iter != NULL) {
 				vm->m_stack->push(arg.p_for.iter);
 				vm->m_stack->push(arg.p_for.per);
-				vm->m_stack->push(arg.p_for.is_iterator);
 			}
 			// fallthrough
 		case 'd':

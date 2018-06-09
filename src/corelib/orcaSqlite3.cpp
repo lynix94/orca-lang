@@ -66,7 +66,7 @@ orcaData orcaSqlite3Result::ex_next(orcaVM* vm, int n)
 
 	if (done || stmt == NULL || sqlite3_step(stmt) == SQLITE_DONE) {
 		done = true;
-		throw orcaException(vm, "orca.iter", "out of range");
+		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
 	return this;
@@ -75,7 +75,7 @@ orcaData orcaSqlite3Result::ex_next(orcaVM* vm, int n)
 orcaData orcaSqlite3Result::operator()(orcaVM* vm, int param_n)
 {
 	if (done) {
-		throw orcaException(vm, "orca.iter", "out of range");
+		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
 	if (stmt == NULL) {

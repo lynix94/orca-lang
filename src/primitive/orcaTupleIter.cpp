@@ -38,19 +38,23 @@ bool orcaTupleIter::valid()
 
 orcaObject* orcaTupleIter::v_clone() 
 {
-	return new orcaTupleIter(m_iter, m_tp);
+	return new orcaTupleIter(m_iter, m_tp, flag_ready);
 }
 
 orcaTupleIter::~orcaTupleIter() { }
 
 orcaData orcaTupleIter::operator()(orcaVM* vm, int n) 
 {
+	if (flag_ready == false) {
+		throw orcaException(vm, "orca.iter.ready", "not ready");
+	}
+
 	if (valid() == false) {
 		throw orcaException(vm, "orca.tuple", "invalid iterator - timestamp");
 	}
 
 	if (m_iter == m_tp->end()) {
-		throw orcaException(vm, "orca.iter", "out of range");
+		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
 	if (n>0) {
@@ -69,7 +73,7 @@ orcaData orcaTupleIter::ex_next(orcaVM* vm, int n)
 	}
 
 	if (m_iter == m_tp->end()) {
-		throw orcaException(vm, "orca.iter", "out of range");
+		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
 	if (flag_ready == false) {
@@ -80,7 +84,7 @@ orcaData orcaTupleIter::ex_next(orcaVM* vm, int n)
 	++m_iter;
 
 	if (m_iter == m_tp->end()) {
-		throw orcaException(vm, "orca.iter", "out of range");
+		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
 	return this;
@@ -93,7 +97,7 @@ orcaData orcaTupleIter::ex_prev(orcaVM* vm, int n)
 	}
 
 	if (m_iter == m_tp->begin()) {
-		throw orcaException(vm, "orca.iter", "out of range");
+		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
 	--m_iter;
@@ -108,7 +112,11 @@ orcaData orcaTupleIter::ex_eq(orcaVM* vm, int n)
 	}
 
 	orcaTupleIter* ip = dynamic_cast<orcaTupleIter*>(vm->get_param(0).Object());
+
 	if (ip != NULL) {
+		if (flag_ready == false || ip->flag_ready == false) {
+			throw orcaException(vm, "orca.iter.ready", "not ready");
+		}
 		return m_iter == ip->m_iter;
 	}
 

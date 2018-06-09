@@ -1,12 +1,12 @@
 
 using os;
 
-for it in root.MEMBERS.iter() {
-	m = it.value();
+for key, value in root.MEMBERS {
+	m = value;
 	if m.MEMBERS.has_key('models') {
 		models = m.models;
-		for it2 in models.MEMBERS.iter() {
-			m = it2.value();
+		for k2, v2 in models.MEMBERS {
+			m = v2;
 			if m.MEMBERS.has_key('initialize') {
 				#print: m.NAME;
 				m.initialize();

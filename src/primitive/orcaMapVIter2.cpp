@@ -33,7 +33,7 @@ orcaMapVIter2::orcaMapVIter2(orcamap_iterator it, orcaMap* mp, bool flag_ready) 
 
 orcaObject* orcaMapVIter2::v_clone() 
 {
-	return new orcaMapVIter2(m_iter, m_mp);
+	return new orcaMapVIter2(m_iter, m_mp, flag_ready);
 }
 
 orcaMapVIter2::~orcaMapVIter2() { }
@@ -64,6 +64,10 @@ orcaData orcaMapVIter2::ex_eq(orcaVM* vm, int n)
 
 	orcaMapVIter2* ip = dynamic_cast<orcaMapVIter2*>(vm->get_param(0).Object());
 	if (ip != NULL) {
+		if (flag_ready == false || ip->flag_ready == false) {
+			throw orcaException(vm, "orca.iter.ready", "not ready");
+		}
+
 		return m_iter == ip->m_iter;
 	}
 
@@ -78,6 +82,10 @@ orcaData orcaMapVIter2::ex_lt(orcaVM* vm, int n)
 
 	orcaMapVIter2* ip = dynamic_cast<orcaMapVIter2*>(vm->get_param(0).Object());
 	if (ip != NULL) {
+		if (flag_ready == false || ip->flag_ready == false) {
+			throw orcaException(vm, "orca.iter.ready", "not ready");
+		}
+
 		orcaData k1 = m_iter->first;
 		orcaData k2 = ip->m_iter->first;
 		return k1.operator_lt(vm, k2);

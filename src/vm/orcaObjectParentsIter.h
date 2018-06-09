@@ -17,8 +17,7 @@
 class orcaObjectParentsIter : public orcaObject
 {
 public:
-	orcaObjectParentsIter(orcaObject* src, int pos);
-//	orcaObjectParentsIter(orcaObject* src, orcaData p);
+	orcaObjectParentsIter(orcaObject* src, bool flag_ready = false);
 	orcaObjectParentsIter(void* vp);
 	virtual orcaObject* v_clone();
 	virtual ~orcaObjectParentsIter();
@@ -27,14 +26,11 @@ public:
 
 	orcaData ex_next(orcaVM* vm, int n);
 	orcaData ex_erase(orcaVM* vm, int n);
-/*
-	orcaData ex_prev(orcaVM* vm, int n);
-	orcaData ex_eq(orcaVM* vm, int n);
-*/
 
 private:
 	orcaObject* m_op;
 	list<orcaObject*>::iterator m_it;
+	bool flag_ready;
 };
 
 #endif

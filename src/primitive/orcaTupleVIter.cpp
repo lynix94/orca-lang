@@ -30,7 +30,7 @@ orcaTupleVIter::orcaTupleVIter(orcatuple_iterator it, orcaTuple* tp, bool flag_r
 
 orcaObject* orcaTupleVIter::v_clone() 
 {
-	return new orcaTupleVIter(m_iter, m_tp);
+	return new orcaTupleVIter(m_iter, m_tp, flag_ready);
 }
 
 orcaTupleVIter::~orcaTupleVIter() { }
@@ -55,6 +55,10 @@ orcaData orcaTupleVIter::ex_eq(orcaVM* vm, int n)
 
 	orcaTupleVIter* ip = dynamic_cast<orcaTupleVIter*>(vm->get_param(0).Object());
 	if (ip != NULL) {
+		if (flag_ready == false || ip->flag_ready == false) {
+			throw orcaException(vm, "orca.iter.ready", "not ready");
+		}
+
 		return m_iter == ip->m_iter;
 	}
 

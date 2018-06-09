@@ -62,6 +62,7 @@ liborca_la_SOURCES = \
 		$(VM_DIR)/orcaObject.cpp \
 		$(VM_DIR)/orcaObjectMembers.cpp \
 		$(VM_DIR)/orcaObjectMembersIter.cpp \
+		$(VM_DIR)/orcaObjectMembersIter2.cpp \
 		$(VM_DIR)/orcaObjectParents.cpp \
 		$(VM_DIR)/orcaObjectParentsIter.cpp \
 		$(VM_DIR)/orcaRoot.cpp \

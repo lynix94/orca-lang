@@ -1009,7 +1009,7 @@ orcaData orcaGtkIter::ex_push_child(orcaVM* vm, int n)/*{{{*/
 orcaData orcaGtkIter::ex_next(orcaVM* vm, int n)/*{{{*/
 {
 	if (!gtk_tree_model_iter_next(m_gp->store, &m_iter)) {
-		throw orcaException(vm, "orca.iter", "out of range");
+		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
 	return this;

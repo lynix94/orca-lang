@@ -2,21 +2,21 @@
 
 /**********************************************************************
 
-  orcaObjectMembersIter.cpp - orca object member iterator
+  orcaObjectMembersIter2.cpp - orca object member iterator
 
   Copyright (C) 2009-2011 Lee, Ki-Yeul
 
 **********************************************************************/
 
-#include "orcaObjectMembersIter.h"
+#include "orcaObjectMembersIter2.h"
 #include "orcaException.h"
 #include "orcaTuple.h"
 
 
-orcaObjectMembersIter::orcaObjectMembersIter(orcaObject* src, bool flag_ready)
+orcaObjectMembersIter2::orcaObjectMembersIter2(orcaObject* src, bool flag_ready)
 {
-	set_name("iter");
-	insert_native_function("next", (object_fp)&orcaObjectMembersIter::ex_next);
+	set_name("iter2");
+	insert_native_function("next", (object_fp)&orcaObjectMembersIter2::ex_next);
 
 	m_op = src;
 	if (m_op == NULL) return;
@@ -33,41 +33,44 @@ orcaObjectMembersIter::orcaObjectMembersIter(orcaObject* src, bool flag_ready)
 }
 
 
-orcaObjectMembersIter::orcaObjectMembersIter(void* vp) { }
+orcaObjectMembersIter2::orcaObjectMembersIter2(void* vp) { }
 
-orcaObject* orcaObjectMembersIter::v_clone()
+orcaObject* orcaObjectMembersIter2::v_clone()
 {
-	orcaObjectMembersIter* ip = new orcaObjectMembersIter(m_op, 0);
+	orcaObjectMembersIter2* ip = new orcaObjectMembersIter2(m_op, 0);
 	ip->m_sit = m_sit;
 	ip->m_mit = m_mit;
 	ip->in_static = in_static;
 	return ip;
 }
 
-orcaObjectMembersIter::~orcaObjectMembersIter() { }
+orcaObjectMembersIter2::~orcaObjectMembersIter2() { }
 
-orcaData orcaObjectMembersIter::operator()(orcaVM* vm, int n)
+orcaTuple* orcaObjectMembersIter2::value(orcaVM *vm)
 {
 	if (m_op == NULL) {
 		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
-	if (flag_ready == false) {
-		throw orcaException(vm, "orca.iter.ready", "not ready");
-	}
-
 	if (in_static) {
-		return m_mit->first;
+		orcaTuple* tp = new orcaTuple(2);
+		tp->update(0, m_sit->first);
+		tp->update(1, m_sit->second);
+		return tp;
 	}
 
 	if (m_mit == m_op->m_member.end()) {
 		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
-	return m_mit->first;
+	orcaTuple* tp = new orcaTuple(2);
+	tp->update(0, m_mit->first);
+	tp->update(1, m_mit->second);
+
+	return tp;
 }
 
-orcaData orcaObjectMembersIter::ex_next(orcaVM* vm, int n)
+orcaData orcaObjectMembersIter2::ex_next(orcaVM* vm, int n)
 {
 	if (m_op == NULL) {
 		throw orcaException(vm, "orca.iter.end", "out of range");
@@ -75,17 +78,7 @@ orcaData orcaObjectMembersIter::ex_next(orcaVM* vm, int n)
 
 	if (flag_ready == false) {
 		flag_ready = true;
-
-		if (in_static) {
-			return m_sit->first; // at least 1
-		}
-		else {
-			if (m_mit == m_op->m_member.end()) {
-				throw orcaException(vm, "orca.iter.end", "out of range");
-			}
-
-			return m_mit->first;
-		}
+		return value(vm);
 	}
 
 	if (in_static) {
@@ -94,7 +87,7 @@ orcaData orcaObjectMembersIter::ex_next(orcaVM* vm, int n)
 		if (m_sit != m_op->m_static->end())  {
 			++m_sit;
 			if (m_sit != m_op->m_static->end()) {
-				return m_sit->first;
+				return value(vm);
 			}
 		}
 	
@@ -104,7 +97,7 @@ orcaData orcaObjectMembersIter::ex_next(orcaVM* vm, int n)
 			throw orcaException(vm, "orca.iter.end", "out of range");
 		}
 
-		return m_mit->first;
+		return value(vm);
 	}
 
 	if (m_mit == m_op->m_member.end()) {
@@ -115,7 +108,7 @@ orcaData orcaObjectMembersIter::ex_next(orcaVM* vm, int n)
 		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
-	return m_mit->first;
+	return value(vm);
 }
 
 

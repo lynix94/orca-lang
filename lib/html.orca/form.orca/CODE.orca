@@ -8,19 +8,18 @@ def fill_and_get(param)
 {
 	errors = {,};
 	result = {,};
-	for it in ..MEMBERS.iter() {
-		if it.value().TYPE < form.input.input_base.TYPE {
-			k = it.key();
-			if param.has_key(k) {
-				result[k] = param[k];
+	for key, value in ..MEMBERS {
+		if value.TYPE < form.input.input_base.TYPE {
+			if param.has_key(key) {
+				result[key] = param[key];
 			}
 			else {
-				result[k] = nil;
+				result[key] = nil;
 			}
 
-			err = my.check_valid(k, result[k]);
+			err = my.check_valid(key, result[key]);
 			if err != nil {
-				errors[k] = err;
+				errors[key] = err;
 			}
 		}
 	}
@@ -85,11 +84,11 @@ def render_item(form_result, decorator)
 	bdr = strings.builder();
 
 	keys = [];
-	for it in ..MEMBERS.iter() {
-		if it.value().TYPE < form.input.input_base.TYPE {
-			it.value().id = it.key();
-			it.value().name = it.key();
-			keys.push_back(it.value());
+	for key, value in ..MEMBERS {
+		if value.TYPE < form.input.input_base.TYPE {
+			value.id = key;
+			value.name = key;
+			keys.push_back(value);
 		}
 	}
 

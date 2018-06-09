@@ -48,9 +48,9 @@ namespace fs = boost::filesystem;
 #include "orcaFloat.h"
 #include "orcaString.h"
 #include "orcaTuple.h"
-#include "orcaTupleIter.h"
+#include "orcaTupleVIter.h"
 #include "orcaList.h"
-#include "orcaListIterator.h"
+#include "orcaListVIterator.h"
 #include "orcaSbf.h"
 #include "orcaVirtList.h"
 #include "orcaMap.h"
@@ -1095,7 +1095,7 @@ void orcaVM::parallel_do(const char* code, const char* offset)/*{{{*/
 }
 /*}}}*/
 
-void orcaVM::parallel_for(const char* code, const char* offset, int* run_count, orcaObject* op, int per, bool is_iterator)/*{{{*/
+void orcaVM::parallel_for(const char* code, const char* offset, int* run_count, orcaObject* op, int per)/*{{{*/
 {
 	g_thread_pool->m_mutex_pool.lock();
 
@@ -1107,7 +1107,6 @@ void orcaVM::parallel_for(const char* code, const char* offset, int* run_count, 
 	arg.p_for.run_count = run_count;
 	arg.p_for.iter = op;
 	arg.p_for.per = per;
-	arg.p_for.is_iterator = is_iterator;
 
 	g_thread_pool->m_cond_mutex.lock();
 	bool ret = g_thread_pool->signal_restart(arg);
@@ -2307,7 +2306,6 @@ do_assign_list:
 				}
 
 				if (m_for_stack->push(c + sizeof(short) + sizeof(int), lv, p1.o(), d, m_curr) == false) {
-					
 					c = code + addr;
 					goto fast_jmp;
 				}
@@ -2356,8 +2354,7 @@ do_assign_list:
 				int lv = TO_SHORT(&c[1]);
 				int addr = TO_INT(&c[1 + sizeof(short)]);
 
-				p3 = m_stack->pop();	// is_iterator
-				p2 = m_stack->pop();	// per
+				int per = m_stack->pop().Integer();	// per
 				p1 = m_stack->pop();	// iter
 				if (!is<TYPE_OBJ>(p1)) {
 					throw orcaException(this, "orca.type", 
@@ -2365,8 +2362,8 @@ do_assign_list:
 						p1.dump_str());
 				}
 
-				if (m_for_stack->push_sub(c + sizeof(short) + sizeof(int), lv, p1.o(), d, m_curr, p2.Integer(), p3.Boolean()) == false) {
-					
+				bool ret = m_for_stack->push_sub(c+sizeof(short)+sizeof(int), lv, p1.o(), d, m_curr, per);
+				if (ret == false) {
 					c = code + addr;
 					goto fast_jmp;
 				}
@@ -2386,7 +2383,7 @@ do_assign_list:
 				int lv2;
 				
 				const char* cont = m_for_stack->cont(&lv1, &p1, &lv2, &p2);
-				if (cont > 0) { // continue
+				if (cont != 0) { // continue
 					m_local->set(lv1, p1);
 					if (lv2 > 0) {
 						m_local->set(lv2, p2);
@@ -2395,7 +2392,6 @@ do_assign_list:
 				}
 				else {			// end
 					m_for_stack->pop();
-
 					m_local->clean_mark(MARK_FOR);
 				}
 				break;
@@ -2791,25 +2787,35 @@ do_assign_list:
 				}
 
 				orcaObject* iterator = NULL;
-				orcaTupleIter* tit = NULL;
-				orcaListIterator* lit = NULL;
+				orcaData next;
+
 				orcaTuple* tp = NULL;
+				orcaTupleIter* tit = NULL;
+
 				orcaList* lp = NULL;
+				orcaListIterator* lit = NULL;
 				bool iterator_done = false;
-				bool is_iterator = true;
 
 				if (isobj<orcaTuple>(p1)) {
 					tp = castobj<orcaTuple>(p1);
-					iterator = tit = new orcaTupleIter(tp->begin(), tp);
-					is_iterator = false;
+					iterator = tit = new orcaTupleVIter(tp->begin(), tp, false);
 				}
 				else if (isobj<orcaList>(p1)) {
 					lp = castobj<orcaList>(p1);
-					iterator = lit = new orcaListIterator(lp->begin(), lp->begin(), lp->end());
-					is_iterator = false;
+					iterator = lit = new orcaListVIterator(lp->begin(), lp->begin(), lp->end(), false);
 				}
 				else {
+					orcaData out;
 					iterator = p1.o();
+					if (iterator->has_member((char*)"iter", out) == true) {
+						m_stack->push(out);
+						call(0); // iter()
+						iterator = m_stack->pop().Object();
+					}
+
+					if (iterator->has_member((char*)"next", next) == false) {
+						throw orcaException(this, "orca.type", "not iteratable");
+					}
 				}
 
 				int cpu_num = port_cpu_num();
@@ -2819,6 +2825,8 @@ do_assign_list:
 					cpu_num = by;
 				}
 
+				iterator->rc_inc();
+				next.rc_inc();
 				int run_count = 0;
 				do {
 					g_thread_pool->m_cond_mutex.lock();
@@ -2836,48 +2844,40 @@ do_assign_list:
 							g_thread_pool->m_cond_done.wait(&g_thread_pool->m_cond_mutex);
 						}
 						g_thread_pool->m_cond_mutex.unlock();
-
-						if (tit) delete tit;
-						if (lit) delete lit;
 						break;
 					}
 
-					orcaObject* new_iterator = iterator->clone(NULL);
+					orcaObject* new_it = iterator->clone(NULL);
 					parallel_for(code, c + 1 + sizeof(short) + sizeof(int),
-								&run_count, new_iterator, per, is_iterator);
+								&run_count, new_it, per);
 
 					int count = per;
-					if (tit) {
-						while (tit->get_iter() != tp->end() && count-- > 0) {
-							tit->ex_next(this, 0);
+					try {
+						if (tit) {
+							while (tit->get_iter() != tp->end() && count-- > 0) {
+								tit->ex_next(this, 0);
+							}
 						}
-					}
-					else if (lit) {
-						while (lit->get_iter() != lp->end() && count-- > 0) {
-							lit->ex_next(this, 0);
+						else if (lit) {
+							while (lit->get_iter() != lp->end() && count-- > 0) {
+								lit->ex_next(this, 0);
+							}
 						}
-					}
-					else {
-						orcaData next, value;
-						if (iterator->has_member((char*)"next", next) == false) {
-							throw orcaException(this, "orca.type",
-												string("not iterable type ") + 
-												iterator->dump_str());
-						}
-
-						try {
+						else {
 							while (count-- > 0) {
 								m_stack->push(next);
 								call(0); // iter.next();
-								call(0); // iter()
 								m_stack->pop();
 							}
 						}
-						catch (...) {
-							iterator_done = true;
-						}
+					}
+					catch (...) {
+						iterator_done = true;
 					}
 				} while(true);
+
+				iterator->rc_dec();
+				next.rc_dec();
 
 				c = code + TO_INT(&c[1 + sizeof(short)]);
 				goto fast_jmp;

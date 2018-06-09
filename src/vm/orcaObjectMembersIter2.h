@@ -9,23 +9,24 @@
 **********************************************************************/
 
 
-#ifndef _DEF_ORCA_OBJECT_MEMBERS_ITER
-#define _DEF_ORCA_OBJECT_MEMBERS_ITER
+#ifndef _DEF_ORCA_OBJECT_MEMBERS_ITER2
+#define _DEF_ORCA_OBJECT_MEMBERS_ITER2
 
 #include "orcaMap.h"
 #include "orcaObject.h"
+#include "orcaTuple.h"
 
 
-class orcaObjectMembersIter : public orcaObject
+
+class orcaObjectMembersIter2 : public orcaObject
 {
 public:
-	orcaObjectMembersIter(orcaObject* src, bool flag_redy = false);
-	orcaObjectMembersIter(void* vp);
+	orcaObjectMembersIter2(orcaObject* src, bool flag_ready = false);
+	orcaObjectMembersIter2(void* vp);
 	virtual orcaObject* v_clone();
-	virtual ~orcaObjectMembersIter();
+	virtual ~orcaObjectMembersIter2();
 
-	virtual orcaData operator()(orcaVM* vm, int n);
-
+	orcaTuple* value(orcaVM* vm);
 	orcaData ex_next(orcaVM* vm, int n);
 
 private:
@@ -33,7 +34,6 @@ private:
 	cp_map<orcaData>::Type::iterator m_sit;
 	cp_map<orcaData>::Type::iterator m_mit;
 	bool in_static;
-
 	bool flag_ready;
 };
 

@@ -34,12 +34,7 @@ public:
 	orcaData ex_values(orcaVM* vm, int n);
 
 	orcaData ex_iter(orcaVM* vm, int n);
-/*
-	orcaData ex_begin(orcaVM* vm, int n);
-	orcaData ex_last(orcaVM* vm, int n);
-	orcaData ex_end(orcaVM* vm, int n);
-	orcaData ex_find(orcaVM* vm, int n);
-*/
+	orcaData ex_iter2(orcaVM* vm, int n);
 
 private:
 	orcaData m_src;

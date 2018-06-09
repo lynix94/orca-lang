@@ -39,9 +39,9 @@ def result()
 {
 	if .._project == nil {
 		attrs = [];
-		for m in ..MEMBERS.iter() {
-			if m.value() < orm.query.TYPE {
-				attrs.push_back(m.key());
+		for key, value in ..MEMBERS {
+			if value < orm.query.TYPE {
+				attrs.push_back(key);
 			}
 		}
 		
@@ -99,9 +99,9 @@ def unique_index(...argv)
 def initialize()
 {
 	if .._name == nil {
-		for m in ..MEMBERS.iter() {
-			if m.value() < orm.query.TYPE {
-				m.value().qstr = m.key();
+		for key, value in ..MEMBERS {
+			if value < orm.query.TYPE {
+				value.qstr = key;
 			}
 		}
 
@@ -115,9 +115,9 @@ def create_table()
 	owner();
 
 	attrs = [];
-	for m in ..MEMBERS.iter() {
-		if m.value() < orm.query.TYPE {
-			attr = m.value();
+	for key, value in ..MEMBERS {
+		if value < orm.query.TYPE {
+			attr = value;
 			#if attr.meta < type.list {
 			meta = '';
 			if attr.meta != nil && attr.meta.size() > 0 {
@@ -179,9 +179,9 @@ def new()
 {
 	ins = orm.instance.clone();
 	ins.MEMBERS['__name__'] = .._name;
-	for m in ..MEMBERS.iter() {
-		if m.value() < orm.query.TYPE {
-			ins.MEMBERS[m.key()] = nil;
+	for key,value in ..MEMBERS {
+		if value < orm.query.TYPE {
+			ins.MEMBERS[key] = nil;
 		}
 	}
 	

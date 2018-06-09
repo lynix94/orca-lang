@@ -55,9 +55,9 @@ def process_context(body)
 		bdr = strings.builder();
 		bdr.push_back(my.__template % dict);
 
-		for it in my.MEMBERS.iter() {
-			if it.key().starts_with('script_') {
-				bdr.push_back(it.value()(req));
+		for key, value in my.MEMBERS {
+			if key.starts_with('script_') {
+				bdr.push_back(value(req));
 			}
 		}
 

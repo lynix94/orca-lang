@@ -40,6 +40,7 @@ friend class orcaObjectParents;
 friend class orcaObjectParentsIter;
 friend class orcaObjectMembers;
 friend class orcaObjectMembersIter;
+friend class orcaObjectMembersIter2;
 
 public:
 	orcaObject();

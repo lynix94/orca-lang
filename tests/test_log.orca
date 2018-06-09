@@ -1,11 +1,9 @@
 using log;
-
 log.tcp(false);
 
 log <- 'log print';
 log.tcp <- 'log.tcp print';
 log.tcp.socket <- 'log.tcp.socket print';
-
 log.tcp.socket(true);
 log.tcp.raw(true);
 
