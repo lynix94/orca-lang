@@ -1,4 +1,6 @@
 
+using storage.sqlite3;
+using orm;
 using os;
 
 print: argv;
@@ -6,12 +8,30 @@ if argv == nil || argv.size() < 1 {
 	return false;
 }
 
-curr_list = my.get_fileinfo(argv[0]);
+conn = sqlite3.connect('sonar.db');
+orm.set_conn(conn);
+
+curr_list = my.get_models(argv[0]);
 print: curr_list;
+for m in curr_list {
+	ret = orca.load(m, my);
+	print: my.MEMBERS;
+	print: my.models.MEMBERS;
+	for k, v in my.models.MEMBERS {
+		print: v;
+		v.create_table();
+	}
+	
+	ret = orca.unload('models', my);
+	print: my.MEMBERS;
+}
+
 return;
 
 
-def get_fileinfo(path)
+
+
+def get_models(path)
 {
 	src_list = [];
 	it = os.dir_traverser(path);

@@ -2,14 +2,13 @@
 using os;
 
 for key, value in root.MEMBERS {
-	m = value;
-	if m.MEMBERS.has_key('models') {
-		models = m.models;
+	if value.MEMBERS.has_key('models') {
+		models = value.models;
 		for k2, v2 in models.MEMBERS {
-			m = v2;
-			if m.MEMBERS.has_key('initialize') {
-				#print: m.NAME;
-				m.initialize();
+			if v2.MEMBERS.has_key('initialize') {
+				#print: v2.NAME;
+				v2.initialize();
+				#print: v2.MEMBERS;
 			}
 		}
 	}

@@ -68,6 +68,7 @@ def execute(...argv)
 
 	case 'migrate':
 		print: '# migrate';
+		sonar.orm.migrate(os.cwd());
 	
 	default:
 		print: '# nothing todo';
