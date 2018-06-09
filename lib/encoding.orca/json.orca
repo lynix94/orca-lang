@@ -1,6 +1,7 @@
 
 using util.match;
 using alg;
+using strings;
 
 # context parser
 return my.decoding(argv[2]);
@@ -106,7 +107,7 @@ def decoding(str)
 
 def encoding(obj)
 {
-	ret = '';
+	ret = strings.builder();
 	if obj.TYPE == type.map {
 		ret += '{';
 		for a in obj.piter() {
@@ -149,7 +150,7 @@ def encoding(obj)
 		ret += obj;
 	}
 
-	return ret;
+	return ret.string();
 }
 
 
@@ -162,7 +163,7 @@ def beutify(obj, tab)
 	   tab += 1;
 	}
 
-	ret = '';
+	ret = strings.builder();
 	if obj.TYPE == type.map {
 		ret += '\t{';
 		for a in obj.piter() {
@@ -205,6 +206,6 @@ def beutify(obj, tab)
 		ret += obj;
 	}
 
-	return ret;
+	return ret.string();
 }
 

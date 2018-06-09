@@ -1,6 +1,7 @@
 
 using fun;
 using util.match;
+using strings;
 
 # context parser
 return my.decoding(argv[2]);
@@ -118,7 +119,7 @@ def decoding(str)
 
 def encoding(obj)
 {
-	ret = '';
+	ret = strings.builder();
 	if obj.TYPE == type.map {
 		for key, value in obj {
 			if value.TYPE == type.tuple {
@@ -177,7 +178,7 @@ def encoding(obj)
 	else {
 	}
 
-	return ret;
+	return ret.string();
 }
 
 
@@ -190,7 +191,7 @@ def beutify(obj, tab)
 		tab += 1;
 	}
 
-	ret = '';
+	ret = strings.builder();
 	if obj.TYPE == type.map {
 		for key, value in obj {
 			if value.TYPE == type.tuple {
@@ -251,7 +252,7 @@ def beutify(obj, tab)
 	else {
 	}
 
-	return ret;
+	return ret.string();
 }
 
 
