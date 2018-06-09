@@ -4,7 +4,7 @@
 
   orcaList.cpp - list type
 
-  Copyright (C) 2009-2011 Lee, Ki-Yeul
+  Copyright (C) 2009-2018 Lee, Ki-Yeul
 
 **********************************************************************/
 
@@ -51,7 +51,8 @@ orcaList::orcaList()
 	insert_native_function("pop_back", (object_fp)&orcaList::ex_pop_back);
 	insert_native_function("pop_front", (object_fp)&orcaList::ex_pop_front);
 	insert_native_function("find", (object_fp)&orcaList::ex_find);
-	insert_native_function("begin", (object_fp)&orcaList::ex_begin);
+	insert_native_function("iter", (object_fp)&orcaList::ex_iter);
+	insert_native_function("first", (object_fp)&orcaList::ex_first);
 	insert_native_function("last", (object_fp)&orcaList::ex_last);
 	insert_native_function("end", (object_fp)&orcaList::ex_end);
 	insert_native_function("sort", (object_fp)&orcaList::ex_sort);
@@ -381,7 +382,12 @@ orcaData orcaList::ex_find(orcaVM* vm, int n)
 	return new orcaListIterator(it_end, begin(), it_end);
 }
 
-orcaData orcaList::ex_begin(orcaVM* vm, int n) 
+orcaData orcaList::ex_iter(orcaVM* vm, int n) 
+{
+	return new orcaListIterator(begin(), begin(), end(), false);
+}
+
+orcaData orcaList::ex_first(orcaVM* vm, int n) 
 {
 	return new orcaListIterator(begin(), begin(), end());
 }
@@ -392,6 +398,7 @@ orcaData orcaList::ex_last(orcaVM* vm, int n)
 	--li;
 	return new orcaListIterator(li, begin(), end());
 }
+
 
 orcaData orcaList::ex_end(orcaVM* vm, int n) 
 {

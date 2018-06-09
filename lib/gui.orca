@@ -46,7 +46,7 @@ def window
 
 		members = owner.MEMBERS.values();
 
-		alg.remove_if: members.begin(), members.end(), lambda(a){
+		alg.remove_if: members.first(), members.end(), lambda(a){
 			ret = a.TYPE < window.TYPE;
 			if ret == nil || ret == false {
 				return true;
@@ -56,7 +56,7 @@ def window
 		};
 
 		members.sort(lambda(a, b){ return a.order < b.order; });
-		alg.for_each: members.begin(), members.end(), lambda(a){
+		alg.for_each: members.first(), members.end(), lambda(a){
 			a.make();
 			..owner.handle.put(a.handle);
 		};
@@ -321,9 +321,9 @@ def list : window
 		..handle.push_back(item);
 	}
 
-	def begin
+	def first
 	{
-		return ..handle.get_data('begin');
+		return ..handle.get_data('first');
 	}
 
 	def end
@@ -368,9 +368,9 @@ def tree : window
 		..handle.push_back(item);
 	}
 
-	def begin
+	def first
 	{
-		return ..handle.get_data('begin');
+		return ..handle.get_data('first');
 	}
 
 	def end

@@ -4,7 +4,7 @@
 
   orcaMap.h - map type
 
-  Copyright (C) 2009-2011 Lee, Ki-Yeul
+  Copyright (C) 2009 Lee, Ki-Yeul
 
 **********************************************************************/
 
@@ -58,7 +58,8 @@ public:
 	orcaData ex_find(orcaVM* vm, int n);
 	orcaData ex_lower_bound(orcaVM* vm, int n);
 	orcaData ex_upper_bound(orcaVM* vm, int n);
-	orcaData ex_begin(orcaVM* vm, int n);
+	orcaData ex_iter(orcaVM* vm, int n);
+	orcaData ex_first(orcaVM* vm, int n);
 	orcaData ex_last(orcaVM* vm, int n);
 	orcaData ex_end(orcaVM* vm, int n);
 	orcaData ex_erase_key(orcaVM* vm, int n);

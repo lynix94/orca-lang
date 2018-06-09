@@ -4,7 +4,7 @@
 
   orcaListIter.h - list type iterator
 
-  Copyright (C) 2009-2011 Lee, Ki-Yeul
+  Copyright (C) 2009 Lee, Ki-Yeul
 
 **********************************************************************/
 

@@ -2,11 +2,12 @@ using ipc;
 using time;
 
 list = [1..1000];
-parallel for a in list.begin() {
+parallel for a in list.iter() {
   a( a()*2 );
 }
 
 print: list;
+print: %[x*2|x<-1~1000];
 
 if list != %[x*2|x<-1~1000] {
 	throw test.para_for <- 'para for fail';

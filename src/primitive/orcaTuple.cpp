@@ -25,7 +25,8 @@ orcaTuple::orcaTuple()
 	insert_native_function("list", (object_fp)&orcaTuple::ex_list);
 	insert_native_function("push_back", (object_fp)&orcaTuple::ex_push_back);
 	insert_native_function("pop_back", (object_fp)&orcaTuple::ex_pop_back);
-	insert_native_function("begin", (object_fp)&orcaTuple::ex_begin);
+	insert_native_function("iter", (object_fp)&orcaTuple::ex_iter);
+	insert_native_function("first", (object_fp)&orcaTuple::ex_first);
 	insert_native_function("last", (object_fp)&orcaTuple::ex_last);
 	insert_native_function("end", (object_fp)&orcaTuple::ex_end);
 	insert_native_function("find", (object_fp)&orcaTuple::ex_find);
@@ -49,7 +50,8 @@ orcaTuple::orcaTuple(int n)
 	insert_native_function("list", (object_fp)&orcaTuple::ex_list);
 	insert_native_function("push_back", (object_fp)&orcaTuple::ex_push_back);
 	insert_native_function("pop_back", (object_fp)&orcaTuple::ex_pop_back);
-	insert_native_function("begin", (object_fp)&orcaTuple::ex_begin);
+	insert_native_function("iter", (object_fp)&orcaTuple::ex_iter);
+	insert_native_function("first", (object_fp)&orcaTuple::ex_first);
 	insert_native_function("last", (object_fp)&orcaTuple::ex_last);
 	insert_native_function("end", (object_fp)&orcaTuple::ex_end);
 	insert_native_function("find", (object_fp)&orcaTuple::ex_find);
@@ -311,7 +313,12 @@ orcaData orcaTuple::ex_pop_back(orcaVM* vm, int n)
 	return this;
 }
 
-orcaData orcaTuple::ex_begin(orcaVM* vm, int n) 
+orcaData orcaTuple::ex_iter(orcaVM* vm, int n) 
+{
+	return new orcaTupleIter(begin(), this, false);
+}
+
+orcaData orcaTuple::ex_first(orcaVM* vm, int n) 
 {
 	return new orcaTupleIter(begin(), this);
 }

@@ -4,7 +4,7 @@
 
   orcaTupleIter.h - tuple iterator
 
-  Copyright (C) 2009-2011 Lee, Ki-Yeul
+  Copyright (C) 2009 Lee, Ki-Yeul
 
 **********************************************************************/
 
@@ -17,7 +17,7 @@
 class LIBORCA_API orcaTupleIter : public orcaObject
 {
 public:
-	orcaTupleIter(orcatuple_iterator begin, orcaTuple* tp);
+	orcaTupleIter(orcatuple_iterator begin, orcaTuple* tp, bool flag_ready = true);
 	orcaObject* v_clone();
 	virtual ~orcaTupleIter();
 
@@ -34,6 +34,7 @@ private:
 	bool valid();
 
 private:
+	bool flag_ready;
 	orcatuple_iterator m_iter;
 	orcaTuple* m_tp;
 

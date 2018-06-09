@@ -144,7 +144,7 @@ def client
 		print: '# remove: ', key, key.hash(cached.hash_size);
 		list = ..cache[key.hash(cached.hash_size)];
 
-		for it in list.begin() {
+		for it in list.iter() {
 			if it()[0] == key {
 				it.erase();
 			}

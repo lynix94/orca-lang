@@ -20,20 +20,20 @@ class orcaObjectMembersIter : public orcaObject
 {
 public:
 	orcaObjectMembersIter(orcaObject* src, int pos);
-	orcaObjectMembersIter(orcaObject* src, string& name);
+	//orcaObjectMembersIter(orcaObject* src, string& name);
 	orcaObjectMembersIter(void* vp);
 	virtual orcaObject* v_clone();
 	virtual ~orcaObjectMembersIter();
 
 	virtual orcaData operator()(orcaVM* vm, int n);
 
-	orcaData ex_first(orcaVM* vm, int n);
-	orcaData ex_second(orcaVM* vm, int n);
+	orcaData ex_key(orcaVM* vm, int n);
+	orcaData ex_value(orcaVM* vm, int n);
 	orcaData ex_next(orcaVM* vm, int n);
-	orcaData ex_prev(orcaVM* vm, int n);
-	orcaData ex_eq(orcaVM* vm, int n);
-	orcaData ex_lt(orcaVM* vm, int n);
-	orcaData ex_erase(orcaVM* vm, int n);
+	//orcaData ex_prev(orcaVM* vm, int n);
+	//orcaData ex_eq(orcaVM* vm, int n);
+	//orcaData ex_lt(orcaVM* vm, int n);
+	//orcaData ex_erase(orcaVM* vm, int n);
 
 private:
 	orcaObject* m_op;

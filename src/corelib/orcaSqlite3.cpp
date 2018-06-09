@@ -30,6 +30,7 @@ orcaSqlite3Result* orcaSqlite3Result::rs_make(sqlite3_stmt* stmt)
 		rp->done = false;
 	}
 
+	rp->flag_ready = false;
 	return rp;
 }
 
@@ -42,6 +43,8 @@ orcaSqlite3Result* orcaSqlite3Result::rs_make(bool rc, const string& msg)
 
 	rp->rc = rc;
 	rp->msg = msg;
+
+	rp->flag_ready = false;
 	return rp;
 }
 
@@ -50,11 +53,17 @@ orcaObject* orcaSqlite3Result::v_clone()
 	orcaSqlite3Result* sp = new orcaSqlite3Result(NULL);
 	sp->stmt = this->stmt;
 	sp->ncols = this->ncols;
+	sp->flag_ready = this->flag_ready;
 	return sp;
 }
 
 orcaData orcaSqlite3Result::ex_next(orcaVM* vm, int n) 
 {
+	if (flag_ready == false) {
+		flag_ready = true;
+		return this;
+	}
+
 	if (done || stmt == NULL || sqlite3_step(stmt) == SQLITE_DONE) {
 		done = true;
 		throw orcaException(vm, "orca.iter", "out of range");

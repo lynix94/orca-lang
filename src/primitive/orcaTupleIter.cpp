@@ -13,7 +13,7 @@
 #include "orcaTuple.h"
 #include "orcaException.h"
 
-orcaTupleIter::orcaTupleIter(orcatuple_iterator it, orcaTuple* tp)
+orcaTupleIter::orcaTupleIter(orcatuple_iterator it, orcaTuple* tp, bool flag_ready)
 { 
 	set_name("tupleiter"); 
 	insert_native_function("next", (object_fp)&orcaTupleIter::ex_next);
@@ -23,6 +23,8 @@ orcaTupleIter::orcaTupleIter(orcatuple_iterator it, orcaTuple* tp)
 	m_iter = it;
 	m_tp = tp;
 	m_timestamp = tp->get_timestamp();
+
+	this->flag_ready = flag_ready;
 }
 
 bool orcaTupleIter::valid()
@@ -66,32 +68,19 @@ orcaData orcaTupleIter::ex_next(orcaVM* vm, int n)
 		throw orcaException(vm, "orca.tuple", "invalid iterator - timestamp");
 	}
 
-	if (n == 0) {
-		if (m_iter == m_tp->end())
-			throw orcaException(vm, "orca.iter", "out of range");
-
-		++m_iter;
-
-		if (m_iter == m_tp->end()) 
-			return NIL;
+	if (m_iter == m_tp->end()) {
+		throw orcaException(vm, "orca.iter", "out of range");
 	}
-	else {
-		int c = vm->get_param(0).Integer();
-		if (c < 0)
-			throw orcaException(vm, "orca.iter", "minus value in next");
 
-		if (m_iter == m_tp->end())
-			throw orcaException(vm, "orca.iter", "out of range");
+	if (flag_ready == false) {
+		flag_ready = true;
+		return this;
+	}
 
-		m_iter += c;
+	++m_iter;
 
-		if (m_iter == m_tp->end()) 
-			return NIL;
-
-		if (m_iter > m_tp->end()) {
-			m_iter = m_tp->end();
-			throw orcaException(vm, "orca.iter", "out of range");
-		}
+	if (m_iter == m_tp->end()) {
+		throw orcaException(vm, "orca.iter", "out of range");
 	}
 
 	return this;
@@ -103,27 +92,11 @@ orcaData orcaTupleIter::ex_prev(orcaVM* vm, int n)
 		throw orcaException(vm, "orca.tuple", "invalid iterator - timestamp");
 	}
 
-	if (n == 0) {
-		if (m_iter == m_tp->begin()) 
-			throw orcaException(vm, "orca.iter", "out of range");
-
-		--m_iter;
+	if (m_iter == m_tp->begin()) {
+		throw orcaException(vm, "orca.iter", "out of range");
 	}
-	else {
-		int c = vm->get_param(0).Integer();
-		if (c < 0)
-			throw orcaException(vm, "orca.iter", "minus value in prev");
 
-		if (m_iter == m_tp->begin()) 
-			throw orcaException(vm, "orca.iter", "out of range");
-
-		m_iter -= c;
-
-		if (m_iter < m_tp->begin()) {
-			m_iter = m_tp->begin();
-			throw orcaException(vm, "orca.iter", "out of range");
-		}
-	}
+	--m_iter;
 
 	return this;
 }

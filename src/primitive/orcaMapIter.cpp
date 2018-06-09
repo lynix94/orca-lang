@@ -4,7 +4,7 @@
 
   orcaMapIter.cpp - map iterator
 
-  Copyright (C) 2009-2011 Lee, Ki-Yeul
+  Copyright (C) 2009-2018 Lee, Ki-Yeul
 
 **********************************************************************/
 
@@ -13,11 +13,11 @@
 #include "orcaTuple.h"
 #include "orcaException.h"
 
-orcaMapIter::orcaMapIter(orcamap_iterator it, orcaMap* mp)
+orcaMapIter::orcaMapIter(orcamap_iterator it, orcaMap* mp, bool flag_ready)
 { 
 	set_name("mapiter"); 
-	insert_native_function("first", (object_fp)&orcaMapIter::ex_first);
-	insert_native_function("second", (object_fp)&orcaMapIter::ex_second);
+	insert_native_function("key", (object_fp)&orcaMapIter::ex_key);
+	insert_native_function("value", (object_fp)&orcaMapIter::ex_value);
 	insert_native_function("next", (object_fp)&orcaMapIter::ex_next);
 	insert_native_function("prev", (object_fp)&orcaMapIter::ex_prev);
 	insert_native_function("==", (object_fp)&orcaMapIter::ex_eq);
@@ -28,6 +28,7 @@ orcaMapIter::orcaMapIter(orcamap_iterator it, orcaMap* mp)
 
 	m_mp = mp;
 	m_timestamp = mp->get_timestamp();
+	this->flag_ready = flag_ready;
 }
 
 bool orcaMapIter::valid()
@@ -46,7 +47,7 @@ orcaObject* orcaMapIter::v_clone()
 
 orcaMapIter::~orcaMapIter() { }
 
-orcaData orcaMapIter::ex_first(orcaVM* vm, int n) 
+orcaData orcaMapIter::ex_key(orcaVM* vm, int n) 
 {
 	if (valid() == false) {
 		throw orcaException(vm, "orca.map", "invalid iterator - timestamp");
@@ -59,7 +60,7 @@ orcaData orcaMapIter::ex_first(orcaVM* vm, int n)
 	return m_iter->first;
 }
 
-orcaData orcaMapIter::ex_second(orcaVM* vm, int n) 
+orcaData orcaMapIter::ex_value(orcaVM* vm, int n) 
 {
 	if (valid() == false) {
 		throw orcaException(vm, "orca.map", "invalid iterator - timestamp");
@@ -101,29 +102,19 @@ orcaData orcaMapIter::ex_next(orcaVM* vm, int n)
 		throw orcaException(vm, "orca.map", "invalid iterator - timestamp");
 	}
 
-	if (n == 0) {
-		if (m_iter == m_mp->end())
-			throw orcaException(vm, "orca.iter", "out of range");
-
-		++m_iter;
-
-		if (m_iter == m_mp->end())
-			return NIL;
+	if (m_iter == m_mp->end()) {
+		throw orcaException(vm, "orca.iter", "out of range");
 	}
-	else {
-		int c = vm->get_param(0).Integer();
-		if (c < 0)
-			throw orcaException(vm, "orca.iter", "minus value in next");
 
-		if (m_iter == m_mp->end())
-			throw orcaException(vm, "orca.iter", "out of range");
+	if (flag_ready == false) {
+		flag_ready = true;
+		return this;
+	}
 
-		for (int i=0; i<c; i++) {
-			++m_iter;
+	++m_iter;
 
-			if (m_iter == m_mp->end())
-				return NIL;
-		}
+	if (m_iter == m_mp->end()) {
+		throw orcaException(vm, "orca.iter", "out of range");
 	}
 
 	return this;
@@ -135,24 +126,11 @@ orcaData orcaMapIter::ex_prev(orcaVM* vm, int n)
 		throw orcaException(vm, "orca.map", "invalid iterator - timestamp");
 	}
 
-	if (n == 0) {
-		if (m_iter == m_mp->begin())
-			throw orcaException(vm, "orca.iter", "out of range");
-
-		--m_iter;
+	if (m_iter == m_mp->begin()) {
+		throw orcaException(vm, "orca.iter", "out of range");
 	}
-	else {
-		int c = vm->get_param(0).Integer();
-		if (c < 0)
-			throw orcaException(vm, "orca.iter", "minus value in prev");
 
-		for (int i=0; i<c; i++) {
-			if (m_iter == m_mp->begin())
-				throw orcaException(vm, "orca.iter", "out of range");
-
-			--m_iter;
-		}
-	}
+	--m_iter;
 
 	return this;
 }

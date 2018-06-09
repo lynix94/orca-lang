@@ -7,7 +7,7 @@ def one_to_hundred
 
 	def init()
 	{
-		..cur = 1;
+		..cur = 0;
 	}
 
 	def cur;
@@ -18,11 +18,12 @@ def one_to_hundred
 		}
 
 		..cur += 1;
+
 		if ..cur > 100 {
-			return nil;
+			throw orca.iter;
 		}
 
-		return owner;
+		return ..cur;
 	}
 }
 
@@ -30,7 +31,7 @@ it = my.one_to_hundred.clone();
 
 sum = 0;
 for i in it {
-	sum += i();
+	sum += i;
 }
 print: 'sum1: ', sum;
 
@@ -47,7 +48,7 @@ if sum != sum2 {
 
 sum = 0;
 item = [1..100];
-for a in item.begin() {
+for a in item.iter() {
 	sum += a();
 }
 
@@ -58,7 +59,7 @@ if sum != sum2 {
 
 
 item = [1..100];
-for a in item.begin() {
+for a in item.iter() {
 	a(a()*2);
 }
 
@@ -70,7 +71,7 @@ if item != %[2*x|x<-1~100] {
 
 sum = 0;
 item = (1..100);
-for a in item.begin() {
+for a in item.iter() {
 	sum += a();
 }
 
@@ -80,7 +81,7 @@ if sum != sum2 {
 }
 
 item = (1..100);
-for a in item.begin() {
+for a in item.iter() {
 	a(a()*2);
 }
 
@@ -93,8 +94,8 @@ if item != %[2*x|x<-1~100].tuple() {
 	
 sum = 0;
 item =  { 1:1, 2:2, 3:3, 4:4, 5:5 };
-for a in item.begin() {
-	sum += a.second();
+for a in item.iter() {
+	sum += a.value();
 }
 
 print: 'map sum: ', sum;
@@ -103,8 +104,8 @@ if sum !=  1+2+3+4+5 {
 }
 
 item =  { 1:1, 2:2, 3:3, 4:4, 5:5 };
-for a in item.begin() {
-	a(a.second()*2);
+for a in item.iter() {
+	a(a.value()*2);
 }
 
 print: 'map pow sum: ', item;

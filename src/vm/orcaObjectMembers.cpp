@@ -29,10 +29,13 @@ orcaObjectMembers::orcaObjectMembers(orcaData src) : m_src(src)
 	insert_native_function("erase_key", (object_fp)&orcaObjectMembers::ex_erase_key);
 	insert_native_function("keys", (object_fp)&orcaObjectMembers::ex_keys);
 	insert_native_function("values", (object_fp)&orcaObjectMembers::ex_values);
+	insert_native_function("iter", (object_fp)&orcaObjectMembers::ex_iter);
+/*
 	insert_native_function("begin", (object_fp)&orcaObjectMembers::ex_begin);
 	insert_native_function("end", (object_fp)&orcaObjectMembers::ex_end);
 	insert_native_function("last", (object_fp)&orcaObjectMembers::ex_last);
 	insert_native_function("find", (object_fp)&orcaObjectMembers::ex_find);
+*/
 
 	is_static = false;
 
@@ -320,7 +323,20 @@ orcaData orcaObjectMembers::ex_values(orcaVM* vm, int n)
 	return lp;
 }
 
+orcaData orcaObjectMembers::ex_iter(orcaVM* vm, int n)
+{
+	orcaObject* op = NULL;
+	if (isinternal(m_src))
+		op = m_internal;
+	else if (is<TYPE_OBJ>(m_src))
+		op = m_src.o();
+		
+	orcaObjectMembersIter* ip = new orcaObjectMembersIter(op, 0);
+	return ip;
+}
 
+
+/*
 orcaData orcaObjectMembers::ex_begin(orcaVM* vm, int n)
 {
 	orcaObject* op = NULL;
@@ -374,5 +390,6 @@ orcaData orcaObjectMembers::ex_find(orcaVM* vm, int n)
 	orcaObjectMembersIter* ip = new orcaObjectMembersIter(op, name);
 	return ip;
 }
+*/
 
 

@@ -16,13 +16,13 @@
 orcaObjectMembersIter::orcaObjectMembersIter(orcaObject* src, int pos)
 {
 	set_name("MEMBERS_ITERATOR");
-	insert_native_function("first", (object_fp)&orcaObjectMembersIter::ex_first);
-	insert_native_function("second", (object_fp)&orcaObjectMembersIter::ex_second);
+	insert_native_function("key", (object_fp)&orcaObjectMembersIter::ex_key);
+	insert_native_function("value", (object_fp)&orcaObjectMembersIter::ex_value);
 	insert_native_function("next", (object_fp)&orcaObjectMembersIter::ex_next);
-	insert_native_function("prev", (object_fp)&orcaObjectMembersIter::ex_prev);
-	insert_native_function("==", (object_fp)&orcaObjectMembersIter::ex_eq);
-	insert_native_function("<", (object_fp)&orcaObjectMembersIter::ex_lt);
-	insert_native_function("erase", (object_fp)&orcaObjectMembersIter::ex_erase);
+//	insert_native_function("prev", (object_fp)&orcaObjectMembersIter::ex_prev);
+//	insert_native_function("==", (object_fp)&orcaObjectMembersIter::ex_eq);
+//	insert_native_function("<", (object_fp)&orcaObjectMembersIter::ex_lt);
+//	insert_native_function("erase", (object_fp)&orcaObjectMembersIter::ex_erase);
 
 	m_op = src;
 	if (m_op == NULL) return;
@@ -36,6 +36,7 @@ orcaObjectMembersIter::orcaObjectMembersIter(orcaObject* src, int pos)
 			in_static = true;
 		}
 	}
+/*
 	else if (pos == -1) {
 		if (m_op->m_member.empty()) {
 			in_static = true;
@@ -54,12 +55,14 @@ orcaObjectMembersIter::orcaObjectMembersIter(orcaObject* src, int pos)
 		m_mit = m_op->m_member.end();
 		in_static = false;
 	}
+*/
 	else {
 		assert(0);
 	}
 }
 
 
+/*
 orcaObjectMembersIter::orcaObjectMembersIter(orcaObject* src, string& name)
 {
 	set_name("members_iterator");
@@ -85,6 +88,7 @@ orcaObjectMembersIter::orcaObjectMembersIter(orcaObject* src, string& name)
 	in_static = false;
 	m_mit = m_op->m_member.find(name.c_str());
 }
+*/
 
 orcaObjectMembersIter::orcaObjectMembersIter(void* vp) { }
 
@@ -123,7 +127,7 @@ orcaData orcaObjectMembersIter::operator()(orcaVM* vm, int n)
 	return tp;
 }
 
-orcaData orcaObjectMembersIter::ex_first(orcaVM* vm, int n)
+orcaData orcaObjectMembersIter::ex_key(orcaVM* vm, int n)
 {
 	if (m_op == NULL) {
 		throw orcaException(vm, "orca.iter", "out of range");
@@ -147,7 +151,7 @@ orcaData orcaObjectMembersIter::ex_first(orcaVM* vm, int n)
 	return it->first;
 }
 
-orcaData orcaObjectMembersIter::ex_second(orcaVM* vm, int n)
+orcaData orcaObjectMembersIter::ex_value(orcaVM* vm, int n)
 {
 	if (m_op == NULL) {
 		throw orcaException(vm, "orca.iter", "out of range");
@@ -207,6 +211,7 @@ orcaData orcaObjectMembersIter::ex_next(orcaVM* vm, int n)
 	return this;
 }
 
+/*
 orcaData orcaObjectMembersIter::ex_prev(orcaVM* vm, int n)
 {
 	if (m_op == NULL) {
@@ -314,4 +319,8 @@ orcaData orcaObjectMembersIter::ex_erase(orcaVM* vm, int n)
 	m_op->remove_member(name.c_str());
 	return this;
 }
+*/
+
+
+
 

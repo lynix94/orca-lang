@@ -2,247 +2,310 @@
 def traverse(obj, fun)
 {
 	fun(obj);
-	if obj.MEMBERS.has_key('begin') {
-		for a in obj.begin() {
+	if obj.MEMBERS.has_key('iter') {
+		for a in obj.iter() {
 			traverse(a(), fun);
 		}
 	}
 }
 
-def for_each(begin, end, fun)
+def for_each(first, end, fun)
 {
-	iter = begin;
+	iter = first;
 
-	while iter != end {
-		fun(iter());
-		iter.next();
-	}
-}
-
-def for_each_iterator(begin, end, fun)
-{
-	iter = begin;
-
-	while iter != end {
-		fun(iter);
-		iter.next();
-	}
-}
-
-
-def find(begin, end, val)
-{
-	iter = begin;
-
-	while iter != end {
-		if iter() == val {
-			return iter;
+	try {
+		while iter != end {
+			fun(iter());
+			iter.next();
 		}
-		iter.next();
+	} catch orca.iter {
+		// ignore
+	}
+}
+
+def for_each_iterator(first, end, fun)
+{
+	iter = first;
+
+	try {
+		while iter != end {
+			fun(iter);
+			iter.next();
+		}
+	} catch orca.iter {
+		// ignore
+	}
+}
+
+
+def find(first, end, val)
+{
+	iter = first;
+
+	try {
+		while iter != end {
+			if iter() == val {
+				return iter;
+			}
+			iter.next();
+		}
+	} catch orca.iter {
+		// ignore
 	}
 
 	return end;
 }
 
 
-def find_if(begin, end, fun)
+def find_if(first, end, fun)
 {
-	iter = begin;
+	iter = first;
 
-	while iter != end {
-		if fun(iter()) {
-			return iter;
+	try {
+		while iter != end {
+			if fun(iter()) {
+				return iter;
+			}
+
+			iter.next();
 		}
-
-		iter.next();
+	} catch orca.iter {
+		// ignore
 	}
 
 	return end;
 }
 
 
-def remove(begin, end, val)
+def remove(first, end, val)
 {
-	iter = begin;
+	iter = first;
 
-	while iter != end {
-		if iter() == val {
-			iter.erase();
+	try {
+		while iter != end {
+			if iter() == val {
+				iter.erase();
+			}
+			else {
+				iter.next();
+			}
 		}
-		else {
+	} catch orca.iter {
+		// ignore
+	}
+}
+
+
+def remove_if(first, end, fun)
+{
+	iter = first;
+
+	try {
+		while iter != end {
+			if fun(iter()) {
+				iter.erase();
+			}
+			else {
+				iter.next();
+			}
+		}
+	} catch orca.iter {
+		// ignore
+	}
+}
+
+
+def replace(first, end, old, new)
+{
+	iter = first;
+
+	try {
+		while iter != end {
+			if iter() == old {
+				iter(new);
+			}
+
 			iter.next();
 		}
+	} catch orca.iter {
+		// ignore
 	}
 }
 
 
-def remove_if(begin, end, fun)
+def replace_if(first, end, fun, new)
 {
-	iter = begin;
+	iter = first;
 
-	while iter != end {
-		if fun(iter()) {
-			iter.erase();
-		}
-		else {
+	try {
+		while iter != end {
+			if fun(iter()) {
+				iter(new);
+			}
+
 			iter.next();
 		}
+	} catch orca.iter {
+		// ignore
 	}
 }
 
 
-def replace(begin, end, old, new)
+def erase(first, end)
 {
-	iter = begin;
-
-	while iter != end {
-		if iter() == old {
-			iter(new);
+	iter = first;
+		try {
+		while iter != end {
+			iter.erase();
 		}
-
-		iter.next();
+	} catch orca.iter {
+		// ignore
 	}
 }
 
 
-def replace_if(begin, end, fun, new)
+def copy(first, end, dest)
 {
-	iter = begin;
+	iter = first;
 
-	while iter != end {
-		if fun(iter()) {
-			iter(new);
+	try {
+		while iter != end {
+			dest.insert(iter());
+			iter.next();
 		}
-
-		iter.next();
+	} catch orca.iter {
+		// ignore
 	}
 }
 
 
-def erase(begin, end)
+def copy_n(first, n, dest)
 {
-	iter = begin;
+	iter = first;
 
-	while iter != end {
-		iter.erase();
+	try {
+		n times do {
+			dest.insert(iter());
+			iter.next();
+		}
+	} catch orca.iter {
+		// ignore
 	}
 }
 
 
-def copy(begin, end, dest)
+def count(first, end, val)
 {
-	iter = begin;
-
-	while iter != end {
-		dest.insert(iter());
-		iter.next();
-	}
-}
-
-
-def copy_n(begin, n, dest)
-{
-	iter = begin;
-
-	n times do {
-		dest.insert(iter());
-		iter.next();
-	}
-}
-
-
-def count(begin, end, val)
-{
-	iter = begin;
+	iter = first;
 	i = 0;
 
-	while iter != end {
-		if iter() == val {
-			i+=1;
-		}
+	try {
+		while iter != end {
+			if iter() == val {
+				i+=1;
+			}
 
-		iter.next();
+			iter.next();
+		}
+	} catch orca.iter {
+		// ignore
 	}
 
 	return i;
 }
 
 
-def count_if(begin, end, fun)
+def count_if(first, end, fun)
 {
-	iter = begin;
+	iter = first;
 	i = 0;
 
-	while iter != end {
-		if fun(iter()) {
-			i+=1;
-		}
+	try {
+		while iter != end {
+			if fun(iter()) {
+				i+=1;
+			}
 
-		iter.next();
+			iter.next();
+		}
+	} catch orca.iter {
+		// ignore
 	}
 
 	return i;
 }
 
 
-def transform(begin, end, p1, p2, p3)
+def transform(first, end, p1, p2, p3)
 {
-	iter = begin;
+	iter = first;
 
-	if p3 == nil {
-		# transform(begin, end, out, fun)
-		out = p1;
-		fun = p2;
+	try {
+		if p3 == nil {
+			# transform(first, end, out, fun)
+			out = p1;
+			fun = p2;
 
-		while iter != end {
-			out.insert(fun(iter()));
-			iter.next();
-		}
-	}
-	else {
-		# transform(begin, end, begin2, out, fun)
-		begin2 = p1;
-		out = p2;
-		fun = p3;
-
-		while iter != end {
-			out.insert(fun(iter(), begin2()));
-			iter.next();
-			begin2.next();
-		}
-	}
-}
-
-def equal(begin, end, begin2, fun)
-{
-	while begin != end {
-		if fun == nil {
-			if begin() != begin2() {
-				return false;
+			while iter != end {
+				out.insert(fun(iter()));
+				iter.next();
 			}
 		}
 		else {
-			if fun(begin(), begin2()) == false {
-				return false;
+			# transform(first, end, first2, out, fun)
+			first2 = p1;
+			out = p2;
+			fun = p3;
+
+			while iter != end {
+				out.insert(fun(iter(), first2()));
+				iter.next();
+				first2.next();
 			}
 		}
-		
-		begin.next();
-		begin2.next();
+	} catch orca.iter {
+		// ignore
+	}
+}
+
+def equal(first, end, first2, fun)
+{
+	try {
+		while first != end {
+			if fun == nil {
+				if first() != first2() {
+					return false;
+				}
+			}
+			else {
+				if fun(first(), first2()) == false {
+					return false;
+				}
+			}
+			
+			first.next();
+			first2.next();
+		}
+	} catch orca.iter {
+		// ignore
 	}
 
 	return true;
 }
 
 
-def equal_range(begin, end, val)
+def equal_range(first, end, val)
 {
-	while begin != end {
-		if begin() != val {
-			return false;
+	try {
+		while first != end {
+			if first() != val {
+				return false;
+			}
+			
+			first.next();
 		}
-		
-		begin.next();
+	} catch orca.iter {
+		// ignore
 	}
 
 	return true;

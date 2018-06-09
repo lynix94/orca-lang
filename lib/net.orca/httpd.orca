@@ -195,16 +195,15 @@ ${header}
 			list.pop_front();
 			list.pop_back();
 
-			it = list.begin();
-			for a in it {
-				name = a().find(r'name=\"([^\"]+)\"');
+			for a in list {
+				name = a.find(r'name=\"([^\"]+)\"');
 				if name == nil {
 					continue;
 				}
 
 				name = name[1][0];
 
-				value = a().find(r'[\r|]\n[\r|]\n(.*)');
+				value = a.find(r'[\r|]\n[\r|]\n(.*)');
 				if value == nil {
 					continue;
 				}

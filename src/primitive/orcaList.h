@@ -4,7 +4,7 @@
 
   orcaList.h - list type
 
-  Copyright (C) 2009-2011 Lee, Ki-Yeul
+  Copyright (C) 2009 Lee, Ki-Yeul
 
 **********************************************************************/
 
@@ -48,7 +48,8 @@ public:
 	orcaData ex_push_front(orcaVM* vm, int n);
 	orcaData ex_pop_front(orcaVM* vm, int n);
 	orcaData ex_find(orcaVM* vm, int n);
-	orcaData ex_begin(orcaVM* vm, int n);
+	orcaData ex_iter(orcaVM* vm, int n);
+	orcaData ex_first(orcaVM* vm, int n);
 	orcaData ex_last(orcaVM* vm, int n);
 	orcaData ex_end(orcaVM* vm, int n);
 	orcaData ex_sort(orcaVM* vm, int n);

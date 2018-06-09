@@ -4,7 +4,7 @@
 
   orcaMapIter.h - map iterator
 
-  Copyright (C) 2009-2011 Lee, Ki-Yeul
+  Copyright (C) 2009 Lee, Ki-Yeul
 
 **********************************************************************/
 
@@ -18,14 +18,14 @@ class orcaMap;
 class LIBORCA_API orcaMapIter : public orcaObject
 {
 public:
-	orcaMapIter(orcamap_iterator it, orcaMap* mp);
+	orcaMapIter(orcamap_iterator it, orcaMap* mp, bool flag_ready = true);
 	orcaObject* v_clone();
 	virtual ~orcaMapIter();
 
 	virtual orcaData operator()(orcaVM* vm, int n);
 
-	orcaData ex_first(orcaVM* vm, int n);
-	orcaData ex_second(orcaVM* vm, int n);
+	orcaData ex_key(orcaVM* vm, int n);
+	orcaData ex_value(orcaVM* vm, int n);
 	orcaData ex_next(orcaVM* vm, int n);
 	orcaData ex_prev(orcaVM* vm, int n);
 	orcaData ex_eq(orcaVM* vm, int n);
@@ -40,6 +40,7 @@ private:
 	orcaMap* m_mp;
 
 	int m_timestamp;
+	bool flag_ready;
 };
 
 #endif

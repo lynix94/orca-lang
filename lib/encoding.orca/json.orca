@@ -109,21 +109,21 @@ def encoding(obj)
 	ret = '';
 	if obj.TYPE == type.map {
 		ret += '{';
-		for a in obj.begin() {
-			if a.second().TYPE == type.tuple {
-				for b in a.second().begin() {
-					ret += encoding(a.first());
+		for a in obj.iter() {
+			if a.value().TYPE == type.tuple {
+				for b in a.value().iter() {
+					ret += encoding(a.key());
 					ret += ':';
 					ret += encoding(b());
-					if b != a.second().last() {
+					if b != a.value().last() {
 						ret += ',';
 					}
 				}
 			}
 			else {
-				ret += encoding(a.first());
+				ret += encoding(a.key());
 				ret += ':';
-				ret += encoding(a.second());
+				ret += encoding(a.value());
 			}
 
 			if a != obj.last() {
@@ -134,7 +134,7 @@ def encoding(obj)
 	}
 	elif obj.TYPE == type.list {
 		ret += '[';
-		for a in obj.begin() {
+		for a in obj.iter() {
 			ret += encoding(a());
 			if a != obj.last() {
 				ret += ',';
@@ -165,21 +165,21 @@ def beutify(obj, tab)
 	ret = '';
 	if obj.TYPE == type.map {
 		ret += '\t{';
-		for a in obj.begin() {
-			if a.second().TYPE == type.tuple {
-				for b in a.second().begin() {
-					ret += beutify(a.first(), tab);
+		for a in obj.iter() {
+			if a.value().TYPE == type.tuple {
+				for b in a.value().iter() {
+					ret += beutify(a.key(), tab);
 					ret += ':';
 					ret += beutify(b(), tab);
-					if b != a.second().last() {
+					if b != a.value().last() {
 						ret += ',\n' + '\t'*tab;
 					}
 				}
 			}
 			else {
-				ret += beutify(a.first(), tab);
+				ret += beutify(a.key(), tab);
 				ret += ':';
-				ret += beutify(a.second(), tab);
+				ret += beutify(a.value(), tab);
 			}
 
 			if a != obj.last() {
@@ -190,7 +190,7 @@ def beutify(obj, tab)
 	}
 	elif obj.TYPE == type.list {
 		ret += '\t[';
-		for a in obj.begin() {
+		for a in obj.iter() {
 			ret += beutify(a(), tab);
 			if a != obj.last() {
 				ret += ',\n' + '\t'*tab;

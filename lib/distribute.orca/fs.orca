@@ -79,9 +79,9 @@ def unmount(path, flag)
 	mi = ..mtable.upper_bound(path);
 	try {
 		mi.prev();
-		if path.starts_with(mi.first()) {
-			if mi.second().TYPE == type.tuple {
-				for a in mi.second() {
+		if path.starts_with(mi.key()) {
+			if mi.value().TYPE == type.tuple {
+				for a in mi.value() {
 					if flag == true {
 						a.send('<fs1>shutdown,/');
 						msg = a.recv();
@@ -91,10 +91,10 @@ def unmount(path, flag)
 			}
 			else {
 				if flag == true {
-					mi.second().send('<fs1>shutdown,/');
+					mi.value().send('<fs1>shutdown,/');
 					msg = mi.secon().recv();
 				}
-				mi.second().close();
+				mi.value().close();
 			}
 		}
 
@@ -139,15 +139,15 @@ def check_in_table(path)
 	mi = ..mtable.upper_bound(path);
 	try {
 		mi.prev();
-		if path.starts_with(mi.first() + '/') {
-			if mi.second().TYPE == type.tuple {
-				tp = mi.second();
+		if path.starts_with(mi.key() + '/') {
+			if mi.value().TYPE == type.tuple {
+				tp = mi.value();
 				len = tp.size();
 				nth = path.hash(len);
-				return (tp[nth], path[mi.first().length():]);
+				return (tp[nth], path[mi.key().length():]);
 			}
 			else {
-				return (mi.second(), path[mi.first().length():]);
+				return (mi.value(), path[mi.key().length():]);
 			}
 		}
 	}

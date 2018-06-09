@@ -68,8 +68,8 @@ def map(list, f)
 {
 	result = [];
 	
-	for a in list.begin() {
-		result.push_back(f(a()));
+	for a in list {
+		result.push_back(f(a));
 	}
 
 	return result;
@@ -99,16 +99,16 @@ def reduce(a, b, c)
 					result = f(result, nil);
 				}
 				else {
-					for a in tail.begin() {
-						result = f(result, a());
+					for a in tail {
+						result = f(result, a);
 					}
 				}
 		}
 	}
 	else {
 		result = initial;
-		for a in list.begin() {
-			result = f(result, a());
+		for a in list {
+			result = f(result, a);
 		}
 	}
 	

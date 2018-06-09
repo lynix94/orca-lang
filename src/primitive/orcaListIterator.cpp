@@ -4,7 +4,7 @@
 
   orcaListIter.h - list type iterator
 
-  Copyright (C) 2009-2011 Lee, Ki-Yeul
+  Copyright (C) 2009-2018 Lee, Ki-Yeul
 
 **********************************************************************/
 
@@ -13,7 +13,7 @@
 
 
 
-orcaListIterator::orcaListIterator(orcaListIter it, orcaListIter begin, orcaListIter end)
+orcaListIterator::orcaListIterator(orcaListIter it, orcaListIter begin, orcaListIter end, bool flag_ready)
 {
 	set_name("listiter"); 
 	insert_native_function("next", (object_fp)&orcaListIterator::ex_next);
@@ -25,6 +25,7 @@ orcaListIterator::orcaListIterator(orcaListIter it, orcaListIter begin, orcaList
 	m_iter = it;
 	m_begin = begin;
 	m_end = end;
+	this->flag_ready = flag_ready;
 }
 
 orcaObject* orcaListIterator::v_clone()
@@ -52,29 +53,20 @@ orcaData orcaListIterator::operator()(orcaVM* vm, int n)
 
 orcaData orcaListIterator::ex_next(orcaVM* vm, int n)
 {
-	if (n == 0) {
-		if (m_iter == m_end)
-			throw orcaException(vm, "orca.iter", "out of range");
-
-		++m_iter;
-
-		if (m_iter == m_end)
-			return NIL;
+	if (m_iter == m_end) {
+		throw orcaException(vm, "orca.iter", "out of range");
 	}
-	else {
-		int i = vm->get_param(0).Integer();
-		if (i < 0)
-			throw orcaException(vm, "orca.iter", "minus value in next");
 
-		if (m_iter == m_end)
-			throw orcaException(vm, "orca.iter", "out of range");
+	// in case of iter()
+	if (flag_ready == false) {
+		flag_ready = true;
+		return this;
+	}
 
-		for (int j=0; j<i; j++) {
-			++m_iter;
-			if (m_iter == m_end)
-				return NIL;
-		}
+	++m_iter;
 
+	if (m_iter == m_end) {
+		throw orcaException(vm, "orca.iter", "out of range");
 	}
 
 	return this;
@@ -82,22 +74,11 @@ orcaData orcaListIterator::ex_next(orcaVM* vm, int n)
 
 orcaData orcaListIterator::ex_prev(orcaVM* vm, int n)
 {
-	if  (n == 0) {
-		if (m_iter == m_begin)
-			throw orcaException(vm, "orca.iter", "out of range");
-		--m_iter;
+	if (m_iter == m_begin) {
+		throw orcaException(vm, "orca.iter", "out of range");
 	}
-	else {
-		int i = vm->get_param(0).Integer();
-		if (i < 0)
-			throw orcaException(vm, "orca.iter", "minus value in prev");
 
-		for (int j=0; j<i; j++) {
-			if (m_iter == m_begin)
-				throw orcaException(vm, "orca.iter", "out of range");
-			--m_iter;
-		}
-	}
+	--m_iter;
 
 	return this;
 }

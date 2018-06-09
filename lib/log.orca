@@ -21,14 +21,14 @@ def print_flag()
 {
 	print: '[%s - %s]' % (..name, ..'<-');
 
-	for k in ..flag.begin() {
+	for k, v in ..flag {
 		item = nil;
-		if ..flag.has_key(k.first()) {
-			item = k.second();
+		if ..flag.has_key(k) {
+			item = v;
 		}
 
 		if item != nil {
-			item.print_flag(..name + '.' + k.first());
+			item.print_flag(..name + '.' + k);
 		}
 	}
 }

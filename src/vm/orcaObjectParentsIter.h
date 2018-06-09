@@ -18,7 +18,7 @@ class orcaObjectParentsIter : public orcaObject
 {
 public:
 	orcaObjectParentsIter(orcaObject* src, int pos);
-	orcaObjectParentsIter(orcaObject* src, orcaData p);
+//	orcaObjectParentsIter(orcaObject* src, orcaData p);
 	orcaObjectParentsIter(void* vp);
 	virtual orcaObject* v_clone();
 	virtual ~orcaObjectParentsIter();
@@ -26,9 +26,11 @@ public:
 	virtual orcaData operator()(orcaVM* vm, int n);
 
 	orcaData ex_next(orcaVM* vm, int n);
+	orcaData ex_erase(orcaVM* vm, int n);
+/*
 	orcaData ex_prev(orcaVM* vm, int n);
 	orcaData ex_eq(orcaVM* vm, int n);
-	orcaData ex_erase(orcaVM* vm, int n);
+*/
 
 private:
 	orcaObject* m_op;

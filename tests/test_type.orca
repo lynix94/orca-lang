@@ -150,7 +150,7 @@ if type.is_iterable({,}) == false {
 	throw test.type <- 'type testing is failed';
 }
 
-if type.is_iterable({,}.begin()) == false {
+if type.is_iterable({,}.iter()) == false {
 	throw test.type <- 'type testing is failed';
 }
 
@@ -167,7 +167,7 @@ if type.is_indexable({,}) == false {
 	throw test.type <- 'type testing is failed';
 }
 
-if type.is_indexable({,}.begin()) == true {
+if type.is_indexable({,}.iter()) == true {
 	throw test.type <- 'type testing is failed';
 }
 

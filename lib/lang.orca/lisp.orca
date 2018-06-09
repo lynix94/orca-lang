@@ -430,7 +430,7 @@ def execute(pair, local, base)
 					}
 				}
 
-				it = path.begin();
+				it = path.iter().next();
 				curr = base;
 
 				# find module first
@@ -506,7 +506,7 @@ def execute(pair, local, base)
 				return code[1];
 			}
 			elif code[0] == 'backquote' {
-				for sub_expr in code[1].begin() {
+				for sub_expr in code[1].iter() {
 					if sub_expr().TYPE == type.tuple && sub_expr()[0] == 'comma' {
 						ret = execute((sub_expr()[1], fmap), local, base);
 						sub_expr(ret);
@@ -522,7 +522,7 @@ def execute(pair, local, base)
 		return code;
 	}
 	
-	for expr in code.begin() {
+	for expr in code.iter() {
 		ret = execute((expr(), fmap), local, base);
 		expr(ret);
 	}

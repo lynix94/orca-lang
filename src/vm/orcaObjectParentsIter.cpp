@@ -19,8 +19,8 @@ orcaObjectParentsIter::orcaObjectParentsIter(orcaObject* src, int pos)
 {
 	set_name("parents_iterator");
 	insert_native_function("next", (object_fp)&orcaObjectParentsIter::ex_next);
-	insert_native_function("prev", (object_fp)&orcaObjectParentsIter::ex_prev);
-	insert_native_function("==", (object_fp)&orcaObjectParentsIter::ex_eq);
+//	insert_native_function("prev", (object_fp)&orcaObjectParentsIter::ex_prev);
+//	insert_native_function("==", (object_fp)&orcaObjectParentsIter::ex_eq);
 	insert_native_function("erase", (object_fp)&orcaObjectParentsIter::ex_erase);
 
 	m_op = src;
@@ -29,6 +29,7 @@ orcaObjectParentsIter::orcaObjectParentsIter(orcaObject* src, int pos)
 	if (pos == 0) {
 		m_it = m_op->m_parent->begin();
 	}
+/*
 	else if (pos == -1) {
 		m_it = m_op->m_parent->end();
 		--m_it;
@@ -36,6 +37,7 @@ orcaObjectParentsIter::orcaObjectParentsIter(orcaObject* src, int pos)
 	else if (pos == INT_MIN) {
 		m_it = m_op->m_parent->end();
 	}
+*/
 	else {
 		assert(0);
 	}
@@ -66,6 +68,7 @@ struct same_type : public binary_function<orcaObject*, orcaObject*, bool>
 	}
 };
 
+/*
 orcaObjectParentsIter::orcaObjectParentsIter(orcaObject* src, orcaData p)
 {
 	set_name("parents_iterator");
@@ -86,6 +89,7 @@ orcaObjectParentsIter::orcaObjectParentsIter(orcaObject* src, orcaData p)
 
 	m_it = find_if(m_op->m_parent->begin(), m_op->m_parent->end(), bind1st(same_type(), op));
 }
+*/
 
 orcaObjectParentsIter::orcaObjectParentsIter(void* vp) { }
 
@@ -123,6 +127,7 @@ orcaData orcaObjectParentsIter::ex_next(orcaVM* vm, int n)
 	return this;
 }
 
+/*
 orcaData orcaObjectParentsIter::ex_prev(orcaVM* vm, int n)
 {
 	if (m_op == NULL || m_op->m_parent == NULL)
@@ -152,6 +157,7 @@ orcaData orcaObjectParentsIter::ex_eq(orcaVM* vm, int n)
 
 	return m_it == ip->m_it;
 }
+*/
 
 
 orcaData orcaObjectParentsIter::ex_erase(orcaVM* vm, int n)

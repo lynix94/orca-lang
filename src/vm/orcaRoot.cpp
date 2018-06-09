@@ -147,13 +147,7 @@ public:
 		curr = 0;
 		interval = 1;
 
-		insert_native_function("curr", (object_fp)&orcaRange::ex_curr);
 		insert_native_function("next", (object_fp)&orcaRange::ex_next);
-	}
-
-	orcaData ex_curr(orcaVM* vm, int n)
-	{
-		return curr;
 	}
 
 	orcaData ex_next(orcaVM* vm, int n)
@@ -174,15 +168,6 @@ public:
 		return curr;
 	}
 
-	orcaData operator()(orcaVM* vm, int n)
-	{
-		if (n > 0) {
-			throw orcaException(vm, "orca.param", "unmodifiable iterator");
-		}
-
-		return curr;
-	}
-
 public:
 	int from;
 	int to;
@@ -196,7 +181,6 @@ orcaData orcaRoot::ex_range(orcaVM* vm, int n)
 	orcaRange* rp = new orcaRange();
 	rp->from = vm->get_param(0).Integer();
 	rp->to = vm->get_param(1).Integer();
-	rp->curr = rp->from;
 
 	if (n >= 3) {
 		rp->interval = vm->get_param(2).Integer();
@@ -206,13 +190,15 @@ orcaData orcaRoot::ex_range(orcaVM* vm, int n)
 		if (rp->interval <= 0) {
 			throw orcaException(vm, "orca.range", "invalid range");
 		}
+		rp->curr -= rp->interval;
 	}
 	else { // descending
 		if (rp->interval >= 0) {
 			throw orcaException(vm, "orca.range", "invalid range");
 		}
 	}
-	
+
+	rp->curr = rp->from - rp->interval;
 	return rp;
 }
 

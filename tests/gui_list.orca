@@ -42,8 +42,8 @@ def main : window
 
 
 				result = '[ Your selections ]\n';
-				for a in .selected.begin() {
-					result += '%s\n' % a.first();
+				for k, v in .selected {
+					result += '%s\n' % k;
 				}
 	
 				find_owner('box').result.attr['text'] = result;

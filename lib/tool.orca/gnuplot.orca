@@ -42,10 +42,9 @@ def sadd(name, data, grouping)
 	}
 	elif grouping == true {
 		new_data = [];
-		alg.copy(data.begin(), data.end(), new_data.begin());
+		alg.copy(data.first(), data.end(), new_data.first());
 
-		it = new_data.begin();
-		while true {
+		for it in new_data.iter() {
 			b = it()[1];
 			if it.next() == nil {
 				break;
@@ -77,7 +76,7 @@ def splot(cmd_end)
 
 	cmd = ..cmd;
 	cmd += 'splot ';
-	for name in ..name.begin() {
+	for name in ..name.iter() {
 		cmd += '"${file_name + order}" title \'${name()}\'';
 		if ..with_line {
 			cmd += ' with line';
@@ -128,7 +127,7 @@ def plot(cmd_end)
 
 	cmd = ..cmd;
 	cmd += 'plot ';
-	for name in ..name.begin() {
+	for name in ..name.iter() {
 		cmd += '"${file_name}" using ${idx}:${idx+1} title \'${name()}\'';
 		idx += 2;
 		if ..with_line {

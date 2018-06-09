@@ -63,7 +63,8 @@ public:
 	orcaData ex_list(orcaVM* vm, int n);
 	orcaData ex_push_back(orcaVM* vm, int n);
 	orcaData ex_pop_back(orcaVM* vm, int n);
-	orcaData ex_begin(orcaVM* vm, int n);
+	orcaData ex_iter(orcaVM* vm, int n);
+	orcaData ex_first(orcaVM* vm, int n);
 	orcaData ex_last(orcaVM* vm, int n);
 	orcaData ex_end(orcaVM* vm, int n);
 	orcaData ex_find(orcaVM* vm, int n);

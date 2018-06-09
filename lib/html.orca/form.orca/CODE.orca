@@ -8,9 +8,9 @@ def fill_and_get(param)
 {
 	errors = {,};
 	result = {,};
-	for it in ..MEMBERS.begin() {
-		if it.second().TYPE < form.input.input_base.TYPE {
-			k = it.first();
+	for it in ..MEMBERS.iter() {
+		if it.value().TYPE < form.input.input_base.TYPE {
+			k = it.key();
 			if param.has_key(k) {
 				result[k] = param[k];
 			}
@@ -85,11 +85,11 @@ def render_item(form_result, decorator)
 	bdr = strings.builder();
 
 	keys = [];
-	for it in ..MEMBERS.begin() {
-		if it.second().TYPE < form.input.input_base.TYPE {
-			it.second().id = it.first();
-			it.second().name = it.first();
-			keys.push_back(it.second());
+	for it in ..MEMBERS.iter() {
+		if it.value().TYPE < form.input.input_base.TYPE {
+			it.value().id = it.key();
+			it.value().name = it.key();
+			keys.push_back(it.value());
 		}
 	}
 

@@ -46,6 +46,7 @@ private:
 	sqlite3_stmt *stmt;
 	int ncols;
 	bool done;
+	bool flag_ready;
 };
 
 class orcaSqlite3Conn : public orcaObject 

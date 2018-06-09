@@ -23,10 +23,13 @@ orcaObjectParents::orcaObjectParents(orcaData src) : m_src(src)
 	insert_native_function("push_front", (object_fp)&orcaObjectParents::ex_push_front);
 	insert_native_function("pop_front", (object_fp)&orcaObjectParents::ex_pop_front);
 
+	insert_native_function("iter", (object_fp)&orcaObjectParents::ex_iter);
+/*
 	insert_native_function("begin", (object_fp)&orcaObjectParents::ex_begin);
 	insert_native_function("end", (object_fp)&orcaObjectParents::ex_end);
 	insert_native_function("last", (object_fp)&orcaObjectParents::ex_last);
 	insert_native_function("find", (object_fp)&orcaObjectParents::ex_find);
+*/
 	m_src.rc_inc();
 }
 
@@ -189,6 +192,20 @@ orcaData orcaObjectParents::ex_pop_front(orcaVM* vm, int n)
 	return this;
 }
 
+orcaData orcaObjectParents::ex_iter(orcaVM* vm, int n)
+{
+	orcaObject* op = NULL;
+	if (isinternal(m_src))
+		op = m_internal;
+	else if (is<TYPE_OBJ>(m_src))
+		op = m_src.o();
+
+	orcaObjectParentsIter* ip = new orcaObjectParentsIter(op, 0);
+	return ip;
+}
+
+
+/*
 orcaData orcaObjectParents::ex_begin(orcaVM* vm, int n)
 {
 	orcaObject* op = NULL;
@@ -240,5 +257,8 @@ orcaData orcaObjectParents::ex_find(orcaVM* vm, int n)
 	orcaObjectParentsIter* ip = new orcaObjectParentsIter(op, vm->get_param(0));
 	return ip;
 }
+*/
+
+
 
 
