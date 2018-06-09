@@ -46,13 +46,17 @@ liborca_la_SOURCES = \
 		$(PRIMITIVE_DIR)/orcaList.cpp \
 		$(PRIMITIVE_DIR)/orcaListIter.cpp \
 		$(PRIMITIVE_DIR)/orcaListIterator.cpp \
+		$(PRIMITIVE_DIR)/orcaListVIterator.cpp \
 		$(PRIMITIVE_DIR)/orcaVirtList.cpp \
 		$(PRIMITIVE_DIR)/orcaSbf.cpp \
 		$(PRIMITIVE_DIR)/orcaMap.cpp \
 		$(PRIMITIVE_DIR)/orcaMapIter.cpp \
+		$(PRIMITIVE_DIR)/orcaMapVIter.cpp \
+		$(PRIMITIVE_DIR)/orcaMapVIter2.cpp \
 		$(PRIMITIVE_DIR)/orcaString.cpp \
 		$(PRIMITIVE_DIR)/orcaTuple.cpp \
 		$(PRIMITIVE_DIR)/orcaTupleIter.cpp \
+		$(PRIMITIVE_DIR)/orcaTupleVIter.cpp \
 		$(VM_DIR)/orcaData.cpp \
 		$(VM_DIR)/orcaLocal.cpp \
 		$(VM_DIR)/orcaObject.cpp \

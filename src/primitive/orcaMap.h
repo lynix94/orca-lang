@@ -59,6 +59,8 @@ public:
 	orcaData ex_lower_bound(orcaVM* vm, int n);
 	orcaData ex_upper_bound(orcaVM* vm, int n);
 	orcaData ex_iter(orcaVM* vm, int n);
+	orcaData ex_iter2(orcaVM* vm, int n);
+	orcaData ex_piter(orcaVM* vm, int n);
 	orcaData ex_first(orcaVM* vm, int n);
 	orcaData ex_last(orcaVM* vm, int n);
 	orcaData ex_end(orcaVM* vm, int n);

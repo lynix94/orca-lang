@@ -48,7 +48,7 @@ if sum != sum2 {
 
 sum = 0;
 item = [1..100];
-for a in item.iter() {
+for a in item.piter() {
 	sum += a();
 }
 
@@ -59,7 +59,7 @@ if sum != sum2 {
 
 
 item = [1..100];
-for a in item.iter() {
+for a in item.piter() {
 	a(a()*2);
 }
 
@@ -71,7 +71,7 @@ if item != %[2*x|x<-1~100] {
 
 sum = 0;
 item = (1..100);
-for a in item.iter() {
+for a in item.piter() {
 	sum += a();
 }
 
@@ -81,7 +81,7 @@ if sum != sum2 {
 }
 
 item = (1..100);
-for a in item.iter() {
+for a in item.piter() {
 	a(a()*2);
 }
 
@@ -94,7 +94,7 @@ if item != %[2*x|x<-1~100].tuple() {
 	
 sum = 0;
 item =  { 1:1, 2:2, 3:3, 4:4, 5:5 };
-for a in item.iter() {
+for a in item.piter() {
 	sum += a.value();
 }
 
@@ -104,7 +104,7 @@ if sum !=  1+2+3+4+5 {
 }
 
 item =  { 1:1, 2:2, 3:3, 4:4, 5:5 };
-for a in item.iter() {
+for a in item.piter() {
 	a(a.value()*2);
 }
 

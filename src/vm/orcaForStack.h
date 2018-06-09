@@ -18,18 +18,10 @@ class orcaMap;
 #include "orcaMapIter.h"
 
 
-enum for_source_type
-{
-	FOR_SOURCE_LIST,
-	FOR_SOURCE_VECTOR,
-	FOR_SOURCE_MAP,
-	FOR_SOURCE_ITER,
-};
-
 struct FOR 
 {
 	FOR(const char* code, int lv1, int lv2, orcaObject* curr) : 
-		code(code), lv1(lv1), lv2(lv2), m_curr_back(curr), limit(-1), idx(0), is_iterator(true) {}
+		code(code), lv1(lv1), lv2(lv2), m_curr_back(curr), limit(-1), idx(-1), is_iterator(true), is_iter2(false) {}
 
 	virtual ~FOR() {}
 
@@ -39,62 +31,13 @@ struct FOR
 	int idx;
 	int limit;
 	bool is_iterator;
-	for_source_type type;
+	bool is_iter2;
 
 	orcaObject* m_curr_back;
-};
-
-struct FOR_LIST : public FOR
-{
-	FOR_LIST(const char* code, int lv1, int lv2, orcaObject* curr) : FOR(code, lv1, lv2, curr)
-	{
-		type = FOR_SOURCE_LIST;
-	}
-
-	virtual ~FOR_LIST() {}
-
-	orcaListIter li;
-	orcaList* lp;
-};
-
-struct FOR_VECTOR : public FOR
-{
-	FOR_VECTOR(const char* code, int lv1, int lv2, orcaObject* curr) : FOR(code, lv1, lv2, curr)
-	{
-		type = FOR_SOURCE_VECTOR;
-	}
-
-	virtual ~FOR_VECTOR() {}
-
-	vector<orcaData>::iterator vi;
-	vector<orcaData>* vp;
-};
-
-struct FOR_MAP : public FOR
-{
-	FOR_MAP(const char* code, int lv1, int lv2, orcaObject* curr) : FOR(code, lv1, lv2, curr)
-	{
-		type = FOR_SOURCE_MAP;
-	}
-
-	virtual ~FOR_MAP() {}
-
-	orcamap_iterator mi;
-	orcaMap* mp;
-};
-
-
-struct FOR_ITER : public FOR
-{
-	FOR_ITER(const char* code, int lv1, int lv2, orcaObject* curr) : FOR(code, lv1, lv2, curr)
-	{
-		type = FOR_SOURCE_ITER;
-	}
-
-	virtual ~FOR_ITER() {}
-
+	orcaData iter; 
 	orcaData next; 
 };
+
 
 class orcaForStack
 {
@@ -109,7 +52,7 @@ public:
 	const char* cont(int* lv1, orcaData* d1, int* lv2, orcaData* d2);
 
 private:
-	vector<FOR*> m_stack;
+	vector<FOR> m_stack;
 };
 
 

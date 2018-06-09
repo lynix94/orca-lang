@@ -18,6 +18,7 @@ class LIBORCA_API orcaTupleIter : public orcaObject
 {
 public:
 	orcaTupleIter(orcatuple_iterator begin, orcaTuple* tp, bool flag_ready = true);
+	orcaTupleIter(void*) {};
 	orcaObject* v_clone();
 	virtual ~orcaTupleIter();
 
@@ -30,10 +31,9 @@ public:
 		return m_iter;
 	}
 
-private:
+protected:
 	bool valid();
 
-private:
 	bool flag_ready;
 	orcatuple_iterator m_iter;
 	orcaTuple* m_tp;

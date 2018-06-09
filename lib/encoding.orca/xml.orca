@@ -120,52 +120,52 @@ def encoding(obj)
 {
 	ret = '';
 	if obj.TYPE == type.map {
-		for a in obj.iter() {
-			if a.value().TYPE == type.tuple {
-				for b in a.value().iter() {
+		for key, value in obj {
+			if value.TYPE == type.tuple {
+				for v in value {
 					attrs = '';
-					if b().TYPE == type.map && b().has_key('$attrs') {
-						for c in b()['$attrs'].iter() {
-							attrs += c.key() + '=' + c.value() + ' ';
+					if v.TYPE == type.map && v.has_key('$attrs') {
+						for k2, v2 in v['$attrs'] {
+							attrs += k2  + '=' + v2 + ' ';
 						}
 					}
 
-					if a.key() == '$attrs' {
+					if key == '$attrs' {
 						continue;
 					}
 
-					if a.key() == '$info' {
+					if key == '$info' {
 						ret += '<? ';
 					}
-					elif a.key() != '$text' {
-						ret += '<${a.key()} ${attrs}>';
+					elif key != '$text' {
+						ret += '<${key} ${attrs}>';
 					}
 
-					ret += encoding(b());
-					if a.key() == '$info' {
+					ret += encoding(v);
+					if key == '$info' {
 						ret += ' ?>';
 					}
-					elif a.key() != '$text' {
-						ret += '</${a.key()}>';
+					elif key != '$text' {
+						ret += '</${key}>';
 					}
 				}
 			}
 			else {
-				if a.key() != '$attrs' {
+				if key != '$attrs' {
 
-					if a.key() == '$info' {
+					if key == '$info' {
 						ret += '<? ';
 					}
-					elif a.key() != '$text' {
-						ret += '<${a.key()}>';
+					elif key != '$text' {
+						ret += '<${key}>';
 					}
 
-					ret += encoding(a.value());
-					if a.key() == '$info' {
+					ret += encoding(value);
+					if key == '$info' {
 						ret += ' ?>';
 					}
-					elif a.key() != '$text' {
-						ret += '</${a.key()}>';
+					elif key != '$text' {
+						ret += '</${key}>';
 					}
 				}
 			}
@@ -192,54 +192,54 @@ def beutify(obj, tab)
 
 	ret = '';
 	if obj.TYPE == type.map {
-		for a in obj.iter() {
-			if a.value().TYPE == type.tuple {
-				for b in a.value().iter() {
+		for key, value in obj {
+			if value.TYPE == type.tuple {
+				for v in value {
 					attrs = '';
-					if b().TYPE == type.map && b().has_key('$attrs') {
-						for c in b()['$attrs'].iter() {
-							attrs += c.key() + '=' + c.value() + ' ';
+					if v.TYPE == type.map && v.has_key('$attrs') {
+						for k2, v2 in v['$attrs'] {
+							attrs += k2 + '=' + v2 + ' ';
 						}
 					}
 
-					if a.key() == '$attrs' {
+					if key == '$attrs' {
 						continue;
 					}
 
-					if a.key() == '$info' {
+					if key == '$info' {
 						ret += '<? ';
 					}
-					elif a.key() != '$text' {
-						ret += '\t'*tab + '<${a.key()} ${attrs}>\n';
+					elif key != '$text' {
+						ret += '\t'*tab + '<${key} ${attrs}>\n';
 					}
 
-					ret += beutify(b(), tab);
+					ret += beutify(v, tab);
 
-					if a.key() == '$info' {
+					if key() == '$info' {
 						ret += ' ?>\n';
 					}
-					elif a.key() != '$text' {
-						ret += '\n' + '\t'*tab + '</${a.key()}>\n';
+					elif key() != '$text' {
+						ret += '\n' + '\t'*tab + '</${key()}>\n';
 					}
 				}
 			}
 			else {
-				if a.key() != '$attrs' {
+				if key != '$attrs' {
 
-					if a.key() == '$info' {
+					if key == '$info' {
 						ret += '<? ';
 					}
-					elif a.key() != '$text' {
-						ret += '\t'*tab + '<${a.key()}>\n';
+					elif key != '$text' {
+						ret += '\t'*tab + '<${key}>\n';
 					}
 
-					ret += beutify(a.value(), tab);
+					ret += beutify(value, tab);
 
-					if a.key() == '$info' {
+					if key == '$info' {
 						ret += ' ?>\n';
 					}
-					elif a.key() != '$text' {
-						ret += '\n' + '\t'*tab + '</${a.key()}>\n';
+					elif key != '$text' {
+						ret += '\n' + '\t'*tab + '</${key}>\n';
 					}
 				}
 			}

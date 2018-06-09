@@ -109,9 +109,9 @@ def encoding(obj)
 	ret = '';
 	if obj.TYPE == type.map {
 		ret += '{';
-		for a in obj.iter() {
+		for a in obj.piter() {
 			if a.value().TYPE == type.tuple {
-				for b in a.value().iter() {
+				for b in a.value().piter() {
 					ret += encoding(a.key());
 					ret += ':';
 					ret += encoding(b());
@@ -134,7 +134,7 @@ def encoding(obj)
 	}
 	elif obj.TYPE == type.list {
 		ret += '[';
-		for a in obj.iter() {
+		for a in obj.piter() {
 			ret += encoding(a());
 			if a != obj.last() {
 				ret += ',';
@@ -165,9 +165,9 @@ def beutify(obj, tab)
 	ret = '';
 	if obj.TYPE == type.map {
 		ret += '\t{';
-		for a in obj.iter() {
+		for a in obj.piter() {
 			if a.value().TYPE == type.tuple {
-				for b in a.value().iter() {
+				for b in a.value().piter() {
 					ret += beutify(a.key(), tab);
 					ret += ':';
 					ret += beutify(b(), tab);
@@ -190,7 +190,7 @@ def beutify(obj, tab)
 	}
 	elif obj.TYPE == type.list {
 		ret += '\t[';
-		for a in obj.iter() {
+		for a in obj.piter() {
 			ret += beutify(a(), tab);
 			if a != obj.last() {
 				ret += ',\n' + '\t'*tab;

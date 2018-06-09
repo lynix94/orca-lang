@@ -15,7 +15,7 @@
 
 orcaListIterator::orcaListIterator(orcaListIter it, orcaListIter begin, orcaListIter end, bool flag_ready)
 {
-	set_name("listiter"); 
+	set_name("iter"); 
 	insert_native_function("next", (object_fp)&orcaListIterator::ex_next);
 	insert_native_function("prev", (object_fp)&orcaListIterator::ex_prev);
 	insert_native_function("==", (object_fp)&orcaListIterator::ex_eq);

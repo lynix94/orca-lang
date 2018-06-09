@@ -4,7 +4,7 @@
 
   orcaForStack.cpp - class for handling "for statement"
 
-  Copyright (C) 2009-2011 Lee, Ki-Yeul
+  Copyright (C) 2009 Lee, Ki-Yeul
 
 **********************************************************************/
 
@@ -16,404 +16,195 @@
 #include "orcaException.h"
 #include "orcaForStack.h"
 
-bool orcaForStack::push(const char* code, int lv, orcaObject* obj,
-						orcaData& out, orcaObject* curr) 
+bool orcaForStack::push(const char* code, int lv, orcaObject* obj, orcaData& out, orcaObject* curr) 
 {
-	orcaList* lp = NULL;
-	if( (lp = dynamic_cast<orcaList*>(obj)) || 
-		(lp = dynamic_cast<orcaSbf*>(obj)) ||
-		(lp = dynamic_cast<orcaVirtList*>(obj)) )
-	{
-		FOR_LIST* f = new FOR_LIST(code, lv, -1, curr);
-		
-		f->lp = lp;
-		f->li = f->lp->begin();
+	FOR f(code, lv, -1, curr);
 
-		if (f->li == f->lp->end()) {
-			delete f;
-			return false;
-		}
-
-		m_stack.push_back(f);
-
-		out = *f->li;
-		return true;
-	}
-	else if (orcaMap* mp = dynamic_cast<orcaMap*>(obj)) {
-		FOR_MAP* f = new FOR_MAP(code, lv, -1, curr);
-
-		f->mp = mp;
-		f->mi = f->mp->begin();
-
-		if (f->mi == f->mp->end()) {
-			delete f;
-			return false;
-		}
-
-		m_stack.push_back(f);
-
-		out = f->mi->first;
-		return true;
-	}
-	else if (orcaTuple* tp = dynamic_cast<orcaTuple*>(obj)) {
-		FOR_VECTOR* f = new FOR_VECTOR(code, lv, -1, curr);
-
-		f->vp = &tp->m_value;
-		f->vi = f->vp->begin();
-
-		if (f->vi == f->vp->end()) {
-			delete f;
-			return false;
-		}
-
-		m_stack.push_back(f);
-
-		out = *f->vi;
-		return true;
-	}
-	else {
-		FOR_ITER* f = new FOR_ITER(code, lv, -1, curr);
-
+	orcaData next, iter;
+	if (obj->has_member((char*)"iter", iter)) {
 		orcaVM* vm = get_current_vm();
-
-		orcaData next, value;
-		if (obj->has_member((char*)"next", next) == false) {
-			delete f;
-			throw orcaException(vm, "orca.type", string("not iterable type ") + obj->dump_str());
-		}
+		vm->push_stack(iter);
+		vm->call(0); // iter()
+		obj = vm->m_stack->pop().Object();
 		
-		if (is<TYPE_OBJ>(next) || is<TYPE_NATIVE>(next)) {
-			f->next = next;
-			m_stack.push_back(f);
-		}
-		else {
-			delete f;
-			throw orcaException(vm, "orca.type", "next is not runable");
-		}
-
-
-		try {
-			vm->push_stack(next);
-			vm->call(0);		// next()
-			out = vm->m_stack->pop();
-			return true;
-		}
-		catch(orcaException& e) {
-			delete f;
-
-			if (string("orca.iter") != e.who()) {
-				throw e;
-			}
-
-			e.rc_dec();
-
-			get_current_vm()->m_curr = curr;
-			return false;
-		}
 	}
 
-	return false;
+	if (obj->has_member((char*)"next", next) == false) {
+		throw orcaException(NULL, "orca.type", string("not iterable type ") + obj->dump_str());
+	}
+	
+	if (!is<TYPE_OBJ>(next) && !is<TYPE_NATIVE>(next)) {
+		throw orcaException(NULL, "orca.type", "next is not runable");
+	}
+
+	f.iter = obj;
+	f.iter.rc_inc();
+	f.next = next;
+	f.next.rc_inc();
+	m_stack.push_back(f);
+
+	int dummy_i;
+	orcaData dummy_d;
+	const char* dummy_code = cont(&lv, &out, &dummy_i, &dummy_d);
+	if (dummy_code == 0) {
+		return false;
+	}
+
+	return true;
 }
 
 bool orcaForStack::push_2(const char* code, int lv1, int lv2,
 						orcaObject* obj, orcaData& out1, orcaData& out2, orcaObject* curr) 
 {
-	orcaList* lp = NULL;
-	if( (lp = dynamic_cast<orcaList*>(obj)) || 
-		(lp = dynamic_cast<orcaSbf*>(obj)) ||
-		(lp = dynamic_cast<orcaVirtList*>(obj)) )
-	{
-		FOR_LIST* f = new FOR_LIST(code, lv1, lv2, curr);
+	FOR f(code, lv1, lv2, curr);
 
-		f->lp = lp;
-		f->li = f->lp->begin();
-
-		if (f->li == f->lp->end()) {
-			delete f;
-			return false;
-		}
-
-		m_stack.push_back(f);
-
-		out1 = f->idx;
-		out2 = *f->li;
-		return true;
-	}
-	else if (orcaMap* mp = dynamic_cast<orcaMap*>(obj)) {
-		FOR_MAP* f = new FOR_MAP(code, lv1, lv2, curr);
-
-		f->mp = mp;
-		f->mi = f->mp->begin();
-
-		if (f->mi == f->mp->end()) {
-			delete f;
-			return false;
-		}
-
-		m_stack.push_back(f);
-
-		out1 = f->mi->first;
-		out2 = f->mi->second;
-		return true;
-	}
-	else if (orcaTuple* tp = dynamic_cast<orcaTuple*>(obj)) {
-		FOR_VECTOR* f = new FOR_VECTOR(code, lv1, lv2, curr);
-
-		f->vp = &tp->m_value;
-		f->vi = f->vp->begin();
-
-		if (f->vi == f->vp->end()) {
-			delete f;
-			return false;
-		}
-
-		m_stack.push_back(f);
-
-		out1 = f->idx;
-		out2 = *f->vi;
-		return true;
-	}
-	else {
-		FOR_ITER* f = new FOR_ITER(code, lv1, lv2, curr);
-
+	orcaData next, iter;
+	if (obj->has_member((char*)"iter2", iter)) {
 		orcaVM* vm = get_current_vm();
-
-		orcaData next, value;
-		if (obj->has_member((char*)"next", next) == false) {
-			delete f;
-			throw orcaException(vm, "orca.type", string("not iterable type ") + obj->dump_str());
-		}
-
-		if (is<TYPE_OBJ>(next) || is<TYPE_NATIVE>(next)) {
-			f->next = next;
-			m_stack.push_back(f);
-		}
-		else {
-			delete f;
-			throw orcaException(vm, "orca.type", "next is not runable");
-		}
-
-		try {
-			vm->push_stack(next);
-			vm->call(0);		// next()
-			out1 = f->idx;
-			out2 = vm->m_stack->pop();
-			return true;
-		}
-		catch(orcaException& e) {
-			delete f;
-			if (string("orca.iter") != e.who()) {
-				throw e;
-			}
-
-			e.rc_dec();
-
-			get_current_vm()->m_curr = curr;
-			return false;
-		}
+		vm->push_stack(iter);
+		vm->call(0); // iter2()
+		obj = vm->m_stack->pop().Object();
+		f.is_iter2 = true;
+	}
+	else if (obj->has_member((char*)"iter", iter)) {
+		orcaVM* vm = get_current_vm();
+		vm->push_stack(iter);
+		vm->call(0); // iter()
+		obj = vm->m_stack->pop().Object();
 	}
 
-	return false;
+	if (obj->has_member((char*)"next", next) == false) {
+		throw orcaException(NULL, "orca.type", string("not iterable type ") + obj->dump_str());
+	}
+
+	if (!is<TYPE_OBJ>(next) && !is<TYPE_NATIVE>(next)) {
+		throw orcaException(NULL, "orca.type", "next is not runable");
+	}
+
+	f.iter = obj;
+	f.iter.rc_inc();
+	f.next = next;
+	f.next.rc_inc();
+	m_stack.push_back(f);
+	
+	const char* dummy_code = cont(&lv1, &out1, &lv2, &out2);
+	if (dummy_code == 0) {
+		return false;
+	}
+
+	return true;
 }
 
 
 bool orcaForStack::push_sub(const char* code, int lv, orcaObject* obj, 
 							orcaData& out, orcaObject* curr, int per, bool is_iterator)
 {
-	FOR_ITER* f = new FOR_ITER(code, lv, -1, curr);
-	f->limit = per;
-	f->is_iterator = is_iterator;
+	FOR f(code, lv, -1, curr);
+	f.limit = per;
+	f.is_iterator = is_iterator;
 
-	orcaVM* vm = get_current_vm();
+	orcaData next, iter;
+	if (obj->has_member((char*)"iter", iter)) {
+		orcaVM* vm = get_current_vm();
+		vm->push_stack(iter);
+		vm->call(0); // iter()
+		obj = vm->m_stack->pop().Object();
+		
+	}
 
-	orcaData next, value;
 	if (obj->has_member((char*)"next", next) == false) {
-		throw orcaException(vm, "orca.type", string("not iterable type ") + obj->dump_str());
+		throw orcaException(NULL, "orca.type", string("not iterable type ") + obj->dump_str());
 	}
 
-	if (is<TYPE_OBJ>(next) || is<TYPE_NATIVE>(next)) {
-		f->next = next;
-		m_stack.push_back(f);
+	if (!is<TYPE_OBJ>(next) && !is<TYPE_NATIVE>(next)) {
+		throw orcaException(NULL, "orca.type", "next is not runable");
 	}
-	else {
-		delete f;
-		throw orcaException(vm, "orca.type", "next is not runable");
+
+	f.iter = obj;
+	f.iter.rc_inc();
+	f.next = next;
+	f.next.rc_inc();
+	m_stack.push_back(f);
+
+	int dummy_i;
+	orcaData dummy_d;
+	const char* dummy_code = cont(&lv, &out, &dummy_i, &dummy_d);
+	if (dummy_code == 0) {
+		return false;
+	}
+
+	return true;
+}
+
+
+FOR* orcaForStack::top() 
+{
+	return &m_stack[m_stack.size()-1];
+}
+
+void orcaForStack::pop() 
+{
+	FOR* f = top();
+	f->iter.rc_dec();
+	f->next.rc_dec();
+
+	m_stack.pop_back();
+}
+
+const char* orcaForStack::cont(int* lv1, orcaData* d1, int *lv2, orcaData* d2) 
+{
+	FOR* f = top();
+	f->idx++;
+	*d2 = NIL;
+
+	// check limit (per for parallel for sub group)
+	if (f->limit >= 0) {
+		f->limit--;
+		if (f->limit == 0) {
+			return 0;
+		}
 	}
 
 	try {
-		vm->push_stack(next);
-		vm->call(0);		// next()
-		out = vm->m_stack->pop();
-printf("### push sub\n");
-out.dump();
-/*
-		if (is_iterator) {
-			out = obj;
+		orcaVM* vm = get_current_vm();
+		vm->push_stack(f->next);
+		vm->call(0); // iter.next();
+		orcaData iter = vm->m_stack->pop();
+
+		if (f->lv2 > 0) {
+			if (f->is_iter2) {
+				orcaTuple* tp = castobj<orcaTuple>(iter);
+				if (tp == NULL || tp->size() != 2) {
+					throw orcaException(NULL, "orca.type", "iter2 should return tuple (pair)");
+				}
+
+				*d1 = tp->at(0);
+				*d2 = tp->at(1);
+			}
+			else {
+				*d1 = f->idx;
+				*d2 = iter;
+			}
 		}
 		else {
-			out = value;
+			*d1 = iter;
 		}
-*/
-		return true;
 	}
 	catch(orcaException& e) {
-		delete f;
 		if (string("orca.iter") != e.who()) {
 			throw e;
 		}
 
 		e.rc_dec();
 
-		get_current_vm()->m_curr = curr;
-		return false;
+		get_current_vm()->m_curr = f->m_curr_back;
+		return 0;
 	}
 
 
-	return false;
-}
+	*lv1 = f->lv1;
+	*lv2 = f->lv2;
 
-
-FOR* orcaForStack::top() 
-{
-	return m_stack[m_stack.size()-1];
-}
-
-void orcaForStack::pop() 
-{
-	FOR* f = m_stack[m_stack.size()-1];
-	delete f;
-	m_stack.pop_back();
-}
-
-const char* orcaForStack::cont(int* lv1, orcaData* d1, int *lv2, orcaData* d2) 
-{
-	FOR* bf = top();
-	bf->idx++;
-	*d2 = NIL;
-
-	// check limit (per for parallel for sub group)
-	if (bf->limit >= 0) {
-		bf->limit--;
-		if (bf->limit == 0) {
-			return 0;
-		}
-	}
-
-	switch (bf->type)
-	{
-	case FOR_SOURCE_LIST: {
-		FOR_LIST* f = (FOR_LIST*)bf;
-
-		f->li++;
-		if (f->li == f->lp->end()) {
-			return 0;
-		}
-		else {
-			if (f->lv2 > 0) {
-				*d1  = f->idx;
-				*d2  = *f->li;
-			}
-			else {
-				*d1  = *f->li;
-			}
-		}
-	}
-	break;
-
-	case FOR_SOURCE_MAP: {
-		FOR_MAP* f = (FOR_MAP*)bf;
-
-		f->mi++;
-		if (f->mi == f->mp->end()) {
-			return 0;
-		}
-		else {
-			orcaVM* vm = get_current_vm();
-			*d1  = f->mi->first;
-			*d2  = f->mi->second;
-		}
-	}
-	break;
-
-	case FOR_SOURCE_VECTOR: {
-		FOR_VECTOR* f = (FOR_VECTOR*)bf;
-
-		f->vi++;
-		if (f->vi == f->vp->end()) {
-			return 0;
-		}
-		else {
-			if (f->lv2 > 0) {
-				*d1  = f->idx;
-				*d2  = *f->vi;
-			}
-			else {
-				*d1  = *f->vi;
-			}
-		}
-	}
-	break;
-
-	case FOR_SOURCE_ITER: {
-		FOR_ITER* f = (FOR_ITER*)bf;
-
-		orcaVM* vm = get_current_vm();
-		try {
-			vm->push_stack(f->next);
-			vm->call(0); // iter.next();
-			orcaData iter = vm->m_stack->top();
-
-			vm->m_stack->pop();
-			if (f->lv2 > 0) {
-				*d1  = f->idx;
-				*d2 = iter;
-			}
-			else {
-				*d1 = iter;
-			}
-
-
-/*
-			if (f->is_iterator) {
-				vm->m_stack->pop();
-				if (f->lv2 > 0) {
-					*d1  = f->idx;
-					*d2 = iter;
-				}
-				else {
-					*d1 = iter;
-				}
-			}
-			else {
-				vm->call(0); // iter()
-				if (f->lv2 > 0) {
-					*d1  = f->idx;
-					*d2 = vm->m_stack->pop();
-				}
-				else {
-					*d1 = vm->m_stack->pop();
-				}
-			}
-*/
-		}
-		catch(orcaException& e) {
-			if (string("orca.iter") != e.who()) {
-				throw e;
-			}
-
-			e.rc_dec();
-
-			get_current_vm()->m_curr = f->m_curr_back;
-			return 0;
-		}
-	}
-	break;
-
-	} // switch
-
-	*lv1 = bf->lv1;
-	*lv2 = bf->lv2;
-
-	return bf->code;
+	return f->code;
 }
 

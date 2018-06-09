@@ -12,6 +12,8 @@
 
 #include "orcaMap.h"
 #include "orcaMapIter.h"
+#include "orcaMapVIter.h"
+#include "orcaMapVIter2.h"
 #include "orcaList.h"
 #include "orcaException.h"
 
@@ -54,6 +56,8 @@ orcaMap::orcaMap()
 	insert_native_function("erase_key", (object_fp)&orcaMap::ex_erase_key);
 	insert_native_function("find", (object_fp)&orcaMap::ex_find);
 	insert_native_function("iter", (object_fp)&orcaMap::ex_iter);
+	insert_native_function("iter2", (object_fp)&orcaMap::ex_iter2);
+	insert_native_function("piter", (object_fp)&orcaMap::ex_piter);
 	insert_native_function("first", (object_fp)&orcaMap::ex_first);
 	insert_native_function("last", (object_fp)&orcaMap::ex_last);
 	insert_native_function("end", (object_fp)&orcaMap::ex_end);
@@ -282,6 +286,16 @@ orcaData orcaMap::ex_upper_bound(orcaVM* vm, int n)
 }
 
 orcaData orcaMap::ex_iter(orcaVM* vm, int n) 
+{
+	return new orcaMapVIter(m_value.begin(), this, false);
+}
+
+orcaData orcaMap::ex_iter2(orcaVM* vm, int n) 
+{
+	return new orcaMapVIter2(m_value.begin(), this, false);
+}
+
+orcaData orcaMap::ex_piter(orcaVM* vm, int n) 
 {
 	return new orcaMapIter(m_value.begin(), this, false);
 }

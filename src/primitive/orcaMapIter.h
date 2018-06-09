@@ -19,6 +19,7 @@ class LIBORCA_API orcaMapIter : public orcaObject
 {
 public:
 	orcaMapIter(orcamap_iterator it, orcaMap* mp, bool flag_ready = true);
+	orcaMapIter(void*) {};
 	orcaObject* v_clone();
 	virtual ~orcaMapIter();
 
@@ -32,10 +33,9 @@ public:
 	orcaData ex_lt(orcaVM* vm, int n);
 	orcaData ex_erase(orcaVM* vm, int n);
 
-private:
+protected:
 	bool valid();
 
-private:
 	orcamap_iterator m_iter;
 	orcaMap* m_mp;
 
