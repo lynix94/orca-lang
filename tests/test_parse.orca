@@ -1,6 +1,12 @@
 
 def.parse calc(str)
 {
+	stmt_done: stmt
+				lambda(...argv) {
+					..RESULT = argv[0];
+				}
+		;
+	
 	stmt : stmt '+' mul
 				lambda(...argv) {
 					return argv[0] + argv[2];
@@ -10,9 +16,6 @@ def.parse calc(str)
 					return argv[0] - argv[2];
 				}
 		| mul
-				lambda(...argv) {
-					return argv[0];
-				}
 		;
 
 	mul : mul '*' number
@@ -24,9 +27,6 @@ def.parse calc(str)
 					return argv[0] / argv[2];
 				}
 		| number
-				lambda(...argv) {
-					return argv[0];
-				}
 		;
 
 	number : r'[0-9]+'
@@ -41,17 +41,20 @@ def.parse calc(str)
 
 
 print: r = my.calc('1*3');
-if r != 3 {
+if r != 0 || my.calc.RESULT != 3 {
+	print: 't1> %d, %d' % (r, my.calc.RESULT);
 	throw test.parsing <- 'parsing result is wrong';
 }
 
 print: r = my.calc('1+2-3');
-if r != 0 {
+if r != 0 || my.calc.RESULT != 0 {
+	print: 't2> %d, %d' % (r, my.calc.RESULT);
 	throw test.parsing <- 'parsing result is wrong';
 }
 
 print: r = my.calc('3+4*100/20-3');
-if r != 20 {
+if r != 0 || my.calc.RESULT != 20 {
+	print: 't3> %d, %d' % (r, my.calc.RESULT);
 	throw test.parsing <- 'parsing result is wrong';
 }
 

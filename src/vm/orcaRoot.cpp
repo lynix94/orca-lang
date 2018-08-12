@@ -94,8 +94,8 @@ orcaRoot::orcaRoot()
 		insert_static("gtk", new orcaGtk());
 	}
 #endif
-
 #endif
+
 }
 
 orcaRoot::~orcaRoot() { }

@@ -172,13 +172,21 @@ def compile(src)
 	..fmap['list'] = ..list;
 	..fmap['do'] = ..do_list;
 
-	code = ..parse_code(src);
+	ret = ..parse_lisp(src);
+	if ret != 0 {
+		print: '[ERROR] ' + ..parse_lisp.ERROR;
+	}
+
+	code = ..parse_lisp.RESULT;
 	return (code, ..fmap);
 }
 
-def.parse parse_code(src)
+def.parse parse_lisp(src)
 {
 	stmt:	expr_list
+			lambda(...argv){ 
+				..RESULT = argv[0];
+			}
 		;
 
 	expr:	'(' expr_list ')'
@@ -394,9 +402,11 @@ def.parse parse_code(src)
 			lambda(...argv) { return argv[0].float(); }
 		;
 
-	string: r'"[^"]*"'
+
+	string: r'\"[^\"]*\"'
 			lambda(...argv) { return argv[0].strip('"'); }
 		;
+
 
 	~ : r'[ \r\n\t]+'
 		;

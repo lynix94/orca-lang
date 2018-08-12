@@ -53,9 +53,9 @@ using namespace std;
 	int integer;
 	double real;
 	void* vector_cp;	
-	struct bnf* bp;	
 	struct cp2_t cp2; 
 	struct int2_t int2;
+	void* vp;	
 };
 
 %error-verbose
@@ -73,16 +73,12 @@ using namespace std;
 %type <cp> opt_under
 %type <cp> big_number
 %type <cp> minus_big_number
+%type <cp> lambda_object
 %type <cp> lambda_define_header
 %type <cp> lambda_context_header
 %type <cp> lambda_decode_header
 %type <cp> lambda_parse_header
 
-%type <bp> terminal
-%type <bp> non_terminal
-%type <bp> action_code
-%type <bp> bnf_left
-%type <bp> bnf_node
 
 %type <integer> number					// integer
 %type <integer> minus_number			// integer
@@ -110,6 +106,16 @@ using namespace std;
 %type <vector_cp> superclass_path_list
 %type <vector_cp> opt_superclass
 
+%type <vp> bnf_stmt_list
+%type <vp> bnf_stmt
+%type <vp> bnf_node_list
+%type <vp> bnf_node
+%type <vp> bnf_right_list
+%type <vp> bnf_right
+%type <vp> terminal
+%type <cp> action_code
+%type <cp> bnf_left
+%type <cp> non_terminal
 
 /*}}}*/
 
@@ -854,23 +860,37 @@ decode_stmt:/*{{{*/
 
 bnf_stmt_list:/*{{{*/
 	bnf_stmt_list bnf_stmt
+		{
+			parse_t* pp = (parse_t*)$1;
+			pp->push_rule((rule_t*)$2);
+			$$ = pp;
+		}
 	| bnf_stmt
+		{
+			parse_t* pp = new parse_t();
+			pp->push_rule((rule_t*)$1);
+			$$ = pp;
+		}
 	;
 /*}}}*/
 
 bnf_stmt:/*{{{*/
-	bnf_left 
+	bnf_left ':' bnf_right_list ';'
 		{
-			g_parse->set_current_bnf($1);
-		}
-	':' bnf_right_list ';'
-		{
-
+			rule_t* rp = (rule_t*)$3;
+			rp->set_name($1);
+			$$ = rp;
 		}
 	| '~' ':' terminal ';'
 		{
-			bnf* b = $3;
-			b->type = BNF_WS;
+			rule_t* rp = new rule_t();
+			rp->set_name("~");
+
+			bnf_t* bp = new bnf_t();
+			bp->push_expr((expr_t*)$3);
+			rp->push_bnf(bp);
+
+			$$ = rp;
 		}
 	
 	;
@@ -878,7 +898,19 @@ bnf_stmt:/*{{{*/
 
 bnf_right_list:/*{{{*/
 	bnf_right_list '|' bnf_right
+		{
+			rule_t* rp = (rule_t*)$1;
+			rp->push_bnf((bnf_t*)$3);
+
+			$$ = rp;
+		}
 	| bnf_right
+		{
+			rule_t* rp = new rule_t();
+			rp->push_bnf((bnf_t*)$1);
+
+			$$ = rp;
+		}
 	;
 /*}}}*/
 
@@ -888,28 +920,26 @@ bnf_left:/*{{{*/
 /*}}}*/
 
 bnf_right:/*{{{*/
-		{
-			g_bnf_right_num = 1;
-			g_parse->current_bnf()->add_rule();
-		}
-	bnf_right_
-	;
-	/*}}}*/
-
-bnf_right_:/*{{{*/
 	bnf_node_list
 	;
-/*}}}*/
+	/*}}}*/
 
 bnf_node_list:/*{{{*/
 	bnf_node_list bnf_node
 		{
-			g_bnf_right_num++;
-			g_parse->current_bnf()->current_rule()->push_bnf($2);
+			bnf_t* bp = (bnf_t*)$1;
+			expr_t* ep = (expr_t*)$2;
+	
+			bp->push_expr(ep);
+			$$ = bp;
 		}
 	| bnf_node
 		{
-			g_parse->current_bnf()->current_rule()->push_bnf($1);
+			bnf_t* bp = new bnf_t();
+			expr_t* ep = (expr_t*)$1;
+
+			bp->push_expr(ep);
+			$$ = bp;
 		}
 	;
 /*}}}*/
@@ -917,37 +947,43 @@ bnf_node_list:/*{{{*/
 bnf_node:/*{{{*/
 	terminal
 	| non_terminal
+		{
+			expr_t* ep = new expr_t();
+			ep->set_non_terminal($1);
+			$$ = ep;
+		}
 	| action_code
+		{
+			expr_t* ep = new expr_t();
+			ep->set_action_code($1);
+			$$ = ep;
+		}
 	;
 /*}}}*/
 
 terminal:/*{{{*/
 	STRING
 		{
-			$$ = g_parse->get_term_bnf($1);
+			expr_t* ep = new expr_t();
+			ep->set_terminal($1);
+			$$ = ep;
 		}
 	| RE_STRING
 		{
-			$$ = g_parse->get_term_bnf($1, true);
+			expr_t* ep = new expr_t();
+			ep->set_terminal_re($1);
+			$$ = ep;
 		}
 	;
 /*}}}*/
 
 non_terminal:/*{{{*/
 	name
-		{
-			string name = "`\a";
-			name += $1;
-			$$ = g_parse->get_nonterm_bnf(name);
-		}
 	;
 /*}}}*/
 
 action_code:/*{{{*/
 	lambda_object
-		{
-			$$ = g_parse->get_action_bnf(g_bnf_right_num);
-		}
 	;
 /*}}}*/
 
@@ -1181,17 +1217,17 @@ define_parse_stmt:/*{{{*/
 				yyerror("at least 1 argument needed in parse object");
 			}
 
-			parserCode::push_code_stack(name, vp, $1, NULL, $6);
-			g_parse->do_parse_init();
+			int flag = $1;
+			flag |= BIT_DEFINE_PARSE;
+			parserCode::push_code_stack(name, vp, flag, NULL, $6);
 		}
 	'{' bnf_stmt_list '}'
 		{
-			vector<char>& def = parserCode::get_def();
-
-			g_parse->make_table();
-			//g_parse->dump();
-			g_parse->do_parse(def);
-			g_parse->cleanup();
+			parse_t* pp = (parse_t*)$9;
+			bool ret = pp->process($4);
+			if (ret == false) {
+				yyerror("build so failed");
+			}
 
 			parserCode::pop_code_stack();
 		}
@@ -1231,36 +1267,30 @@ lambda_object:/*{{{*/
 	lambda_define_header statement_block
 		{
 			parserCode::pop_code_stack();
-			g_op->push_reserved(OP_PUSH_MY);
-			g_op->find_member($1);
+			$$ = $1;
 		}
 	| lambda_context_header '{' open_statement_block
 		{
 			code_top->pop_code_stack();
-			g_op->push_reserved(OP_PUSH_MY);
-			g_op->find_member($1);
+			$$ = $1;
 		}
 	| lambda_decode_header '{' decode_pattern_stmt_list '}'
 		{
 			g_ctl->decode_end();
 			parserCode::pop_code_stack();
-
-			g_op->push_reserved(OP_PUSH_MY);
-			g_op->find_member($1);
+			$$ = $1;
 		}
 	| lambda_parse_header '{' bnf_stmt_list '}'
 		{
 			vector<char>& def = parserCode::get_def();
-
-			g_parse->make_table();
-			//g_parse->dump();
-			g_parse->do_parse(def);
-			g_parse->cleanup();
-
 			parserCode::pop_code_stack();
+			$$ = $1;
 
-			g_op->push_reserved(OP_PUSH_MY);
-			g_op->find_member($1);
+			parse_t* pp = (parse_t*)$3;
+			bool ret = pp->process($1);
+			if (ret == false) {
+				yyerror("build so failed");
+			}
 		}
 	;
 /*}}}*/
@@ -1354,7 +1384,7 @@ lambda_parse_header:/*{{{*/
 			snprintf(buff, 1024, "#%d_parse_lambda", count++);
 			const char* name = g_parser->strdup(buff);
 			parserCode::push_code_stack(name, vp);
-			g_parse->do_parse_init();
+			//g_parse->do_parse_init();
 
 			$$ = name;
 		}
@@ -2146,6 +2176,10 @@ primary_object:/*{{{*/
 	| tuple
 	| map
 	| lambda_object
+		{
+			g_op->push_reserved(OP_PUSH_MY);
+			g_op->find_member($1);
+		}
 	| lvar
 		{
 			if (g_op->check_lvar($1) == false) {

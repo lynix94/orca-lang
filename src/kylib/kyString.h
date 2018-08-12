@@ -62,6 +62,8 @@ public:
 
 	static string to_upper(const string& src);
 	static string to_lower(const string& src);
+
+	static string sprintf(const string& format, ...);
 };
 
 #endif

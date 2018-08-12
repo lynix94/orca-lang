@@ -1,4 +1,4 @@
-/* vim: set fdc=2 foldmethod=marker ts=4 tabstop=4 sw=4 sts=4 : */
+/* vim: et fdc=2 foldmethod=marker ts=4 tabstop=4 sw=4 sts=4 : */
 
 /**********************************************************************
 
@@ -9,836 +9,556 @@
 **********************************************************************/
 
 #include <stdio.h>
+#include <stdarg.h>
+
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
 
 #include "parserParse.h"
-#include "orca_opcode.h"
-#include "parserOP.h"
+#include "orcaObject.h"
+#include "kyString.h"
+
+namespace fs = boost::filesystem;
 
 //#define _PARSE_DEBUG_
 
-static bnf* g_term_eof = NULL;
-static set<bnf*> g_ahead_eof;
+map<string, string> g_term_map;
+vector<string> g_term_list;
+set<string> g_expr_set;
 
-parserParse s_parse;
-parserParse* g_parse = &s_parse;
 
-int rule::m_ruleid;
-vector<rule*> rule::m_rules;
+extern const char* flex_head;
+extern const char* flex_tail;
+extern const char* bison_head;
+extern const char* bison_tail;
 
-static void ahead_dump(set<bnf*> ahead)
+
+string get_term_name()
+{           
+  char buff[1024];
+  sprintf(buff, "TERM_%d", (int)g_term_map.size());
+		  
+  return buff;
+}  
+
+
+string expr_t::escape(const char* cp)
 {
-	set<bnf*>::iterator it = ahead.begin();
-	for (; it != ahead.end(); ++it) {
-		printf("%s, ", (*it)->name.c_str());
-	}
-}
-
-
-rule::rule(bnf* left)/*{{{*/
-{
-	this->left = left;
-	ruleid = m_ruleid++;
-	m_rules.push_back(this);
-}
-/*}}}*/
-
-void rule::push_bnf(bnf* b)/*{{{*/
-{
-	right.push_back(b);
-}
-/*}}}*/
-
-void rule::dump(int idx)/*{{{*/
-{
-	vector<bnf*>::iterator vi = right.begin();
-	printf("r:%d %s :", ruleid, left->name.c_str());
-
-	int i;
-	for(i=0; vi != right.end(); ++vi, i++) {
-		if (i==idx) printf(" . ");
-		printf("%s ", (*vi)->name.c_str());
-	}
-	if (i==idx) printf(" . ");
-	printf("\n");
-}
-/*}}}*/
-
-set<bnf*> rule::ahead_terminals(int i)/*{{{*/
-{
-	if (right.size() > i) {
-		return right[i]->first_terminals();
-	}
-	else {
-		set<bnf*> sb;
-		return sb;
-	}
-}
-/*}}}*/
-
-
-
-
-void state::dump_ahead()/*{{{*/
-{
-	printf(" [ ");
-	set<bnf*>::iterator it = ahead.begin();
-	for (; it != ahead.end(); ++it) {
-		printf("%s, ", (*it)->name.c_str());
-	}
-	printf(" ] ");
-}
-/*}}}*/
-
-void state::push_ahead(bnf* b)/*{{{*/
-{
-	ahead.insert(b);
-}
-/*}}}*/
-
-void state::merge_ahead(state* s)/*{{{*/
-{
-	set<bnf*>& bp = s->ahead;
-	ahead.insert(bp.begin(), bp.end());
-}
-/*}}}*/
-
-bnf* state::next()/*{{{*/
-{
-	if (idx >= r->right.size()) return NULL;
-	return r->right[idx];
-}
-/*}}}*/
-
-bnf* state::next(int i)/*{{{*/
-{
-	if (idx + i >= r->right.size()) return NULL;
-	return r->right[idx + i];
-}
-/*}}}*/
-
-bnf* state::before(int i)/*{{{*/
-{
-	if ((idx-i) < 0) return NULL;
-	return r->right[idx-i];
-}
-/*}}}*/
-
-void state::dump()/*{{{*/
-{
-	if (kernel) printf("[*]");
-	printf("state %d, idx: %d, (from: %d)", s, idx, from);
-	dump_ahead();
-	r->dump(idx);
-
-	if (transit)
-		printf("		transit: s(%d), r(%d)\n", transit->s, transit->r->ruleid);
-}
-/*}}}*/
-
-set<bnf*> state::ahead_terminals()/*{{{*/
-{
-	return r->ahead_terminals(idx + 1);
-}
-/*}}}*/
-
-
-
-bnf::bnf(int type, const string& name, int nth)/*{{{*/
-{
-	this->type = type;
-	this->name = name;
-	this->nth = nth;
-}
-/*}}}*/
-
-bnf::~bnf()/*{{{*/
-{
-	vector<rule*>::iterator it = rules.begin();
-	for (; it != rules.end(); ++it) {
-		delete (*it);
-	}
-}
-/*}}}*/
-
-rule* bnf::current_rule()/*{{{*/
-{
-	return rules[rules.size()-1];
-}
-/*}}}*/
-
-void bnf::add_rule()/*{{{*/
-{
-	rules.push_back(new rule(this));
-}
-/*}}}*/
-
-void bnf::dump() /*{{{*/
-{
-	vector<rule*>::iterator vi = rules.begin();
-	for(; vi != rules.end(); ++vi) {
-		(*vi)->dump();
-	}
-}
-	/*}}}*/
-
-set<bnf*> bnf::first_terminals() /*{{{*/
-{
-	if (firsts.size() > 0) {
-		return firsts;
-	}
-
-	if (type == BNF_TERMINAL) {
-		firsts.insert(this);
-	}
-	else if (type == BNF_NONTERMINAL) {
-		for (int i=0; i<rules.size(); i++) {
-			rule* rp = rules[i];
-			if (rp->right[0] == this) continue;
-			set<bnf*> fp = rp->right[0]->first_terminals();
-			if (fp.size() > 0) {
-				firsts.insert(fp.begin(), fp.end());
-			}
-		}
-
-		return firsts;
-	}
-
-	// action, return empty set
-	return firsts;
-}
-/*}}}*/
-
-
-parserParse::parserParse() { }
-
-void parserParse::cleanup()/*{{{*/
-{
-	m_items.clear();
-
-	state_t::iterator si = m_state.begin();
-	for (; si != m_state.end(); ++si) {
-		delete (*si);
-	}
-	m_state.clear();
-	m_state_group.clear();
-
-	m_max_state = 0;
-
-	map<string, bnf*>::iterator it = m_sb.begin();
-	for (; it != m_sb.end(); ++it) {
-		delete (*it).second;
-	}
-	m_sb.clear();
-
-	vector<bnf*>::iterator vi = m_ib.begin();
-	for (; vi != m_ib.end(); ++vi) {
-		delete (*vi);
-	}
-	m_ib.clear();
-}
-/*}}}*/
-
-bnf* parserParse::get_term_bnf(const string& name, bool is_re) /*{{{*/
-{
-	if (m_sb.find(name) == m_sb.end()) {
-		int nth = m_sb.size();
-		m_sb[name] = new bnf(BNF_TERMINAL, name, nth);
-		m_sb[name]->is_re = is_re;
-	}
-
-	return m_sb[name];
-}
-/*}}}*/
-
-bnf* parserParse::get_nonterm_bnf(const string& name) /*{{{*/
-{
-	if (m_sb.find(name) == m_sb.end()) {
-		bool first = false;
-		if (m_sb.size() == 0) { // first case
-			first = true;
-
-			// add dummy rule
-			bnf* bp = new bnf(BNF_NONTERMINAL, "@stmt_done", 0);
-			m_sb["@stmt_done"] = bp;
-			m_start = bp;
-
-			g_term_eof = get_term_bnf("@EOF");
-			if (g_ahead_eof.size() == 0) {
-				g_ahead_eof.insert(g_term_eof);
-			}
-		}
-
-		int nth = m_sb.size();
-		bnf* bp = new bnf(BNF_NONTERMINAL, name, nth);
-		m_sb[name] = bp;
-
-		if (first) {
-			m_start->add_rule();
-			m_start->current_rule()->push_bnf(bp);
-		}
-	}
-
-	return m_sb[name];
-}
-/*}}}*/
-
-bnf* parserParse::get_action_bnf(int rights)/*{{{*/
-{
-	int nth = m_ib.size();
-	bnf* bp = new bnf(BNF_ACTION, "@ACTION", nth);
-	bp->node_num = rights;
-	m_ib.push_back(bp);
-	
-	return bp;
-}
-/*}}}*/
-
-bnf* parserParse::current_bnf()/*{{{*/
-{
-	return m_current;
-}
-/*}}}*/
-
-void parserParse::set_current_bnf(bnf* b)/*{{{*/
-{
-	m_current = b;
-}
-/*}}}*/
-
-int parserParse::find_same_shift_goto(rule* r, int idx)/*{{{*/
-{
-	for (int i=0; i<m_state.size(); i++) {
-		if ((m_state[i]->r == r) &&
-			(m_state[i]->idx == idx)) 
+	stringstream ss;
+	for (const char* c = cp; *c != 0; c++) {
+		switch (*c)
 		{
-			return i;
+		case '\a': ss << "\\a"; break;
+		case '\b': ss << "\\b"; break;
+		case '\f': ss << "\\f"; break;
+		case '\n': ss << "\\n"; break;
+		case '\r': ss << "\\r"; break;
+		case '\t': ss << "\\t"; break;
+		case '\v': ss << "\\v"; break;
+		case '\"': ss << "\\\""; break;
+		case '\'': ss << "\\'"; break;
+		default: ss << *c; break;
 		}
 	}
 
-	return -1;
+	return ss.str();
 }
-/*}}}*/
 
-int parserParse::find_dup_shift_goto(int sn, bnf* b)/*{{{*/
+void expr_t::set_terminal(const char* cp)
 {
-	for (int i=0; i<m_items.size(); i++) {
-		if ((m_items[i].from == sn) &&
-			(m_items[i].b == b))
-		{
-			return m_items[i].to;
-		}
-	}
-
-	return -1;
+	type = 'T';
+	expr = escape(cp);
 }
-/*}}}*/
 
-int parserParse::find_dup_action(int sn, bnf* b)/*{{{*/
+void expr_t::set_terminal_re(const char* cp)
 {
-	for (int i=0; i<m_items.size(); i++) {
-		if ((m_items[i].from == sn) &&
-			(m_items[i].b->type == BNF_ACTION))
-		{
-			return m_items[i].to;
-		}
-	}
-
-	return -1;
+	type = 'R';
+	expr = escape(cp);
 }
-/*}}}*/
 
-int parserParse::find_same_state(int sn, rule* r, int idx)/*{{{*/
+void expr_t::set_non_terminal(const char* cp)
 {
-// fix more efficient
-	for (int i=0; i<m_state.size(); i++) {
-		if ((m_state[i]->s == sn) &&
-			(m_state[i]->r == r) &&
-			(m_state[i]->idx == idx)) 
-		{
-			return i;
-		}
-	}
-
-	return -1;
+	type = 'N';
+	expr = cp;
 }
-/*}}}*/
 
-void parserParse::dump()/*{{{*/
+void expr_t::set_action_code(const char* cp)
 {
-	map<string, bnf*>::iterator it = m_sb.begin();
-	for(; it != m_sb.end(); ++it) {
-		(*it).second->dump();
-	}
-
-	for (int i=0; i<m_state.size(); i++) {
-		m_state[i]->dump();
-	}
+	type = 'A';
+	expr = cp;
 }
-/*}}}*/
 
-void parserParse::make_parsing_table(map<string, bnf*>& cols)/*{{{*/
+void expr_t::pass1(int idx)
 {
-	int depth = m_max_state + 1;
-	int width = cols.size() + 1;
+	this->idx = idx;
 
-	m_table.resize(depth);
-	for (int i=0; i<depth; i++) {
-		m_table[i].resize(width);
-		for (int j=0; j<width-1; j++) {
-			m_table[i][j].first = 'x';
-			m_table[i][j].second = 0;
-		}	
+	string key;
+	if (type == 'T') {
+		key = string("\"") + expr + "\"";
 	}
-
-	for (int i=0; i<m_items.size(); i++) {
-		int row = m_items[i].from;
-		int col = m_items[i].b->nth;
-		char type = m_items[i].type;
-		int to = m_items[i].to;
-
-		if (type == 'a') { // nth of action means executable object order
-			col = 0;
-		}
-
-		if (m_table[row][col].first != 'x') {
-		//	printf("conflict at: %d, %d\n", row, col);
-		}
-
-		if (type == 's') {
-			m_table[row][col].first = type;
-			m_table[row][col].second = to;
-		}
-		else if (type == 'g') {
-			m_table[row][col].first = type;
-			m_table[row][col].second = to;
-		}
-		else if (type == 'a') {
-			m_table[row][col].first = type;
-			m_table[row][col].second = to;
-		}
-		else { // 'r'
-			set<bnf*>::iterator it = m_items[i].sp->ahead.begin();
-			for (; it!=m_items[i].sp->ahead.end(); ++it) {
-				bnf* b = (*it);
-				int ahead = b->nth;
-				m_table[row][ahead].first = type;
-				m_table[row][ahead].second = to;
-			}
-		}
-
-		if (type == 'a') {
-			for (int j=0; j<width-1; j++) {
-				if (m_table[row][j].first == 'x') {
-					m_table[row][j].first = type;
-					m_table[row][j].second = to;
-				}
-
-				if (type == 'a') {
-					m_table[row][width-1].first = m_items[i].b->node_num;
-					m_table[row][width-1].second = m_items[i].b->nth;
-				}
-			}
-		}
+	else if (type == 'R') {
+		key = expr;
 	}
-
-	if (m_table[0][0].first == 'x')
-			m_table[0][0].first = 'q';	// END condition
-
-#ifdef _PARSE_DEBUG_/*{{{*/
-	vector<string> columns;
-	columns.resize(cols.size());
-	map<string, bnf*>::iterator it = cols.begin();
-	for(; it != cols.end(); ++it) {
-		columns[(*it).second->nth] = (*it).first.c_str();
+	else if (type == 'A') {
+		return;
 	}
-
-	printf("\t");
-	for (int j=0; j<width-1; j++) {
-		printf("%s,\t", columns[j].c_str());
-	}
-	printf("\n");
-
-	for (int i=0; i<depth; i++) {
-		printf("%d:\t", i);
-		for (int j=0; j<width; j++) {
-			if (j == width-1) {
-				printf("%d:%d\t", m_table[i][j].first, m_table[i][j].second);
-			}
-			else {
-				printf("%c%d\t", m_table[i][j].first, m_table[i][j].second);
-			}
-		}
-		printf("\n");
-	}
-#endif
-/*}}}*/
-}
-/*}}}*/
-
-#include <stdlib.h>
-
-void parserParse::make_transit(state* sp)/*{{{*/
-{
-#ifdef _PARSE_DEBUG_
-	printf("Make transit: %d\n", sp->s);
-	sp->dump_ahead();
-#endif
-	int from = sp->s;
-
-	if (sp->next() == NULL) {
-#ifdef _PARSE_DEBUG_
-		printf("REDUCE(%s): %d-%d\n", sp->before()->name.c_str(), sp->s, sp->r->ruleid);
-		sp->dump();
-#endif
-		int idx = 1;
-		if (sp->before(1)==NULL) {
-			return;
-		}
-		if (sp->before(1)->type == BNF_ACTION) {
-			idx = 2;
-		}
-
-		table_item ti(sp->s, sp->before(idx), 'r', sp->r->ruleid);
-		ti.sp = sp;
-		m_items.push_back(ti);
+	else { // 'N'
 		return;
 	}
 
-	state* s = new state();
-	*s = *sp;
-	bool find = false;
-	bool dup_find = false;
-	int to = m_max_state + 1;
-	int type = s->next()->type;
-	int ret;
-
-	if (type == BNF_TERMINAL) {
-		if ((ret = find_dup_shift_goto(s->s, s->next())) >= 0) {
-			to = ret;
-			dup_find = true;
-		}
-		else if ((ret = find_same_shift_goto(s->r, s->idx+1)) >= 0) {
-			to = m_state[ret]->s;
-			find = true;
-			sp->transit = m_state[ret];
-		}
-
-
-#ifdef _PARSE_DEBUG_
-		printf("SHIFT(%s): %d-%d\n", s->next()->name.c_str(), from, to);
-		s->dump();
-#endif
-		table_item ti(from, s->next(), 's', to);
-		ti.sp = s;
-		m_items.push_back(ti);
-
-		if (to >= m_max_state) m_max_state = to;
-
+	map<string, string>::iterator it = g_term_map.find(key);
+	
+	if (it == g_term_map.end()) {
+		g_term_map[key] = get_term_name();
+		g_term_list.push_back(key);
+		it = g_term_map.find(key);
 	}
-	else if (type == BNF_NONTERMINAL) {
-		if ((ret = find_dup_shift_goto(s->s, s->next())) >= 0) {
-			to = ret;
-			dup_find = true;
-		}
-		else if ((ret = find_same_shift_goto(s->r, s->idx+1)) >= 0) {
-			to = m_state[ret]->s;
-			find = true;
-			sp->transit = m_state[ret];
-		}
 
-#ifdef _PARSE_DEBUG_
-		printf("GOTO(%s): %d-%d\n", s->next()->name.c_str(), from, to);
-		s->dump();
-#endif
-		table_item ti(from, s->next(), 'g', to);
-		ti.sp = s;
-		m_items.push_back(ti);
-		if (to >= m_max_state) m_max_state = to;
+	type = 'N';
+	expr = it->second;
+}
+
+
+
+string expr_t::make_action_code()
+{
+	char buff[1024];
+		
+	sprintf(buff, "{ $$ = parse_call(\"%s\", %d, ", expr.c_str(), idx);
+	string ret = buff;
+	for (int i=1; i<=idx; i++) {
+		if (i < idx) {
+			sprintf(buff, "$%d, ", i);
+		}
+		else {
+			sprintf(buff, "$%d); }", i);
+		}
+		ret += buff;
+	}
+
+	return ret;
+}
+
+void expr_t::pass2(stringstream& flex, stringstream& bison)
+{
+	if (type == 'N') {
+		bison << expr + " ";
+	}
+	else if (type == 'A') {
+		bison << make_action_code();
 	}
 	else {
-#ifdef _PARSE_DEBUG_
-		printf("ACTION(%s): %d-%d\n", s->next()->name.c_str(), from, to);
-		s->dump();
-#endif
-		if ((ret = find_dup_action(s->s, s->next())) >= 0) {
-			to = ret;
-		}
-
-		table_item ti(from, s->next(), 'a', to);
-		ti.sp = s;
-		m_items.push_back(ti);
-		if (to >= m_max_state) m_max_state = to;
+		printf("Something wrong\n");
 	}
-
-	if (find) return;
-
-	if (dup_find) {
-		if (find_same_state(to, s->r, s->idx + 1) >= 0) {
-			return;
-		}
-	}
-
-	sp->transit = s;
-	s->from = from;
-	s->s = to;
-	s->idx++;
-//	s->merge_ahead(sp);
-	make_one_state(s);
 }
-/*}}}*/
 
-void parserParse::make_one_state(state* s)/*{{{*/
+void expr_t::dump()
 {
-#ifdef _PARSE_DEBUG_
-	printf("####  make one state : %d####\n", s->s);
-	s->dump();
-#endif
-
-	int start = m_state.size();
-	s->kernel = true;
-	make_closure(s);
-
-#ifdef _PARSE_DEBUG_
-	printf("####  make one state done: %d####\n", s->s);
-	s->dump();
-#endif
-	
-	// todo : fix more efficienty
-	for (int i=0; i<m_state.size(); i++) {
-		if (m_state[i]->s == s->s && m_state[i]->transited == false) {
-			make_transit(m_state[i]);
-			m_state[i]->transited = true;
-		}
-	}
-
-#ifdef _PARSE_DEBUG_
-	printf("####  make one state complete done: %d####\n", s->s);
-	s->dump();
-#endif
+	printf("%s", to_str().c_str());
 }
-/*}}}*/
 
-void parserParse::make_ahead()/*{{{*/
+string expr_t::to_str()
 {
-	state_group_t::iterator it = m_state_group.begin();
-	for (; it != m_state_group.end(); ++it) {
-		state* sp = it->second;
+	switch(type)
+	{
+	case 'T':
+		return string("'") + expr + "'";
 
-		if (sp->kernel && sp->next()) {
-#ifdef _PARSE_DEBUG_
-	printf("####  make ahead of ####\n");
-	sp->dump();
-#endif
-			state_group_t::iterator si = m_state_group.find(sp->s);
-			while (si != m_state_group.end() && si->first == sp->s) {
-				state* cp = si->second;
-				set<bnf*> aheads = cp->ahead_terminals();
-				cp->next()->new_ahead.insert(aheads.begin(), aheads.end());
-				
-				state_group_t::iterator sub_si = m_state_group.find(sp->s);
-				while (sub_si != m_state_group.end() && sub_si->first == sp->s) {
-					state* sub_cp = sub_si->second;
-					if (sub_cp->r->left->new_ahead.size()) {
-						sub_cp->ahead.insert(sub_cp->r->left->new_ahead.begin(), sub_cp->r->left->new_ahead.end());
-					}
+	case 'R':
+		return string("r'") + expr + "'";
 
-					++sub_si;
-				}
-					
-				++si;
-			} // while (si ...
+	case 'N':
+		return expr;
 
-		} // if (sp...
-
-	} // for (; ..
-
-
-	for (int i=0; i<m_state.size(); i++) {
-		state* sp = m_state[i];
-		if (sp->kernel && sp->next()) {
-			
-#ifdef _PARSE_DEBUG_
-	printf("####  make ahead done ####\n");
-	sp->dump();
-#endif
-		}
+	case 'A':
+		return expr;
 	}
 
-
-	bool cont = false;
-	do {
-		cont = false;
-		state_group_t::iterator it = m_state_group.begin();
-		for (; it != m_state_group.end(); ++it) {
-			state* sp = it->second;
-			state_group_t::iterator si = m_state_group.find(sp->s);
-			while (si != m_state_group.end() && si->first == sp->s) {
-				state* cp = si->second;
-				state* tp = cp->transit;
-				if (tp) {
-					int old = tp->ahead.size();
-					tp->merge_ahead(sp);
-					if (old < tp->ahead.size()) {
-						cont = true;
-					}
-				}
-				++si;
-			}
-		}
-	} while (cont);
+	return "N/A";
 }
-/*}}}*/
 
-void parserParse::make_closure_bnf(state* sp)/*{{{*/
+
+
+bnf_t::~bnf_t()
+{
+	for (int i=0; i<expr_list.size(); i++) {
+		delete expr_list[i];
+	}
+}
+
+void bnf_t::push_expr(expr_t* ep)
+{
+	expr_list.push_back(ep);
+}
+
+void bnf_t::pass1()
+{
+	for (int i=0; i<expr_list.size(); i++) {
+		expr_list[i]->pass1(i);
+	}
+}
+
+void bnf_t::pass2(stringstream& flex, stringstream& bison)
+{
+	for (int i=0; i<expr_list.size(); i++) {
+		expr_list[i]->pass2(flex, bison);
+	}
+
+	bison << "\n";
+}
+
+void bnf_t::dump()
+{
+	printf("%s", to_str().c_str());
+}
+
+string bnf_t::to_str()
+{
+	stringstream str;
+	for (int i=0; i<expr_list.size(); i++) {
+		str << expr_list[i]->to_str() << " ";
+	}
+
+	return str.str();
+}
+
+string bnf_t::get_terminal()
+{
+	if (expr_list.size() != 1) {
+		throw "escaping terminal should be one";
+	}
+
+	return expr_list[0]->expr;
+}
+
+
+
+
+
+rule_t::~rule_t()
+{
+	for (int i=0; i<bnf_list.size(); i++) {
+		delete bnf_list[i];
+	}
+}
+
+void rule_t::set_name(const char* cp)
+{
+	name = cp;
+}
+
+void rule_t::push_bnf(bnf_t* bnf)
+{
+	bnf_list.push_back(bnf);
+}
+
+void rule_t::pass1()
+{
+	for (int i=0; i<bnf_list.size(); i++) {
+		if (name == "~") continue;
+		bnf_list[i]->pass1();
+	}
+
+	g_expr_set.insert(name);
+}
+
+void rule_t::pass2(stringstream& flex, stringstream& bison)
+{
+	if (name == "~") {
+		for (int i=0; i<bnf_list.size(); i++) {
+			flex << bnf_list[i]->get_terminal() << "\t;\n";
+		}
+		return;
+	}
+
+	bison << name + ":\n\t";
+	for (int i=0; i<bnf_list.size(); i++) {
+		bnf_list[i]->pass2(flex, bison);
+		if (i < bnf_list.size()-1) {
+			bison << "\t| ";
+		}
+		else {
+			bison << "\t;\n\n";
+		}
+	}
+}
+
+void rule_t::dump()
+{
+	printf("%s", to_str().c_str());
+}
+
+string rule_t::to_str()
+{
+	stringstream str;
+	str << name << " : ";
+	for (int i=0; i<bnf_list.size(); i++) {
+		str << bnf_list[i]->to_str();
+		if (i != bnf_list.size()-1) {
+			str << "\n\t|";
+		}
+	}
+	str << "\n\t;";
+
+	return str.str();
+}
+
+parse_t::~parse_t()
+{
+	for (int i=0; i<rule_list.size(); i++) {
+		delete rule_list[i];
+	}
+}
+
+void parse_t::push_rule(rule_t* r)
+{
+	rule_list.push_back(r);
+}
+
+void parse_t::make_lexer(const string& prefix, stringstream& flex, stringstream& bison)
+{
+	for (int i=0; i<g_term_list.size(); i++) {
+		string key = g_term_list[i];
+		string value = g_term_map[key];
+
+		flex<< kyString::sprintf("%s\t{ %slval.i = parse_make_string(%stext); return %s; }\n",
+								key.c_str(), prefix.c_str(), prefix.c_str(), value.c_str());
+
+		bison << kyString::sprintf("%%token<i> %s\n", value.c_str());
+	}
+
+	bison << "\n\n";
+	set<string>::iterator it = g_expr_set.begin();
+	for (; it != g_expr_set.end(); ++it) {
+		if ((*it) == "~") continue;
+		bison << kyString::sprintf("%%type<i> %s\n", (*it).c_str());
+	}
+
+	bison << "%%\n\n";
+}
+
+bool parse_t::process(const string& name)
+{
+	make_meta(name);
+	return build_so(name);
+}
+
+bool parse_t::build_so(const string& name)
 {
 	int ret;
-	bnf* b = sp->r->right[sp->idx];
+	char buff[4096];
+	const char* cp = name.c_str();
 
-	for(int i=0; i<b->rules.size(); i++) {
-		state* s = new state(sp->s, b->rules[i], 0, sp->from);
+	fs::remove(name + "_lexer.cpp");
+	sprintf(buff, "flex -P %s -o %s_lexer.cpp %s_lexer.l", cp, cp, cp);
+	printf("flex compile: %s\n", buff);
+	ret = ::system(buff);
 
-		if ((ret = find_same_state(s->s, b->rules[i], 0)) < 0) {
-#ifdef _PARSE_DEBUG_
-			printf("      push_rule_bnf: state: %d, idx: %d, (from: %d)\t", s->s, 0, s->from);
-			b->rules[i]->dump();
-			s->dump_ahead();
-#endif
-			m_state.push_back(s);
-			m_state_group.insert(pair<int, state*>(s->s, s));
+	fs::remove(name + "_parser.cpp");
+	fs::remove(name + "_parser.hpp");
+	sprintf(buff, "bison -p %s -d -r all -o %s_parser.cpp %s_parser.y", cp, cp, cp);
+	printf("bison compile: %s\n", buff);
+	ret = ::system(buff);
 
-			if (b->rules[i]->right[0]->type == BNF_NONTERMINAL) {
-				make_closure_bnf(s);
-			}
-		}
+	string target = string("libparse_") + name + ".so";
+	fs::remove(target);
+	sprintf(buff, "g++ -g -fPIC -shared -o ./%s ./%s_lexer.cpp ./%s_parser.cpp -I${ORCA_HOME}/include/orca -L${ORCA_HOME}/lib -lorca", target.c_str(), cp, cp);
+	printf("external module compile: %s\n", buff);
+	ret = ::system(buff);
+
+	if (!fs::exists(target)) {
+		return false;
 	}
+
+	return true;
 }
-/*}}}*/
 
-void parserParse::make_closure(state* s)/*{{{*/
+void parse_t::make_meta(const string& name)
 {
-	int ret;
-	if ((ret = find_same_state(s->s, s->r, s->idx)) < 0) {
-		m_state.push_back(s);
-		m_state_group.insert(pair<int, state*>(s->s, s));
-#ifdef _PARSE_DEBUG_
-		printf("      push_rule: state: %d, idx: %d, (from: %d)\t", s->s, s->idx, s->from);
-		s->r->dump();
-		//s->dump_ahead();
-#endif
+	stringstream flex;
+	stringstream bison;
 
-		if (s->s >= m_max_state) m_max_state = s->s;
-
-		if (s->r->right.size() > s->idx && 
-			s->r->right[s->idx]->type == BNF_NONTERMINAL) 
-		{
-			make_closure_bnf(s);
-		}
+	for (int i=0; i<rule_list.size(); i++) {
+		rule_list[i]->pass1();
 	}
-}
-/*}}}*/
 
-void parserParse::make_table()/*{{{*/
+	const char* cp = name.c_str();
+	flex << kyString::sprintf(flex_head, cp);
+	bison << kyString::sprintf(bison_head, cp, cp, cp, cp);
+
+	// make flex
+	make_lexer(name, flex, bison);
+	// make bison
+	for (int i=0; i<rule_list.size(); i++) {
+		rule_list[i]->pass2(flex, bison);
+	}
+
+	flex << kyString::sprintf(flex_tail);
+	bison << kyString::sprintf(bison_tail, cp, cp, cp, cp, cp, cp);
+
+	//dump();
+	//printf("flex>> '%s'\n", flex.str().c_str());
+	//printf("bison>> '%s'\n", bison.str().c_str());
+
+	FILE* fp;
+	fp = fopen((name + "_lexer.l").c_str(), "w");
+	string flex_string = flex.str();
+	cp = flex_string.c_str();
+	fwrite(cp, strlen(cp), 1, fp);
+	fclose(fp);
+
+	fp = fopen((name + "_parser.y").c_str(), "w");
+	string bison_string = bison.str();
+	cp = bison_string.c_str();
+	fwrite(cp, strlen(cp), 1, fp);
+	fclose(fp);
+}
+
+void parse_t::dump()
 {
-#ifdef _PARSE_DEBUG_
-	map<string, bnf*>::iterator mi = m_sb.begin();
-	for (; mi != m_sb.end(); ++mi) {
-		printf("## %s\n", mi->first.c_str()); 
-		mi->second->dump();
-		set<bnf*> sp = mi->second->first_terminals();
-		if (sp.size() > 0) {
-			set<bnf*>::iterator si = sp.begin();
-			for (; si != sp.end(); ++si) {
-				printf(">%s\n", (*si)->name.c_str());
-			}
+	if (!g_term_map.empty()) {
+		printf("========= term table =========\n");
+		map<string, string>::iterator it = g_term_map.begin();
+		for(; it != g_term_map.end(); ++it) {
+			printf("\t%s : %s\n", it->first.c_str(), it->second.c_str());
 		}
+
 		printf("\n");
 	}
-#endif
 
-	state* st = new state(0, m_start->rules[0], 0, -1);
-
-	make_one_state(st);
-	st->push_ahead(get_term_bnf("@EOF"));
-
-	make_ahead();
-	
-	
-
-#ifdef _PARSE_DEBUG_
-	item_dump();
-	dump();
-#endif
-	make_parsing_table(m_sb);
+	printf("========= rule table =========\n");
+	printf("%s", to_str().c_str());
 }
-/*}}}*/
 
-void parserParse::do_parse_init()/*{{{*/
+string parse_t::to_str()
 {
-	cleanup();
-	rule::m_ruleid = 0;
-	rule::m_rules.clear();
+	stringstream str;
+	for (int i=0; i<rule_list.size(); i++) {
+		str << rule_list[i]->to_str();
+		str << "\n";
+	}
 
-	code_top->push_char(OP_PUSH_LVAR);
-	code_top->push_short(0);
-
-	code_top->push_char(OP_PARSE_INIT);
-	m_idx_2pass = code_top->size();
-	code_top->increase(sizeof(int));
+	return str.str();
 }
-/*}}}*/
 
-void parserParse::do_parse(vector<char>& def)/*{{{*/
+
+
+
+
+// parse runtime
+static orcaVM* parseVM;
+static orcaObject* parseObject;
+static string parse_error;
+static portMutex parseMutex;
+static vector<orcaData> gc_pool;
+
+
+orcaParseContext::orcaParseContext(orcaVM* vm, orcaObject* op)
 {
-	code_top->set_int(code_top->size(), m_idx_2pass);
-	int depth = m_max_state+1;
-	int width = m_sb.size();
-	int rules = rule::m_rules.size();
+	parseMutex.lock();
 
-	def.push_back(OP_PARSE);
-	copy((char*)&width, (char*)(&width+1), back_inserter(def));
-	copy((char*)&depth, (char*)(&depth+1), back_inserter(def));
-	copy((char*)&rules, (char*)(&rules+1), back_inserter(def));
-
-	vector<bnf*> vec;
-	vec.resize(width);
-	map<string, bnf*>::iterator it = m_sb.begin();
-	for (; it != m_sb.end(); ++it) 
-		vec[it->second->nth] = it->second;
-
-	// terms
-	for (int i=0; i<vec.size(); i++) {
-		def.push_back(vec[i]->type); 
-		if (vec[i]->type == BNF_TERMINAL || vec[i]->type == BNF_WS) {
-			def.push_back(vec[i]->is_re); // str or regex
-		}
-
-		const char* cp = vec[i]->name.c_str();
-		def.push_back(strlen(cp));
-		copy(cp, cp + strlen(cp)+1, back_inserter(def));
+	// cleanup
+	for (int i=0; i<gc_pool.size(); i++) {
+		gc_pool[i].rc_dec();
 	}
+	gc_pool.clear();
 
-	// table
-	for (int i=0; i<depth; i++) {
-		for (int j=0; j<width + 1; j++) {	// 1 for action
-			def.push_back(m_table[i][j].first);
-			short idx = m_table[i][j].second;
-			copy((char*)&idx, (char*)(&idx+1), back_inserter(def));
-		}
-	}
+	// init
+	parseVM = vm;
+	parseObject = op;
 
-	// rules
-	for (int i=0; i<rules; i++) {
-		rule* rp = rule::m_rules[i];
-		short rn = rp->left->nth;
-		copy((char*)&rn, (char*)(&rn+1), back_inserter(def));
-		rn = rp->right.size();
-		copy((char*)&rn, (char*)(&rn+1), back_inserter(def));
-	}
-
-	// actions
-	code_top->push_char(OP_PARSE);
-	code_top->push_short(m_ib.size());
-	code_top->push_char(OP_RETURN);
+	op->update_member("RESULT", NIL);
+	op->update_member("ERROR", "");
+	parse_error = "";
 }
-/*}}}*/
+
+
+orcaParseContext::~orcaParseContext()
+{
+	parseObject->update_member("ERROR", parse_error);
+
+	for (int i=0; i<gc_pool.size(); i++) {
+		gc_pool[i].rc_dec();
+	}
+	gc_pool.clear();
+
+	parseMutex.unlock();
+}
+
+
+void parse_set_error(const char* msg, const char* token)
+{
+	parse_error = kyString::sprintf("%s near by '%s'", msg, token);
+}
+
+int parse_make_string(const char* cp)
+{
+	orcaData d = cp;
+	gc_pool.push_back(d);
+	d.rc_inc();
+
+	return gc_pool.size()-1;
+}
+
+
+int parse_call(const string& name, int num, ...)
+{
+	orcaData d = parseObject->get_member(name.c_str());
+	parseVM->push_stack(d);
+
+	va_list ap;
+	va_start(ap, num);
+	for (int i=0; i<num; i++) {
+		int idx = va_arg(ap, int);
+		orcaData d = gc_pool[idx];
+		parseVM->push_param(d);
+	}
+	va_end(ap);
+
+	parseVM->call(num);
+	orcaData ret = parseVM->pop_stack(); 
+	gc_pool.push_back(ret);
+	ret.rc_inc();
+
+	return gc_pool.size() - 1;
+}
+
+
+// parse source
+struct parseSource
+{
+	string source;
+	int len;
+	int idx;
+};
+
+static parseSource parse_source;
+
+void parse_set_source(const string& src)
+{
+	parse_source.source = src;
+	parse_source.len = src.length();
+	parse_source.idx = 0;
+}
+
+int parse_yyinput(char* buff, int max_size)
+{
+	int remain = parse_source.len - parse_source.idx;
+	int n = max_size;
+
+	if (remain < n) {
+		n = remain;
+	}
+
+	if (n > 0) {
+		memcpy(buff, parse_source.source.c_str() + parse_source.idx, n);
+		parse_source.idx += n;
+	}
+	
+	return n;
+}
+
+
+
+
 

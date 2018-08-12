@@ -86,6 +86,7 @@ public:
 	orcaObject* find_object_by_path(const char* path);
 	orcaObject* exec_define(const char* c, int size, const char* code, 
 							orcaObject* owner, time_t last_write_time);
+	orcaObject* load_parse_object(const string& name);
 
 	void exec_code(const char* c, const char* offset=NULL);
 	bool load(const string& module_name, orcaObject* owner = NULL, string owner_path = "");

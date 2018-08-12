@@ -9,6 +9,7 @@
 **********************************************************************/
 
 #include <limits.h>
+#include <stdarg.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -347,6 +348,43 @@ string kyString::to_upper(const string& s)/*{{{*/
 string kyString::to_lower(const string& s)/*{{{*/
 {
 	return boost::to_lower_copy<string>(s);
+}
+/*}}}*/
+
+string kyString::sprintf(const string& fmt, ...)/*{{{*/
+{
+	char buff[4096];
+	char *bp = buff;
+	int size = 4096;
+	int ret;
+
+	while (true) {
+		va_list ap;
+		va_start(ap, fmt);
+		ret = vsnprintf(bp, 4096, fmt.c_str(), ap);
+		va_end(ap);
+
+		if (ret < size) {
+			if (bp != buff) {
+				free(bp);
+			}
+
+			if (bp != buff) {
+				string ret = bp;
+				free(bp);
+				return ret;
+			}
+
+			return bp;
+		}
+
+		size *= 2;
+		if (bp != buff) {
+			free(bp);
+		}
+
+		bp = (char*)malloc(size);
+	}
 }
 /*}}}*/
 

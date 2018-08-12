@@ -212,6 +212,8 @@ void orcaVM::cleanup()/*{{{*/
 {
 	delete m_for_stack;
 	delete m_decode_stack;
+	delete m_switch_stack;
+	delete m_select_stack;
 	delete m_stack;
 	delete m_local;
 	delete m_trace;
@@ -672,6 +674,38 @@ orcaObject* orcaVM::find_object_by_path(const char* path)/*{{{*/
 }
 /*}}}*/
 
+
+orcaObject* orcaVM::load_parse_object(const string& name)
+{
+	PRINT1("\t\t  load parse: %s\n", name.c_str());
+	string mod_name = string("libparse_") + name + ".so";
+
+	DLHANDLE handle = dlopen(mod_name.c_str(), RTLD_NOW);
+	if (handle == NULL) {
+		string path = "./" + mod_name;
+		handle = dlopen(path.c_str(), RTLD_NOW);
+		if (handle == NULL) {
+			throw orcaException(this, "orca.module", kyString::sprintf("module '%s' launch failure", mod_name.c_str()));
+		}
+	}
+
+	typedef void* (*fp_t)(void);
+	fp_t pfunc = (fp_t)dlsym(handle, "get_parse");
+	if (pfunc == NULL) {
+		printf("invalid module file: %p, %s\n", handle, "parse");
+		throw orcaException(this, "orca.module", "invalid module");
+	}
+
+	orcaObject* obj = (orcaObject*)(*pfunc)();
+	if (obj == NULL) {
+		throw orcaException(this, "orca.define", kyString::sprintf("parse object %s load failed", name.c_str()));
+	}
+
+	obj->insert_member("RESULT", NIL);
+	obj->insert_member("ERROR", "");
+	return obj;
+}
+
 orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaObject* owner, time_t last_write_time)/*{{{*/
 {
 	vector<orcaObject*> v;
@@ -702,13 +736,17 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 				i += 1 + 1 + c[i+1+1];
 				current = owner;
 				PRINT1("\t\t CODE DEF start (%p)\n", code);
-				if (mod == NULL) {
-					mod = current;
-				}
+				if (mod == NULL) mod = current;
 				break;
 			}
 
-			o = new orcaObject();
+			if (c[i+1] & BIT_DEFINE_PARSE) {
+				o = load_parse_object(name);
+			}
+			else {
+				o = new orcaObject();
+			}
+
 			o->make_original();
 			d.o_set(o);
 			d.o()->set_name(name);
@@ -726,14 +764,12 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			}
 
 			if (c[i+1] & BIT_DEFINE_STATIC) {
-				if (op->insert_static(d.o()->get_name(), d) == false) {
-					throw orcaException(this, "orca.define", string("member ") + name + " already exists");
-				}
+				if (op->insert_static(d.o()->get_name(), d) == false)
+					throw orcaException(this, "orca.define", kyString::sprintf("member '%s' already exists", name));
 			}
 			else {
-				if (op->insert_member(d.o()->get_name(), d) == false) {
-					throw orcaException(this, "orca.define", string("member ") + name + " already exists");
-				}
+				if (op->insert_member(d.o()->get_name(), d) == false)
+					throw orcaException(this, "orca.define", kyString::sprintf("member '%s' already exists", name));
 			}
 
 			d.o()->set_flag(c[i+1]);
@@ -754,6 +790,8 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			current = d.o();
 			break;
 		  }
+
+
 
 		case OP_DEF_END:
 			PRINT0("\t\t DEF END\n");
@@ -818,7 +856,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			char *last;
 			char *tok = strtok_r(buff, ".", &last);
 			if (op->has_member(tok, out) == false) {
-				throw orcaException(this, "orca.define", string("inherit parents failed"));
+				throw orcaException(this, "orca.define", "inherit parents failed");
 			}
 			op = out.Object();
 
@@ -826,7 +864,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 				tok = strtok_r(NULL, ".", &last);
 				if (tok == NULL) break;
 				if (op->has_member(tok, out) == false) {
-					throw orcaException(this, "orca.define", string("inherit parents failed"));
+					throw orcaException(this, "orca.define", "inherit parents failed");
 				}
 
 				op = out.Object();
@@ -846,6 +884,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			i += 1 + c[i+1];
 			break;
 		  }
+
 
 		case OP_USING: {
 				PRINT1("\t\t  using: %s\n", &c[i+2]);
@@ -915,77 +954,6 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			i += 1 + c[i+1] + 1 + c[i+2];
 			break;
 
-		case OP_PARSE: {
-				orcaParserObject* op = new orcaParserObject(this);
-				current->insert_member("parse", op);
-				
-				int width = TO_INT(&c[i+1]);
-				int depth = TO_INT(&c[i+1 + sizeof(int)]);
-				int rules = TO_INT(&c[i+1 + 2*sizeof(int)]);
-				i += 3 * sizeof(int);
-
-				PRINT2("\t\t  parse object: %d x %d\n", width, depth);
-				// term, nonterm
-				for (int j=0; j<width; j++) { 
-					char type = c[i+1];
-					i++;
-
-					char is_re = 0;
-					if (type == BNF_TERMINAL || type == BNF_WS) {
-						is_re = c[i+1];
-						i++;
-					} 
-
-					int len = c[i+1];
-					i++;
-
-					const char* str = &c[i+1];
-
-					if (type == BNF_TERMINAL) {
-						if (is_re) {
-							op->push_re(str, j);
-						}
-						else {
-							op->push_str(str, j);
-						}
-					}
-					else if (type == BNF_WS) {
-						if (is_re) {
-							op->push_re_ws(str, j);
-						}
-						else {
-							op->push_str_ws(str, j);
-						}
-					}
-					else {
-						op->push_nonterminal(str, j);
-					}
-
-					i += len+1;
-				}
-
-				// table
-				op->resize_table(width + 1, depth);	// 1 for action
-				for (int j=0; j<depth; j++) {
-					for (int k=0; k<=width; k++) {
-
-						char action = c[i+1];
-						short to = TO_SHORT(&c[i+1+1]);
-						i += 1 + sizeof(short);
-						op->set_table(j, k, action, to);
-					}
-				}
-
-				// rules
-				for (int j=0; j<rules; j++) {
-					short left = TO_SHORT(&c[i+1]);
-					i += sizeof(short);
-					short right = TO_SHORT(&c[i+1]);
-					i += sizeof(short);
-					op->new_rule(left, right);
-				}
-			}
-			break;
 
 		case OP_DEF_CONTEXT_START:    // this, ctx_mod_len, ctx_mod, flag, name_len, name, code_len, code, param_n, params
 		case OP_DEF_CONTEXT_UNDER_START: { // this, ctx_mod_len, ctx_mod, flag, name_len, name, under_len, under, code_len, code, param_n, params
@@ -2899,55 +2867,6 @@ do_assign_list:
 				goto fast_jmp;
 				break;
 			}
-
-			case OP_PARSE_INIT: {
-				PRINT1("\t\t%p : parse init start\n", c);
-				int addr = TO_INT(&c[1]);
-
-				orcaParserObject* op = 
-					dynamic_cast<orcaParserObject*>(m_curr->get_member("parse").Object());
-				if (op == NULL) {
-					throw orcaException(this, "orca.parse", "invalid parsing object");
-				}
-
-				if (op->get_action_size() > 0) {
-					// maybe, already set up
-					c  = code + addr;
-					goto fast_jmp;
-				}
-
-				c += 1 + sizeof(int);
-				goto fast_jmp;
-				break;
-			}
-
-			case OP_PARSE: {
-				PRINT2("\t\t%p : parse start (actions: %d)\n", c, TO_SHORT(&c[1]));
-				short actions = TO_SHORT(&c[1]);
-
-				orcaParserObject* op = 
-					dynamic_cast<orcaParserObject*>(m_curr->get_member("parse").Object());
-				if (op == NULL) {
-					throw orcaException(this, "orca.parse", "invalid parsing object");
-				}
-
-				if (op->get_action_size() == 0) {
-					PRINT1("  parsing actions setup: %d\n", actions);
-					op->resize_action(actions);
-					for (int i=actions-1; i>=0; i--) {
-						op->set_action(i, m_stack->pop().Object());
-					}
-				}
-
-				p1 = m_stack->pop(); // parameter
-				p2 = m_curr->get_member("parse");
-				m_stack->push(p2);
-				m_stack->push(p1);
-				call(1);
-				c += 1 + sizeof(short);
-				goto fast_jmp;
-				break;
-			  }
 
 			case OP_RC_INC: 
 				PRINT1("\t\t%p : rc inc\n", c);

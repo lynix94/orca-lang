@@ -39,6 +39,7 @@ liborca_la_SOURCES = \
 		$(PARSER_DIR)/parserException.cpp \
 		$(PARSER_DIR)/parserOP.cpp \
 		$(PARSER_DIR)/parserParse.cpp \
+		$(PARSER_DIR)/parserConst.cpp \
 		$(PRIMITIVE_DIR)/orcaNil.cpp \
 		$(PRIMITIVE_DIR)/orcaBoolean.cpp \
 		$(PRIMITIVE_DIR)/orcaInteger.cpp \

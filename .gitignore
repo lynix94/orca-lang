@@ -25,6 +25,10 @@ stamp-h1
 orca
 nohup.out
 vgcore.*
+*.so
+calc_*
+parse_lisp_*
+
 
 
 
