@@ -675,18 +675,18 @@ orcaObject* orcaVM::find_object_by_path(const char* path)/*{{{*/
 /*}}}*/
 
 
-orcaObject* orcaVM::load_parse_object(const string& name)
+orcaObject* orcaVM::load_parse_object(const string& name, const string& path)
 {
 	PRINT1("\t\t  load parse: %s\n", name.c_str());
 	string mod_name = string("libparse_") + name + ".so";
+	string mod_path = mod_name;
+	if (path != "") {
+		mod_path = path + "/" + mod_name;
+	}
 
-	DLHANDLE handle = dlopen(mod_name.c_str(), RTLD_NOW);
+	DLHANDLE handle = dlopen(mod_path.c_str(), RTLD_NOW);
 	if (handle == NULL) {
-		string path = "./" + mod_name;
-		handle = dlopen(path.c_str(), RTLD_NOW);
-		if (handle == NULL) {
-			throw orcaException(this, "orca.module", kyString::sprintf("module '%s' launch failure", mod_name.c_str()));
-		}
+		throw orcaException(this, "orca.module", kyString::sprintf("module '%s' launch failure", mod_path.c_str()));
 	}
 
 	typedef void* (*fp_t)(void);
@@ -706,7 +706,8 @@ orcaObject* orcaVM::load_parse_object(const string& name)
 	return obj;
 }
 
-orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaObject* owner, time_t last_write_time)/*{{{*/
+orcaObject* orcaVM::exec_define(const char* c, int size, const char* code,
+							orcaObject* owner, time_t last_write_time, const string& path)/*{{{*/
 {
 	vector<orcaObject*> v;
 	orcaObject* current = owner;
@@ -741,7 +742,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code, orcaO
 			}
 
 			if (c[i+1] & BIT_DEFINE_PARSE) {
-				o = load_parse_object(name);
+				o = load_parse_object(name, path);
 			}
 			else {
 				o = new orcaObject();
@@ -3289,7 +3290,8 @@ bool orcaVM::load_helper(const string& mod_name, const string& candidate_path,/*
 
 	// and recursively define
 	orcaObject* old_curr = m_curr;
-	orcaObject* op = exec_define(define, header.def_size, code, owner, last_write_time);
+	string parent_path = fs::path(candidate_path).parent_path().string();
+	orcaObject* op = exec_define(define, header.def_size, code, owner, last_write_time, parent_path);
 
 	string mod_path;
 	if (owner_path == "") {

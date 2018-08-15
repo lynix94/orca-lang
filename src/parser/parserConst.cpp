@@ -28,7 +28,9 @@ const char* flex_head = "\n\
 
 
 const char* flex_tail = "\n\
-%%%%\n\n";
+%%%%\n\
+int parse_input() { return yyinput(); }\n\
+\n\n";
 
 
 const char* bison_head = "\n\
@@ -64,28 +66,8 @@ const char* bison_tail = "\n\
 #define EXPORT\n\
 #endif\n\
 \n\
+int parse_input(void);\n\
 int %sparse (void);\n\
-class orcaParseObject : public orcaObject\n\
-{\n\
-public:\n\
-	orcaData operator()(orcaVM* vm, int param_n)\n\
-	{\n\
-		orcaParseContext ctx(vm, this);\n\
-		vector<orcaData> argv;\n\
-		if (param_n < 1) return NIL;\n\
-		\n\
-		parse_set_source(vm->get_param(0).String());\n\
-		int ret = %sparse();\n\
-		return ret;\n\
-	}\n\
-};\n\
-\n\
-extern \"C\" EXPORT void* get_parse()\n\
-{\n\
-	orcaParseObject* pp = new orcaParseObject();\n\
-	return pp;\n\
-}\n\
-\n\
 extern char *%stext;\n\
 void %serror(const char* s)\n\
 {\n\
@@ -95,7 +77,56 @@ void %serror(const char* s)\n\
 extern \"C\" int %swrap()\n\
 {\n\
 	return 1;\n\
-}\n\n";
+}\n\n\
+class orcaParseObject : public orcaObject\n\
+{\n\
+public:\n\
+	DEFAULT_NATIVE_DEFINE(orcaParseObject);\n\
+	int error;\n\
+	orcaParseObject()\n\
+	{\n\
+		set_name(\"%s\");\n\
+		insert_native_function(\"yyinput\", (object_fp)&orcaParseObject::ex_yyinput);\n\
+		insert_native_function(\"yyerror\", (object_fp)&orcaParseObject::ex_yyerror);\n\
+	}\n\
+	\n\
+	orcaData operator()(orcaVM* vm, int param_n)\n\
+	{\n\
+		error = 0;\n\
+		orcaParseContext ctx(vm, this);\n\
+		vector<orcaData> argv;\n\
+		if (param_n < 1) return NIL;\n\
+		\n\
+		parse_set_source(vm->get_param(0).String());\n\
+		int ret = %sparse();\n\
+		if (error != 0) return error;\n\
+		return ret;\n\
+	}\n\
+	\n\
+	orcaData ex_yyinput(orcaVM* vm, int n)\n\
+	{\n\
+		char buff[2];\n\
+		buff[0] = parse_input();\n\
+		buff[1] = 0;\n\
+		if (buff[0] == 0 || buff[0]  == -1) return \"\";\n\
+		return buff;\n\
+	}\n\
+	\n\
+	orcaData ex_yyerror(orcaVM* vm, int n)\n\
+	{\n\
+		if (n<1) vm->need_param();\n\
+		%serror(vm->get_param(0).String().c_str());\n\
+		error = -1;\n\
+	}\n\
+	\n\
+};\n\
+\n\
+extern \"C\" EXPORT void* get_parse()\n\
+{\n\
+	orcaParseObject* pp = new orcaParseObject();\n\
+	return pp;\n\
+}\n\
+\n\n";
 
 
 

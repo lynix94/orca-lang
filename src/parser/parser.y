@@ -28,6 +28,7 @@
 #include "parserException.h"
 #include "orca_opcode.h"
 #include "parserParse.h"
+#include "kyString.h"
 
 
 //TEMP
@@ -275,9 +276,6 @@ channel_stmt:/*{{{*/
 
 assign_target_list_with_argv:/*{{{*/
 	assign_target_list
-		{
-			$$ = $1;
-		}
 	| assign_target_list ',' argv_name
 		{
 			const char* cp = $3;
@@ -364,9 +362,6 @@ assign_target:/*{{{*/
 
 channel_assign_target_list_with_argv:/*{{{*/
 	channel_assign_target_list
-		{
-			$$ = $1;
-		}
 	| channel_assign_target_list ',' argv_name
 		{
 			const char* cp = $3;
@@ -502,7 +497,7 @@ parallel_option: /* empty *//*{{{*/
 			g_op->push_integer(0);	// by
 			g_op->push_integer(1);	// per
 		}
-	| NAME expression
+	| name expression
 		{
 			int opt = 0;
 			if (strncmp($1, "by", 2) == 0) {
@@ -513,17 +508,17 @@ parallel_option: /* empty *//*{{{*/
 				g_op->rotate();
 			}
 			else {
-				yyerror("parallel option 'by' or 'per' expected");
+				throw g_parser->strdup("parallel option 'by' or 'per' expected");
 			}
 		} 
-	| NAME expression NAME expression
+	| name expression name expression
 		{
 			if (strncmp($1, "by", 2) != 0) {
-				yyerror("parallel option 'by' expected");
+				throw g_parser->strdup("parallel option 'by' expected");
 			}
 
 			if (strncmp($3, "per", 3) != 0) {
-				yyerror("parallel option 'per' expected");
+				throw g_parser->strdup("parallel option 'per' expected");
 			}
 		}
 	;
@@ -687,9 +682,6 @@ object_path:/*{{{*/
 			$$ = g_parser->strdup(buff);
 		}
 	| name_or_string
-		{
-			$$ = $1;
-		}
 	;
 /*}}}*/
 
@@ -731,9 +723,6 @@ opt_expr_list:/*{{{*/
 			$$ = 0;
 		}
 	| expression_list
-		{
-			$$ = $1;
-		}
 	;
 /*}}}*/
 
@@ -881,10 +870,10 @@ bnf_stmt:/*{{{*/
 			rp->set_name($1);
 			$$ = rp;
 		}
-	| '~' ':' terminal ';'
+	| NIL_ ':' terminal ';'
 		{
 			rule_t* rp = new rule_t();
-			rp->set_name("~");
+			rp->set_name("nil");
 
 			bnf_t* bp = new bnf_t();
 			bp->push_expr((expr_t*)$3);
@@ -921,6 +910,10 @@ bnf_left:/*{{{*/
 
 bnf_right:/*{{{*/
 	bnf_node_list
+	| /* empty */
+		{
+			$$ = NULL;
+		}
 	;
 	/*}}}*/
 
@@ -1084,21 +1077,12 @@ opt_name_or_string:/*{{{*/
 			$$ = NULL;
 		}
 	| name_or_string
-		{
-			$$ = $1;
-		}
 	;
 /*}}}*/
 
 name_or_string:/*{{{*/
 	name
-		{
-			$$ = $1;
-		}
 	| STRING
-		{
-			$$ = $1;
-		}
 	;
 /*}}}*/
 
@@ -1210,11 +1194,11 @@ define_parse_stmt:/*{{{*/
 
 			// check argv
 			if (vp && strncmp((*vp)[vp->size()-1], "...", 3) == 0) {
-				yyerror("argv not allowed in parse object");
+				throw g_parser->strdup("argv not allowed in parse object");
 			}
 
 			if (vp == NULL) {
-				yyerror("at least 1 argument needed in parse object");
+				throw g_parser->strdup("at least 1 argument needed in parse object");
 			}
 
 			int flag = $1;
@@ -1226,7 +1210,7 @@ define_parse_stmt:/*{{{*/
 			parse_t* pp = (parse_t*)$9;
 			bool ret = pp->process($4);
 			if (ret == false) {
-				yyerror("build so failed");
+				throw g_parser->strdup("build so failed");
 			}
 
 			parserCode::pop_code_stack();
@@ -1289,7 +1273,7 @@ lambda_object:/*{{{*/
 			parse_t* pp = (parse_t*)$3;
 			bool ret = pp->process($1);
 			if (ret == false) {
-				yyerror("build so failed");
+				throw g_parser->strdup("build so failed");
 			}
 		}
 	;
@@ -1372,11 +1356,11 @@ lambda_parse_header:/*{{{*/
 
 			// check argv
 			if (vp && strncmp((*vp)[vp->size()-1], "...", 3) == 0) {
-				yyerror("argv not allowed in parse object");
+				throw g_parser->strdup("argv not allowed in parse object");
 			}
 
 			if (vp == NULL) {
-				yyerror("at least 1 argument needed in parse object");
+				throw g_parser->strdup("at least 1 argument needed in parse object");
 			}
 
 			static int count = 1;
@@ -1384,7 +1368,6 @@ lambda_parse_header:/*{{{*/
 			snprintf(buff, 1024, "#%d_parse_lambda", count++);
 			const char* name = g_parser->strdup(buff);
 			parserCode::push_code_stack(name, vp);
-			//g_parse->do_parse_init();
 
 			$$ = name;
 		}
@@ -1623,9 +1606,6 @@ for_stmt:/*{{{*/
 
 expression_stmt:/*{{{*/
 	expression_list ';'
-		{ 
-			$$ = $1; 
-		}
 	;
 /*}}}*/
 
@@ -2183,10 +2163,7 @@ primary_object:/*{{{*/
 	| lvar
 		{
 			if (g_op->check_lvar($1) == false) {
-				string msg = "variable ";
-				msg += $1;
-				msg += " is not defined";
-				yyerror(msg.c_str());
+				throw g_parser->strdup(kyString::sprintf("variable %s is not defiend", $1).c_str());
 			}
 
 			g_op->push_lvar($1);
@@ -2306,7 +2283,7 @@ postfix_object:/*{{{*/
 	| name
 		{
 			if (g_op->push_mvar_using_space($1) == false) {
-				yyerror("invalid object name in name'string' format");
+				throw g_parser->strdup("invalid object name in name'string' format");
 			}
 		}
 	  string
@@ -2425,9 +2402,6 @@ reserved_object:/*{{{*/
 
 lvar:/*{{{*/
 	name
-		{
-			$$ = $1;
-		}
 	;
 /*}}}*/
 
@@ -2485,57 +2459,36 @@ string: // char* /*{{{*/
 
 name: // char* /*{{{*/
 	NAME
-		{
-			$$ = $1;
-		}
 	;
 /*}}}*/
 
 minus_number: /*{{{*/
 	MINUS_NUMBER
-		{
-			$$ = $1;
-		}
 	;
 /*}}}*/
 
 number: /*{{{*/
 	NUMBER
-		{
-			$$ = $1;
-		}
 	;
 /*}}}*/
 
 minus_big_number: /*{{{*/
 	MINUS_BIG_NUMBER 
-		{
-			$$ = $1;
-		}
 	;
 /*}}}*/
 
 big_number: /*{{{*/
 	BIG_NUMBER 
-		{
-			$$ = $1;
-		}
 	;
 /*}}}*/
 
 real: /*{{{*/
 	REAL 
-		{
-			$$ = $1;
-		}
 	;
 /*}}}*/
 
 minus_real: /*{{{*/
 	MINUS_REAL 
-		{
-			$$ = $1;
-		}
 	;
 /*}}}*/
 

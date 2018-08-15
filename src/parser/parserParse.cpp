@@ -14,6 +14,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 
+#include "parserParser.h"
 #include "parserParse.h"
 #include "orcaObject.h"
 #include "kyString.h"
@@ -238,6 +239,7 @@ string bnf_t::get_terminal()
 rule_t::~rule_t()
 {
 	for (int i=0; i<bnf_list.size(); i++) {
+		if (bnf_list[i] == NULL) continue;
 		delete bnf_list[i];
 	}
 }
@@ -255,7 +257,8 @@ void rule_t::push_bnf(bnf_t* bnf)
 void rule_t::pass1()
 {
 	for (int i=0; i<bnf_list.size(); i++) {
-		if (name == "~") continue;
+		if (name == "nil") continue;
+		if (bnf_list[i] == NULL) continue;
 		bnf_list[i]->pass1();
 	}
 
@@ -264,7 +267,7 @@ void rule_t::pass1()
 
 void rule_t::pass2(stringstream& flex, stringstream& bison)
 {
-	if (name == "~") {
+	if (name == "nil") {
 		for (int i=0; i<bnf_list.size(); i++) {
 			flex << bnf_list[i]->get_terminal() << "\t;\n";
 		}
@@ -273,7 +276,13 @@ void rule_t::pass2(stringstream& flex, stringstream& bison)
 
 	bison << name + ":\n\t";
 	for (int i=0; i<bnf_list.size(); i++) {
-		bnf_list[i]->pass2(flex, bison);
+		if (bnf_list[i] == NULL) {
+			bison << "/* empty */\n";
+		}
+		else {
+			bnf_list[i]->pass2(flex, bison);
+		}
+
 		if (i < bnf_list.size()-1) {
 			bison << "\t| ";
 		}
@@ -330,7 +339,7 @@ void parse_t::make_lexer(const string& prefix, stringstream& flex, stringstream&
 	bison << "\n\n";
 	set<string>::iterator it = g_expr_set.begin();
 	for (; it != g_expr_set.end(); ++it) {
-		if ((*it) == "~") continue;
+		if ((*it) == "nil") continue;
 		bison << kyString::sprintf("%%type<i> %s\n", (*it).c_str());
 	}
 
@@ -349,20 +358,28 @@ bool parse_t::build_so(const string& name)
 	char buff[4096];
 	const char* cp = name.c_str();
 
-	fs::remove(name + "_lexer.cpp");
-	sprintf(buff, "flex -P %s -o %s_lexer.cpp %s_lexer.l", cp, cp, cp);
+	// calc path
+	boost::filesystem::path src_path(g_parser->filename);
+	string dir = src_path.parent_path().string();
+	const char* dp = dir.c_str();
+	if (dp[0] == 0) {
+		dp = ".";
+	}
+
+	fs::remove(kyString::sprintf("%s/%s_lexer.cpp", dp, name.c_str()));
+	sprintf(buff, "flex -P %s -o %s/%s_lexer.cpp %s/%s_lexer.l", cp, dp, cp, dp, cp);
 	printf("flex compile: %s\n", buff);
 	ret = ::system(buff);
 
-	fs::remove(name + "_parser.cpp");
-	fs::remove(name + "_parser.hpp");
-	sprintf(buff, "bison -p %s -d -r all -o %s_parser.cpp %s_parser.y", cp, cp, cp);
+	fs::remove(kyString::sprintf("%s/%s_parser.cpp", dp, name.c_str()));
+	fs::remove(kyString::sprintf("%s/%s_parser.hpp", dp, name.c_str()));
+	sprintf(buff, "bison -p %s -d -r all -o %s/%s_parser.cpp %s/%s_parser.y", cp, dp, cp, dp, cp);
 	printf("bison compile: %s\n", buff);
 	ret = ::system(buff);
 
-	string target = string("libparse_") + name + ".so";
+	string target = kyString::sprintf("%s/libparse_%s.so", dp, name.c_str());
 	fs::remove(target);
-	sprintf(buff, "g++ -g -fPIC -shared -o ./%s ./%s_lexer.cpp ./%s_parser.cpp -I${ORCA_HOME}/include/orca -L${ORCA_HOME}/lib -lorca", target.c_str(), cp, cp);
+	sprintf(buff, "g++ -g -fPIC -shared -o %s %s/%s_lexer.cpp %s/%s_parser.cpp -I${ORCA_HOME}/include/orca -L${ORCA_HOME}/lib -lorca", target.c_str(), dp, cp, dp, cp);
 	printf("external module compile: %s\n", buff);
 	ret = ::system(buff);
 
@@ -375,6 +392,14 @@ bool parse_t::build_so(const string& name)
 
 void parse_t::make_meta(const string& name)
 {
+	// calc path
+	boost::filesystem::path src_path(g_parser->filename);
+	string dir = src_path.parent_path().string();
+	const char* dp = dir.c_str();
+	if (dp[0] == 0) {
+		dp = ".";
+	}
+
 	stringstream flex;
 	stringstream bison;
 
@@ -394,20 +419,20 @@ void parse_t::make_meta(const string& name)
 	}
 
 	flex << kyString::sprintf(flex_tail);
-	bison << kyString::sprintf(bison_tail, cp, cp, cp, cp, cp, cp);
+	bison << kyString::sprintf(bison_tail, cp, cp, cp, cp, cp, cp, cp, cp);
 
 	//dump();
 	//printf("flex>> '%s'\n", flex.str().c_str());
 	//printf("bison>> '%s'\n", bison.str().c_str());
 
 	FILE* fp;
-	fp = fopen((name + "_lexer.l").c_str(), "w");
+	fp = fopen(kyString::sprintf("%s/%s_lexer.l", dp, name.c_str()).c_str(), "w");
 	string flex_string = flex.str();
 	cp = flex_string.c_str();
 	fwrite(cp, strlen(cp), 1, fp);
 	fclose(fp);
 
-	fp = fopen((name + "_parser.y").c_str(), "w");
+	fp = fopen(kyString::sprintf("%s/%s_parser.y", dp, name.c_str()).c_str(), "w");
 	string bison_string = bison.str();
 	cp = bison_string.c_str();
 	fwrite(cp, strlen(cp), 1, fp);
