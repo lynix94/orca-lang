@@ -124,9 +124,14 @@ void expr_t::pass1(int idx)
 string expr_t::make_action_code()
 {
 	char buff[1024];
-		
+	if (idx == 0) { // action only
+		sprintf(buff, "{ $$ = parse_call(\"%s\", 0); }", expr.c_str());
+		return buff;
+	}
+
 	sprintf(buff, "{ $$ = parse_call(\"%s\", %d, ", expr.c_str(), idx);
 	string ret = buff;
+
 	for (int i=1; i<=idx; i++) {
 		if (i < idx) {
 			sprintf(buff, "$%d, ", i);

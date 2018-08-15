@@ -515,6 +515,8 @@ const char* orcaFlexLexer::get_string(char end)/*{{{*/
 
 		if (c == '\\') {
 			c = lexer->yyinput();
+			if (c == '\r' || c == '\n') { g_parser->lineno++; }
+
 			if (c == 0 || c == -1) {
 				yyerror("empty stream");
 				return "";
@@ -535,6 +537,8 @@ const char* orcaFlexLexer::get_string(char end)/*{{{*/
 
 		if (c == '$') {
 			c = lexer->yyinput();
+			if (c == '\r' || c == '\n') { g_parser->lineno++; }
+
 			if (c == end) {
 				str += '$';
 				break;
@@ -557,8 +561,11 @@ const char* orcaFlexLexer::get_string(char end)/*{{{*/
 		}
 	}
 
-	if (c == end && g_format_string == c) {
-		g_format_string = 0;
+	if (c == end) {
+		if (c == '\n' || c == '\r') g_parser->lineno++;
+		if (g_format_string == c) {
+			g_format_string = 0;
+		}
 	}
 
 	return g_parser->strdup(str.c_str());
@@ -573,10 +580,16 @@ const char* orcaFlexLexer::get_comment(char end)/*{{{*/
 	g_comment = true;
 
 	while ((c = lexer->yyinput()) != 0 && c != -1) {
+		if (c == '\r' || c == '\n') { g_parser->lineno++; }
+
 		if (c == end) {
 			char c2 = lexer->yyinput();
+			if (c2 == '\r' || c2 == '\n') { g_parser->lineno++; }
+
 			if (c2 == end) {
 				char c3 = lexer->yyinput();
+				if (c3 == '\r' || c3 == '\n') { g_parser->lineno++; }
+
 				if (c3 == end) {
 					g_format_string = 0;
 					g_comment = false;
@@ -593,6 +606,8 @@ const char* orcaFlexLexer::get_comment(char end)/*{{{*/
 
 		if (end == '\'' && c == '$') {
 			c = lexer->yyinput();
+			if (c == '\r' || c == '\n') { g_parser->lineno++; }
+
 			if (c != '{') {
 				str += '$';
 				str += c;
@@ -623,15 +638,13 @@ string orcaFlexLexer::get_raw_context()/*{{{*/
 	string str;
 	
 	while ((c = lexer->yyinput()) != 0 && c != -1) {
+		if (c == '\r' || c == '\n') { g_parser->lineno++; }
+
 		if (c == open) depth++;
 		else if (c == close) depth--;
 
 		if (depth == 0 && c == close) {
 			break;
-		}
-
-		if (c == '\r' || c == '\n') { 
-			g_parser->lineno++;
 		}
 
 		str += c;
