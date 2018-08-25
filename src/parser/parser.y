@@ -184,10 +184,10 @@ using namespace std;
 
 %token<cp> NAME
 %token<cp> STRING
-%token<cp> FORMAT_STRING_HEAD
-%token<cp> FORMAT_STRING_TAIL
+%token<cp> STRING_VAR_HEAD
+%token<cp> STRING_VAR_TAIL
 %token<cp> RE_STRING
-%token<cp> RE_FORMAT_STRING_HEAD
+%token<cp> RE_STRING_VAR_HEAD
 %token<cp> HEX_STRING
 %token<cp> SHELL_STRING_HEAD
 
@@ -212,12 +212,6 @@ statement_list:/*{{{*/
 statement_block:/*{{{*/
 	'{' statement_list '}'
 	| '{' '}'
-	;
-/*}}}*/
-
-open_statement_block:/*{{{*/
-	statement_list '}'
-	| '}'
 	;
 /*}}}*/
 
@@ -546,7 +540,7 @@ shell_stmt:/*{{{*/
 /*}}}*/
 
 shell_string:/*{{{*/
-	  shell_string format_object
+	  shell_string string_var_object
 	| SHELL_STRING_HEAD
 		{
 			g_op->push_string($1);
@@ -1150,7 +1144,7 @@ define_stmt:/*{{{*/
 	/*}}}*/
 
 define_context_stmt:/*{{{*/
-	def '.' object_path opt_name_or_string opt_argument_list opt_superclass opt_under '{'
+	def '.' object_path opt_name_or_string opt_argument_list opt_superclass opt_under
 		{
 			const char* name = $4;
 			static int count = 1;
@@ -1172,7 +1166,7 @@ define_context_stmt:/*{{{*/
 				code_top->set_argv_on();
 			}
 		}
-	open_statement_block
+	statement_block
 		{
 			code_top->pop_code_stack();
 		}
@@ -1253,7 +1247,7 @@ lambda_object:/*{{{*/
 			parserCode::pop_code_stack();
 			$$ = $1;
 		}
-	| lambda_context_header '{' open_statement_block
+	| lambda_context_header statement_block
 		{
 			code_top->pop_code_stack();
 			$$ = $1;
@@ -2406,8 +2400,8 @@ lvar:/*{{{*/
 /*}}}*/
 
 format_string:/*{{{*/
-	  format_string format_object
-	| FORMAT_STRING_HEAD
+	  format_string string_var_object
+	| STRING_VAR_HEAD
 		{
 			g_op->push_string($1);
 		}
@@ -2415,16 +2409,16 @@ format_string:/*{{{*/
 /*}}}*/
 
 re_format_string:/*{{{*/
-	  re_format_string format_object
-	| RE_FORMAT_STRING_HEAD
+	  re_format_string string_var_object
+	| RE_STRING_VAR_HEAD
 		{
 			g_op->push_string($1);
 		}
 	;			 
 /*}}}*/
 
-format_object:/*{{{*/
-	 '$' '{' expression FORMAT_STRING_TAIL
+string_var_object:/*{{{*/
+	 '$' '{' expression STRING_VAR_TAIL
 		{
 			g_op->add();
 

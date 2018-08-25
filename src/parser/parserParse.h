@@ -30,6 +30,7 @@ extern vector<string> g_expr_list;
 string get_term_name();
 
 
+struct bnf_t;
 struct expr_t
 {
 	string escape(const char* cp);
@@ -49,6 +50,7 @@ struct expr_t
 	char type;
 	string expr;
 	int idx;
+	bnf_t* bp;
 };
 
 struct bnf_t

@@ -43,7 +43,7 @@ int my_yyinput(char* buff, int max_size);
 #define YY_INPUT(buffer, result, max_size) ( result = my_yyinput(buffer, max_size))
 
 static bool g_shell_start = true;
-static int g_format_string = 0;
+static int g_string_var = 0;
 static bool g_comment = false;
 //%option prefix="orca"
 
@@ -283,8 +283,8 @@ under				{ g_parser->n_tok++; return UNDER; }
 						g_parser->n_tok++;
 						yylval.cp = lexer->get_comment('\'');
 
-						if (g_format_string) {
-							return FORMAT_STRING_HEAD;
+						if (g_string_var) {
+							return STRING_VAR_HEAD;
 						}
 
 						return STRING;
@@ -294,8 +294,8 @@ under				{ g_parser->n_tok++; return UNDER; }
 '					{ 
 						yylval.cp = lexer->get_string('\'');
 
-						if (g_format_string) {
-							return FORMAT_STRING_HEAD;
+						if (g_string_var) {
+							return STRING_VAR_HEAD;
 						}
 
 						return STRING; 
@@ -305,8 +305,8 @@ under				{ g_parser->n_tok++; return UNDER; }
 						g_parser->n_tok++;
 						yylval.cp = lexer->get_string('\"');
 
-						if (g_format_string) {
-							return FORMAT_STRING_HEAD;
+						if (g_string_var) {
+							return STRING_VAR_HEAD;
 						}
 
 						return STRING; 
@@ -316,8 +316,8 @@ r'					{
 						g_parser->n_tok++;
 						yylval.cp = lexer->get_string('\'');
 
-						if (g_format_string) {
-							return RE_FORMAT_STRING_HEAD;
+						if (g_string_var) {
+							return RE_STRING_VAR_HEAD;
 						}
 
 						return RE_STRING; 
@@ -327,8 +327,8 @@ r\"					{
 						g_parser->n_tok++;
 						yylval.cp = lexer->get_string('\"');
 
-						if (g_format_string) {
-							return RE_FORMAT_STRING_HEAD;
+						if (g_string_var) {
+							return RE_STRING_VAR_HEAD;
 						}
 
 						return RE_STRING; 
@@ -397,13 +397,13 @@ b\"					{
 
 \}					{
 						g_parser->n_tok++;
-						if (g_format_string) {
+						if (g_string_var) {
 							if (g_comment) 
-								yylval.cp = lexer->get_comment(g_format_string);
+								yylval.cp = lexer->get_comment(g_string_var);
 							else 
-								yylval.cp = lexer->get_string(g_format_string);
+								yylval.cp = lexer->get_string(g_string_var);
 
-							return FORMAT_STRING_TAIL;
+							return STRING_VAR_TAIL;
 						}
 						
 						return '}';
@@ -551,8 +551,8 @@ const char* orcaFlexLexer::get_string(char end)/*{{{*/
 			else {
 				lexer->yyunput('{', (char*)lexer->YYText());
 				lexer->yyunput('$', (char*)lexer->YYText());
-				if (g_format_string && g_format_string != end) yyerror("nested format string is not allowed");
-				g_format_string = end;
+				if (g_string_var && g_string_var != end) yyerror("nested format string is not allowed");
+				g_string_var = end;
 				break;
 			}
 		}
@@ -563,8 +563,8 @@ const char* orcaFlexLexer::get_string(char end)/*{{{*/
 
 	if (c == end) {
 		if (c == '\n' || c == '\r') g_parser->lineno++;
-		if (g_format_string == c) {
-			g_format_string = 0;
+		if (g_string_var == c) {
+			g_string_var = 0;
 		}
 	}
 
@@ -591,7 +591,7 @@ const char* orcaFlexLexer::get_comment(char end)/*{{{*/
 				if (c3 == '\r' || c3 == '\n') { g_parser->lineno++; }
 
 				if (c3 == end) {
-					g_format_string = 0;
+					g_string_var = 0;
 					g_comment = false;
 					break;
 				}	
@@ -616,7 +616,7 @@ const char* orcaFlexLexer::get_comment(char end)/*{{{*/
 			else {
 				lexer->yyunput('{', (char*)lexer->YYText());
 				lexer->yyunput('$', (char*)lexer->YYText());
-				g_format_string = end;
+				g_string_var = end;
 				break;
 			}
 		}

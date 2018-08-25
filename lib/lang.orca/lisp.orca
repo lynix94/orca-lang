@@ -408,7 +408,7 @@ def.parse parse_lisp(src)
 		;
 
 
-	~ : r'[ \r\n\t]+'
+	nil : r'[ \r\n\t]+'
 		;
 }
 

@@ -3,7 +3,7 @@ using storage.sqlite3;
 using orm;
 using os;
 
-print: argv;
+print: '# migrate dir: ', argv;
 if argv == nil || argv.size() < 1 {
 	return false;
 }
@@ -12,11 +12,11 @@ conn = sqlite3.connect('sonar.db');
 orm.set_conn(conn);
 
 curr_list = my.get_models(argv[0]);
-print: curr_list;
+print: '# models: ', curr_list;
 for m in curr_list {
 	ret = orca.load(m, my);
-	print: my.MEMBERS;
-	print: my.models.MEMBERS;
+	print: '# my.MEMBERS: ', my.MEMBERS;
+	print: '# my.models.MEMBERS: ', my.models.MEMBERS;
 	for k, v in my.models.MEMBERS {
 		print: v;
 		v.create_table();

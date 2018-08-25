@@ -124,21 +124,30 @@ void expr_t::pass1(int idx)
 string expr_t::make_action_code()
 {
 	char buff[1024];
-	if (idx == 0) { // action only
-		sprintf(buff, "{ $$ = parse_call(\"%s\", 0); }", expr.c_str());
-		return buff;
+	if (idx != bp->expr_list.size()-1) { // not end
+		sprintf(buff, "{ parse_call(\"%s\", %d, ", expr.c_str(), idx);
+	}
+	else {
+		if (idx == 0) { // action only
+			sprintf(buff, "{ $$ = parse_call(\"%s\", 0); }", expr.c_str());
+			return buff;
+		}
+
+		sprintf(buff, "{ $$ = parse_call(\"%s\", %d, ", expr.c_str(), idx);
 	}
 
-	sprintf(buff, "{ $$ = parse_call(\"%s\", %d, ", expr.c_str(), idx);
 	string ret = buff;
-
 	for (int i=1; i<=idx; i++) {
-		if (i < idx) {
-			sprintf(buff, "$%d, ", i);
+		if (bp->expr_list[i-1]->type == 'A') {
+			if (i < idx) sprintf(buff, "-1, ");
+			else		 sprintf(buff, "-1); }");
 		}
 		else {
-			sprintf(buff, "$%d); }", i);
+			if (i < idx) sprintf(buff, "$%d, ", i);
+			else		 sprintf(buff, "$%d); }", i);
 		}
+
+
 		ret += buff;
 	}
 
@@ -151,7 +160,9 @@ void expr_t::pass2(stringstream& flex, stringstream& bison)
 		bison << expr + " ";
 	}
 	else if (type == 'A') {
+#ifndef _PARSE_DEBUG_
 		bison << make_action_code();
+#endif
 	}
 	else {
 		printf("Something wrong\n");
@@ -194,6 +205,7 @@ bnf_t::~bnf_t()
 
 void bnf_t::push_expr(expr_t* ep)
 {
+	ep->bp = this;
 	expr_list.push_back(ep);
 }
 
@@ -287,6 +299,16 @@ void rule_t::pass2(stringstream& flex, stringstream& bison)
 		else {
 			bnf_list[i]->pass2(flex, bison);
 		}
+
+#ifdef _PARSE_DEBUG_
+		string debug;
+		bnf_t* bp = bnf_list[i];
+		for (int j=0; j<bp->expr_list.size(); j++) {
+			debug += bp->expr_list[j]->to_str();
+			debug += " ";
+		}
+		bison << kyString::sprintf("\t\t{ printf(\"rule match: %s <- %s\\n\"); }\n", name.c_str(), debug.c_str());
+#endif
 
 		if (i < bnf_list.size()-1) {
 			bison << "\t| ";
@@ -540,8 +562,12 @@ int parse_call(const string& name, int num, ...)
 	va_start(ap, num);
 	for (int i=0; i<num; i++) {
 		int idx = va_arg(ap, int);
-		orcaData d = gc_pool[idx];
-		parseVM->push_param(d);
+		if (idx == -1) {
+			parseVM->push_param(NIL);
+		}
+		else {
+			parseVM->push_param(gc_pool[idx]);
+		}
 	}
 	va_end(ap);
 

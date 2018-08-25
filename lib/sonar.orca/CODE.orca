@@ -3,7 +3,7 @@ using io.open;
 
 print: argv;
 
-if argv.size() < 2 {
+if argv == nil || argv.size() < 2 {
 	return;
 }
 

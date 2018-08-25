@@ -35,7 +35,7 @@ def.parse calc(str)
 				}
 		;
 
-	~ : r'[ \t\r\n]+'
+	nil : r'[ \t\r\n]+'
 		;
 }
 
