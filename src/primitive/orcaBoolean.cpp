@@ -23,6 +23,18 @@ orcaBoolean::orcaBoolean()
 	orcaData d;
 	d.set_type(TYPE_INTERNAL);
 
+	d.internal(FI_INT_EQ, "=="); 
+	insert_static("==", d);
+
+	d.internal(FI_INT_NEQ, "!="); 
+	insert_static("!=", d);
+
+	d.internal(FI_INT_AND, "&&"); 
+	insert_static("&&", d);
+
+	d.internal(FI_INT_OR, "||");
+	insert_static("||", d);
+
 	d.internal(FI_BOOL_TO_STR, "string");
 	insert_static("string", d);
 
@@ -36,7 +48,35 @@ orcaBoolean::orcaBoolean()
 	insert_static("float", d);
 }
 
-orcaData orcaBoolean::string_(orcaVM* vm, int b)
+orcaData orcaBoolean::ex_eq(orcaVM* vm, int b, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(b==1).operator_eq(vm, rhs);
+}
+
+orcaData orcaBoolean::ex_neq(orcaVM* vm, int b, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(b==1).operator_neq(vm, rhs);
+}
+
+orcaData orcaBoolean::ex_and(orcaVM* vm, int b, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(b==1).operator_and(vm, rhs);
+}
+
+orcaData orcaBoolean::ex_or(orcaVM* vm, int b, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(b==1).operator_or(vm, rhs);
+}
+
+orcaData orcaBoolean::ex_string(orcaVM* vm, int b, int param_n)
 {
 	orcaData d;
 	b ? d.s_set("true") : d.s_set("false");
@@ -44,13 +84,13 @@ orcaData orcaBoolean::string_(orcaVM* vm, int b)
 	return d;
 }
 
-orcaData orcaBoolean::float_(orcaVM* vm, int b)
+orcaData orcaBoolean::ex_float(orcaVM* vm, int b, int param_n)
 {
 	if (b) return 1.0;
 	return 0.0;
 }
 
-orcaData orcaBoolean::integer(orcaVM* vm, int b)
+orcaData orcaBoolean::ex_integer(orcaVM* vm, int b, int param_n)
 {
 	if (b) return 1;
 	return 0;

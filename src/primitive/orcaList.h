@@ -41,6 +41,10 @@ public:
 	void sort(orcaVM* vm, orcaData fun);
 
 	// member function
+	orcaData ex_add(orcaVM* vm, int n);
+	orcaData ex_eq(orcaVM* vm, int n);
+	orcaData ex_get_at(orcaVM* vm, int n);
+	orcaData ex_set_at(orcaVM* vm, int n);
 	orcaData ex_size(orcaVM* vm, int n);
 	orcaData ex_tuple(orcaVM* vm, int n);
 	orcaData ex_push_back(orcaVM* vm, int n);

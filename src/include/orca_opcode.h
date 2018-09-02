@@ -13,33 +13,30 @@
 
 // op code
 #define OP_NOP						0x00
-#define OP_CALL						0x02
-#define OP_CALL_					0x03
-#define OP_ASSIGN_LOCAL				0x04
-#define OP_ASSIGN_LOCAL_			0x05
-#define OP_ASSIGN_MEMBER			0x06
-#define OP_ASSIGN_MEMBER_			0x07
-#define OP_ASSIGN_RESERVED			0x08
-#define OP_ASSIGN_RESERVED_			0x09
-#define OP_ASSIGN_LIST				0x0A
-#define OP_ASSIGN_LIST_				0x0B
-#define OP_ASSIGN_LIST_IR			0x0C
-#define OP_ASSIGN_LIST_IR_			0x0D
+#define OP_CALL						0x01
+#define OP_CLONE					0x02
+#define OP_ASSIGN_LOCAL				0x03
+#define OP_ASSIGN_MEMBER			0x04
+#define OP_ASSIGN_RESERVED			0x05
+#define OP_ASSIGN_LIST				0x06
+#define OP_ASSIGN_LIST_IR			0x07
+#define OP_LIST_AT					0x08
+#define OP_LIST_AT_IR				0x09
 
 #define OP_ADD						0x10
 #define OP_MUL						0x11
 #define OP_SUB						0x12
 #define OP_DIV						0x13
-#define OP_AND						0x14		
+#define OP_AND						0x14
 #define OP_OR						0x15
 #define OP_MINUS					0x16
 #define OP_ROTATE					0x17
-#define OP_DUP						0x18
-#define OP_DUP2						0x19
-#define OP_NOT						0x1A
-#define OP_MOD						0x1B
-#define OP_EVAL						0x1C
-#define OP_ROTATE3					0x1D // rearrange
+#define OP_ROTATE3					0x18
+#define OP_DUP						0x19
+#define OP_DUP2						0x1A
+#define OP_NOT						0x1B
+#define OP_MOD						0x1C
+#define OP_EVAL						0x1D
 
 #define OP_JMP_TRUE					0x20	
 #define OP_JMP_FALSE				0x21
@@ -72,18 +69,17 @@
 #define OP_FIND_RESERVED			0x42
 #define OP_FIND_MEMBER_LAST			0x43
 
-#define OP_CLONE					0x50
-#define OP_LIST_AT					0x51
-#define OP_LIST_AT_IR				0x52
-#define OP_MAKE_LIST				0x53
-#define OP_MAKE_TUPLE				0x54
-#define OP_MAKE_PAIR				0x55
-#define OP_MAKE_REGEX				0x56
-#define OP_MAKE_MAP					0x57
-#define OP_MAKE_LONG_LIST			0x58
-#define OP_MAKE_LONG_TUPLE			0x59
-#define OP_MAKE_LONG_MAP			0x5A
-
+#define OP_MAKE_LIST				0x50
+#define OP_MAKE_TUPLE				0x51
+#define OP_MAKE_PAIR				0x52
+#define OP_MAKE_REGEX				0x53
+#define OP_MAKE_MAP					0x54
+#define OP_MAKE_LONG_LIST			0x55
+#define OP_MAKE_LONG_TUPLE			0x56
+#define OP_MAKE_LONG_MAP			0x57
+#define OP_SBF						0x58
+#define OP_SBF_LIST					0x59
+#define OP_SBF_RANGE				0x5A
 
 #define OP_RETURN					0x60
 #define OP_RETURN_NIL				0x61
@@ -92,14 +88,9 @@
 #define OP_FOR_END					0x64
 #define OP_FOR_POP					0x65
 #define OP_FOR_SUB					0x66
-#define OP_MARK_STACK				0x67
-#define OP_MARK_STACK_POP			0x68
-#define OP_SCOPE_START				0x69
-#define OP_SCOPE_END				0x6A
-#define OP_PARALLEL_START			0x6B
-#define OP_PARALLEL_END				0x6C
-#define OP_PARALLEL_FOR				0x6D
-#define OP_PARALLEL_CALL			0x6E
+#define OP_SWITCH					0x67
+#define OP_SWITCH_END				0x68
+#define OP_SWITCH_CASE				0x69
 
 #define OP_DECODE					0x70
 #define OP_DECODE_END				0x71
@@ -111,33 +102,33 @@
 #define OP_SHIFT_ALL				0x77
 #define OP_CUT_LIST					0x78
 #define OP_DECODE_CHECK_REMAIN		0x79
-#define OP_PARSE_INIT				0x7A
-#define OP_PARSE					0x7B
-#define OP_SWITCH					0x7C
-#define OP_SWITCH_END				0x7D
-#define OP_SWITCH_CASE				0x7E
 
-#define OP_SBF						0x80
-#define OP_SBF_LIST					0x81
-#define OP_SBF_RANGE				0x82
-#define OP_SIMPLE_RETURN			0x83
-#define OP_CHANNEL_IN				0x84
-#define OP_CHANNEL_OUT				0x85
-#define OP_EXTRACT					0x86
-#define OP_SELECT_PREPARE			0x87
-#define OP_SELECT_START				0x88
-#define OP_SELECT_END				0x89
-#define OP_SELECT_CASE				0x8A
-#define OP_SELECT_DEFAULT			0x8B
-#define OP_SELECT_SIGNAL			0x8C
+#define OP_SELECT_PREPARE			0x80
+#define OP_SELECT_START				0x81
+#define OP_SELECT_END				0x82
+#define OP_SELECT_CASE				0x83
+#define OP_SELECT_DEFAULT			0x84
+#define OP_SELECT_SIGNAL			0x85
+#define OP_PARALLEL_START			0x86
+#define OP_PARALLEL_END				0x87
+#define OP_PARALLEL_FOR				0x88
+#define OP_PARALLEL_CALL			0x89
 
-#define OP_RC_INC					0x90
-#define OP_RC_DEC					0x91
-#define OP_THROW					0x92
-#define OP_THROW_WITH_ARG			0x93
-#define OP_MARK_TRY					0x94
-#define OP_DONE_TRY					0x95
+#define OP_MARK_STACK				0x90
+#define OP_MARK_STACK_POP			0x91
+#define OP_SCOPE_START				0x92
+#define OP_SCOPE_END				0x93
+#define OP_CHANNEL_IN				0x94
+#define OP_CHANNEL_OUT				0x95
+#define OP_EXTRACT					0x96
 
+
+#define OP_RC_INC					0xE0
+#define OP_RC_DEC					0xE1
+#define OP_THROW					0xE2
+#define OP_THROW_WITH_ARG			0xE3
+#define OP_MARK_TRY					0xE4
+#define OP_DONE_TRY					0xE5
 
 #define OP_DUMP_STACK				0xF0
 #define OP_DUMP_LOCAL				0xF1

@@ -59,6 +59,8 @@ public:
 
 
 	// static
+	orcaData ex_get_at(orcaVM* vm, int n);
+	orcaData ex_set_at(orcaVM* vm, int n);
 	orcaData ex_size(orcaVM* vm, int n);
 	orcaData ex_list(orcaVM* vm, int n);
 	orcaData ex_push_back(orcaVM* vm, int n);

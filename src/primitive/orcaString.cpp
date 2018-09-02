@@ -34,6 +34,15 @@ orcaString::orcaString()
 	orcaData d;
 	d.set_type(TYPE_INTERNAL);
 
+	d.internal(FI_STR_ADD, "+");						insert_static("+", d);
+	d.internal(FI_STR_MUL, "*");						insert_static("*", d);
+	d.internal(FI_STR_MOD, "%");						insert_static("%", d);
+	d.internal(FI_STR_EQ, "==");						insert_static("==", d);
+	d.internal(FI_STR_NEQ, "!=");						insert_static("!=", d);
+	d.internal(FI_STR_GT, ">");							insert_static(">", d);
+	d.internal(FI_STR_GE, ">=");						insert_static(">=", d);
+	d.internal(FI_STR_LT, "<");							insert_static("<", d);
+	d.internal(FI_STR_LE, "<=");						insert_static("<=", d);
 	d.internal(FI_STR_LENGTH, "length");				insert_static("length", d);
 	d.internal(FI_STR_FIND,"find");						insert_static("find", d);
 	d.internal(FI_STR_FIND_ALL,"find_all");				insert_static("find_all", d);
@@ -63,7 +72,7 @@ static char char_upper(char in)
 }
 
 
-orcaData orcaString::upper(orcaVM* vm, string& str) /*{{{*/
+orcaData orcaString::ex_upper(orcaVM* vm, string& str, int param_n) 
 { 
 	string ret;
 	ret.resize(str.length());
@@ -72,14 +81,79 @@ orcaData orcaString::upper(orcaVM* vm, string& str) /*{{{*/
 	transform(str.begin(), str.end(), ret.begin(), char_upper);
 	return ret;
 }
-/*}}}*/
+
 
 static char char_lower(char in)
 {
 	return tolower(in);
 }
 
-orcaData orcaString::lower(orcaVM* vm, string& str) 
+orcaData orcaString::ex_add(orcaVM* vm, string& str, int param_n)
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(str).operator_add(vm, rhs);
+}
+
+orcaData orcaString::ex_mul(orcaVM* vm, string& str, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(str).operator_mul(vm, rhs);
+}
+
+orcaData orcaString::ex_mod(orcaVM* vm, string& str, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(str).operator_mod(vm, rhs);
+}
+
+
+orcaData orcaString::ex_eq(orcaVM* vm, string& str, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(str).operator_eq(vm, rhs);
+}
+
+orcaData orcaString::ex_neq(orcaVM* vm, string& str, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(str).operator_neq(vm, rhs);
+}
+
+orcaData orcaString::ex_gt(orcaVM* vm, string& str, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(str).operator_gt(vm, rhs);
+}
+
+orcaData orcaString::ex_ge(orcaVM* vm, string& str, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(str).operator_ge(vm, rhs);
+}
+
+orcaData orcaString::ex_lt(orcaVM* vm, string& str, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(str).operator_lt(vm, rhs);
+}
+
+orcaData orcaString::ex_le(orcaVM* vm, string& str, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(str).operator_le(vm, rhs);
+}
+
+
+orcaData orcaString::ex_lower(orcaVM* vm, string& str, int param_n) /*{{{*/
 { 
 	string ret;
 	ret.resize(str.length());
@@ -87,18 +161,21 @@ orcaData orcaString::lower(orcaVM* vm, string& str)
 	transform(str.begin(), str.end(), ret.begin(), char_lower);
 	return ret;
 }
+/*}}}*/
 
-
-orcaData orcaString::char_(orcaVM* vm, string& str) 
+orcaData orcaString::ex_char(orcaVM* vm, string& str, int param_n) /*{{{*/
 { 
+	if (param_n != 1) vm->need_param(1);
 	int v = str[vm->get_param(0).Integer()];
 	return v;
 }
+/*}}}*/
 
-orcaData orcaString::length(orcaVM* vm, string& str) 
+orcaData orcaString::ex_length(orcaVM* vm, string& str, int param_n) /*{{{*/
 { 
 	return str.length();
 }
+/*}}}*/
 
 orcaTuple* orcaString::_find_regex(string& str, regex& re, int s, int e)/*{{{*/
 {	
@@ -139,7 +216,7 @@ orcaTuple* orcaString::_find_regex(string& str, regex& re, int s, int e)/*{{{*/
 }
 /*}}}*/
 
-orcaData orcaString::find(orcaVM* vm, string& str)/*{{{*/
+orcaData orcaString::ex_find(orcaVM* vm, string& str, int param_n)/*{{{*/
 {	
 	int s, e;
 
@@ -176,7 +253,7 @@ orcaData orcaString::find(orcaVM* vm, string& str)/*{{{*/
 }
 /*}}}*/
 
-orcaData orcaString::starts_with(orcaVM* vm, string& str)/*{{{*/
+orcaData orcaString::ex_starts_with(orcaVM* vm, string& str, int param_n)/*{{{*/
 {	
 	orcaData d;
 	orcaData p = vm->get_param(0);
@@ -194,7 +271,7 @@ orcaData orcaString::starts_with(orcaVM* vm, string& str)/*{{{*/
 }
 /*}}}*/
 
-orcaData orcaString::ends_with(orcaVM* vm, string& str) /*{{{*/
+orcaData orcaString::ex_ends_with(orcaVM* vm, string& str, int param_n) /*{{{*/
 {	
 	orcaData d;
 	orcaData p = vm->get_param(0);
@@ -212,7 +289,7 @@ orcaData orcaString::ends_with(orcaVM* vm, string& str) /*{{{*/
 }
 /*}}}*/
 
-orcaData orcaString::hash(orcaVM* vm, string& str)/*{{{*/
+orcaData orcaString::ex_hash(orcaVM* vm, string& str, int param_n)/*{{{*/
 {	
 	orcaData p = vm->get_param(0);
 	int mod = INT_MAX;
@@ -225,7 +302,7 @@ orcaData orcaString::hash(orcaVM* vm, string& str)/*{{{*/
 }
 /*}}}*/
 
-orcaData orcaString::split(orcaVM* vm, string& str)/*{{{*/
+orcaData orcaString::ex_split(orcaVM* vm, string& str, int param_n)/*{{{*/
 {	
 	//int sss=0, count=INT_MAX;
 	orcaData p = vm->get_param(0);
@@ -292,7 +369,7 @@ orcaData orcaString::split(orcaVM* vm, string& str)/*{{{*/
 }
 /*}}}*/
 
-orcaData orcaString::find_all(orcaVM* vm, string& str)/*{{{*/
+orcaData orcaString::ex_find_all(orcaVM* vm, string& str, int param_n)/*{{{*/
 {
 	int s, e;
 	if (is<TYPE_NIL>(vm->get_param(1))) 
@@ -343,7 +420,7 @@ orcaData orcaString::find_all(orcaVM* vm, string& str)/*{{{*/
 }
 /*}}}*/
 
-orcaData orcaString::replace(orcaVM* vm, string& str)/*{{{*/
+orcaData orcaString::ex_replace(orcaVM* vm, string& str, int param_n)/*{{{*/
 {	
 	int s, e;
 
@@ -374,7 +451,7 @@ orcaData orcaString::replace(orcaVM* vm, string& str)/*{{{*/
 }
 /*}}}*/
 
-orcaData orcaString::strip(orcaVM* vm, string& str)/*{{{*/
+orcaData orcaString::ex_strip(orcaVM* vm, string& str, int param_n)/*{{{*/
 { 
 	string what;
 
@@ -387,7 +464,7 @@ orcaData orcaString::strip(orcaVM* vm, string& str)/*{{{*/
 }
 /*}}}*/
 
-orcaData orcaString::lstrip(orcaVM* vm, string& str) /*{{{*/
+orcaData orcaString::ex_lstrip(orcaVM* vm, string& str, int param_n) /*{{{*/
 { 
 	string what;
 	
@@ -400,7 +477,7 @@ orcaData orcaString::lstrip(orcaVM* vm, string& str) /*{{{*/
 }
 /*}}}*/
 
-orcaData orcaString::rstrip(orcaVM* vm, string& str) /*{{{*/
+orcaData orcaString::ex_rstrip(orcaVM* vm, string& str, int param_n) /*{{{*/
 { 
 	string what;
 	
@@ -413,7 +490,7 @@ orcaData orcaString::rstrip(orcaVM* vm, string& str) /*{{{*/
 }
 /*}}}*/
 
-orcaData orcaString::integer(orcaVM* vm, string& s) /*{{{*/
+orcaData orcaString::ex_integer(orcaVM* vm, string& s, int param_n) /*{{{*/
 {
 	orcaData d;
 	orcaData zero = 0;
@@ -445,7 +522,7 @@ orcaData orcaString::integer(orcaVM* vm, string& s) /*{{{*/
 }
 /*}}}*/
 
-orcaData orcaString::float_(orcaVM* vm, string& s) /*{{{*/
+orcaData orcaString::ex_float(orcaVM* vm, string& s, int param_n) /*{{{*/
 {
 	orcaData d;
 	string str = kyString::strip(s);;
@@ -461,12 +538,12 @@ orcaData orcaString::float_(orcaVM* vm, string& s) /*{{{*/
 }
 /*}}}*/
 
-orcaData orcaString::to_string(orcaVM* vm, string& s) 
+orcaData orcaString::ex_string(orcaVM* vm, string& s, int param_n) 
 {
 	return s;
 }
 
-orcaData orcaString::to_repr(orcaVM* vm, string& s) 
+orcaData orcaString::ex_repr(orcaVM* vm, string& s, int param_n) 
 {
 	return string("\"") + kyString::to_escape(s) + "\"";
 }
@@ -516,14 +593,14 @@ string orcaString::slice(string& s, int start, int end, bool include_right) /*{{
 }
 /*}}}*/
 
-orcaData orcaString::push_back(orcaVM* vm, string& str) // int
+orcaData orcaString::ex_push_back(orcaVM* vm, string& str, int param_n) // int
 {	
 	orcaData p = vm->get_param(0);
 	p.string_(vm, str);
 	return 0; // return value is made in orcaVM.cpp (caller)
 }
 
-orcaData orcaString::list_format(orcaVM* vm, string& str) 
+orcaData orcaString::ex_list_format(orcaVM* vm, string& str, int param_n) 
 { 
 	int s=0;
 	int e=INT_MAX;

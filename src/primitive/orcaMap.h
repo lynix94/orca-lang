@@ -51,6 +51,8 @@ public:
 	void dump(); 
 
 	// static
+	orcaData ex_get_at(orcaVM* vm, int n);
+	orcaData ex_set_at(orcaVM* vm, int n);
 	orcaData ex_size(orcaVM* vm, int n);
 	orcaData ex_keys(orcaVM* vm, int n);
 	orcaData ex_values(orcaVM* vm, int n);

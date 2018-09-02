@@ -36,7 +36,16 @@ void orca_error(const char* fmt, ...);
 
 enum FUNCTION_INDEX
 {
-	FI_STR_LENGTH = 1,
+	FI_STR_ADD = 1,
+	FI_STR_MUL,
+	FI_STR_MOD,
+	FI_STR_EQ,
+	FI_STR_NEQ,
+	FI_STR_GT,
+	FI_STR_GE,
+	FI_STR_LT,
+	FI_STR_LE,
+	FI_STR_LENGTH,
 	FI_STR_FIND,
 	FI_STR_FIND_ALL,
 	FI_STR_STRIP,
@@ -55,20 +64,63 @@ enum FUNCTION_INDEX
 	FI_STR_CHAR,
 	FI_STR_UPPER,
 	FI_STR_LOWER,
+	FI_STR_LIST_FORMAT,
+	FI_INT_ADD = 100,
+	FI_INT_SUB,
+	FI_INT_MUL,
+	FI_INT_DIV,
+	FI_INT_MOD,
+	FI_INT_EQ,
+	FI_INT_NEQ,
+	FI_INT_GT,
+	FI_INT_GE,
+	FI_INT_LT,
+	FI_INT_LE,
+	FI_INT_AND,
+	FI_INT_OR,
 	FI_INT_TO_INT,	
-	FI_BN_TO_INT,	
 	FI_INT_TO_FLOAT,	
-	FI_BN_TO_FLOAT,	
 	FI_INT_TO_STR,	
+	FI_BN_ADD = 200,
+	FI_BN_SUB,
+	FI_BN_MUL,
+	FI_BN_DIV,
+	FI_BN_MOD,
+	FI_BN_EQ,
+	FI_BN_NEQ,
+	FI_BN_GT,
+	FI_BN_GE,
+	FI_BN_LT,
+	FI_BN_LE,
+	FI_BN_AND,
+	FI_BN_OR,
+	FI_BN_TO_INT,	
+	FI_BN_TO_FLOAT,	
 	FI_BN_TO_STR,	
+	FI_FLOAT_ADD = 300,
+	FI_FLOAT_SUB,
+	FI_FLOAT_MUL,
+	FI_FLOAT_DIV,
+	FI_FLOAT_MOD,
+	FI_FLOAT_EQ,
+	FI_FLOAT_NEQ,
+	FI_FLOAT_GT,
+	FI_FLOAT_GE,
+	FI_FLOAT_LT,
+	FI_FLOAT_LE,
+	FI_FLOAT_AND,
+	FI_FLOAT_OR,
 	FI_FLOAT_TO_INT,	
 	FI_FLOAT_TO_FLOAT,	
 	FI_FLOAT_TO_STR,	
+	FI_BOOL_EQ = 400,
+	FI_BOOL_NEQ,
+	FI_BOOL_AND,
+	FI_BOOL_OR,
 	FI_BOOL_TO_INT,	
 	FI_BOOL_TO_FLOAT,	
 	FI_BOOL_TO_STR,	
 	FI_NIL_TO_STR,	
-	FI_STR_LIST_FORMAT,
 };
 
 class LIBORCA_API orcaVM
@@ -80,7 +132,7 @@ public:
 	void init();
 	void cleanup();
 
-	inline orcaData invoke_internal_func(InternalFunction& in);
+	inline orcaData invoke_internal_func(InternalFunction& in, int param_n);
 	void call(int param_n);
 
 	orcaObject* find_object_by_path(const char* path);
@@ -102,7 +154,7 @@ public:
 
 	// for interface
 	orcaData get_param(int i);
-	void need_param();
+	void need_param(int i = -1);
 	void set_param(int i, orcaData d);
 	void push_param(orcaData d);
 	void push_stack(orcaData d);
@@ -151,6 +203,9 @@ LIBORCA_API int orca_launch_interpreter(orcaVM* vm);
 LIBORCA_API void set_current_vm(orcaVM* vm);
 LIBORCA_API orcaVM* get_current_vm();
 
+orcaData get_collection_at(orcaData& src, orcaData& idx, bool ir=false, orcaVM* vm=NULL);
+
+bool set_collection_at(orcaData& src, orcaData& idx, orcaData& val, orcaData& out, bool ir=false, orcaVM* vm=NULL);
 #endif
 
 

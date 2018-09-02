@@ -17,9 +17,13 @@ class LIBORCA_API orcaBoolean : public orcaObject
 {
 public:
 	orcaBoolean();
-	orcaData string_(orcaVM* vm, int i);
-	orcaData float_(orcaVM* vm, int i);
-	orcaData integer(orcaVM* vm, int i);
+	orcaData ex_eq(orcaVM* vm, int i, int param_n);
+	orcaData ex_neq(orcaVM* vm, int i, int param_n);
+	orcaData ex_and(orcaVM* vm, int i, int param_n);
+	orcaData ex_or(orcaVM* vm, int i, int param_n);
+	orcaData ex_string(orcaVM* vm, int i, int param_n);
+	orcaData ex_float(orcaVM* vm, int i, int param_n);
+	orcaData ex_integer(orcaVM* vm, int i, int param_n);
 };
 
 extern orcaBoolean g_boolean;

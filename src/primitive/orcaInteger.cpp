@@ -28,6 +28,45 @@ orcaInteger::orcaInteger()
 	orcaData d;
 	d.set_type(TYPE_INTERNAL);
 
+	d.internal(FI_INT_ADD, "+"); 
+	insert_static("+", d);
+
+	d.internal(FI_INT_SUB, "-"); 
+	insert_static("-", d);
+
+	d.internal(FI_INT_MUL, "*"); 
+	insert_static("*", d);
+
+	d.internal(FI_INT_DIV, "/"); 
+	insert_static("/", d);
+
+	d.internal(FI_INT_MOD, "%"); 
+	insert_static("%", d);
+
+	d.internal(FI_INT_EQ, "=="); 
+	insert_static("==", d);
+
+	d.internal(FI_INT_NEQ, "!="); 
+	insert_static("!=", d);
+
+	d.internal(FI_INT_GT, ">"); 
+	insert_static(">", d);
+
+	d.internal(FI_INT_GE, ">="); 
+	insert_static(">=", d);
+
+	d.internal(FI_INT_LT, "<"); 
+	insert_static("<", d);
+
+	d.internal(FI_INT_LE, "<="); 
+	insert_static("<=", d);
+
+	d.internal(FI_INT_AND, "&&"); 
+	insert_static("&&", d);
+
+	d.internal(FI_INT_OR, "||");
+	insert_static("||", d);
+
 	d.internal(FI_INT_TO_STR, "string"); 
 	insert_static("string", d);
 
@@ -49,8 +88,50 @@ orcaBigInteger::orcaBigInteger()
 	orcaData d;
 	d.set_type(TYPE_INTERNAL);
 
+	d.internal(FI_BN_ADD, "+"); 
+	insert_static("+", d);
+
+	d.internal(FI_BN_SUB, "-"); 
+	insert_static("-", d);
+
+	d.internal(FI_BN_MUL, "*"); 
+	insert_static("*", d);
+
+	d.internal(FI_BN_DIV, "/"); 
+	insert_static("/", d);
+
+	d.internal(FI_BN_DIV, "%"); 
+	insert_static("%", d);
+
+	d.internal(FI_BN_EQ, "=="); 
+	insert_static("==", d);
+
+	d.internal(FI_BN_NEQ, "!="); 
+	insert_static("!=", d);
+
+	d.internal(FI_BN_GT, ">"); 
+	insert_static(">", d);
+
+	d.internal(FI_BN_GE, ">="); 
+	insert_static(">=", d);
+
+	d.internal(FI_BN_LT, "<"); 
+	insert_static("<", d);
+
+	d.internal(FI_BN_LE, "<="); 
+	insert_static("<=", d);
+
+	d.internal(FI_BN_AND, "&&"); 
+	insert_static("&&", d);
+
+	d.internal(FI_BN_OR, "||");
+	insert_static("||", d);
+
 	d.internal(FI_BN_TO_STR, "string"); 
 	insert_static("string", d);
+
+	d.internal(FI_BN_TO_STR, "repr"); 
+	insert_static("repr", d);
 
 	d.internal(FI_BN_TO_FLOAT, "float"); 
 	insert_static("float", d);
@@ -60,9 +141,101 @@ orcaBigInteger::orcaBigInteger()
 }
 
 
-orcaData orcaInteger::string_(orcaVM* vm, int i) 
+orcaData orcaInteger::ex_add(orcaVM* vm, int i, int param_n) 
 {
-	if (is<TYPE_STR>(vm->get_param(0))) {
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(i).operator_add(vm, rhs);
+}
+
+orcaData orcaInteger::ex_sub(orcaVM* vm, int i, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(i).operator_sub(vm, rhs);
+}
+
+orcaData orcaInteger::ex_mul(orcaVM* vm, int i, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(i).operator_mul(vm, rhs);
+}
+
+orcaData orcaInteger::ex_div(orcaVM* vm, int i, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(i).operator_div(vm, rhs);
+}
+
+orcaData orcaInteger::ex_mod(orcaVM* vm, int i, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(i).operator_mod(vm, rhs);
+}
+
+
+orcaData orcaInteger::ex_eq(orcaVM* vm, int i, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(i).operator_eq(vm, rhs);
+}
+
+orcaData orcaInteger::ex_neq(orcaVM* vm, int i, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(i).operator_neq(vm, rhs);
+}
+
+orcaData orcaInteger::ex_gt(orcaVM* vm, int i, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(i).operator_gt(vm, rhs);
+}
+
+orcaData orcaInteger::ex_ge(orcaVM* vm, int i, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(i).operator_ge(vm, rhs);
+}
+
+orcaData orcaInteger::ex_lt(orcaVM* vm, int i, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(i).operator_lt(vm, rhs);
+}
+
+orcaData orcaInteger::ex_le(orcaVM* vm, int i, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(i).operator_le(vm, rhs);
+}
+
+orcaData orcaInteger::ex_and(orcaVM* vm, int i, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(i).operator_and(vm, rhs);
+}
+
+orcaData orcaInteger::ex_or(orcaVM* vm, int i, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(i).operator_or(vm, rhs);
+}
+
+orcaData orcaInteger::ex_string(orcaVM* vm, int i, int param_n) 
+{
+	if (param_n > 0 && is<TYPE_STR>(vm->get_param(0))) {
 		string format = vm->get_param(0).s();
 		return format_str(vm, format, i);
 	}
@@ -75,9 +248,116 @@ orcaData orcaInteger::string_(orcaVM* vm, int i)
 	return NIL;
 }
 
-orcaData orcaBigInteger::string_(orcaVM* vm, mpz_t& bn) 
+orcaData orcaInteger::ex_float(orcaVM* vm, int i, int param_n) 
 {
-	if (is<TYPE_STR>(vm->get_param(0))) {
+	return static_cast<double>(i);
+}
+
+orcaData orcaInteger::ex_integer(orcaVM* vm, int i, int param_n) 
+{
+	return i;
+}
+
+
+
+
+
+orcaData orcaBigInteger::ex_add(orcaVM* vm, mpz_t& bn, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(bn).operator_add(vm, rhs);
+}
+
+orcaData orcaBigInteger::ex_sub(orcaVM* vm, mpz_t& bn, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(bn).operator_sub(vm, rhs);
+}
+
+orcaData orcaBigInteger::ex_mul(orcaVM* vm, mpz_t& bn, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(bn).operator_mul(vm, rhs);
+}
+
+orcaData orcaBigInteger::ex_div(orcaVM* vm, mpz_t& bn, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(bn).operator_div(vm, rhs);
+}
+
+orcaData orcaBigInteger::ex_mod(orcaVM* vm, mpz_t& bn, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(bn).operator_mod(vm, rhs);
+}
+
+
+orcaData orcaBigInteger::ex_eq(orcaVM* vm, mpz_t& bn, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(bn).operator_eq(vm, rhs);
+}
+
+orcaData orcaBigInteger::ex_neq(orcaVM* vm, mpz_t& bn, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(bn).operator_neq(vm, rhs);
+}
+
+orcaData orcaBigInteger::ex_gt(orcaVM* vm, mpz_t& bn, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(bn).operator_gt(vm, rhs);
+}
+
+orcaData orcaBigInteger::ex_ge(orcaVM* vm, mpz_t& bn, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(bn).operator_ge(vm, rhs);
+}
+
+orcaData orcaBigInteger::ex_lt(orcaVM* vm, mpz_t& bn, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(bn).operator_lt(vm, rhs);
+}
+
+orcaData orcaBigInteger::ex_le(orcaVM* vm, mpz_t& bn, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(bn).operator_le(vm, rhs);
+}
+
+orcaData orcaBigInteger::ex_and(orcaVM* vm, mpz_t& bn, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(bn).operator_and(vm, rhs);
+}
+
+orcaData orcaBigInteger::ex_or(orcaVM* vm, mpz_t& bn, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(bn).operator_or(vm, rhs);
+}
+
+
+orcaData orcaBigInteger::ex_string(orcaVM* vm, mpz_t& bn, int param_n) 
+{
+	if (param_n > 0 && is<TYPE_STR>(vm->get_param(0))) {
 		string format = vm->get_param(0).s();
 		return format_str(vm, format, bn);
 	}
@@ -89,22 +369,12 @@ orcaData orcaBigInteger::string_(orcaVM* vm, mpz_t& bn)
 	return NIL;
 }
 
-orcaData orcaInteger::float_(orcaVM* vm, int i) 
-{
-	return static_cast<double>(i);
-}
-
-orcaData orcaBigInteger::float_(orcaVM* vm, mpz_t& bn) 
+orcaData orcaBigInteger::ex_float(orcaVM* vm, mpz_t& bn, int param_n) 
 {
 	return get_bn_double(bn);
 }
 
-orcaData orcaInteger::integer(orcaVM* vm, int i) 
-{
-	return i;
-}
-
-orcaData orcaBigInteger::integer(orcaVM* vm, mpz_t& bn) 
+orcaData orcaBigInteger::ex_integer(orcaVM* vm, mpz_t& bn, int param_n) 
 {
 	orcaData d = bn;
 	return d;

@@ -119,6 +119,18 @@ if a != [1..7] {
 	throw test.list <- 'list extract fail';
 }
 
+a = [1,2,3];
+b = a."[]"(1);
+if b != 2 {
+	throw test.list <- 'list at fail';
+}
+
+a = [1,2,3];
+a."[]="(1, 20);
+b = a[1];
+if b != 20 {
+	throw test.list <- 'list set at fail';
+}
 
 print: 'OK';
 return true;

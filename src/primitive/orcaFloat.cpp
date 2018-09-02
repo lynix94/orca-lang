@@ -25,6 +25,45 @@ orcaFloat::orcaFloat()
 	orcaData d;
 	d.set_type(TYPE_INTERNAL);
 
+	d.internal(FI_FLOAT_ADD, "+"); 
+	insert_static("+", d);
+
+	d.internal(FI_FLOAT_SUB, "-"); 
+	insert_static("-", d);
+
+	d.internal(FI_FLOAT_MUL, "*"); 
+	insert_static("*", d);
+
+	d.internal(FI_FLOAT_DIV, "/"); 
+	insert_static("/", d);
+
+	d.internal(FI_FLOAT_MOD, "%"); 
+	insert_static("%", d);
+
+	d.internal(FI_FLOAT_EQ, "=="); 
+	insert_static("==", d);
+
+	d.internal(FI_FLOAT_NEQ, "!="); 
+	insert_static("!=", d);
+
+	d.internal(FI_FLOAT_GT, ">"); 
+	insert_static(">", d);
+
+	d.internal(FI_FLOAT_GE, ">="); 
+	insert_static(">=", d);
+
+	d.internal(FI_FLOAT_LT, "<"); 
+	insert_static("<", d);
+
+	d.internal(FI_FLOAT_LE, "<="); 
+	insert_static("<=", d);
+
+	d.internal(FI_FLOAT_AND, "&&"); 
+	insert_static("&&", d);
+
+	d.internal(FI_FLOAT_OR, "||");
+	insert_static("||", d);
+
 	d.internal(FI_FLOAT_TO_STR, "string"); 
 	insert_static("string", d);
 
@@ -38,7 +77,99 @@ orcaFloat::orcaFloat()
 	insert_static("float", d);
 }
 
-orcaData orcaFloat::string_(orcaVM* vm, double f) 
+orcaData orcaFloat::ex_add(orcaVM* vm, double f, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(f).operator_add(vm, rhs);
+}
+
+orcaData orcaFloat::ex_sub(orcaVM* vm, double f, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(f).operator_sub(vm, rhs);
+}
+
+orcaData orcaFloat::ex_mul(orcaVM* vm, double f, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(f).operator_mul(vm, rhs);
+}
+
+orcaData orcaFloat::ex_div(orcaVM* vm, double f, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(f).operator_div(vm, rhs);
+}
+
+orcaData orcaFloat::ex_mod(orcaVM* vm, double f, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(f).operator_mod(vm, rhs);
+}
+
+
+orcaData orcaFloat::ex_eq(orcaVM* vm, double f, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(f).operator_eq(vm, rhs);
+}
+
+orcaData orcaFloat::ex_neq(orcaVM* vm, double f, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(f).operator_neq(vm, rhs);
+}
+
+orcaData orcaFloat::ex_gt(orcaVM* vm, double f, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(f).operator_gt(vm, rhs);
+}
+
+orcaData orcaFloat::ex_ge(orcaVM* vm, double f, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(f).operator_ge(vm, rhs);
+}
+
+orcaData orcaFloat::ex_lt(orcaVM* vm, double f, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(f).operator_lt(vm, rhs);
+}
+
+orcaData orcaFloat::ex_le(orcaVM* vm, double f, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(f).operator_le(vm, rhs);
+}
+
+orcaData orcaFloat::ex_and(orcaVM* vm, double f, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(f).operator_and(vm, rhs);
+}
+
+orcaData orcaFloat::ex_or(orcaVM* vm, double f, int param_n) 
+{
+	if (param_n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(f).operator_or(vm, rhs);
+}
+
+orcaData orcaFloat::ex_string(orcaVM* vm, double f, int param_n) 
 {
 	if (is<TYPE_STR>(vm->get_param(0))) {
 		char buff[1024];
@@ -51,12 +182,12 @@ orcaData orcaFloat::string_(orcaVM* vm, double f)
 	return lexical_cast<string>(f);
 }
 
-orcaData orcaFloat::integer(orcaVM* vm, double f) 
+orcaData orcaFloat::ex_integer(orcaVM* vm, double f, int param_n) 
 {
 	return static_cast<int>(f);
 }
 
-orcaData orcaFloat::float_(orcaVM* vm, double f) 
+orcaData orcaFloat::ex_float(orcaVM* vm, double f, int param_n) 
 {
 	return f;
 }

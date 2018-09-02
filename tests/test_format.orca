@@ -287,5 +287,47 @@ print: '%% d' % 10;
 print: '%% d %d' % 10;
 
 
+# map type format string
+
+src1 = '''
+name:%s,
+age:%d,
+addr:%s
+''';
+
+src2 = '''
+name:%s,
+age:%{age},
+addr:%{addr}
+''';
+
+src3 = '''
+name:%{name},
+age:%{age},
+addr:%{addr}
+''';
+
+r1 = src1 % ('tom', 20, 'Seoul');
+r2 = src2 % ('tom', {'age':20, 'addr':'Seoul'});
+r3 = src3 % ({'name':'tom', 'age':20, 'addr':'Seoul'});
+
+print: r1;
+if r1 != r2 || r1 != r3 {
+	throw test.format <- 'map type format failed';
+}
+
+def foo
+{
+	def name := 'tom';
+	def age := 20;
+	def addr := 'Seoul';
+}
+
+r4 = src3 % my.foo.MEMBERS;
+if r1 != r4 {
+	throw test.format <- 'map type format failed';
+}
+
+
 print: 'OK';
 

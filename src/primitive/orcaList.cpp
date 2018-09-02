@@ -45,6 +45,10 @@ orcaList::orcaList()
 	m_timestamp = 0;
 
 	set_name("list"); 
+	insert_native_function("+", (object_fp)&orcaList::ex_add);
+	insert_native_function("==", (object_fp)&orcaList::ex_eq);
+	insert_native_function("[]", (object_fp)&orcaList::ex_get_at);
+	insert_native_function("[]=", (object_fp)&orcaList::ex_set_at);
 	insert_native_function("size", (object_fp)&orcaList::ex_size);
 	insert_native_function("tuple", (object_fp)&orcaList::ex_tuple);
 	insert_native_function("push_back", (object_fp)&orcaList::ex_push_back);
@@ -322,9 +326,66 @@ void orcaList::repr(orcaVM* vm, string& str)
 	str = ss.str();
 }
 
+orcaData orcaList::ex_get_at(orcaVM* vm, int n) 
+{
+	orcaData ret;
+
+	if (n < 1) vm->need_param();
+	orcaData idx = vm->get_param(0); 
+	
+	if (is<TYPE_INT>(idx)) {
+		ret = at(idx.i());
+	}
+	else if (is<TYPE_PAIR>(idx)) {
+		ret = slice(idx.sl().from, idx.sl().to, false);
+	}
+	else {
+		throw orcaException(vm, "orca.type", 
+			string("invalid parameter at list index: ") + idx.dump_str());
+	}
+
+	return ret;
+}
+
+orcaData orcaList::ex_set_at(orcaVM* vm, int n) 
+{
+	orcaData ret;
+
+	if (n < 2) vm->need_param();
+	orcaData idx = vm->get_param(0); 
+	orcaData val = vm->get_param(1); 
+
+	if (is<TYPE_INT>(idx)) {
+		update(idx.i(), val);
+	}
+	else if (is<TYPE_PAIR>(idx)) {
+		update_range(idx.sl().from, idx.sl().to, false, val);
+	}
+	else {
+		throw orcaException(vm, "orca.type", "invalid slice");
+	}
+
+	return this;
+}
+
+
 orcaData orcaList::ex_size(orcaVM* vm, int n) 
 {
 	return size();
+}
+
+orcaData orcaList::ex_add(orcaVM* vm, int n) 
+{
+	if (n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(this).operator_add(vm, rhs);
+}
+
+orcaData orcaList::ex_eq(orcaVM* vm, int n) 
+{
+	if (n != 1) vm->need_param(1);
+	orcaData rhs = vm->get_param(0);
+	return orcaData(this).operator_eq(vm, rhs);
 }
 
 orcaData orcaList::ex_tuple(orcaVM* vm, int n) 

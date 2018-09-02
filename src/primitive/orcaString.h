@@ -22,27 +22,36 @@ class LIBORCA_API orcaString : public orcaObject
 public:
 	orcaString();
 
-	orcaData length(orcaVM* vm, string& str);
-	orcaData find(orcaVM* vm, string& str);
-	orcaData find_all(orcaVM* vm, string& str);
-	orcaData strip(orcaVM* vm, string& str);
-	orcaData lstrip(orcaVM* vm, string& str);
-	orcaData rstrip(orcaVM* vm, string& str);
-	orcaData substr(orcaVM* vm, string& str);
-	orcaData integer(orcaVM* vm, string& str);
-	orcaData float_(orcaVM* vm, string& str);
-	orcaData to_string(orcaVM* vm, string& str);
-	orcaData to_repr(orcaVM* vm, string& str);
-	orcaData replace(orcaVM* vm, string& str);
-	orcaData starts_with(orcaVM* vm, string& str);
-	orcaData ends_with(orcaVM* vm, string& str);
-	orcaData hash(orcaVM* vm, string& str);
-	orcaData split(orcaVM* vm, string& str);
-	orcaData push_back(orcaVM* vm, string& str);
-	orcaData char_(orcaVM* vm, string& str);
-	orcaData upper(orcaVM* vm, string& str);
-	orcaData lower(orcaVM* vm, string& str);
-	orcaData list_format(orcaVM* vm, string& str);
+	orcaData ex_add(orcaVM* vm, string& str, int param_n);
+	orcaData ex_mul(orcaVM* vm, string& str, int param_n);
+	orcaData ex_mod(orcaVM* vm, string& str, int param_n);
+	orcaData ex_gt(orcaVM* vm, string& str, int param_n);
+	orcaData ex_ge(orcaVM* vm, string& str, int param_n);
+	orcaData ex_lt(orcaVM* vm, string& str, int param_n);
+	orcaData ex_le(orcaVM* vm, string& str, int param_n);
+	orcaData ex_eq(orcaVM* vm, string& str, int param_n);
+	orcaData ex_neq(orcaVM* vm, string& str, int param_n);
+	orcaData ex_length(orcaVM* vm, string& str, int param_n);
+	orcaData ex_find(orcaVM* vm, string& str, int param_n);
+	orcaData ex_find_all(orcaVM* vm, string& str, int param_n);
+	orcaData ex_strip(orcaVM* vm, string& str, int param_n);
+	orcaData ex_lstrip(orcaVM* vm, string& str, int param_n);
+	orcaData ex_rstrip(orcaVM* vm, string& str, int param_n);
+	orcaData ex_substr(orcaVM* vm, string& str, int param_n);
+	orcaData ex_integer(orcaVM* vm, string& str, int param_n);
+	orcaData ex_float(orcaVM* vm, string& str, int param_n);
+	orcaData ex_string(orcaVM* vm, string& str, int param_n);
+	orcaData ex_repr(orcaVM* vm, string& str, int param_n);
+	orcaData ex_replace(orcaVM* vm, string& str, int param_n);
+	orcaData ex_starts_with(orcaVM* vm, string& str, int param_n);
+	orcaData ex_ends_with(orcaVM* vm, string& str, int param_n);
+	orcaData ex_hash(orcaVM* vm, string& str, int param_n);
+	orcaData ex_split(orcaVM* vm, string& str, int param_n);
+	orcaData ex_push_back(orcaVM* vm, string& str, int param_n);
+	orcaData ex_char(orcaVM* vm, string& str, int param_n);
+	orcaData ex_upper(orcaVM* vm, string& str, int param_n);
+	orcaData ex_lower(orcaVM* vm, string& str, int param_n);
+	orcaData ex_list_format(orcaVM* vm, string& str, int param_n);
 
 	static string slice(string& s, int start, int end, bool include_right);
 

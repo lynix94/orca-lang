@@ -243,7 +243,7 @@ struct auto_trace/*{{{*/
 };
 /*}}}*/
 
-orcaData orcaVM::invoke_internal_func(InternalFunction& in) /*{{{*/
+orcaData orcaVM::invoke_internal_func(InternalFunction& in, int param_n) /*{{{*/
 {
 	int code = in.idx;
 	u_internal d = in.owner;
@@ -251,133 +251,341 @@ orcaData orcaVM::invoke_internal_func(InternalFunction& in) /*{{{*/
 
 	switch(code) 
 	{
+	case FI_STR_ADD:	
+		r = g_string.ex_add(this, d.so->s, param_n); 
+		break;
+
+	case FI_STR_MUL:	
+		r = g_string.ex_mul(this, d.so->s, param_n); 
+		break;
+
+	case FI_STR_MOD:	
+		r = g_string.ex_mod(this, d.so->s, param_n); 
+		break;
+
+	case FI_STR_GT:	
+		r = g_string.ex_gt(this, d.so->s, param_n); 
+		break;
+
+	case FI_STR_GE:	
+		r = g_string.ex_ge(this, d.so->s, param_n); 
+		break;
+
+	case FI_STR_LT:	
+		r = g_string.ex_lt(this, d.so->s, param_n); 
+		break;
+
+	case FI_STR_LE:	
+		r = g_string.ex_le(this, d.so->s, param_n); 
+		break;
+
+	case FI_STR_EQ:	
+		r = g_string.ex_eq(this, d.so->s, param_n); 
+		break;
+
+	case FI_STR_NEQ:	
+		r = g_string.ex_neq(this, d.so->s, param_n); 
+		break;
+
 	case FI_STR_LENGTH:	
-		r = g_string.length(this, d.so->s);
+		r = g_string.ex_length(this, d.so->s, param_n);
 		break;
 
 	case FI_STR_FIND:	
-		r = g_string.find(this, d.so->s); 
+		r = g_string.ex_find(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_FIND_ALL:	
-		r = g_string.find_all(this, d.so->s); 
+		r = g_string.ex_find_all(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_STRIP:	
-		r = g_string.strip(this, d.so->s); 
+		r = g_string.ex_strip(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_LSTRIP:	
-		r = g_string.lstrip(this, d.so->s); 
+		r = g_string.ex_lstrip(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_REPLACE:	
-		r = g_string.replace(this, d.so->s); 
+		r = g_string.ex_replace(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_RSTRIP:	
-		r = g_string.rstrip(this, d.so->s); 
+		r = g_string.ex_rstrip(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_TO_INT:	
-		r = g_string.integer(this, d.so->s); 
+		r = g_string.ex_integer(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_TO_FLOAT:	
-		r = g_string.float_(this, d.so->s); 
+		r = g_string.ex_float(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_TO_STR:	
-		r = g_string.to_string(this, d.so->s); 
+		r = g_string.ex_string(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_TO_REPR:	
-		r = g_string.to_repr(this, d.so->s); 
+		r = g_string.ex_repr(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_STARTSWITH:	
-		r = g_string.starts_with(this, d.so->s); 
+		r = g_string.ex_starts_with(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_ENDSWITH:	
-		r = g_string.ends_with(this, d.so->s); 
+		r = g_string.ex_ends_with(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_HASH:	
-		r = g_string.hash(this, d.so->s); 
+		r = g_string.ex_hash(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_SPLIT:	
-		r = g_string.split(this, d.so->s); 
+		r = g_string.ex_split(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_PUSH_BACK:	
-		g_string.push_back(this, d.so->s); 
+		g_string.ex_push_back(this, d.so->s, param_n); 
 		r.__so_set__(d.so);
 		break;
 
 	case FI_STR_CHAR:	
-		r = g_string.char_(this, d.so->s); 
+		r = g_string.ex_char(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_UPPER:	
-		r = g_string.upper(this, d.so->s); 
+		r = g_string.ex_upper(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_LOWER:	
-		r = g_string.lower(this, d.so->s); 
+		r = g_string.ex_lower(this, d.so->s, param_n); 
 		break;
 
 	case FI_STR_LIST_FORMAT:	
-		r = g_string.list_format(this, d.so->s); 
+		r = g_string.ex_list_format(this, d.so->s, param_n); 
+		break;
+
+	case FI_INT_ADD:	
+		r = g_integer.ex_add(this, d.i, param_n); 
+		break;
+
+	case FI_INT_SUB:	
+		r = g_integer.ex_sub(this, d.i, param_n); 
+		break;
+
+	case FI_INT_MUL:	
+		r = g_integer.ex_mul(this, d.i, param_n); 
+		break;
+
+	case FI_INT_DIV:	
+		r = g_integer.ex_div(this, d.i, param_n); 
+		break;
+
+	case FI_INT_MOD:	
+		r = g_integer.ex_mod(this, d.i, param_n); 
+		break;
+
+	case FI_INT_GT:	
+		r = g_integer.ex_gt(this, d.i, param_n); 
+		break;
+
+	case FI_INT_GE:	
+		r = g_integer.ex_ge(this, d.i, param_n); 
+		break;
+
+	case FI_INT_LT:	
+		r = g_integer.ex_lt(this, d.i, param_n); 
+		break;
+
+	case FI_INT_LE:	
+		r = g_integer.ex_le(this, d.i, param_n); 
+		break;
+
+	case FI_INT_EQ:	
+		r = g_integer.ex_eq(this, d.i, param_n); 
+		break;
+
+	case FI_INT_NEQ:	
+		r = g_integer.ex_neq(this, d.i, param_n); 
+		break;
+
+	case FI_INT_AND:	
+		r = g_integer.ex_and(this, d.i, param_n); 
+		break;
+
+	case FI_INT_OR:	
+		r = g_integer.ex_or(this, d.i, param_n); 
 		break;
 
 	case FI_INT_TO_INT:	
-		r = g_integer.integer(this, d.i); 
-		break;
-
-	case FI_BN_TO_INT:	
-		r = g_big_integer.integer(this, d.bo->bn); 
-		break;
-
-	case FI_INT_TO_STR:	
-		r = g_integer.string_(this, d.i); 
-		break;
-
-	case FI_BN_TO_STR:	
-		r = g_big_integer.string_(this, d.bo->bn); 
+		r = g_integer.ex_integer(this, d.i, param_n); 
 		break;
 
 	case FI_INT_TO_FLOAT:	
-		r = g_integer.float_(this, d.i); 
+		r = g_integer.ex_float(this, d.i, param_n); 
+		break;
+
+	case FI_INT_TO_STR:	
+		r = g_integer.ex_string(this, d.i, param_n); 
+		break;
+
+	case FI_BN_ADD:	
+		r = g_big_integer.ex_add(this, d.bo->bn, param_n); 
+		break;
+
+	case FI_BN_SUB:	
+		r = g_big_integer.ex_sub(this, d.bo->bn, param_n); 
+		break;
+
+	case FI_BN_MUL:	
+		r = g_big_integer.ex_mul(this, d.bo->bn, param_n); 
+		break;
+
+	case FI_BN_DIV:	
+		r = g_big_integer.ex_div(this, d.bo->bn, param_n); 
+		break;
+
+	case FI_BN_MOD:	
+		r = g_big_integer.ex_mod(this, d.bo->bn, param_n); 
+		break;
+
+	case FI_BN_GT:	
+		r = g_big_integer.ex_gt(this, d.bo->bn, param_n); 
+		break;
+
+	case FI_BN_GE:	
+		r = g_big_integer.ex_ge(this, d.bo->bn, param_n); 
+		break;
+
+	case FI_BN_LT:	
+		r = g_big_integer.ex_lt(this, d.bo->bn, param_n); 
+		break;
+
+	case FI_BN_LE:	
+		r = g_big_integer.ex_le(this, d.bo->bn, param_n); 
+		break;
+
+	case FI_BN_EQ:	
+		r = g_big_integer.ex_eq(this, d.bo->bn, param_n); 
+		break;
+
+	case FI_BN_NEQ:	
+		r = g_big_integer.ex_neq(this, d.bo->bn, param_n); 
+		break;
+
+	case FI_BN_AND:	
+		r = g_big_integer.ex_and(this, d.bo->bn, param_n); 
+		break;
+
+	case FI_BN_OR:	
+		r = g_big_integer.ex_or(this, d.bo->bn, param_n); 
+		break;
+
+	case FI_BN_TO_INT:	
+		r = g_big_integer.ex_integer(this, d.bo->bn, param_n); 
 		break;
 
 	case FI_BN_TO_FLOAT:	
-		r = g_big_integer.float_(this, d.bo->bn); 
+		r = g_big_integer.ex_float(this, d.bo->bn, param_n); 
+		break;
+
+	case FI_BN_TO_STR:	
+		r = g_big_integer.ex_string(this, d.bo->bn, param_n); 
+		break;
+
+	case FI_FLOAT_ADD:	
+		r = g_float.ex_add(this, d.r, param_n); 
+		break;
+
+	case FI_FLOAT_SUB:	
+		r = g_float.ex_sub(this, d.r, param_n); 
+		break;
+
+	case FI_FLOAT_MUL:	
+		r = g_float.ex_mul(this, d.r, param_n); 
+		break;
+
+	case FI_FLOAT_DIV:	
+		r = g_float.ex_div(this, d.r, param_n); 
+		break;
+
+	case FI_FLOAT_MOD:	
+		r = g_float.ex_mod(this, d.r, param_n); 
+		break;
+
+	case FI_FLOAT_GT:	
+		r = g_float.ex_gt(this, d.r, param_n); 
+		break;
+
+	case FI_FLOAT_GE:	
+		r = g_float.ex_ge(this, d.r, param_n); 
+		break;
+
+	case FI_FLOAT_LT:	
+		r = g_float.ex_lt(this, d.r, param_n); 
+		break;
+
+	case FI_FLOAT_LE:	
+		r = g_float.ex_le(this, d.r, param_n); 
+		break;
+
+	case FI_FLOAT_EQ:	
+		r = g_float.ex_eq(this, d.r, param_n); 
+		break;
+
+	case FI_FLOAT_NEQ:	
+		r = g_float.ex_neq(this, d.r, param_n); 
+		break;
+
+	case FI_FLOAT_AND:	
+		r = g_float.ex_and(this, d.r, param_n); 
+		break;
+
+	case FI_FLOAT_OR:	
+		r = g_float.ex_or(this, d.r, param_n); 
 		break;
 
 	case FI_FLOAT_TO_INT:	
-		r = g_float.integer(this, d.r); 
+		r = g_float.ex_integer(this, d.r, param_n); 
 		break;
 
 	case FI_FLOAT_TO_FLOAT:	
-		r = g_float.float_(this, d.r); 
+		r = g_float.ex_float(this, d.r, param_n); 
 		break;
 
 	case FI_FLOAT_TO_STR:	
-		r = g_float.string_(this, d.r); 
+		r = g_float.ex_string(this, d.r, param_n); 
+		break;
+
+	case FI_BOOL_EQ:	
+		r = g_boolean.ex_eq(this, d.i, param_n); 
+		break;
+
+	case FI_BOOL_NEQ:	
+		r = g_boolean.ex_neq(this, d.i, param_n); 
+		break;
+
+	case FI_BOOL_AND:	
+		r = g_boolean.ex_and(this, d.i, param_n); 
+		break;
+
+	case FI_BOOL_OR:	
+		r = g_boolean.ex_or(this, d.i, param_n); 
 		break;
 
 	case FI_BOOL_TO_STR:	
-		r = g_boolean.string_(this, d.i); 
+		r = g_boolean.ex_string(this, d.i, param_n); 
 		break;
 
 	case FI_BOOL_TO_INT:	
-		r = g_boolean.integer(this, d.i); 
+		r = g_boolean.ex_integer(this, d.i, param_n); 
 		break;
 
 	case FI_BOOL_TO_FLOAT:	
-		r = g_boolean.float_(this, d.i); 
+		r = g_boolean.ex_float(this, d.i, param_n); 
 		break;
 
 	case FI_NIL_TO_STR:	
@@ -423,7 +631,7 @@ void orcaVM::call(int param_n)/*{{{*/
 			set_caller(m_curr);
 			m_stack->pop();
 
-			r = invoke_internal_func(f.internal());
+			r = invoke_internal_func(f.internal(), param_n);
 			m_stack->push(r);
 		}}
 	}
@@ -1157,30 +1365,12 @@ fast_jmp:
 				goto fast_jmp;
 				break; 
 
-			case OP_CALL_: 
-				PRINT2("\t\t%p : call fast (param: %d)\n", c, c[1]); 
-				j = c[1];
-				call(j);
-				m_stack->dummy_pop();
-				c += 1 + FJ_INC;
-				goto fast_jmp;
-				break; 
-
 			case OP_ASSIGN_LOCAL:	
 				PRINT2("\t\t%p : assign local (%d)\n", c, TO_SHORT(&c[1]));
 				j = TO_SHORT(&c[1]);
 				p1 = m_stack->pop();
 				m_local->set(j, p1);
 				m_stack->push(m_local->get(j));
-				c += sizeof(short) + FJ_INC;
-				goto fast_jmp;
-				break;
-
-			case OP_ASSIGN_LOCAL_:
-				PRINT2("\t\t%p : assign local fast (%d)\n", c, TO_SHORT(&c[1]));
-				j = TO_SHORT(&c[1]);
-				p1 = m_stack->pop();
-				m_local->set(j, p1);
 				c += sizeof(short) + FJ_INC;
 				goto fast_jmp;
 				break;
@@ -1194,40 +1384,10 @@ fast_jmp:
 				goto fast_jmp;
 				break;				
 
-			case OP_ASSIGN_MEMBER_:	
-				PRINT2("\t\t%p : assign member fast(%s)\n", c, &c[2]);
-				p2 = m_stack->pop();
-				p1 = m_stack->pop();
-				p1.Object()->update_member(&c[2], p2);
-				c += c[1] + 1 + FJ_INC;
-				goto fast_jmp;
-				break;				
-
 			case OP_ASSIGN_RESERVED:	
 				PRINT2("\t\t%p : assign reserved (%d)\n", c, c[1]);
 				p2 = m_stack->pop();
 				p1 = m_stack->top();
-				switch(c[1])
-				{
-				case OP_PUSH_OWNER:
-					if (p1.Object()->m_owner) p1.o()->m_owner->rc_dec();
-					p1.o()->m_owner = p2.Object();
-					p1.o()->m_owner->rc_inc();
-					break;
-
-				case OP_PUSH_CALLER:
-					set_caller(p2.Object());
-					break;
-				}
-
-				c += 1 + FJ_INC;
-				goto fast_jmp;
-				break;				
-
-			case OP_ASSIGN_RESERVED_:
-				PRINT2("\t\t%p : assign reserved (%d)\n", c, c[1]);
-				p2 = m_stack->pop();
-				p1 = m_stack->pop();
 				switch(c[1])
 				{
 				case OP_PUSH_OWNER:
@@ -1257,66 +1417,18 @@ fast_jmp:
 				p3 = m_stack->pop();
 				p2 = m_stack->pop();
 				p1 = m_stack->top();
-				goto do_assign_list; // pros & cons
 
-			case OP_ASSIGN_LIST_:	
-			case OP_ASSIGN_LIST_IR_:	
-				if ((unsigned char)*c == OP_ASSIGN_LIST_IR_)
-					flag = true;
-				else
-					flag = false;
+				try {
+					flag = set_collection_at(p1, p2, p3, d, flag, this);
+				}
+				catch (orcaException& e) {
+					m_stack->pop(); // clear unpoped stack
+					throw e;
+				}
 
-				PRINT2("\t\t%p : assign list (include right?: %d)\n", c, flag);
-
-				p3 = m_stack->pop();
-				p2 = m_stack->pop();
-				p1 = m_stack->pop();
-
-do_assign_list:
-				if (isobj<orcaList>(p1)) {
-					if (is<TYPE_INT>(p2)) {
-						TO_LIST(p1.o())->update(p2.i(), p3);
-					}
-					else if (is<TYPE_PAIR>(p2)) {
-						TO_LIST(p1.o())->update_range(p2.sl().from, p2.sl().to, flag, p3);
-					}
-					else {
-						throw orcaException(this, "orca.type", "invalid slice");
-						break;
-					}
-				}
-				else if (isobj<orcaTuple>(p1)) {
-					if (is<TYPE_INT>(p2)) {
-						TO_TUPLE(p1.o())->update(p2.i(), p3);
-					}
-					else if (is<TYPE_PAIR>(p2)) {
-						TO_TUPLE(p1.o())->update_range(p2.sl().from, p2.sl().to, flag, p3);
-					}
-					else {
-						throw orcaException(this, "orca.type", "invalid slice");
-						break;
-					}
-				}
-				else if (isobj<orcaMap>(p1)) {
-					TO_MAP(p1.o())->update(p2, p3);
-				}
-				else if (is<TYPE_OBJ>(p1) && p1.o()->has_member("[]=", d)) {
-					if ((unsigned char)*c == OP_ASSIGN_LIST || 
-						(unsigned char)*c == OP_ASSIGN_LIST_IR )
-					{
-						m_stack->replace(d);
-					}
-					else {
-						m_stack->push(d);
-					}
-					m_stack->push(p2);
-					m_stack->push(p3);
-					call(2);
-					break;
-				}
-				else {
-					throw orcaException(this, "orca.type", "assignment target is abnormal");
-					break;
+				if (flag == true) { // operator[] & set result
+					m_stack->pop();
+					m_stack->push(d);
 				}
 				break;				
 
@@ -2152,76 +2264,10 @@ do_assign_list:
 				}
 
 				PRINT2("\t\t%p : list at (include right?: %d)\n", c, flag); 
-
-				p1 = m_stack->at(1);
-				p2 = m_stack->top();
-
-				if (is<TYPE_STR>(p1)) {
-					if (is<TYPE_INT>(p2)) {
-						int idx = p2.i();
-						if (idx < 0) {
-							idx += p1.s().length();
-						}
-						if (idx < 0 || idx >=  p1.s().length()) {
-							throw orcaException(this, "orca.index", string("out of index: ") + lexical_cast<string>(p2.i()));
-						}
-						p3.s_set(p1.s().substr(idx, 1));
-					}
-					else if (is<TYPE_PAIR>(p2)) {
-						p3.s_set(orcaString::slice(p1.s(), p2.sl().from, p2.sl().to, flag));
-					}
-					else {
-						m_stack->pop();
-						m_stack->pop();
-						throw orcaException(this, "orca.type", 
-							string("invalid parameter at string index: ") + p2.dump_str());
-					}
-				}
-				else if (isobj<orcaList>(p1)) {
-					if (is<TYPE_INT>(p2)) {
-						p3 = TO_LIST(p1.o())->at(p2.i());
-					}
-					else if (is<TYPE_PAIR>(p2)) {
-						p3 = TO_LIST(p1.o())->slice(p2.sl().from, p2.sl().to, flag);
-					}
-					else {
-						m_stack->pop();
-						m_stack->pop();
-						throw orcaException(this, "orca.type", 
-							string("invalid parameter at list index: ") + p2.dump_str());
-					}
-				}
-				else if (isobj<orcaTuple>(p1)) {
-					if (is<TYPE_INT>(p2)) {
-						p3 = TO_TUPLE(p1.o())->at(p2.i());
-					}
-					else if (is<TYPE_PAIR>(p2)) {
-						p3 = TO_TUPLE(p1.o())->slice(p2.sl().from, p2.sl().to, flag);
-					}
-					else {
-						m_stack->pop();
-						m_stack->pop();
-						throw orcaException(this, "orca.type", 
-							string("invalid parameter at tuple index: ") + p2.dump_str());
-					}
-				}
-				else if (isobj<orcaMap>(p1)) {
-					p3 = TO_MAP(p1.o())->at(p2);
-				}
-				else if (is<TYPE_OBJ>(p1) && p1.o()->has_member("[]", d)) {
-					m_stack->set(1, d);
-					call(1);
-					break;
-				}
-				else {
-					m_stack->pop();
-					m_stack->pop();
-					throw orcaException(this, "orca.type", 
-						string("invalid list type object: ") + p1.dump_str());
-				}
-
-				m_stack->pop();
-				m_stack->replace(p3);
+				p2 = m_stack->pop();
+				p1 = m_stack->pop();
+				p3 = get_collection_at(p1, p2, flag, this);
+				m_stack->push(p3);
 				break;
 
 			case OP_MAKE_PAIR: 
@@ -3501,9 +3547,13 @@ orcaData orcaVM::get_param(int idx)/*{{{*/
 }
 /*}}}*/
 
-void orcaVM::need_param()/*{{{*/
+void orcaVM::need_param(int exp)/*{{{*/
 {
-	throw orcaException(this, "orca.param", "insufficient parameters");
+	if (exp < 0) {
+		throw orcaException(this, "orca.param", "insufficient parameters");
+	}
+
+	throw orcaException(this, "orca.param", kyString::sprintf("invalid param number. (required:%d)", exp));
 }
 /*}}}*/
 
@@ -3776,5 +3826,121 @@ OrcaHeader::OrcaHeader(int d, int c, int debug) /*{{{*/
 	debug_size = htonl(debug);
 }
 /*}}}*/
+
+orcaData get_collection_at(orcaData& src, orcaData& idx, bool ir, orcaVM* vm)
+{
+	orcaData ret, d;
+
+	if (is<TYPE_STR>(src)) {
+		if (is<TYPE_INT>(idx)) {
+			int i = idx.i();
+			if (i < 0) {
+				i += src.s().length();
+			}
+			if (i < 0 || i >=  src.s().length()) {
+				throw orcaException(vm, "orca.index", string("out of index: ") + lexical_cast<string>(idx.i()));
+			}
+			ret.s_set(src.s().substr(i, 1));
+		}
+		else if (is<TYPE_PAIR>(idx)) {
+			ret.s_set(orcaString::slice(src.s(), idx.sl().from, idx.sl().to, ir));
+		}
+		else {
+			throw orcaException(vm, "orca.type", 
+				string("invalid parameter at string index: ") + idx.dump_str());
+		}
+	}
+	else if (isobj<orcaList>(src)) {
+		if (is<TYPE_INT>(idx)) {
+			ret = TO_LIST(src.o())->at(idx.i());
+		}
+		else if (is<TYPE_PAIR>(idx)) {
+			ret = TO_LIST(src.o())->slice(idx.sl().from, idx.sl().to, ir);
+		}
+		else {
+			throw orcaException(vm, "orca.type", 
+				string("invalid parameter at list index: ") + idx.dump_str());
+		}
+	}
+	else if (isobj<orcaTuple>(src)) {
+		if (is<TYPE_INT>(idx)) {
+			ret = TO_TUPLE(src.o())->at(idx.i());
+		}
+		else if (is<TYPE_PAIR>(idx)) {
+			ret = TO_TUPLE(src.o())->slice(idx.sl().from, idx.sl().to, ir);
+		}
+		else {
+			throw orcaException(vm, "orca.type", 
+				string("invalid parameter at tuple index: ") + idx.dump_str());
+		}
+	}
+	else if (isobj<orcaMap>(src)) {
+		ret = TO_MAP(src.o())->at(idx);
+	}
+	else if (is<TYPE_OBJ>(src) && src.o()->has_member("[]", d)) {
+		if (vm == NULL) {
+			vm = get_current_vm();
+		}
+
+		vm->push_stack(d);
+		vm->push_param(idx);
+		vm->call(1);
+		ret = vm->pop_stack();
+	}
+	else {
+		throw orcaException(vm, "orca.type", 
+			string("invalid indexible type object: ") + src.dump_str());
+	}
+
+	return ret;
+}
+
+bool set_collection_at(orcaData& src, orcaData& idx, orcaData& val, orcaData& out, bool ir, orcaVM* vm)
+{
+	orcaData d;
+
+	if (isobj<orcaList>(src)) {
+		if (is<TYPE_INT>(idx)) {
+			TO_LIST(src.o())->update(idx.i(), val);
+		}
+		else if (is<TYPE_PAIR>(idx)) {
+			TO_LIST(src.o())->update_range(idx.sl().from, idx.sl().to, ir, val);
+		}
+		else {
+			throw orcaException(vm, "orca.type", "invalid slice");
+		}
+	}
+	else if (isobj<orcaTuple>(src)) {
+		if (is<TYPE_INT>(idx)) {
+			TO_TUPLE(src.o())->update(idx.i(), val);
+		}
+		else if (is<TYPE_PAIR>(idx)) {
+			TO_TUPLE(src.o())->update_range(idx.sl().from, idx.sl().to, ir, val);
+		}
+		else {
+			throw orcaException(vm, "orca.type", "invalid slice");
+		}
+	}
+	else if (isobj<orcaMap>(src)) {
+		TO_MAP(src.o())->update(idx, val);
+	}
+	else if (is<TYPE_OBJ>(src) && src.o()->has_member("[]=", d)) {
+		if (vm == NULL) {
+			vm = get_current_vm();
+		}
+
+		vm->push_stack(d);
+		vm->push_param(idx);
+		vm->push_param(val);
+		vm->call(2);
+		out = vm->pop_stack();
+		return true;
+	}
+	else {
+		throw orcaException(vm, "orca.type", "assignment target is abnormal");
+	}
+
+	return false;
+}
 
 

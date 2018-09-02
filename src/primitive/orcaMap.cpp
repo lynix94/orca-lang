@@ -49,6 +49,8 @@ cp_map<orcaData>::Type orcaMap::m_static_map;
 orcaMap::orcaMap()
 { 
 	set_name("map"); 
+	insert_native_function("[]", (object_fp)&orcaMap::ex_get_at);
+	insert_native_function("[]=", (object_fp)&orcaMap::ex_set_at);
 	insert_native_function("size", (object_fp)&orcaMap::ex_size);
 	insert_native_function("keys", (object_fp)&orcaMap::ex_keys);
 	insert_native_function("values", (object_fp)&orcaMap::ex_values);
@@ -202,6 +204,28 @@ void orcaMap::repr(orcaVM* vm, string& str)
 
 	ss << " }";
 	str = ss.str();
+}
+
+
+orcaData orcaMap::ex_get_at(orcaVM* vm, int n) 
+{
+	orcaData ret;
+
+	if (n < 1) vm->need_param();
+	orcaData idx = vm->get_param(0); 
+
+	ret = at(idx);
+	return ret;
+}
+
+orcaData orcaMap::ex_set_at(orcaVM* vm, int n) 
+{
+	if (n < 2) vm->need_param();
+	orcaData idx = vm->get_param(0); 
+	orcaData val = vm->get_param(1); 
+
+	update(idx, val);
+	return this;
 }
 
 

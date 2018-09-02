@@ -23,6 +23,13 @@ if a != 4 {
 	throw test.arith <- 'div fail';
 }
 
+print('mod');
+a = 20 % 3;
+if a != 2 {
+	throw test.arith <- 'mod fail %d' % a;
+}
+
+
 print('mix');
 a = 10;
 b = 20;
@@ -173,6 +180,61 @@ if '10e-10'.float() != 10e-10 {
   throw test.arith <- 'string to float fail';
 }
 
+
+# using function
+print('add');
+a = 10.'+'(20);
+if a != 30 {
+  throw test.arith <- 'add fail';
+}
+
+print('sub');
+a = 10.'-'(20);
+if a != -10 {
+  throw test.arith <- 'sub fail';
+}
+
+print('mul');
+a = 10.'*'(20);
+if a != 200 {
+	throw test.arith <- 'mul fail';
+}
+
+print('div');
+a = 20.'/'(5);
+if a != 4 {
+	throw test.arith <- 'div fail';
+}
+
+print('mod');
+a = 20.'%'(3);
+if a != 2 {
+	throw test.arith <- 'mod fail %d' % a;
+}
+
+print('add');
+a = 10.0."+"(20);
+if a != 30.0 {
+  throw test.arith <- 'add fail';
+}
+
+print('sub');
+a = 10.0."-"(20);
+if a != -10.0 {
+  throw test.arith <- 'sub fail';
+}
+
+print('mul');
+a = 10.0."*"(20.0);
+if a != 200.0 {
+	throw test.arith <- 'mul fail';
+}
+
+print('div');
+a = 20."/"(5.0);
+if a != 4.0 {
+	throw test.arith <- 'div fail';
+}
 
 
 

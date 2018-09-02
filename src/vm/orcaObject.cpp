@@ -806,7 +806,7 @@ orcaData orcaObject::operator_eq(orcaVM* vm, orcaData& p)
 orcaData orcaObject::operator_neq(orcaVM* vm, orcaData& p)
 {
 	orcaData d;
-	if (has_member("==", d)) {
+	if (has_member("!=", d)) {
 		vm->push_param(d);
 		vm->push_param(p);
 		vm->call(1);

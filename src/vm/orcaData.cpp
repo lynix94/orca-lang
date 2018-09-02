@@ -33,10 +33,6 @@ LIBORCA_API orcaData NIL;
 string format_str(orcaVM* vm, string& format, vector<orcaData>& params)/*{{{*/
 {
 	orcaData d = params[params.size()-1];
-	orcaMap* mp = NULL;
-	if (isobj<orcaMap>(d)) {
-		mp = dynamic_cast<orcaMap*>(d.o());
-	}
 
 	stringstream ss;
 	vector<orcaData>::iterator it = params.begin();
@@ -50,9 +46,9 @@ string format_str(orcaVM* vm, string& format, vector<orcaData>& params)/*{{{*/
 					if (format[j] == '%') break;
 				}
 
-				if (format[j] == '}' && mp != NULL) {
+				if (format[j] == '}') {
 					orcaData key = format.substr(i+2, j-(i+2));
-					orcaData value =  mp->at(key);
+					orcaData value =  get_collection_at(d, key, false, vm);
 					ss << value.string_(vm);
 					i = j;
 				}
@@ -144,6 +140,7 @@ string format_str(orcaVM* vm, string& format, vector<orcaData>& params)/*{{{*/
 
 				orcaData d = (*it);
 
+				int ret;
 				int p_i;
 				string p_s;
 				double p_d;
@@ -159,7 +156,11 @@ string format_str(orcaVM* vm, string& format, vector<orcaData>& params)/*{{{*/
 							case TYPE_BOOL: p_i = d.i(); break;
 							default: p_i = 0;
 						}
-						snprintf(buff, sizeof(buff), new_format.c_str(), p_i);
+						ret = snprintf(buff, sizeof(buff), new_format.c_str(), p_i);
+						if (ret >= sizeof(buff)) {
+							ss << kyString::sprintf(new_format.c_str(), p_i);
+							buff[0] = 0;
+						}
 					}
 					else {
 						new_format = new_format.replace(0, 1, "%Z"); 
@@ -177,12 +178,20 @@ string format_str(orcaVM* vm, string& format, vector<orcaData>& params)/*{{{*/
 						case TYPE_BOOL: p_d = d.i(); break;
 						default: p_d = 0;
 					}
-					snprintf(buff, sizeof(buff), new_format.c_str(), p_d);
+					ret = snprintf(buff, sizeof(buff), new_format.c_str(), p_d);
+					if (ret >= sizeof(buff)) {
+						ss << kyString::sprintf(new_format.c_str(), p_d);
+						buff[0] = 0;
+					}
 					break;
 
 				case 's':
 					p_s = d.string_(vm);
-					snprintf(buff, sizeof(buff), new_format.c_str(), p_s.c_str());
+					ret = snprintf(buff, sizeof(buff), new_format.c_str(), p_s.c_str());
+					if (ret >= sizeof(buff)) {
+						ss << kyString::sprintf(new_format.c_str(), p_s.c_str());
+						buff[0] = 0;
+					}
 					break;
 
 				case 'p':
@@ -191,7 +200,11 @@ string format_str(orcaVM* vm, string& format, vector<orcaData>& params)/*{{{*/
 						p_p = d.o();
 					}
 
-					snprintf(buff, sizeof(buff), new_format.c_str(), p_p);
+					ret = snprintf(buff, sizeof(buff), new_format.c_str(), p_p);
+					if (ret >= sizeof(buff)) {
+						ss << kyString::sprintf(new_format.c_str(), p_p);
+						buff[0] = 0;
+					}
 					
 	#ifdef WINDOWS
 					{
@@ -982,7 +995,7 @@ orcaData orcaData::operator_neq(orcaVM* vm, orcaData& rhs) /*{{{*/
 	// try redefined operator first
 	if (is<TYPE_OBJ>(*this)) {
 		if (o()->has_member("!=")) {
-			orcaData d = o()->operator_neq(vm, rhs);
+			orcaData d = o()->operator_neq(vm, rhs); // TODO: use real member
 			if (!is<TYPE_NIL>(d)) {
 				return d;
 			}
@@ -1112,9 +1125,6 @@ orcaData orcaData::operator_add(orcaVM* vm, orcaData& rhs) /*{{{*/
 		case TYPE_REAL:	
 			return i() + rhs.r();
 
-		case TYPE_STR:
-			return boost::lexical_cast<string>(i()) + rhs.s();
-
 		case TYPE_OBJ:		break;
 		default:
 			return NIL;
@@ -1131,9 +1141,6 @@ orcaData orcaData::operator_add(orcaVM* vm, orcaData& rhs) /*{{{*/
 
 		case TYPE_REAL:		
 			return r() + rhs.r();
-
-		case TYPE_STR:		
-			return boost::lexical_cast<string>(r()) + rhs.s();
 
 		case TYPE_OBJ:		break;
 
@@ -1174,9 +1181,6 @@ orcaData orcaData::operator_add(orcaVM* vm, orcaData& rhs) /*{{{*/
 		
 		case TYPE_REAL:
 			return mpz_get_d(bn()) + rhs.r();
-
-		case TYPE_STR: 
-			return get_bn_string(bn()) + rhs.s();
 
 		case TYPE_OBJ:		
 			break;
