@@ -1215,7 +1215,6 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code,
 			}
 
 			orcaData ctx = do_context(ctx_mod, name, code, last_write_time, params);
-
 			if (c[i +1+ctx_mod_len +1] & BIT_DEFINE_STATIC) {
 				op->insert_static(name, ctx.Object());
 			}
@@ -3189,8 +3188,13 @@ orcaData orcaVM::do_context(const char* ctx_mod, const char* name, const char* c
 	while (o_name) {
 		ret = curr->has_member(o_name, out);
 		if (ret == false) {
-			printf("ERROR: module %s (for context) not found\n", o_name);
-			return NIL;
+			if (curr->has_member(".")) {
+				out = curr->get_member(o_name);
+			}
+			else {
+				printf("ERROR: module %s (for context) not found\n", o_name);
+				return NIL;
+			}
 		}
 
 		curr = out.Object();
@@ -3827,7 +3831,7 @@ OrcaHeader::OrcaHeader(int d, int c, int debug) /*{{{*/
 }
 /*}}}*/
 
-orcaData get_collection_at(orcaData& src, orcaData& idx, bool ir, orcaVM* vm)
+orcaData get_collection_at(orcaData& src, orcaData& idx, bool ir, orcaVM* vm)/*{{{*/
 {
 	orcaData ret, d;
 
@@ -3894,8 +3898,9 @@ orcaData get_collection_at(orcaData& src, orcaData& idx, bool ir, orcaVM* vm)
 
 	return ret;
 }
+/*}}}*/
 
-bool set_collection_at(orcaData& src, orcaData& idx, orcaData& val, orcaData& out, bool ir, orcaVM* vm)
+bool set_collection_at(orcaData& src, orcaData& idx, orcaData& val, orcaData& out, bool ir, orcaVM* vm)/*{{{*/
 {
 	orcaData d;
 
@@ -3942,5 +3947,5 @@ bool set_collection_at(orcaData& src, orcaData& idx, orcaData& val, orcaData& ou
 
 	return false;
 }
-
+/*}}}*/
 

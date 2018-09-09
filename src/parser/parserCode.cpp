@@ -559,6 +559,12 @@ int parserCode::size()/*{{{*/
 }
 /*}}}*/
 
+void parserCode::clear()/*{{{*/
+{
+	return m_code.clear();
+}
+/*}}}*/
+
 void parserCode::reinit_code_stack_for_interpreter()/*{{{*/
 {
 	while (parserCode::m_codeStack.size() > 1) {
@@ -672,7 +678,6 @@ void parserCode::eval(orcaVM* vm)/*{{{*/
 	vm->exec_code(&m_code[0]);
 }
 /*}}}*/
-
 
 void parserCode::init_current() /*{{{*/
 {

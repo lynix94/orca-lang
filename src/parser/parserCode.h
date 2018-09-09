@@ -66,6 +66,7 @@ public:
 	char get_char(int offset);
 	void increase(int size);
 	int size();
+	void clear();
 	void pop_back();
 
 	static void push_code_stack(const char* name, vector<const char*>* param,

@@ -221,8 +221,14 @@ bool parserParser::parse(const string& filename)/*{{{*/
 	// parse
 	init();
 	try {
-		if (yyparse() != 0 && g_parser->n_tok != 0) {
-			return false;
+		int ret = yyparse();
+		if (ret != 0) {
+			if (g_parser->n_tok > 0) {
+				return false;
+			}
+			else {
+				code_top->clear();
+			}
 		}
 	}
 	catch(const char* cp) {
@@ -269,8 +275,14 @@ bool parserParser::parse_context_file(const string& filename, const string& mod_
 	curr_fp = fmemopen((void*)def.c_str(), def.size(), "r");
 	lineno = 1;
 	try {
-		if (yyparse() != 0 && g_parser->n_tok > 0) {
-			return false;
+		int ret = yyparse();
+		if (ret != 0) {
+			if (g_parser->n_tok > 0) {
+				return false;
+			}
+			else {
+				code_top->clear();
+			}
 		}
 	}
 	catch(const char* cp) {
@@ -333,7 +345,6 @@ orcaData parserParser::eval(orcaVM* vm, const string& src)/*{{{*/
 
 		if (rv == 0) {
 			code_top->push_char(OP_RETURN);
-
 			code_top->eval(vm);
 		}
 

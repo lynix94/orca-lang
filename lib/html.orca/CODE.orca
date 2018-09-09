@@ -5,30 +5,48 @@ using strings;
 using __clib__;
 
 #print: argv;
-name = argv[0];
-ts = argv[1];
-body = argv[2];
-params = argv[3];
+#name = argv[0];
+#ts = argv[1];
+#body = argv[2];
+#params = argv[3];
 
 
-return .process_context(body);
+return .process_context(argv...);
 
-
-def js(...argv)
+def '.'(tag)
 {
-	return ..process_context(argv[2]);
+	h = my.handler.clone();
+	h.tag = tag;
+	return h;
+
+	def handler(...argv)
+	{
+		def tag;
+
+		obj = html.process_context(argv...);
+		obj.__head = '<${.tag} id="${argv[0]}">';
+		obj.__tail = '</${.tag}>';
+
+		return obj;
+	}
 }
 
 
-def process_context(body)
+
+
+def process_context(...argv)
 {
 	def html_object(req)
 	{
+		def __head := '';
+		def __tail := '';
 		def __template;
+		def __id;
 
-		def init(body)
+		def init(...argv)
 		{
-			..__template = body;
+			..__id = argv[0];
+			..__template = argv[2];
 		}
 
 		if my.MEMBERS.has_key('prepare') {
@@ -53,18 +71,35 @@ def process_context(body)
 		}
 
 		bdr = strings.builder();
+		bdr.push_back(my.__head);
 		bdr.push_back(my.__template % dict);
 
 		for key, value in my.MEMBERS {
 			if key.starts_with('script_') {
 				bdr.push_back(value(req));
 			}
+			elif key.starts_with('on_') {
+				template = '''
+<script>
+$(document).ready(function() {
+	$("#%s").%s(function(){
+		%s;
+	});
+});
+</script>
+''';
+				event = key.split('_', 1)[1];
+				code = value(req);
+				result = template % (my.__id, event, code);
+				bdr.push_back(result);
+			}
 		}
 
+		bdr.push_back(my.__tail);
 		return bdr.string();
 	}
 
-	ret = my.html_object.clone(body);
+	ret = my.html_object.clone(argv...);
 	return ret;
 }
 
