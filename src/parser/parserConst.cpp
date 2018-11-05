@@ -30,6 +30,13 @@ const char* flex_head = "\n\
 const char* flex_tail = "\n\
 %%%%\n\
 int parse_input() { return yyinput(); }\n\
+int parse_unput(const char* str) {\n\
+	const char *cp = str + strlen(str) - 1;\n\
+	while (cp >= str) {\n\
+		yyunput(*cp, yytext);\n\
+		cp--;\n\
+	}\n\
+}\n\
 \n\n";
 
 
@@ -67,6 +74,7 @@ const char* bison_tail = "\n\
 #endif\n\
 \n\
 int parse_input(void);\n\
+int parse_unput(const char* cp);\n\
 int %sparse (void);\n\
 extern char *%stext;\n\
 void %serror(const char* s)\n\
@@ -87,6 +95,7 @@ public:\n\
 	{\n\
 		set_name(\"%s\");\n\
 		insert_native_function(\"yyinput\", (object_fp)&orcaParseObject::ex_yyinput);\n\
+		insert_native_function(\"yyunput\", (object_fp)&orcaParseObject::ex_yyunput);\n\
 		insert_native_function(\"yyerror\", (object_fp)&orcaParseObject::ex_yyerror);\n\
 	}\n\
 	\n\
@@ -110,6 +119,11 @@ public:\n\
 		buff[1] = 0;\n\
 		if (buff[0] == 0 || buff[0]  == -1) return \"\";\n\
 		return buff;\n\
+	}\n\
+	orcaData ex_yyunput(orcaVM* vm, int n)\n\
+	{\n\
+		if (n<1) vm->need_param();\n\
+		parse_unput(vm->get_param(0).String().c_str());\n\
 	}\n\
 	\n\
 	orcaData ex_yyerror(orcaVM* vm, int n)\n\
