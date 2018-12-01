@@ -72,7 +72,7 @@ def client
 	{
 		header = ..sock.recv(cached.magic.length() + 5);
 		if header.starts_with(cached.magic) {
-			len = header[-5:-1).integer();
+			len = header[-5:].integer();
 		}
 		else {
 			..sock.recv(0, 0);

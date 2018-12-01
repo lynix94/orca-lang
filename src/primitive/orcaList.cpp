@@ -140,7 +140,7 @@ orcaData orcaList::slice(int start, int end, bool include_right)
 	int i;
 	for(i=0; i<start; i++) li++;
 
-	if (!reverse) {
+	if (reverse == false) {
 		for(; i<end; i++) {
 			lst->push_back(*li++);
 		}
@@ -150,12 +150,12 @@ orcaData orcaList::slice(int start, int end, bool include_right)
 		}
 	}
 	else {
-		for(; i<end; i++) {
-			lst->push_front(*li++);
+		if (include_right == false) {
+			li++;
 		}
 
-		if (include_right && li != m_value.end()) {
-			lst->push_front(*li);
+		for(; i<end; i++) {
+			lst->push_front(*li++);
 		}
 	}
 

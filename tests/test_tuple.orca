@@ -11,15 +11,28 @@ if a[0:] != a {
 	throw test.tuple <- 'tuple slice fail';
 }
 
-print: a[-1:0);
-if a[-1:0) != (5, 4, 3, 2, 1,) {
+print: a[-1:0];
+if a[-1:0] != (5, 4, 3, 2,) {
 	throw test.tuple <- 'tuple reverse fail';
 }
+
+print: a[-1:0+];
+if a[-1:0+] != (5, 4, 3, 2, 1) {
+	throw test.tuple <- 'tuple reverse fail';
+}
+
 
 b = a[2:3];
 
 print: b;
-if b != [3].tuple() {	# (3) does not means tuple (expression with paren)
+if b != (3,) {
+	throw test.tuple <- 'tuple index fail';
+}
+
+b = a[2:3+];
+
+print: b;
+if b != [3, 4].tuple() {
 	throw test.tuple <- 'tuple index fail';
 }
 

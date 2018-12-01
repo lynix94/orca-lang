@@ -17,8 +17,8 @@ if a[0:] != a {
 	throw test.list <- 'list slice fail';
 }
 
-print: a[-1:0);
-if a[-1:0) != [ 5, 4, 3, 2, 1, ] {
+print: a[-1:0];
+if a[-1:0] != [ 5, 4, 3, 2, ] {
 	throw test.list <- 'list reverse fail';
 }
 
@@ -26,6 +26,13 @@ b = a[2:3];
 
 print: b;
 if b != [3] {
+	throw test.list <- 'list index fail';
+}
+
+b = a[2:3+];
+
+print: b;
+if b != [3, 4] {
 	throw test.list <- 'list index fail';
 }
 

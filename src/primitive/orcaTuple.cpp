@@ -139,10 +139,13 @@ orcaData orcaTuple::slice(int start, int end, bool include_right)
 	if (end > len) end = len;
 
 	orcaTuple* tup = new orcaTuple();
-	if (!reverse) {
+	if (reverse == false) {
 		vector<orcaData>::iterator vis = m_value.begin() + start;
 		vector<orcaData>::iterator vie = m_value.begin() + end;
 		if (include_right) vie++;
+		if (vie > m_value.end()) {
+			vie = m_value.end();
+		}
 
 		copy(vis, vie, back_inserter(tup->m_value));
 		for_each(tup->m_value.begin(), tup->m_value.end(), RC_INC());
@@ -154,6 +157,9 @@ orcaData orcaTuple::slice(int start, int end, bool include_right)
 			m_value.rbegin() + m_value.size() - start;
 
 		if (include_right) vie++;
+		if (vie > m_value.rend()) {
+			vie = m_value.rend();
+		}
 
 		copy(vis, vie, back_inserter(tup->m_value));
 		for_each(tup->m_value.begin(), tup->m_value.end(), RC_INC());

@@ -137,6 +137,7 @@ under				{ g_parser->n_tok++; return UNDER; }
 
 "->"				{ g_parser->n_tok++; return RIGHT_ARROW; }
 "<-"				{ g_parser->n_tok++; return LEFT_ARROW; }
+"+]"				{ g_parser->n_tok++; return IR_BRACKET; }
 
 
 

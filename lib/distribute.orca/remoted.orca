@@ -5,7 +5,6 @@ using pack;
 using distribute.remoted;
 
 print: '## dist server start';
-
 def sock;
 def shut_down;
 def port;
@@ -66,7 +65,7 @@ def client
 	{
 		header = ..sock.recv(remoted.magic.length() + 5);
 		if header.starts_with(remoted.magic) {
-			len = header[-5:-1).integer();
+			len = header[-5:].integer();
 		}
 		else {
 			..sock.recv(0, 0);

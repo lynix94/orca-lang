@@ -58,7 +58,7 @@ def server
 	{
 		header = ..sock.recv(remotec.magic.length() + 5);
 		if header.starts_with(remotec.magic) {
-			len = header[-5:-1).integer();
+			len = header[-5:].integer();
 		}
 		else {
 			..sock.recv(0, 0);

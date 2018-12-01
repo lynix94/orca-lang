@@ -181,6 +181,7 @@ using namespace std;
 %token EVAL
 %token LAMBDA
 %token UNDER
+%token IR_BRACKET
 
 %token<cp> NAME
 %token<cp> STRING
@@ -322,7 +323,7 @@ assign_target:/*{{{*/
 			g_op->assign_list(false);
 			g_op->pop_stack();
 		}
-	| postfix_object '[' slice_expression ')'
+	| postfix_object '[' slice_expression IR_BRACKET
 		{
 			g_op->assign_list(true);
 			g_op->pop_stack();
@@ -411,7 +412,7 @@ channel_assign_target:/*{{{*/
 			g_op->assign_list(false);
 			g_op->pop_stack();
 		}
-	| postfix_object '[' slice_expression ')'
+	| postfix_object '[' slice_expression IR_BRACKET
 		{
 			g_op->rotate3();
 			g_op->assign_list(true);
@@ -1702,7 +1703,7 @@ assign_expr:	/*{{{*/
 
 			g_op->assign_list(false);
 		}
-	| postfix_object '[' slice_expression ')' assign_type 
+	| postfix_object '[' slice_expression IR_BRACKET assign_type 
 		{
 			if ($5 != '=') {
 				g_op->dup2(); 
@@ -2250,7 +2251,7 @@ postfix_object:/*{{{*/
 		{
 			g_op->listat(false);
 		}
-	| postfix_object '[' slice_expression ')'
+	| postfix_object '[' slice_expression IR_BRACKET
 		{
 			g_op->listat(true);
 		}

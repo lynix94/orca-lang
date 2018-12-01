@@ -28,6 +28,11 @@ if str[3:6] != '345' {
 	throw test.string <- 'string slice fail';
 }
 
+print: str[3:6+];
+if str[3:6+] != '3456' {
+	throw test.string <- 'string slice fail';
+}
+
 print: str[-3:0];
 if str[-3:] != '789' {
 	throw test.string <- 'string slice fail';
@@ -35,6 +40,11 @@ if str[-3:] != '789' {
 
 print: str[5:0];
 if str[5:0] != '54321' {
+	throw test.string <- 'string reverse slice fail';
+}
+
+print: str[5:0+];
+if str[5:0+] != '543210' {
 	throw test.string <- 'string reverse slice fail';
 }
 
@@ -96,18 +106,22 @@ if str[0:3] != '012' {
 	throw test.string <- 'string slicing fail';
 }
 
-print(str[0:3));
-if str[0:3) != '0123' {
+print(str[0:3+]);
+if str[0:3+] != '0123' {
 	throw test.string <- 'string slicing fail';
 }
 
-print(str[-1:0) );	# reverse
-if str[-1:0) != '9876543210' {
+print(str[-1:0] );	# reverse
+if str[-1:0] != '987654321' {
 	throw test.string <- 'string slicing fail';
 }
 
-print(str[3:3+3]);
-if str[3:3+3] != '345' {
+if str[-1:0+] != '9876543210' {
+	throw test.string <- 'string slicing fail';
+}
+
+print(str[3:3+3+]);
+if str[3:3+3+] != '3456' {
 	throw test.string <- 'string slicing fail';
 }
 
