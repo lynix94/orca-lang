@@ -281,6 +281,11 @@ bool parserParser::parse(const string& filename)/*{{{*/
 		}
 	}
 	catch(const char* cp) {
+		print("[%s - %d]%s\n", filename.c_str(), lineno, cp);
+		try_parse(compile_string);
+		if (!g_parser->is_interactive() and !g_parser->is_eval()) {
+			exit(0);
+		}
 		return false;
 	}
 	
@@ -408,12 +413,17 @@ void parserParser::try_parse(const string& src)/*{{{*/
 
 		// parse
 		init();
-		int rv = yyparse();
-		if (rv != 0) {
-			//printf("fail again at %d\n", lineno);
+		try {
+			int rv = yyparse();
+			if (rv != 0) {
+				//printf("fail again at %d\n", lineno);
+			}
+			else {
+				break;
+			}
 		}
-		else {
-			break;
+		catch (const char* cp) {
+			print("[%s - %d]%s\n", filename.c_str(), lineno, cp);
 		}
 	}
 }
