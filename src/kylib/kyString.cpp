@@ -123,7 +123,7 @@ int kyString::hash(const string& str, int mod)/*{{{*/
 }
 /*}}}*/
 
-vector<string> kyString::split(const string& str, const string& by, int count) /*{{{*/
+vector<string> kyString::split(const string& str, const string& by, int count, bool keep_empty) /*{{{*/
 {	
 	vector<string> vs;
 	int start = 0;
@@ -136,8 +136,14 @@ vector<string> kyString::split(const string& str, const string& by, int count) /
 			break;
 		}
 
-		if (r-start == 0) { } // nothing
-		else vs.push_back(str.substr(start, r - start));
+		if (r-start == 0) { // nothing
+			if (keep_empty) {
+				vs.push_back("");
+			}
+		}
+		else {
+			 vs.push_back(str.substr(start, r - start));
+		}
 		start = r+by.length();
 
 		c++;
@@ -151,7 +157,7 @@ vector<string> kyString::split(const string& str, const string& by, int count) /
 }
 /*}}}*/
 
-vector<string> kyString::split(const string& str, regex& re, int count) /*{{{*/
+vector<string> kyString::split(const string& str, regex& re, int count, bool keep_empty) /*{{{*/
 {	
 	vector<string> vs;
 	int start = 0;
@@ -164,8 +170,14 @@ vector<string> kyString::split(const string& str, regex& re, int count) /*{{{*/
 		eiter = str.begin() + str.length();
 
 		if ( regex_search(siter, eiter, mr, re) ) {
-			if ((mr[0].first - str.begin() - start) == 0) { } // nothing 
-			else vs.push_back(str.substr(start, (mr[0].first - str.begin()) - start));
+			if ((mr[0].first - str.begin() - start) == 0) { // nothing 
+				if (keep_empty) {
+					vs.push_back("");
+				}
+			}
+			else {
+				vs.push_back(str.substr(start, (mr[0].first - str.begin()) - start));
+			}
 		}
 		else {
 			vs.push_back(str.substr(start));
@@ -182,6 +194,19 @@ vector<string> kyString::split(const string& str, regex& re, int count) /*{{{*/
 	} while(true);
 
 	return vs;
+}
+/*}}}*/
+
+string kyString::join(vector<string>& src, const string& with) /*{{{*/
+{	
+	stringstream result;
+
+	for (int i=0; i<src.size(); i++) {
+		result << src[i];
+		result << with;
+	}
+
+	return result.str();
 }
 /*}}}*/
 

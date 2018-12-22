@@ -47,9 +47,6 @@ void yyerror(const char* s)/*{{{*/
 	}
 
 	print("[%s - %d]%s, nearby('%s')\n", g_parser->filename.c_str(), g_parser->lineno, s, lexer->YYText());
-	if (!g_parser->is_interactive() and !g_parser->is_eval()) {
-		exit(0);
-	}
 }/*}}}*/
 
 void print(const char *fmt, ...)/*{{{*/
@@ -235,15 +232,28 @@ bool parserParser::parse(const string& filename)/*{{{*/
 	lineno = 1;
 	this->filename = filename;
 
+	// read for error recovery
+	fseek(curr_fp, 0, SEEK_END);
+	int f_size = ftell(curr_fp);
+	fseek(curr_fp, 0, SEEK_SET);
+
+	string compile_string;
+	compile_string.resize(f_size);
+	size_t ret = fread(&compile_string[0], 1, f_size, curr_fp);
+	fseek(curr_fp, 0, SEEK_SET);
+
+
 	// init
 	parserCode::init();
 
-	string module_name;
-	if (filename.rfind("/") > 0) 
+	string module_name; 
+	if (filename.rfind("/") > 0) {
 		module_name = filename.substr( filename.rfind("/")+1 );
+	}
 
-	if (filename.rfind(".") > 0) 
+	if (filename.rfind(".") > 0) {
 		module_name = module_name.substr( 0, module_name.rfind(".") );
+	}
 
 	this->module_name = module_name;
 
@@ -257,6 +267,11 @@ bool parserParser::parse(const string& filename)/*{{{*/
 	try {
 		int ret = yyparse();
 		if (ret != 0) {
+			try_parse(compile_string);
+			if (!g_parser->is_interactive() and !g_parser->is_eval()) {
+				exit(0);
+			}
+
 			if (g_parser->n_tok > 0) {
 				return false;
 			}
@@ -266,7 +281,6 @@ bool parserParser::parse(const string& filename)/*{{{*/
 		}
 	}
 	catch(const char* cp) {
-		printf("%s\n", cp);
 		return false;
 	}
 	
@@ -354,11 +368,62 @@ bool parserParser::parse_context_file(const string& filename, const string& mod_
 
 extern orcaData g_last_pop_stack;
 
+static string line_replace(const string& src)
+{
+	stringstream buff;
+	for(int i=0; i<src.length(); i++) {
+		if (src[i] == '{') {
+			buff << "{";
+		}
+
+		if (src[i] == '}') {
+			buff << "}";
+		}
+	}
+
+	return buff.str();
+}
+
+void parserParser::try_parse(const string& src)/*{{{*/
+{
+	vector<string> lines = kyString::split(src, "\n", INT_MAX, true);
+	//printf("compile string: '%s'\n", src.c_str());
+
+	for (int i=0; i<10; i++) {
+		// replace with
+		if (lineno < 0 || lineno > lines.size()) {
+			return;
+		}
+		lines[lineno-1] = line_replace(lines[lineno-1]);
+		string new_src = kyString::join(lines, "\n");
+	
+		//printf(">>> try %d: '%s'\n", i, new_src.c_str());
+		curr_fp = fmemopen((void*)new_src.c_str(), new_src.size(), "r");
+
+		// init
+		lineno = 1;
+		parserCode::init();
+		parserCode::push_code_stack((char*)"try", NULL);
+		code_top->init_current();  
+
+		// parse
+		init();
+		int rv = yyparse();
+		if (rv != 0) {
+			//printf("fail again at %d\n", lineno);
+		}
+		else {
+			break;
+		}
+	}
+}
+/*}}}*/
+
 orcaData parserParser::eval(orcaVM* vm, const string& src)/*{{{*/
 {
 	set_eval(true);
 
-	printf(">>> eval: %s\n", src.c_str());
+	//printf(">>> eval: %s\n", src.c_str());
 	curr_fp = fmemopen((void*)src.c_str(), src.size(), "r");
 
 	// init

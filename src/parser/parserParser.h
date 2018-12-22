@@ -89,6 +89,7 @@ public:
 	bool parse_context_file(const string& filename, const string& mod_name, const string& sub_postfix);
 	bool interpret(orcaVM* vm);
 	orcaData eval(orcaVM* vm, const string& src);
+	void try_parse(const string& src);
 
 	void set_interactive(bool flag);
 	bool is_interactive();
@@ -106,7 +107,6 @@ public:
 	int lineno;
 	string filename;
 	string module_name;
-
 
 	bool flag_interactive;
 	bool flag_eval;
