@@ -1094,7 +1094,6 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code,
 			break;
 		  }
 
-
 		case OP_USING: {
 				PRINT1("\t\t  using: %s\n", &c[i+2]);
 				bool ret = false;
@@ -1164,8 +1163,8 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code,
 			break;
 
 
-		case OP_DEF_CONTEXT_START:    // this, ctx_mod_len, ctx_mod, flag, name_len, name, code_len, code, param_n, params
-		case OP_DEF_CONTEXT_UNDER_START: { // this, ctx_mod_len, ctx_mod, flag, name_len, name, under_len, under, code_len, code, param_n, params
+		case OP_DEF_CONTEXT_START:    // this, ctx_mod_len, ctx_mod, flag, name_len, name, code_len, code, param_n, params, pos_n, pos
+		case OP_DEF_CONTEXT_UNDER_START: { // this, ctx_mod_len, ctx_mod, flag, name_len, name, under_len, under, code_len, code, param_n, params, pos_n, pos
 			bool is_under = false;
 			if ((unsigned char)c[i] == OP_DEF_UNDER_START) {
 				is_under = true;
@@ -1214,7 +1213,19 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code,
 				params.push_back(cp);
 			}
 
-			orcaData ctx = do_context(ctx_mod, name, code, last_write_time, params);
+			// pos_map
+			map<string, int> pos_map;
+			int pos_n  = c[++idx];
+			for (int j=0; j<pos_n; j++) {
+				int name_len = c[++idx];
+				const char* cp = &c[++idx];
+				idx += name_len-1;
+				int line_no = *(int*)&c[++idx];
+				idx += sizeof(int)-1;
+				pos_map[cp] = line_no;
+			}
+
+			orcaData ctx = do_context(ctx_mod, name, code, last_write_time, params, pos_map);
 			if (c[i +1+ctx_mod_len +1] & BIT_DEFINE_STATIC) {
 				op->insert_static(name, ctx.Object());
 			}
@@ -3175,7 +3186,7 @@ fast_jmp:
 }
 /*}}}*/
 
-orcaData orcaVM::do_context(const char* ctx_mod, const char* name, const char* cp, time_t last_write_time, vector<const char*>& params)/*{{{*/
+orcaData orcaVM::do_context(const char* ctx_mod, const char* name, const char* cp, time_t last_write_time, vector<const char*>& params, map<string, int>& pos_map)/*{{{*/
 {
 	orcaData out;
 	orcaObject* ctx_modp;
@@ -3205,7 +3216,7 @@ orcaData orcaVM::do_context(const char* ctx_mod, const char* name, const char* c
 	ctx_modp = curr;
 
 	// set last write time
-	orcaDatetime* dp = new orcaDatetime(last_write_time);
+	orcaDatetime* ts = new orcaDatetime(last_write_time);
 
 	// set params
 	orcaTuple* tp = new orcaTuple(params.size());
@@ -3214,13 +3225,23 @@ orcaData orcaVM::do_context(const char* ctx_mod, const char* name, const char* c
 		tp->update(i, d);
 	}
 
+	// set pos
+	orcaMap *mp = new orcaMap();
+	map<string, int>::iterator it;
+	for (it = pos_map.begin(); it != pos_map.end(); ++it) {
+		orcaData key = it->first;
+		orcaData value = it->second;
+		mp->update(key, value);
+	}
+
 	// now let's compile
 	push_stack(ctx_modp);
 	push_param(name);
-	push_param(dp);
+	push_param(ts);
 	push_param(cp);
 	push_param(tp);
-	call(4);
+	push_param(mp);
+	call(5);
 
 	out = m_stack->pop();
 	if (is<TYPE_OBJ>(out) == false) {

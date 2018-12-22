@@ -459,7 +459,7 @@ retry:
 	}
 #endif
 
-	g_shell_start = parser_starts_with(buff, ";");
+	g_shell_start = (parser_starts_with(buff, ";") >= 0);
 
 	if (g_parser->is_interactive()) {
 		if (g_shell_start) {
@@ -658,11 +658,11 @@ string orcaFlexLexer::get_raw_context()/*{{{*/
 }
 /*}}}*/
 
-const char* orcaFlexLexer::get_context()/*{{{*/
+const char* orcaFlexLexer::get_context(map<string, int>& pos_map)/*{{{*/
 {
 	string raw_str = get_raw_context();
 	string ctx, def;
-	parser_split_ctx_def(raw_str, ctx, def);
+	parser_split_ctx_def(raw_str, ctx, def, pos_map);
 
 	yyunput_string(def.c_str());
 	

@@ -14,6 +14,7 @@
 #include <FlexLexer.h>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "orcaData.h"
 
@@ -31,7 +32,7 @@ public:
 	const char* get_comment(char end);
 
 	string get_raw_context();
-	const char* get_context();
+	const char* get_context(map<string, int>& pos_map);
 	const char* get_hex_string(char end);
 	const char* get_bin_string(char end);
 
@@ -72,8 +73,8 @@ class orcaVM;
 void print(const char* fmt, ...);
 void hex_dump(unsigned char* data, int len);
 
-void parser_split_ctx_def(const string& src, string& ctx, string& def);
-bool parser_starts_with(const char* line, const char* word);
+void parser_split_ctx_def(const string& src, string& ctx, string& def, map<string, int>& pos_map);
+int parser_starts_with(const char* line, const char* word);
 
 
 class parserParser

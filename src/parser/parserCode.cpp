@@ -178,7 +178,8 @@ parserCode::parserCode(const char* module_name, vector<const char*>* param, /*{{
 
 parserCode::parserCode(const char* ctx_type, const char* ctx_code, /*{{{*/
 				const char* module_name, vector<const char*>* param,
-				int flag_define, vector<const char*>* supers, const char* under_path )
+				int flag_define, vector<const char*>* supers, const char* under_path,
+				map<string, int>& pos_map)
 {
 	m_name = module_name;
 
@@ -240,6 +241,26 @@ parserCode::parserCode(const char* ctx_type, const char* ctx_code, /*{{{*/
 		m_def.push_back(0);
 	}
 
+	// pos
+	if (pos_map.empty() == false) {
+		m_def.push_back(pos_map.size());
+
+		map<string, int>::iterator it;
+		for (it = pos_map.begin(); it != pos_map.end(); ++it) {
+			const char* cp = it->first.c_str();
+			int len = strlen(cp);
+			if (len > 254) {
+				throw "name exceeds length";
+			}
+
+			m_def.push_back(len + 1);
+			copy(cp, cp + len, back_inserter(m_def));
+			m_def.push_back(0);
+			cp = (char*)&it->second;
+			copy(cp, cp+sizeof(int), back_inserter(m_def));
+		}
+	}
+
 	// super
 	if (supers) {
 		for (int i=0; i<supers->size(); i++) {
@@ -255,6 +276,7 @@ parserCode::parserCode(const char* ctx_type, const char* ctx_code, /*{{{*/
 			m_def.push_back(0);
 		}
 	}
+
 }
 /*}}}*/
 
@@ -583,9 +605,10 @@ void parserCode::push_code_stack(const char* name, vector<const char*>* param, i
 
 void parserCode::push_context_stack(const char* type, const char* code,/*{{{*/
 								const char* name, vector<const char*>* param, int flag_define,
-								vector<const char*>* super_class, const char* under_path)
+								vector<const char*>* super_class, const char* under_path,
+								map<string, int>& pos_map)
 {
-	parserCode* c = new parserCode(type, code, name, param, flag_define, super_class, under_path);
+	parserCode* c = new parserCode(type, code, name, param, flag_define, super_class, under_path, pos_map);
 	parserCode::m_codeStack.push_back(c);
 }
 /*}}}*/

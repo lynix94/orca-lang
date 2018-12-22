@@ -29,8 +29,9 @@ public:
 	parserCode(const char* s, vector<const char*>* param, int flag = 0,
 			vector<const char*>* supers = NULL, const char* under_path = NULL);
 	parserCode(const char* type, const char* code,
-			const char* s, vector<const char*>* param, int flag = 0,
-			vector<const char*>* supers = NULL, const char* under_path = NULL);
+			const char* s, vector<const char*>* param, int flag,
+			vector<const char*>* supers, const char* under_path,
+			map<string, int>& pos_map);
 	~parserCode();
 
 	static void init();
@@ -75,8 +76,8 @@ public:
 
 	static void push_context_stack(const char* type, const char* code,
 							const char* name, vector<const char*>* param,
-							int flag = 0, vector<const char*>* super_class = NULL,
-							const char* under_path = NULL);
+							int flag, vector<const char*>* super_class,
+							const char* under_path, map<string, int>& pos_map);
 
 	// just case for exception in interpreter
 	static void reinit_code_stack_for_interpreter();

@@ -164,7 +164,7 @@ public:
 
 	orcaData do_context(const char* ctx_mod, const char* name, 
 						const char* cp, time_t last_write_time,
-						vector<const char*>& params);
+						vector<const char*>& params, map<string, int>& pos_map);
 
 	orcaData channel_in(orcaData d);
 	bool channel_out(orcaData d, int num);

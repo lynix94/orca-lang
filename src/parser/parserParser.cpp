@@ -22,6 +22,7 @@
 #include "parserCode.h"
 #include "orcaException.h"
 #include "orcaVM.h"
+#include "kyString.h"
 
 parserParser s_parser;
 parserParser* g_parser = &s_parser;
@@ -77,20 +78,18 @@ void hex_dump(unsigned char* data, int len)/*{{{*/
 }
 /*}}}*/
 
-bool parser_starts_with(const char* line, const char* word)/*{{{*/
+int parser_starts_with(const char* line, const char* word)/*{{{*/
 {
-	bool ret = false;
+	int ret = -1;
 	for(int i=0; i<strlen(line); i++) {
 		char c = line[i];
 
 		if (strncmp(&line[i], word, strlen(word)) == 0) {
-			ret = true;
+			ret = i;
 			break;
 		}
 
-		if (c != ' ' && c != '\t' && 
-		    c != '\n' && c != '\r') 
-		{
+		if (!isspace(c)) {
 			break;
 		}
 	}
@@ -119,7 +118,7 @@ static int count_in(const char* line, const char* word)/*{{{*/
 }
 /*}}}*/
 
-void parser_split_ctx_def(const string& src, string& ctx, string& def)/*{{{*/
+void parser_split_ctx_def(const string& src, string& ctx, string& def, map<string, int>& pos_map)/*{{{*/
 {
 	istringstream f(src);
 	string line;	
@@ -127,9 +126,43 @@ void parser_split_ctx_def(const string& src, string& ctx, string& def)/*{{{*/
 
 	int open = 0;
 	int close = 0;
+	int line_no = -1;
 	while (getline(f, line)) {
-		if (parser_starts_with(line.c_str(), "def")) {
+		line_no++;
+		int start = parser_starts_with(line.c_str(), "def");
+		if (start > 0) {
 			open = close = 0;
+
+			// get name
+			int name_start = -1;
+			int name_end = -1;
+			bool is_start = false;
+			int i=start;
+			for (; i<line.length(); i++) {
+				if (is_start == false && isspace(line[i])) {
+					is_start = true;
+					continue;
+				}
+
+				if (is_start == true && name_start < 0 && !isspace(line[i])) {
+					name_start = i;
+				}
+
+				if (name_start >= 0 && 
+					(isspace(line[i]) || line[i] == '(' || line[i] == '{'))
+				{
+					name_end = i;
+					break;
+				}
+			}
+			if (i == line.length() && name_start > 0) {
+				name_end = line.length();
+			}
+
+			if (name_start > 0 && name_end > 0) {
+				string name = line.substr(name_start, name_end - name_start);
+				pos_map[name] = line_no;
+			}
 
 			while (true) {
 				def_ss << line << "\n";
@@ -143,9 +176,10 @@ void parser_split_ctx_def(const string& src, string& ctx, string& def)/*{{{*/
 				}
 
 				getline(f, line);
+				line_no++;
 			}
 		}
-		else if (parser_starts_with(line.c_str(), "using")) {
+		else if (parser_starts_with(line.c_str(), "using") > 0) {
 			def_ss << line << "\n";
 			ctx_ss << "\n";
 		}
@@ -262,13 +296,14 @@ bool parserParser::parse_context_file(const string& filename, const string& mod_
 
 	string code;
 	string def;
-	parser_split_ctx_def(source, code, def);
+	map<string, int> pos_map;
+	parser_split_ctx_def(source, code, def, pos_map);
 
 	// init
 	parserCode::init();
 	this->module_name = mod_name;
 
-	parserCode::push_context_stack((char*)sub_postfix.c_str(), (char*)code.c_str(), (char*)mod_name.c_str(), NULL);
+	parserCode::push_context_stack((char*)sub_postfix.c_str(), (char*)code.c_str(), (char*)mod_name.c_str(), NULL, 0, NULL, NULL, pos_map);
 
 	// parse
 	init();

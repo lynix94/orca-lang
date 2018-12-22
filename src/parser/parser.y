@@ -1157,11 +1157,12 @@ define_context_stmt:/*{{{*/
 				name = buff;
 			}
 
-			const char* cp = lexer->get_context();
+			map<string, int> pos_map;
+			const char* cp = lexer->get_context(pos_map);
 			//print("lexer->get_context(): '%s'\n", cp);
 
 			name_list_t* vp = (name_list_t*)$5;
-			code_top->push_context_stack($3, cp, name, vp, $1, supers, $7);
+			code_top->push_context_stack($3, cp, name, vp, $1, supers, $7, pos_map);
 
 			if (vp && strncmp((*vp)[vp->size()-1], "...", 3) == 0) {
 				code_top->set_argv_on();
@@ -1308,8 +1309,9 @@ lambda_context_header:/*{{{*/
 			snprintf(name, 1024, "__%s_%d_context", g_parser->module_name.c_str(), count++);
 
 			name_list_t* vp = (name_list_t*)$4;
-			const char* cp = lexer->get_context();
-			code_top->push_context_stack($3, cp, name, vp, 0, supers);
+			map<string, int> pos_map;
+			const char* cp = lexer->get_context(pos_map);
+			code_top->push_context_stack($3, cp, name, vp, 0, supers, NULL, pos_map);
 
 			// check argv
 			if (vp && strncmp((*vp)[vp->size()-1], "...", 3) == 0) {
