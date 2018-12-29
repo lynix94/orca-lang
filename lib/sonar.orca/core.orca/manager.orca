@@ -22,21 +22,32 @@ def create_app(basepath, appname)
 
 def execute(...argv)
 {
-	print: argv;
+	def usage()
+	{
+		msg = '''[usage]
+orca manage runserver 127.0.0.1:8000'
+orca manage newapp APP_NAME
+orca manage migrate ''';
+
+		print: msg;
+	}
+
+	#print: argv;
 	if argv == nil || argv.size() == 0 {
-		print: '# nothing todo';
+		my.usage();
 		return;
 	}
 
 	switch argv[0]
 	{
 	case 'runserver':
-		print: '# runserver';
 		if argv.size() < 2 {
-			print: 'insufficient parameter: address is needed';
+			print: 'insufficient parameter: address is needed\n';
+			my.usage();
 			return;
 		}
 
+		print: 'runserver...';
 		while true {
 			pid = os.fork();
 			if pid == 0 {
@@ -58,20 +69,27 @@ def execute(...argv)
 		}
 
 	case 'newapp':
-		print: '# newapp';
 		if argv.size() < 2 {
-			print: 'insufficient parameter: app name is required';
+			print: 'insufficient parameter: app name is required\n';
+			my.usage();
+			return;
+		}
+
+		if os.isexists('%s.orca' % argv[1]) {
+			print: '%s already exists' % argv[1];
 			return;
 		}
 
 		..create_app('.', argv[1]);
+		print: 'newapp %s is created' % argv[1];
 
 	case 'migrate':
-		print: '# migrate';
 		sonar.orm.migrate(os.cwd());
+		print: 'migrate done';
 	
 	default:
-		print: '# nothing todo';
+		my.usage();
+		return;
 	}
 }
 

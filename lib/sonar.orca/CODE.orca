@@ -1,15 +1,20 @@
 using os;
 using io.open;
 
-print: argv;
+#print: argv;
 
 if argv == nil || argv.size() < 2 {
+	print: 'usage: orca sonar create NEW_PROJECT_NAME';
 	return;
 }
 
 
 if argv[0] == 'create' {
 	project_name = argv[1];
+}
+else {
+	print: 'usage: orca sonar create NEW_PROJECT_NAME';
+	return;
 }
 
 os.mkdir('%s' % project_name);
