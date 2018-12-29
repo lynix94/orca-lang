@@ -307,18 +307,18 @@ bool parserOP::check_lvar(const char* s)/*{{{*/
 
 void parserOP::push_lvar(const char* s)/*{{{*/
 { 
-	// first, check if self recurrsion
-	if (strcmp(s, code_top->get_name())==0) {  // recurrsion
-		push_reserved(OP_PUSH_MY);
-		return;
-	}
-
 	// local should be faster than using space
 	bool ret = code_top->check_lvar(s);
 	if (ret == true) {
 		short idx = code_top->find_lvar(s);
 		code_top->push_char(OP_PUSH_LVAR);
 		code_top->push_short(idx);
+		return;
+	}
+
+	// second check if self recurrsion
+	if (strcmp(s, code_top->get_name())==0) {  // recurrsion
+		push_reserved(OP_PUSH_MY);
 		return;
 	}
 
