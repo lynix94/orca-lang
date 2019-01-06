@@ -1170,7 +1170,7 @@ define_context_stmt:/*{{{*/
 		}
 	statement_block
 		{
-			code_top->pop_code_stack();
+			parserCode::pop_code_stack();
 		}
 	;
 /*}}}*/
@@ -1251,7 +1251,7 @@ lambda_object:/*{{{*/
 		}
 	| lambda_context_header statement_block
 		{
-			code_top->pop_code_stack();
+			parserCode::pop_code_stack();
 			$$ = $1;
 		}
 	| lambda_decode_header '{' decode_pattern_stmt_list '}'

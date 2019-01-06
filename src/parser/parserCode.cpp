@@ -242,23 +242,20 @@ parserCode::parserCode(const char* ctx_type, const char* ctx_code, /*{{{*/
 	}
 
 	// pos
-	if (pos_map.empty() == false) {
-		m_def.push_back(pos_map.size());
-
-		map<string, int>::iterator it;
-		for (it = pos_map.begin(); it != pos_map.end(); ++it) {
-			const char* cp = it->first.c_str();
-			int len = strlen(cp);
-			if (len > 254) {
-				throw "name exceeds length";
-			}
-
-			m_def.push_back(len + 1);
-			copy(cp, cp + len, back_inserter(m_def));
-			m_def.push_back(0);
-			cp = (char*)&it->second;
-			copy(cp, cp+sizeof(int), back_inserter(m_def));
+	m_def.push_back(pos_map.size());
+	map<string, int>::iterator it;
+	for (it = pos_map.begin(); it != pos_map.end(); ++it) {
+		const char* cp = it->first.c_str();
+		int len = strlen(cp);
+		if (len > 254) {
+			throw "name exceeds length";
 		}
+
+		m_def.push_back(len + 1);
+		copy(cp, cp + len, back_inserter(m_def));
+		m_def.push_back(0);
+		cp = (char*)&it->second;
+		copy(cp, cp+sizeof(int), back_inserter(m_def));
 	}
 
 	// super

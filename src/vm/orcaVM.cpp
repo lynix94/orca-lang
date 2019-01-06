@@ -944,7 +944,6 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code,
 				v.push_back(NULL);
 				i += 1 + 1 + c[i+1+1];
 				current = owner;
-				PRINT1("\t\t CODE DEF start (%p)\n", code);
 				if (mod == NULL) mod = current;
 				break;
 			}
@@ -965,11 +964,11 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code,
 			int len = 0;
 			if (is_under) {
 				len = c[i+1+1];
-				PRINT3("\t\t DEF under start: %s under %s, (%p)\n", name, &c[i+1+1+1+len+1], d.o());
+				PRINT4("\t\t DEF under start: %s under %s, (%p) - depth:%lu\n", name, &c[i+1+1+1+len+1], d.o(), v.size());
 				op = find_object_by_path(&c[i+1+1+1+len+1]);
 			}
 			else {
-				PRINT3("\t\t DEF start: %s(%d), (%p)\n", name, c[i+1+1], d.o());
+				PRINT4("\t\t DEF start: %s(%d), (%p) - depth:%lu\n", name, c[i+1+1], d.o(), v.size());
 			}
 
 			if (c[i+1] & BIT_DEFINE_STATIC) {
@@ -1003,7 +1002,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code,
 
 
 		case OP_DEF_END:
-			PRINT0("\t\t DEF END\n");
+			PRINT1("\t\t DEF END - depth:%lu\n", v.size()-1);
 			o = v[v.size()-1];
 			if (o != NULL) { // !CODE
 				current = o;
@@ -1014,7 +1013,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code,
 			break;
 
 		case OP_DEF_UNDER_END:
-			PRINT0("\t\t DEF UNDER END\n");
+			PRINT1("\t\t DEF UNDER END - depth:%lu\n", v.size()-2);
 			o = v[v.size()-2];
 			current = o;
 			m_curr = o;
@@ -1165,6 +1164,8 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code,
 
 		case OP_DEF_CONTEXT_START:    // this, ctx_mod_len, ctx_mod, flag, name_len, name, code_len, code, param_n, params, pos_n, pos
 		case OP_DEF_CONTEXT_UNDER_START: { // this, ctx_mod_len, ctx_mod, flag, name_len, name, under_len, under, code_len, code, param_n, params, pos_n, pos
+			PRINT2("\t\t CODE DEF CONTEXT start (%p) - depth:%lu\n", code, v.size());
+
 			bool is_under = false;
 			if ((unsigned char)c[i] == OP_DEF_UNDER_START) {
 				is_under = true;

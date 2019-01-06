@@ -127,7 +127,7 @@ void parser_split_ctx_def(const string& src, string& ctx, string& def, map<strin
 	while (getline(f, line)) {
 		line_no++;
 		int start = parser_starts_with(line.c_str(), "def");
-		if (start > 0) {
+		if (start >= 0) {
 			open = close = 0;
 
 			// get name
@@ -176,7 +176,7 @@ void parser_split_ctx_def(const string& src, string& ctx, string& def, map<strin
 				line_no++;
 			}
 		}
-		else if (parser_starts_with(line.c_str(), "using") > 0) {
+		else if (parser_starts_with(line.c_str(), "using") >=  0) {
 			def_ss << line << "\n";
 			ctx_ss << "\n";
 		}
