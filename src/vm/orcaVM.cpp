@@ -1093,7 +1093,7 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code,
 			break;
 		  }
 
-		case OP_USING: {
+		case OP_USING: { // OP_USING, LEN, C_STR
 				PRINT1("\t\t  using: %s\n", &c[i+2]);
 				bool ret = false;
 				int idx = 0;
@@ -1126,12 +1126,12 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code,
 			i += 1 + c[i+1];
 			break;
 
-		case OP_USING_EXT: {
-				PRINT2("\t\t  using context: %s, %s\n", &c[i+3], &c[i+2 + c[i+1] + 1]);
+		case OP_USING_EXT: { // OP_USING_EXT, LEN_MOD, LEN_BY, MOD_PATH_C_STR, BY_C_STR
+				PRINT2("\t\t  using context: %s, %s\n", &c[i+3], &c[i+3 + c[i+1]]);
 				bool ret = false;
 				int idx = 0;
-				string mod_path = &c[i+2];
-				const char *by = &c[i+2 + c[i+1]+1];
+				string mod_path = &c[i+3];
+				const char *by = &c[i+3 + c[i+1]];
 
 				idx = mod_path.find_last_of("/");
 				if (idx > 0) { // absolute path
