@@ -100,7 +100,7 @@ orcaData orcaDirTraverse::ex_next(orcaVM* vm, int n)
 			delete it;
 		}
 		else {
-			m_iter.push_back(new fs::directory_iterator(str));
+			m_iter.push_back(it);
 		}
 	}
 

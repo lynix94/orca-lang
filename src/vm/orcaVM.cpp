@@ -823,13 +823,13 @@ orcaData& orcaVM::handle_throw(const char* name)/*{{{*/
 			  }
 			case MARK_SWITCH: 
 			  {
-				m_stack->pop();
+				m_switch_stack->pop();
 				m_local->clean_mark(MARK_SWITCH);
 				break;
 			  }
 			case MARK_SELECT: 
 			  {
-				m_stack->pop();
+				m_select_stack->pop();
 				m_local->clean_mark(MARK_SELECT);
 				break;
 			  }
