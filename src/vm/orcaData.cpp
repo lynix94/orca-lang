@@ -38,6 +38,11 @@ string format_str(orcaVM* vm, string& format, vector<orcaData>& params)/*{{{*/
 	vector<orcaData>::iterator it = params.begin();
 	for (int i=0; i<format.length(); i++) {
 		if (format[i] == '%') {
+			if (i>0 && format[i-1] == '\\') {
+				ss << format[i];
+				continue;
+			}
+
 			// keyword format
 			if (i < format.length()-1 && format[i+1] == '{') {
 				int j=i+2;

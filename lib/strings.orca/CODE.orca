@@ -12,4 +12,3 @@ def html_unescape := __clib__.strings.html_unescape;
 def url_escape := __clib__.strings.url_escape;
 def url_unescape := __clib__.strings.url_unescape;
 
-print: "it's me";

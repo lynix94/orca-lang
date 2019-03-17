@@ -214,6 +214,11 @@ public:
 
 		stringstream ss;
 		for (int i=0; i<s.length(); i++) {
+			if (s[i] == '+') {
+				ss << ' ';
+				continue;
+			}
+
 			if (s[i] == '%') {
 				if (i+2 >= s.length()) {
 					throw orcaException(vm, "url decoding failed");
@@ -259,7 +264,6 @@ public:
 
 		return ss.str();
 	}
-
 };
 
 #endif
