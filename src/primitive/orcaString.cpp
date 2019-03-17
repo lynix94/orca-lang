@@ -325,8 +325,12 @@ orcaData orcaString::ex_split(orcaVM* vm, string& str, int param_n)/*{{{*/
 				break;
 			}
 
-			if (r-start == 0) { } // nothing
-			else lp->push_back(str.substr(start, r - start));
+			if (r-start == 0) {
+				lp->push_back("");
+			}
+			else {
+				lp->push_back(str.substr(start, r - start));
+			}
 			start = r+by.length();
 
 			count--;
@@ -344,8 +348,12 @@ orcaData orcaString::ex_split(orcaVM* vm, string& str, int param_n)/*{{{*/
 			eiter = str.begin() + str.length();
 
 			if ( regex_search(siter, eiter, mr, p.re()) ) {
-				if ((mr[0].first - str.begin() - start) == 0) { } // nothing 
-				else lp->push_back(str.substr(start, (mr[0].first - str.begin()) - start));
+				if ((mr[0].first - str.begin() - start) == 0) {
+					lp->push_back("");
+				}
+				else {
+					lp->push_back(str.substr(start, (mr[0].first - str.begin()) - start));
+				}
 			}
 			else {
 				lp->push_back(str.substr(start));

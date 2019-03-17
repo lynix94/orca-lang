@@ -9,6 +9,7 @@ using __clib__;
 #ts = argv[1];
 #body = argv[2];
 #params = argv[3];
+#position = argv[4];
 
 
 return .process_context(argv...);
@@ -42,13 +43,16 @@ def process_context(...argv)
 		def __tail := '';
 		def __template;
 		def __id;
+		def __position;
 
 		def init(...argv)
 		{
 			..__id = argv[0];
 			..__template = argv[2];
+			..__position = argv[4];
 		}
 
+		# STEP 1: process prepare
 		if my.MEMBERS.has_key('prepare') {
 			ret = my.prepare(req);
 			if ret.TYPE == ''.TYPE {
@@ -56,7 +60,44 @@ def process_context(...argv)
 			}
 		}
 
-		keys = .__template.list_format();
+		# STEP 2: process embedded object
+		template = my.__template;
+		token = {,};
+		for key, value in my.MEMBERS {
+			if key.starts_with('embed_') {
+				if !my.__position.has_key(key) {
+					continue;
+				}
+
+				ret = value(req);
+				pos = my.__position[key];
+				token[pos] = ret;
+
+			}
+		}
+		if token.size() > 0 {
+			result = strings.builder();
+			start = 0;
+			lines = my.__template.split('\n');
+
+			for k, v in token { // as you know, it's ordered
+				if k > start {
+					result.push_back(strings.join('\n', lines[start:k]...));
+				}
+
+				result.push_back(v);
+				start = k+1;
+			}
+
+			result.push_back(strings.join('\n', lines[k+1:]...));
+		
+
+			template = result.string();
+		}
+
+
+		# STEP 3: process dictionary format
+		keys = template.list_format();
 		#print: keys;
 
 		dict = {,};
@@ -65,6 +106,16 @@ def process_context(...argv)
 				value = my.MEMBERS[key](req);
 				dict[key] = value;
 			}
+			elif owner.MEMBERS.has_key(key) {
+				value = owner.MEMBERS[key](req);
+				dict[key] = value;
+			}
+			elif req.get.has_key(key) {
+				dict[key] = req.get[key];
+			}
+			elif req.post.has_key(key) {
+				dict[key] = req.post[key];
+			}
 			else {
 				dict[key] = '';
 			}
@@ -72,8 +123,9 @@ def process_context(...argv)
 
 		bdr = strings.builder();
 		bdr.push_back(my.__head);
-		bdr.push_back(my.__template % dict);
+		bdr.push_back(template % dict);
 
+		# STEP 4: process script
 		for key, value in my.MEMBERS {
 			if key.starts_with('script_') {
 				bdr.push_back(value(req));

@@ -3729,7 +3729,7 @@ void orcaVM::channel_signal(orcaObject* op)/*{{{*/
 	SELECT* sp = g_select.find_select(op);
 	if (sp != NULL) {
 		sp->mutex.lock();
-		uint64_t u;
+		uint64_t u = 0;
 		ssize_t ret = write(sp->efd, &u, sizeof(uint64_t));
 		sp->mutex.unlock();
 	}

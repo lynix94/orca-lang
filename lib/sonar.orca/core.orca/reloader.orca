@@ -28,23 +28,30 @@ def get_fileinfo(path)
 {
 	src_list = {,};
 	it = os.dir_traverser(path);
-	for i in it {
-		if os.isdir(i()) {
-			continue;
-		}
-
-		basename = os.path.basename(i());
-		if basename.find('orca') > 0 {
-			if basename.find('kw') > 0 {
+	try {
+		for i in it {
+			if os.isdir(i()) {
 				continue;
 			}
 
-			if basename.starts_with('.') {
-				continue;
-			}
+			basename = os.path.basename(i());
+			if basename.find('orca') > 0 {
+				if basename.find('kw') > 0 {
+					continue;
+				}
 
-			src_list[i()] = os.last_write_time(i());
+				if basename.starts_with('.') {
+					continue;
+				}
+
+				src_list[i()] = os.last_write_time(i());
+			}
 		}
+	}
+	catch orca.type {
+		print: '###########';
+		print: path;
+		print: it;
 	}
 
 	return src_list;
