@@ -1,0 +1,15 @@
+
+
+
+
+using __clib__;
+
+
+def join := __clib__.strings.join;
+def builder := __clib__.strings.builder;
+def html_escape := __clib__.strings.html_escape;
+def html_unescape := __clib__.strings.html_unescape;
+def url_escape := __clib__.strings.url_escape;
+def url_unescape := __clib__.strings.url_unescape;
+
+print: "it's me";

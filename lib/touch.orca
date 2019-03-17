@@ -45,6 +45,7 @@ using html;
 using html.form;
 using html.form.input;
 using html.jqueryui;
+using strings;
 
 
 using os;
@@ -106,6 +107,7 @@ os.touch('./html.orca/CODE.orca');
 os.touch('./html.orca/form.orca/CODE.orca');
 os.touch('./html.orca/form.orca/input.orca');
 os.touch('./html.orca/jqueryui.orca');
+os.touch('./strings.orca/CODE.orca');
 
 
 

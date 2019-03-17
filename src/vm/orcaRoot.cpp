@@ -73,7 +73,6 @@ orcaRoot::orcaRoot()
 	insert_static("cpp", new orcaCPP());
 	insert_static("system", new orcaSystem());
 	insert_static("queue", new orcaQueue());
-	insert_static("strings", new orcaStrings());
 	insert_native_function("string", (object_fp)&orcaRoot::ex_string);
 	insert_native_function("repr", (object_fp)&orcaRoot::ex_repr);
 	insert_native_function("range", (object_fp)&orcaRoot::ex_range);
@@ -84,7 +83,7 @@ orcaRoot::orcaRoot()
 	clib->insert_static("lru", new orcaUtilLru());
 	clib->insert_static("sqlite3", new orcaSqlite3());
 	clib->insert_static("base64", new orcaBase64());
-	clib->insert_static("stringutil", new orcaStringUtil());
+	clib->insert_static("strings", new orcaStrings());
 
 #if defined(LINUX)
 #if defined(USE_GTK)

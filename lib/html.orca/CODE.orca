@@ -2,7 +2,6 @@ using html;
 using html.form;
 using sorted;
 using strings;
-using __clib__;
 
 #print: argv;
 #name = argv[0];
@@ -10,7 +9,6 @@ using __clib__;
 #body = argv[2];
 #params = argv[3];
 #position = argv[4];
-
 
 return .process_context(argv...);
 
@@ -156,8 +154,9 @@ $(document).ready(function() {
 }
 
 
-def escape := __clib__.stringutil.html_escape;
-def unescape := __clib__.stringutil.html_unescape;
+def escape := strings.html_escape;
+def unescape := strings.html_unescape;
+
 
 
 

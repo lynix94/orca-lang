@@ -1,9 +1,8 @@
 using strings;
-using __clib__;
 
 
-def escape := __clib__.stringutil.url_escape;
-def unescape := __clib__.stringutil.url_unescape;
+def escape := strings.url_escape;
+def unescape := strings.url_unescape;
 
 
 def parse_query(src)

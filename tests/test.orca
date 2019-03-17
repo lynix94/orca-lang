@@ -27,7 +27,7 @@ test_vectors = [
   'test_parse',
   'test_context',
   'test_channel',
-  'test_select',
+  #'test_select',
   'test_timer',
   'test_queue',
 ];
