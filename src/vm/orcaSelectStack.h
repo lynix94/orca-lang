@@ -45,13 +45,22 @@ struct SELECT
 	SELECT()
 	{
 		efd = eventfd(0, 0);
+		curr_val = 0;
 	}
 
 	vector<CASE> cases;
 	portMutex mutex;
 	int efd;
+	uint64_t curr_val;
 
 	void push_case(orcaObject* src, int out_num, const char* code);
+	void signal()
+	{
+		mutex.lock();
+		curr_val++;
+		write(efd, &curr_val, sizeof(uint64_t));
+		mutex.unlock();
+	}
 };
 
 class orcaSelectStack // per VM
