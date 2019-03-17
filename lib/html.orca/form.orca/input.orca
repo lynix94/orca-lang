@@ -223,6 +223,16 @@ def text(label) : input.input_base
 	return ret;
 }
 
+def textarea(label, rows, cols) : input.input_base
+{
+	ret =..__clone(my, label);
+	ret.MEMBERS['rows'] = rows;
+	ret.MEMBERS['cols'] = cols;
+	ret.type = 'textarea';
+	return ret;
+}
+
+
 def time(label) : input.input_base
 {
 	ret =..__clone(my, label);

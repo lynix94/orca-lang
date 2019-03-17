@@ -10,7 +10,7 @@ def fill_and_get(param)
 	result = {,};
 	for key, value in ..MEMBERS {
 		if value.TYPE < form.input.input_base.TYPE {
-			if param.has_key(key) {
+			if param != nil && param.has_key(key) {
 				result[key] = param[key];
 			}
 			else {
@@ -41,6 +41,9 @@ def as_p(v, value)
 	case 'submit', 'button', 'reset':
 		ret = '<p><input id="%s" name="%s" type="%s" value="%s" /></p>\n' % (v.id, v.name, v.type, v.label);
 
+	case 'textarea':
+		ret = '<p><label for="%s">%s:</label><br><textarea id="%s" name="%s" rows="%d" cols="%d"></textarea></p>\n' % (v.id, v.label, v.id, v.name, v.rows, v.cols);
+
 	default:
 		ret = '<p><label for="%s">%s:</label><input id="%s" name="%s" type="%s" value="%s"/></p>\n' % (v.id, v.label, v.id, v.name, v.type, value);
 
@@ -50,7 +53,7 @@ def as_p(v, value)
 }
 
 
-def render(form_result, decorator, method, action)
+def render(action, form_result, decorator, method)
 {
 	if method == nil {
 		method = 'POST';
@@ -93,10 +96,13 @@ def render_item(form_result, decorator)
 	}
 
 	for v in sorted(keys, lambda(a, b) { return a.serno < b.serno; }) {
-		value = nil;
+		value = '';
 
 		if form_result != nil && form_result[0].has_key(v.id) {
 			value = form_result[0][v.id];
+			if value == nil {
+				value = '';
+			}
 		}
 
 		ret = decorator(v, value);
