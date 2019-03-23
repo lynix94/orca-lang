@@ -28,6 +28,9 @@ public:
 		insert_static("put", new ex_put());
 		insert_static("open", new ex_open());
 		insert_static("input", new ex_input());
+		insert_static("stdin", init_stdin());
+		insert_static("stdout", init_stdout());
+		insert_static("stderr", init_stderr());
 		insert_static_native_function("fdselect", (object_fp)&orcaIO::ex_fdselect);
 		insert_static_native_function("fdreadable", (object_fp)&orcaIO:: ex_fdreadable);
 	}

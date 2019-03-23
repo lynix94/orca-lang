@@ -90,6 +90,7 @@ liborca_la_SOURCES = \
 		$(CORELIB_DIR)/orcaIO.cpp \
 		$(CORELIB_DIR)/orcaOS.cpp \
 		$(CORELIB_DIR)/orcaIPC.cpp \
+		$(CORELIB_DIR)/orcaFile.cpp \
 		$(KYLIB_DIR)/kyString.cpp 
 
 liborca_la_LDFLAGS = -version-number 0:5:0
