@@ -61,7 +61,7 @@ orcaData orcaSqlite3Result::ex_next(orcaVM* vm, int n)
 {
 	if (flag_ready == false) {
 		flag_ready = true;
-		return this;
+		return (*this)(vm, 0);
 	}
 
 	if (done || stmt == NULL || sqlite3_step(stmt) == SQLITE_DONE) {
@@ -69,7 +69,7 @@ orcaData orcaSqlite3Result::ex_next(orcaVM* vm, int n)
 		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
-	return this;
+	return (*this)(vm, 0);
 }
 
 orcaData orcaSqlite3Result::operator()(orcaVM* vm, int param_n)

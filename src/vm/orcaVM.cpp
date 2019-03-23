@@ -2320,7 +2320,7 @@ fast_jmp:
 				return;
 	
 			case OP_FOR: {
-				PRINT3("\t\t%p : for (%d), %d\n", c, TO_SHORT(&c[1]), TO_INT(&c[1 + sizeof(short)]));
+				PRINT4("\t\t%p : for (lv: %d), %d, depth:%d\n", c, TO_SHORT(&c[1]), TO_INT(&c[1 + sizeof(short)]), m_for_stack->size()+1);
 				int lv = TO_SHORT(&c[1]);
 				int addr = TO_INT(&c[1 + sizeof(short)]);
 
@@ -2347,7 +2347,7 @@ fast_jmp:
 
 			case OP_FOR_2: {
 				orcaData out1, out2;
-				PRINT4("\t\t%p : for (%d), %d, %d\n", c, TO_SHORT(&c[1]), TO_SHORT(&c[1 + sizeof(short)]), TO_INT(&c[1 + sizeof(short) + sizeof(short)]));
+				PRINT5("\t\t%p : for2 (lv: %d, %d), %d, depth:%d\n", c, TO_SHORT(&c[1]), TO_SHORT(&c[1 + sizeof(short)]), TO_INT(&c[1 + sizeof(short) + sizeof(short)]), m_for_stack->size()+1);
 				int lv1 = TO_SHORT(&c[1]);
 				int lv2 = TO_SHORT(&c[1 + sizeof(short)]);
 				int addr = TO_INT(&c[1 + sizeof(short) + sizeof(short)]);

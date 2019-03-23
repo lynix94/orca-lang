@@ -16,9 +16,14 @@
 #include "orcaException.h"
 #include "orcaForStack.h"
 
+void FOR::dump()
+{
+	printf("FOR{ lv1:%d, lv2:%d, idx:%d, limit: %d, is_iter2:%d }\n", lv1, lv2, idx, limit, is_iter2);
+}
+
 bool orcaForStack::push(const char* code, int lv, orcaObject* obj, orcaData& out, orcaObject* curr) 
 {
-	FOR f(code, lv, -1, curr);
+	FOR* f = new FOR(code, lv, -1, curr);
 
 	orcaData next, iter;
 	if (obj->has_member((char*)"iter", iter)) {
@@ -37,8 +42,8 @@ bool orcaForStack::push(const char* code, int lv, orcaObject* obj, orcaData& out
 		throw orcaException(NULL, "orca.type", "next is not runable");
 	}
 
-	f.iter = obj;
-	f.next = next;
+	f->iter = obj;
+	f->next = next;
 	push(f);
 
 	int dummy_i;
@@ -55,7 +60,7 @@ bool orcaForStack::push(const char* code, int lv, orcaObject* obj, orcaData& out
 bool orcaForStack::push_2(const char* code, int lv1, int lv2,
 						orcaObject* obj, orcaData& out1, orcaData& out2, orcaObject* curr) 
 {
-	FOR f(code, lv1, lv2, curr);
+	FOR *f = new FOR(code, lv1, lv2, curr);
 
 	orcaData next, iter;
 	if (obj->has_member((char*)"iter2", iter)) {
@@ -63,7 +68,7 @@ bool orcaForStack::push_2(const char* code, int lv1, int lv2,
 		vm->push_stack(iter);
 		vm->call(0); // iter2()
 		obj = vm->m_stack->pop().Object();
-		f.is_iter2 = true;
+		f->is_iter2 = true;
 	}
 	else if (obj->has_member((char*)"iter", iter)) {
 		orcaVM* vm = get_current_vm();
@@ -80,8 +85,8 @@ bool orcaForStack::push_2(const char* code, int lv1, int lv2,
 		throw orcaException(NULL, "orca.type", "next is not runable");
 	}
 
-	f.iter = obj;
-	f.next = next;
+	f->iter = obj;
+	f->next = next;
 	push(f);
 	
 	const char* dummy_code = cont(&lv1, &out1, &lv2, &out2);
@@ -97,8 +102,8 @@ bool orcaForStack::push_2(const char* code, int lv1, int lv2,
 bool orcaForStack::push_sub(const char* code, int lv, orcaObject* obj, 
 							orcaData& out, orcaObject* curr, int per)
 {
-	FOR f(code, lv, -1, curr);
-	f.limit = per;
+	FOR *f = new FOR(code, lv, -1, curr);
+	f->limit = per;
 
 	orcaData next, iter;
 	if (obj->has_member((char*)"iter", iter)) {
@@ -117,8 +122,8 @@ bool orcaForStack::push_sub(const char* code, int lv, orcaObject* obj,
 		throw orcaException(NULL, "orca.type", "next is not runable");
 	}
 
-	f.iter = obj;
-	f.next = next;
+	f->iter = obj;
+	f->next = next;
 	push(f);
 
 	int dummy_i;
@@ -132,16 +137,27 @@ bool orcaForStack::push_sub(const char* code, int lv, orcaObject* obj,
 	return true;
 }
 
-void orcaForStack::push(FOR& f)
+void orcaForStack::push(FOR* f)
 {
-	f.iter.rc_inc();
-	f.next.rc_inc();
+	f->iter.rc_inc();
+	f->next.rc_inc();
 	m_stack.push_back(f);
+
+	//printf("### push result\n");
+	//dump();
+}
+
+void orcaForStack::dump()
+{
+	for (int i=0; i<m_stack.size(); i++) {
+		FOR *f = m_stack[i];
+		f->dump();
+	}
 }
 
 FOR* orcaForStack::top() 
 {
-	return &m_stack[m_stack.size()-1];
+	return m_stack[m_stack.size()-1];
 }
 
 void orcaForStack::pop() 
@@ -150,12 +166,19 @@ void orcaForStack::pop()
 	f->iter.rc_dec();
 	f->next.rc_dec();
 
+	delete f;
 	m_stack.pop_back();
+
+	//printf("### pop result\n");
+	//dump();
+
 }
 
 const char* orcaForStack::cont(int* lv1, orcaData* d1, int *lv2, orcaData* d2) 
 {
+	FOR f2 = *top();
 	FOR* f = top();
+	int depth = m_stack.size();
 	f->idx++;
 	*d2 = NIL;
 

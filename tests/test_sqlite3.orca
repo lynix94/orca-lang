@@ -20,9 +20,8 @@ try {
 
 	res = conn.execute('select * from t1;');
 	i = 0;
-	for r in res {
-		print: r();
-		v = r();
+	for v in res {
+		print: v;
 		if v[0] != i || v[1] != 'str_%d' % i || v[2] != (i + 0.1) {
 			throw test.db <- 'select result is wrong';
 		}

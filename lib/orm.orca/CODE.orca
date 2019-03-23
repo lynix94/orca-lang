@@ -29,18 +29,23 @@ def row_iter
 
 	def next() {
 		r = ..res.next();
-r();
-		return owner;
+		v = ..make_value(r);
+
+		return v;
 	}
 
-	# make value
-	t = orm.instance.clone();
+	def make_value(r) {
+		# make value
+		t = orm.instance.clone();
 
-	for i in [0..my.keys.size()-1] {
-		t.MEMBERS[.keys[i]] = .res()[i];
+		for i in [0..owner.keys.size()-1] {
+			t.MEMBERS[..keys[i]] = r[i];
+		}
+
+		return t;
 	}
 
-	return t;
+	return my.make_value(.res());
 }
 
 

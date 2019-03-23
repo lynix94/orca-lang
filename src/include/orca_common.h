@@ -19,17 +19,19 @@ using namespace std;
 //#define _VM_DEBUG_
 
 #ifdef _VM_DEBUG_
-#define PRINT0(f)				printf(f)
-#define PRINT1(f, a)			printf(f, a)
-#define PRINT2(f, a, b)			printf(f, a, b)
-#define PRINT3(f, a, b, c)		printf(f, a, b, c)
-#define PRINT4(f, a, b, c, d)	printf(f, a, b, c, d)
+#define PRINT0(f)					printf(f)
+#define PRINT1(f, a)				printf(f, a)
+#define PRINT2(f, a, b)				printf(f, a, b)
+#define PRINT3(f, a, b, c)			printf(f, a, b, c)
+#define PRINT4(f, a, b, c, d)		printf(f, a, b, c, d)
+#define PRINT5(f, a, b, c, d, e)	printf(f, a, b, c, d, e)
 #else
 #define PRINT0(f)
 #define PRINT1(f, a)
 #define PRINT2(f, a, b)	
 #define PRINT3(f, a, b, c)
 #define PRINT4(f, a, b, c, d)
+#define PRINT5(f, a, b, c, d, e)
 #endif
 
 

@@ -35,6 +35,8 @@ struct FOR
 	orcaObject* m_curr_back;
 	orcaData iter; 
 	orcaData next; 
+
+	void dump();
 };
 
 
@@ -48,11 +50,14 @@ public:
 				  orcaObject* curr, int per);
 	FOR* top();
 	void pop();
-	void push(FOR& f);
+	void push(FOR* f);
 	const char* cont(int* lv1, orcaData* d1, int* lv2, orcaData* d2);
 
+	int size() { return m_stack.size(); }
+	void dump();
+
 private:
-	vector<FOR> m_stack;
+	vector<FOR*> m_stack;
 };
 
 
