@@ -34,6 +34,7 @@ public:
 		set_name("builder"); 
 		insert_native_function("push_back", (object_fp)&orcaStringBuilder::ex_push_back);
 		insert_native_function("+", (object_fp)&orcaStringBuilder::ex_push_back);
+		insert_native_function("write", (object_fp)&orcaStringBuilder::ex_push_back);
 		insert_native_function("string", (object_fp)&orcaStringBuilder::ex_string);
 		insert_native_function("clear", (object_fp)&orcaStringBuilder::ex_clear);
 	}

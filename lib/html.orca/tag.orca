@@ -1,0 +1,48 @@
+
+
+using io;
+
+
+def item(param)
+{
+	def name;
+	def param;
+	def output;
+
+	def init(name, output)
+	{
+		..name = name;
+		..output = output;
+	}
+
+	def '{'()
+	{
+		..output.write('<%s %s>\n' % (..name, ..param));
+	}
+
+
+	def '}'()
+	{
+		..output.write('</%s>\n' % (..name));
+	}
+
+	my.param = param;
+	return my;
+}
+
+
+def output := io.stdout;
+def init()
+{
+	..output = io.stdout;
+}
+
+
+def '.'(name)
+{
+	item = ..item.clone(name, ..output);
+	return item;
+}
+
+
+
