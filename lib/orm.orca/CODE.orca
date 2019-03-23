@@ -60,6 +60,21 @@ def instance
 				continue;
 			}
 
+			meta = ..__model__.MEMBERS[key].meta;
+
+			if meta.TYPE == type.list && meta.size() > 0 {
+				flag_ai = false;
+				for m in meta {
+					if m.starts_with('auto') {
+						flag_ai = true;
+					}
+				}
+
+				if flag_ai {
+					continue;
+				}
+			}
+
 			attr_list.push_back(key);
 			value_list.push_back(repr(value));
 		}
@@ -68,6 +83,7 @@ def instance
 		values = strings.join(', ', value_list...);
 
 		query = 'insert into %s(%s) values(%s)' % (..__name__, attrs, values);
+		print: query;
 		res = orm.conn.execute(query);
 	}
 

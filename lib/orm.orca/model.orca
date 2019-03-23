@@ -1,71 +1,116 @@
 using orm;
 using strings;
 
-#
-# main table
-# 
+# filter object
+def filter
+{
+	def _where;
+	def _orderby;
+	def _project;
+	def _groupby;
+	def _table;
+
+	def init(table)
+	{
+		.._table = table;
+		.._where = nil;
+		.._orderby = nil;
+		.._project = nil;
+		.._groupby = nil;
+	}
+
+	def where(q)
+	{
+		.._where = q;
+		return owner;
+	}
+
+	def orderby(o)
+	{
+		.._orderby = o;
+		return owner;
+	}
+
+	def project(p)
+	{
+		.._project = p;
+		return owner;
+	}
+
+	def groupby(g)
+	{
+		.._groupby = g;
+		return owner;
+	}
+
+	def result()
+	{
+		if .._project == nil {
+			attrs = [];
+			for key, value in owner._table.MEMBERS {
+				if value < orm.query.TYPE {
+					attrs.push_back(key);
+				}
+			}
+			
+			select_list = strings.join(', ', attrs...);
+		}
+		else {
+			select_list = .._project;
+		}
+
+		if .._where != nil {
+			query = 'select %s from %s where %s' % (select_list, owner._table._name, .._where);
+		}
+		else {
+			query = 'select %s from %s' % (select_list, owner._table._name);
+		}
+		
+		if .._orderby.TYPE != nil.TYPE {
+			query += ' order by %s' % .._orderby;
+		}
+
+		print: query;
+		res = orm.conn.execute(query);
+		return orm.row_iter.clone(owner._table, res);
+	}
+}
+
+
+
+# main model base
+
 def _name;
-def _where;
-def _orderby;
-def _project;
-def _groupby;
 def _meta := {,};
 
 def where(q)
 {
-	.._where = q;
-	return owner;
+	f = ..filter.clone(owner);
+	return f.where(q);
 }
 
 def orderby(o)
 {
-	.._orderby = o;
-	return owner;
+	f = ..filter.clone(owner);
+	return f.orderby(o);
 }
 
 def project(p)
 {
-	.._project = p;
-	return owner;
+	f = ..filter.clone(owner);
+	return f.project(p);
 }
 
 def groupby(g)
 {
-	.._groupby = g;
-	return owner;
+	f = ..filter.clone(owner);
+	return f.project(g);
 }
 
 def result()
 {
-	if .._project == nil {
-		attrs = [];
-		for key, value in ..MEMBERS {
-			if value < orm.query.TYPE {
-				attrs.push_back(key);
-			}
-		}
-		
-		select_list = strings.join(', ', attrs...);
-	}
-	else {
-		select_list = .._project;
-	}
-
-	if .._where != nil {
-		query = 'select %s from %s where %s' % (select_list, .._name, .._where);
-	}
-	else {
-		query = 'select %s from %s' % (select_list, .._name);
-	}
-	
-	if .._orderby.TYPE != nil.TYPE {
-		query += ' order by %s' % .._orderby;
-	}
-
-	print: query;
-	res = orm.conn.execute(query);
-
-	return orm.row_iter.clone(owner, res);
+	f = ..filter.clone(owner);
+	return f.result();
 }
 
 #
@@ -184,7 +229,8 @@ def new()
 			ins.MEMBERS[key] = nil;
 		}
 	}
-	
+
+	ins.MEMBERS['__model__'] = owner;
 	return ins;
 }
 

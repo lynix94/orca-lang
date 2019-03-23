@@ -33,6 +33,12 @@ def add_meta(meta)
 	return owner;
 }
 
+def auto_increment()
+{
+	return ..add_meta('autoincrement');
+}
+
+
 def unique()
 {
 	return ..add_meta('unique');

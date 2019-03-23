@@ -20,7 +20,7 @@ def email()
 def int()
 { 
 	q = orm.query.clone();
-	q.type = 'int';
+	q.type = 'integer';
 	return q;
 }
 
