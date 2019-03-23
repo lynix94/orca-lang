@@ -5,6 +5,8 @@ using io.open;
 using time;
 using socket;
 using thread;
+using storage.sqlite3;
+using orm;
 
 
 def create_app(basepath, appname)
@@ -51,10 +53,11 @@ orca manage migrate ''';
 		while true {
 			pid = os.fork();
 			if pid == 0 {
+				conn = sqlite3.connect('sonar.db');
+				orm.set_conn(conn);
 				..server(argv[1]);
 				return;
 			}
-		
 
 			while true {
 				if sonar.core.reloader(os.cwd()) == true {

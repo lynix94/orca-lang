@@ -28,7 +28,8 @@ def row_iter
 	}
 
 	def next() {
-		..res.next();
+		r = ..res.next();
+r();
 		return owner;
 	}
 
@@ -62,7 +63,6 @@ def instance
 		values = strings.join(', ', value_list...);
 
 		query = 'insert into %s(%s) values(%s)' % (..__name__, attrs, values);
-		print: query;
 		res = orm.conn.execute(query);
 	}
 
