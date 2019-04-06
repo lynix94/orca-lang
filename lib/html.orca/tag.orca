@@ -3,21 +3,42 @@
 using io;
 
 
-def item(param)
+def tag_item(param)
 {
 	def name;
 	def param;
 	def output;
+	def last_chain;
+	def tag_id;
+	def tag_class;
+	def event_map;
 
-	def init(name, output)
+	def init(name, output, event_map)
 	{
+		..param = '';
 		..name = name;
 		..output = output;
+		..last_chain = name;
+		..event_map = event_map;
 	}
 
 	def '{'()
 	{
-		..output.write('<%s %s>\n' % (..name, ..param));
+		attr = '';
+
+		if ..tag_id != nil {
+			attr += ' id="%s"' % ..tag_id;
+		}
+
+		if ..tag_class != nil {
+			attr += ' class="%s"' % ..tag_class;
+		}
+
+		if ..param != '' {
+			attr += ' %s' % ..param;
+		}
+
+		..output.write('<%s%s>\n' % (..name, attr));
 	}
 
 
@@ -26,23 +47,60 @@ def item(param)
 		..output.write('</%s>\n' % (..name));
 	}
 
+	def id(i)
+	{
+		..last_chain = '#%s' % i;
+		..tag_id = i;
+		return owner;
+	}
+
+	def class(c)
+	{
+		..last_chain = '.%s' % c;
+		..tag_class = c;
+		return owner;
+	}
+
+
+	def event(type, handler)
+	{
+		template = '''
+<script>
+$(document).ready(function(){
+	$("%s").%s(function(){
+		%s
+	});
+});
+</script>
+''' % (..last_chain, type, handler());
+
+		if ..event_map.has_key(..last_chain) == false {
+			..event_map[..last_chain] = true;
+			..output.write(template);
+		}
+		return owner;
+	}
+
 	my.param = param;
 	return my;
 }
 
 
 def output := io.stdout;
+def event_map := {,}; # use to prevent duplicated event handler
 def init()
 {
 	..output = io.stdout;
+	..event_map = {,};
 }
 
 
 def '.'(name)
 {
-	item = ..item.clone(name, ..output);
+	item = ..tag_item.clone(name, ..output, ..event_map);
 	return item;
 }
+
 
 
 

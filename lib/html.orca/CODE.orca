@@ -23,8 +23,11 @@ def '.'(tag)
 		def tag;
 
 		obj = html.process_context(argv...);
-		obj.__head = '<${.tag} id="${argv[0]}">';
-		obj.__tail = '</${.tag}>';
+
+		if .tag != 'js' && .tag != 'jquery' {
+			obj.__head = '<${.tag} id="${argv[0]}">';
+			obj.__tail = '</${.tag}>';
+		}
 
 		return obj;
 	}
@@ -58,7 +61,15 @@ def process_context(...argv)
 			}
 		}
 
-		# STEP 2: process embedded object
+		# STEP 2: process redirect
+		if my.MEMBERS.has_key('redirect') {
+			ret = my.redirect(req);
+			if ret != nil {
+				return ret;
+			}
+		}
+
+		# STEP 3: process embedded object
 		template = my.__template;
 		token = {,};
 		for key, value in my.MEMBERS {
@@ -94,7 +105,7 @@ def process_context(...argv)
 		}
 
 
-		# STEP 3: process dictionary format
+		# STEP 4: process dictionary format
 		keys = template.list_format();
 		#print: keys;
 
@@ -123,7 +134,7 @@ def process_context(...argv)
 		bdr.push_back(my.__head);
 		bdr.push_back(template % dict);
 
-		# STEP 4: process script
+		# STEP 5: process script
 		for key, value in my.MEMBERS {
 			if key.starts_with('script_') {
 				bdr.push_back(value(req));

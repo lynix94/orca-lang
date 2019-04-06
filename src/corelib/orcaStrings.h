@@ -4,7 +4,7 @@
 
   orcaStrings.h - system utils
 
-  Copyright (C) 2009-2010 Lee, Ki-Yeul
+  Copyright (C) 2009~ Lee, Ki-Yeul
 
 **********************************************************************/
 
@@ -144,33 +144,25 @@ public:
 		stringstream ss;
 		for (int i=0; i<s.length(); i++) {
 			if (s[i] == '&') {
-				if (i+5 < s.length() &&
-					strncmp(s.c_str() + i + 1, "quot;", 5) == 0)
-				{
+				if (i+5 < s.length() && strncmp(s.c_str() + i + 1, "quot;", 5) == 0) {
 					ss << '\"';
 					i += 5;
 					continue;
 				}
 
-				if (i+4 < s.length() &&
-					strncmp(s.c_str() + i + 1, "amp;", 4) == 0)
-				{
+				if (i+4 < s.length() && strncmp(s.c_str() + i + 1, "amp;", 4) == 0) {
 					ss << '&';
 					i += 4;
 					continue;
 				}
 
-				if (i+3 < s.length() &&
-					strncmp(s.c_str() + i + 1, "lt;", 3) == 0)
-				{
+				if (i+3 < s.length() && strncmp(s.c_str() + i + 1, "lt;", 3) == 0) {
 					ss << '<';
 					i += 3;
 					continue;
 				}
 
-				if (i+3 < s.length() &&
-					strncmp(s.c_str() + i + 1, "gt;", 3) == 0)
-				{
+				if (i+3 < s.length() && strncmp(s.c_str() + i + 1, "gt;", 3) == 0) {
 					ss << '>';
 					i += 3;
 					continue;
