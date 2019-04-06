@@ -172,7 +172,11 @@ void parser_split_ctx_def(const string& src, string& ctx, string& def, map<strin
 					break;
 				}
 
-				getline(f, line);
+				if (!getline(f, line)) {
+					printf("context extension compile failed. check {, } pair");
+					break;
+				}
+
 				line_no++;
 			}
 		}
