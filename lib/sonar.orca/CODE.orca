@@ -31,6 +31,8 @@ f = open('%s/settings.orca' % project_name, 'w');
 f.write(.template.template_settings);
 f.close();
 
+os.mkdir('%s/static' % project_name);
+
 .core.manager.create_app(project_name, project_name);
 
 

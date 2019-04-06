@@ -203,10 +203,11 @@ def search(label) : input.input_base
 	return ret;
 }
 
-def submit(label) : input.input_base
+def submit(label, handler) : input.input_base
 {
 	ret =..__clone(my, label);
 	ret.type = 'submit';
+	ret.MEMBERS['handler'] = handler;
 	return ret;
 }
 

@@ -29,17 +29,21 @@ Content-Type: text/html; charset=UTF-8
 	..send(msg);
 }
 
-def send_response(header, msg)
+def send_response(header, msg, content_type)
 {
+	if content_type == nil {
+		content_type = 'text/html';
+	}
+
 	res = '''HTTP/1.1 200 OK
-Server: Orca/0.4 (Unix)  (Red-Hat/Linux)
+Server: Orca/0.9 (Unix)  (Ubuntu/Linux)
 Accept-Ranges: bytes
 Content-Length: ${msg.length()+1}
 Connection: close
-Content-Type: text/html; charset=UTF-8
-${header}
+Content-Type: %s; charset=UTF-8
+%s
 
-''';
+''' % (content_type, header);
 	..send(res);
 	..send(msg);
 }
@@ -183,6 +187,36 @@ def do_what(msg)
 		}
 	}
 	
+
+	if req.uri.starts_with('static/') {
+		if !os.isexists(req.uri) {
+			..send_error('404 Not Found');
+			return;
+		}
+
+		try {
+			body = os.read(req.uri);
+			toks = req.uri.split('.');
+			switch toks[-1]
+			{
+			case 'css':
+				..send_response('', body, 'text/css');
+
+			case 'js':
+				..send_response('', body, 'aplication/js');
+
+			default:
+				..send_response('', body, 'text/plain');
+			}
+		}
+		catch any {
+			..send_error('404 Not Found');
+		}
+
+		return;
+	}
+
+
 	// process response
 	handler = nil;
 	for k, v in core.url_map {
@@ -191,6 +225,7 @@ def do_what(msg)
 			break;
 		}
 	}
+
 	
 	#print: handler;
 	if handler == nil {

@@ -39,7 +39,19 @@ def as_p(v, value)
 	switch v.type
 	{
 	case 'submit', 'button', 'reset':
-		ret = '<p><input id="%s" name="%s" type="%s" value="%s" /></p>\n' % (v.id, v.name, v.type, v.label);
+		if v.MEMBERS.has_key('handler') {
+			ret = '<p><input id="%s" name="%s" type="%s" value="%s" onclick="%s;return false;"/></p>\n' % (v.id, v.name, v.type, v.label, 'function_%s()' % v.id);
+
+			ret += '''<script>
+			function function_%s() {
+				%s
+			}
+			</script>
+			''' % (v.id, v.handler());
+		}
+		else {
+			ret = '<p><input id="%s" name="%s" type="%s" value="%s" /></p>\n' % (v.id, v.name, v.type, v.label);
+		}
 
 	case 'textarea':
 		ret = '<p><label for="%s">%s:</label><br><textarea id="%s" name="%s" rows="%d" cols="%d"></textarea></p>\n' % (v.id, v.label, v.id, v.name, v.rows, v.cols);

@@ -6,17 +6,21 @@ def filter
 {
 	def _where;
 	def _orderby;
+	def _orderby_desc;
 	def _project;
 	def _groupby;
 	def _table;
+	def _limit;
 
 	def init(table)
 	{
 		.._table = table;
 		.._where = nil;
 		.._orderby = nil;
+		.._orderby_desc = nil;
 		.._project = nil;
 		.._groupby = nil;
+		.._limit = nil;
 	}
 
 	def where(q)
@@ -25,9 +29,21 @@ def filter
 		return owner;
 	}
 
+	def limit(n)
+	{
+		.._limit = n;
+		return owner;
+	}
+
 	def orderby(o)
 	{
 		.._orderby = o;
+		return owner;
+	}
+
+	def orderby_desc(o)
+	{
+		.._orderby_desc = o;
 		return owner;
 	}
 
@@ -70,6 +86,14 @@ def filter
 			query += ' order by %s' % .._orderby;
 		}
 
+		if .._orderby_desc.TYPE != nil.TYPE {
+			query += ' order by %s desc' % .._orderby_desc;
+		}
+
+		if .._limit.TYPE != nil.TYPE {
+			query += ' limit %d' % .._limit;
+		}
+
 		print: query;
 		res = orm.conn.execute(query);
 		return orm.row_iter.clone(owner._table, res);
@@ -93,6 +117,18 @@ def orderby(o)
 {
 	f = ..filter.clone(owner);
 	return f.orderby(o);
+}
+
+def orderby_desc(o)
+{
+	f = ..filter.clone(owner);
+	return f.orderby_desc(o);
+}
+
+def limit(n)
+{
+	f = ..filter.clone(owner);
+	return f.limit(n);
 }
 
 def project(p)
