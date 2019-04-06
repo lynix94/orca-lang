@@ -2492,11 +2492,10 @@ fast_jmp:
 
 			case OP_SCOPE_START:
 				PRINT1("\t\t%p : scope start\n", c);
-				d.mark_scope(m_stack->top().o());
+				p1 = m_stack->top().Object()->get_member("{"); // check { if exists first
+				d.mark_scope(m_stack->top().Object());
 				m_local->push_back(d);
-
-				d = m_stack->top().o()->get_member("{");
-				m_stack->replace(d);
+				m_stack->replace(p1);
 				call(0);
 				m_stack->dummy_pop();
 				break;

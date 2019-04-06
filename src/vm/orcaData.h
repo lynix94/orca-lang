@@ -334,6 +334,8 @@ struct LIBORCA_API orcaData
 		t=TYPE_MARK;
 		v.mark.type = MARK_SCOPE;
 		v.mark.vp = (void*)o; 
+		orcaData d(o);
+		d.rc_inc();
 	}
 
 	void mark_for() {
