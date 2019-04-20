@@ -1,67 +1,64 @@
 Orca Programming Language Tutorial
 ==================================
 
-version 0.6
------------
-
 written by Lee, Ki-Yeul (kiyeul.lee@gmail.com)  
 
 
 Table of Contents
 =================
 
-0.  [What's this](#whats_this)
+0.  [What's this](#what's-this)
 1.  [start](#start)
-2.  [Data types](#types)
-    1.  [local variable](#local)
+2.  [Data types](#data-types)
+    1.  [local variable](#local-variable)
     2.  [integer](#integer)
     3.  [real number](#float)
     4.  [string](#string)
-    5.  [regular expression](#regex)
+    5.  [regular expression](#regular-expression)
     6.  [list](#list)
     7.  [tuple](#tuple)
     8.  [map](#map)
-    9.  [set builder form list](#sbf)
+    9.  [set builder form list](#set-builder-form-list)
     10.  [iterator](#iterator)
-3.  [control statement](#control)
+3.  [control statement](#control-statement)
     1.  [if](#if)
     2.  [while](#while)
     3.  [do while](#do_while)
     4.  [for](#for)
     5.  [scope object](#scope)
-    6.  [parallel do](#parallel_do)
-    7.  [parallel for](#parallel_for)
-    8.  [decode statement](#decode)
-        1.  [string match](#string_match)
-        2.  [regular expression match](#regex_match)
-        3.  [list match](#list_match)
-        4.  [decode function](#decode_function)
-4.  [function and object](#function_object)
+    6.  [parallel do](#parallel-do)
+    7.  [parallel call](#parallel-call)
+    8.  [parallel for](#parallel-for)
+    9.  [decode statement](#decode-statement)
+        1.  [string match](#string-match)
+        2.  [regular expression match](#regular-expression-match)
+        3.  [list match](#list-match)
+        4.  [decode function](#decode-function)
+4.  [function and object](#function-and-object)
     1.  [function](#function)
     2.  [object](#object)
-        1.  [object define](#object_define)
-        2.  [simple notaion of my, owner](#object_my_owner)
-        3.  [special character member](#object_special)
-        4.  [one time initializer](#object_init)
-        5.  [name'string' object](#object_string)
+        1.  [object define](#object-define)
+        2.  [simple notation of my, owner](#simple-notation-of-my,-owner)
+        3.  [special character member](#special-character-member))
+        4.  [one time initializer](#one-time-initializer))
+        5.  [name'string' object](#name'string'-object)
     3.  [inherit](#inherit)
     4.  [using](#using)
-    5.  [virtual member](#virtual_member)
-        1.  [type](#virt_type)
-        2.  [typename](#virt_typename)
-        3.  [static_members](#virt_static)
-        4.  [members](#virt_members)
-        5.  [parents](#virt_parents)
-        6.  [id](#virt_id)
+    5.  [virtual member](#virtual-member)
+        1.  [TYPE](#TYPE)
+        2.  [TYPENAME](#TYPENAME)
+        3.  [STATIC_MEMBERS](#STATIC_MEMBERS)
+        4.  [MEMBERS](#MEMBERS)
+        5.  [PARENTS](#PARENTS)
+        6.  [ID](#ID)
     6.  [excpetion](#exception)
     7.  [lambda](#lambda)
-    8.  [operator overloading](#operator)
-5.  [special object](#special)
-    1.  [Native object](#native)
-    2.  [parse object](#parse)
-    3.  [UDS object](#uds)
-    4.  [one time evaluation expression](#onetime)
-    5.  [pure object](#pure)
+    8.  [operator overloading](#operator-overloading)
+	9.  [folder object](#folder-object)
+5.  [special object](#special-object)
+    1.  [native object](#native-object)
+    2.  [parse object](#parse-object)
+    3.  [context extended object](#context-extended-object)
 
 What's this
 ===========
@@ -99,13 +96,13 @@ in orca.
 This expression is named 'simple call statement' it's purpose is not only typing but also improving readability in lambda programming. ex, if there is "for\_each (items, lambda\_function)" function which apply lambda_function to all items of first parameter. Normal notation is like below,
 
 ```
-for_each(list_a, def.lambda(...argv) { print(argv[0]);} );
+for_each(list_a, lambda(...argv) { print(argv[0]);} );
 ```
 
 This expression could not be read easily, But is we use simple call statement, it could be written like below
 
 ```
-for_each: list_a, def.lambda(...argv) {
+for_each: list_a, lambda(...argv) {
   print(argv[0]);
 };
 ```
@@ -194,9 +191,9 @@ $ print: 1.2.integer();
 string
 ------
 
-String separator could be both of ' and ", and it supports escape character. And it supports, """ and ''' like python. both of them has same meaning but ''' recognize format string but """ translate all as text itself.
+String separator could be both of ' and ", and it supports escape character. And it supports, """ and ''' like python. both of them has same meaning but ''' recognize ${} expression but """ translate all as text itself.
 
-String contains expression in it (like ruby) It's form is ${ expression } Below is one example.
+String can contain expression in it (like ruby) It's form is ${ expression } Below is one example.
 
 ```
 $ name = 'james';
@@ -230,14 +227,14 @@ le
 If from is bigger than to, it reverse automatically.
 
 ```
-$ 'hello, world'[0:5);
+$ 'hello, world'[0:5+];
 hello,
 ```
 
-If right part is ')' (not '\]'), it takes last 'to' index item. So if you reverse all string, you can try like this.
+If right part is '+]' (not '\]'), it takes last 'to' index item. So if you reverse all string, you can try like this.
 
 ```
-$ 'hello, world' [-1:0);
+$ 'hello, world' [-1:0+];
 dlrow, olleh
 ```
 
@@ -399,11 +396,21 @@ $ 'i: %d, f: %f, e: %e, s: %s' % (100, 12.34, 12.34, 'hello, world!');
 i: 100, f: 12.340000, e: 1.234000e+01, s: hello, world!
 ```
 
+Orca extends format string by using map type format. This spec is used in html module. If %{NAME} is in format string orca think last parameter is map and replace format by it's 'NAME' value. 
 
+So, below example prints 'hello, orca'.
 
+```
+print: 'hello, %{name}' % ({'name':'orca'});
+```
 
+map type format can be used with other format type. but map type format parameter shold be passed only one and should be last. like below.
 
-# TODO - dictionay format string 
+```
+print: 'format i: %d, name: %{name}, f: %f, age: %{age}' % (10, 12.34, {'name':'orca', 'age':20});
+```
+
+above example prints for format i: 10, name: orca, f: 12.340000, age: 20
 
 
 
@@ -423,7 +430,7 @@ if str == r'[0-9a-z]+' {
 }
 ```
 
-Above example will print 'matched'. Match operation could be done by ==, != operator. In above str, if find interface is called like this.
+맵Above example will print 'matched'. Match operation could be done by ==, != operator. In above str, if find interface is called like this.
 
 ```
 $ print: str.find(r'[a-z]+[0-9+');
@@ -522,25 +529,59 @@ true
 $ 
 ```
 
-begin(), end() return iterator of list which point begin (or end) of list.
+iter() is value based iterator. this interface return iterator which return value of list. piter(), first(), last() and end() are position based iterator. these specs are common on tuple and map.
+
+
+iter() means first item of iterator and it return next value if next() is called. if it moves to end of list, then it raise orca.iter.end exception
 
 ```
 $ list = [1,2,3];
-$ i = list.begin();
-$ e = list.end();
-$ print: i();
+[ 1,2,3 ]
+$ i = list.iter();
+<iter - 0x16edd70>
+$ i.next();
 1
 $ i.next();
-$ i();
-$ i(3);
+2
+$ i.next();
+3
+$ i.next();
+uncaugted exception: orca.iter.end out of range
+recent call-stack trace
+>> root (internal 0)
+```
+
+ 
+
+piter returns an iterator whose position is previous of first item (if it calls next() it return first item position), first() returns the position of first item, last() returns the position of last item. end() means invalid position like c++ stl end. position iterators are can be check as equal or not. If position iterator is called, it returns the value of current position. And if it is called with parameter, It change the value of current position. These aspects are more useful than value based iterator. 
+  
+
+```
+$ list = [1,2,3];
+[ 1,2,3 ]
+$ f = list.first();
+<iter - 0x16f7f30>
+$ l = list.last();
+<iter - 0x16f82f0>
+$ f();
+1
+$ l();
+3
+$ f.next();
+<iter - 0x16f7f30>
+$ f();
+2
+$ f(3);
+3
 $ print: list;
 [ 1,3,3 ]
-$ print: i == e;
+$ print: f == l;
 false
-$ i.next();
-$ e.prev();
-$ print: i == e;
+$ f.next();
+<iter - 0x16f7f30>
+$ print: f == l;
 true
+
 ```
 
 find(value) function find position which have value and return it's iterator.
@@ -579,7 +620,7 @@ $ a.sort();
 $ print: a;
 [ 1,2,2,3,4 ]
 $ 
-$ a.sort(def.lambda(...argv) { return argv[0] >= argv[1]; });
+$ a.sort(lambda(...argv) { return argv[0] >= argv[1]; });
 [ 4,3,2,2,1 ]
 ```
 
@@ -624,28 +665,42 @@ $ a.empty();
 true
 ```
 
-tuple provides begin(), end(), find() interfaces which work like those of list. but does'nt provides insert() and remove()
+
+tuple provides iter(), piter(), first(), last(), end(), find() interfaces but insert() and remove() are not supported.
 
 ```
-$ tp = (1,2,3);
-$ i = tp.begin();
-$ e = tp.end();
-$ print: i();
+$$ tp = (1,2,3);
+( 1,2,3 )
+$ f = tp.first();
+<tupleiter - 0x16fa2d0>
+$ l = tp.last();
+<tupleiter - 0x16fa4c0>
+$ f();
 1
-$ i.next();
-$ print: i();
+$ f.next();
+<tupleiter - 0x16fa2d0>
+$ f();
 2
-$ print: i(3);
+$ f(3);
 3
 $ print: tp;
 ( 1,3,3 )
-$ print: i == e;
+$ print: f == l;
 false
-$ i.next();
-$ e.prev();
-$ print: i == e;
+$ f.next();
+<tupleiter - 0x16fa2d0>
+$ print: f== l;
 true
-$
+$ tp = (1,2,3);
+( 1,2,3 )
+$ i = tp.find(2);
+<tupleiter - 0x16fb4c0>
+$ i();
+2
+$ i.prev();
+<tupleiter - 0x16fb4c0>
+$ i();
+1
 $ tp = (1,2,3);
 $ i = tp.find(2);
 $ print: i();
@@ -654,6 +709,8 @@ $ i.prev();
 $ print: i();
 1
 ```
+
+
 
 map
 ---
@@ -700,35 +757,54 @@ $ print: a;
 $ 
 ```
 
-map provides begin(), end() interfaces. map is sorted associative container. so if traverse from begin() to end(), programmer can access ordered items. Calling of iterator returns item value. but map is key-value pair so it returns (key, value) tuple. If you want access key or value directly, call it.first() or it.second()
+map also provides iter(), piter(), first(), last(), end() interface. map is soreted collection so if you iterate by next() you can get sorted result.
+
+map is composed by key and value so you can get it directly with iter2() interface.
+
+The return type is (key, value) tuple if you call iterator. If you want to get key or value use key() or value() interface.
 
 ```
-$ m = { 1:100, 2:200, 3:300 };
-$ a = m.begin();
-$ print: a(), a.first(), a.second();
+$ m = {1:100, 2:200, 3:300};
+{ 1:100,2:200,3:300 }
+$ a = m.first();
+<mapiter - 0x16fc5e0>
+$ print: a(), a.key(), a.value();
 ( 1,100 )1100
 $ a.next();
-$ print: a(), a.first(), a.second();
+<mapiter - 0x16fc5e0>
+$ print: a(), a.key(), a.value();
 ( 2,200 )2200
 $ a.next();
-$ print: a(), a.first(), a.second();
+<mapiter - 0x16fc5e0>
+$ print: a(), a.key(), a.value();
 ( 3,300 )3300
 $ a.next();
+uncaugted exception: orca.iter.end out of range
+recent call-stack trace
+>> root (internal 0)
 ```
 
-uncaugted exception: orca.iter out of range recent call-stack trace you can change value by iterator by call it with value. but key could'nt be changed by iterator (change of key means ordering is changed) so only value is changed.
+Calling iterator with parameter means change the value of current position. In map it change the value (not key of cource) of map.
 
 ```
-$ a = { 1:100, 2:200, 3:300 };
-$ it = a.begin();
+$ a = {1:100, 2:200, 3:300};
+{ 1:100,2:200,3:300 }
+$ it = a.first();
+<mapiter - 0x1700170>
 $ it(1000);
+( 1,1000 )
 $ it.next();
+<mapiter - 0x1700170>
 $ it(2000);
+( 2,2000 )
 $ it.next();
+<mapiter - 0x1700170>
 $ it(3000);
-$ print: a;
+( 3,3000 )
+$ a;
 { 1:1000,2:2000,3:3000 }
 ```
+
 
 find() return iterator which points item that has same key value.
 
@@ -777,6 +853,10 @@ $ print: a.keys();
 $ print: a.values();
 [ 'value 1',[ 1,2,3 ],2 ]
 ```
+
+
+
+
 
 set builder form list
 ---------------------
@@ -873,11 +953,11 @@ It works well :) And then see another famous functional programming example. Qui
 ```
 def.decode qsort(a)
 {
-  [] ->
+  case []:
     {
       return [];
     }
-  %x:%xs -> 
+  case %x[%xs]:
     {
       return qsort(%[a|a<-xs, a<=x]) + [x] +  qsort(%[b|b<-xs, b>x]);
     }
@@ -921,9 +1001,9 @@ iterator
 
 Iterators of container have simillar interface with STL. Rules of current implementation are like belows.
 
-*   If you want to move next item, call next() and it change it's position and return itselft.
-*   If you want to move prev item, call prev() and it change it's position and return itselft.
-*   If result of next and prev is out of range, next, prev return nil.
+*   If you want to move next item, call next() and it change it's position and return itself or it's value.
+*   If you want to move prev item, call prev() and it change it's position and return itself or it's value.
+*   If result of next and prev is out of range, next, prev raise orca.iter.end exception.
 *   If you want value of item which iterator points out. call iterator. (like, value = it(); )
 *   If you want change value of item which iterator points out. call iterator with parameters ( like, it(3) )
 *   Iterator have operator\_eq, operator\_neq so they could be compared. (==, !=)
@@ -932,7 +1012,7 @@ Iterators of container have simillar interface with STL. Rules of current implem
 
 And here is additional rules of contaner.
 
-*   You can get iterator which points out first posion, call begin()
+*   You can get iterator which points out first posion, call first()
 *   next(), prev() can get integer parameter. next(2) means next(), next().
 *   You can get iterator which points out last item. call last().
 *   You can get iterator which points out next of last posion, call end() (real last postion is end().before())
@@ -945,7 +1025,7 @@ control statement
 =================
 
 if
---
+----
 
 Structure of if statement is
 
@@ -1044,7 +1124,7 @@ object {
 }
 ```
 
-In this case, before statement\_list is excuted, object.scope\_start() is called automatically. And after the excution of statement\_list is done object.scope\_end() is called. And if there is exception throwing or return in statement\_list, object.scope\_end() is called automatically.
+In this case, before statement\_list is excuted, object."{"() is called automatically. And after the excution of statement\_list is done object."}"() is called. And if there is exception throwing or return in statement\_list, object."}"() is called automatically.
 
 As an example, If you make a mutex lock on some code area.
 
@@ -1083,13 +1163,13 @@ def fun {
 If you run fun(),
 
 ```
-mtx.scope_start();
+mtx."{"();
 foo();
 bar();
-mtx.scope_end();
+mtx."}"();
 ```
 
-Will be excuted in order. if there is exception throwing from foo(). bar() is not excuted but mtx.scope\_end() is called automatically. And in below case, mtx.scope\_end() is called also.
+Will be excuted in order. if there is exception throwing from foo(). bar() is not excuted but mtx."}"() is called automatically. And in below case, mtx."}"() is called also.
 
 ```
 mtx {
@@ -1101,8 +1181,6 @@ mtx {
 This statement could be used to all pairing cases. likes making CS, resource open/close, timer start/end.. etc
 
 
-
-# TODO - parallel call
 
 
 
@@ -1147,21 +1225,44 @@ using stopwatch;
 sw = stopwatch;
 
 sw.start();
-time.msleep(1000);
+time.sleep(1.0);
 
 sw.lap('without parallel do: ');
 
 sw.start();
 parallel do {
-  time.msleep(1000);
+  time.sleep(1.0);
 }
 
 sw.lap('with parallel do: ');
 ```
 
-without parallel do: 999 ms, 599 us with parallel do: 399 us Like above, with parallel do, main thread is not blocked by time.msleep(1000) So it can run down to sw.lap() more fast.
+without parallel do: 999 ms, 599 us with parallel do: 399 us Like above, with parallel do, main thread is not blocked by time.sleep(1.0) So it can run down to sw.lap() more fast.
 
 I recommend parallel do statements to IO bound job. Especially logging, async communication and etc. But in case of CPU bound job, maybe parallel for statement (which is in next chapter) is more useful.
+
+parallel call
+-----------
+You can call function with parallel. If so, function is executed parallel.
+
+Below is an example.
+
+```
+using time;
+
+def foo
+{
+	time.sleep(1.0);
+	print: "I'm foo";
+}
+
+
+parallel my.foo();
+print: "may be this will be shown faster";
+
+```
+
+
 
 parallel for
 ------------
@@ -1273,9 +1374,9 @@ Basically, it's grammar is like below
 ```
 decode (A)
 {
-  pattern_list -> statement_list
-  pattern_list -> statement_list
-  pattern_list -> statement_list
+  case pattern_list: statement_list
+  case pattern_list: statement_list
+  case pattern_list: statement_list
   ...
 }
 ```
@@ -1289,8 +1390,8 @@ Let's examine it in each case
 ```
 decode('orca')
 {
-  'orca' -> print: 'orca, matched';
-  'python' -> print: 'python, matched';
+  case 'orca': print('orca, matched');
+  case 'python': print('python, matched');
 }
 ```
 
@@ -1301,9 +1402,9 @@ And here is more complex example.
 ```
 decode(str)
 {
-  'send:', %to, ':', %msg -> ..send(to, msg);
-  'connect:', %to -> ..connect(to);
-  %fail -> ..error(fail);
+  case 'send:', %to, ':', %msg: ..send(to, msg);
+  case 'connect:', %to: ..connect(to);
+  case %fail: ..error(fail);
 }
 ```
 
@@ -1320,8 +1421,8 @@ Regex could make more conveniant and flexible pattern matching.
 ```
 decode (str)
 {
- 'id:', r'[a-zA-Z][a-zA-Z_0-9]*', ', number:', r'[0-9]+' -> print: 'matched!!';
-  %fail -> print: 'failed..';
+	case 'id:', r'[a-zA-Z][a-zA-Z_0-9]*', ', number:', r'[0-9]+': print('matched!!');
+	case %fail: print('failed..');
 }
 ```
 
@@ -1330,8 +1431,8 @@ Above code print 'matched!!' in case of 'id:lynix, number:103'. It print 'failed
 ```
 decode (str)
 {
- 'id:', %id=r'[a-zA-Z][a-zA-Z_0-9]*', ', number:', %number=r'[0-9]+' -> print: 'matched!!, id=${id}, number=${number}';
-  %fail -> print: 'failed..';
+	case 'id:', %id=r'[a-zA-Z][a-zA-Z_0-9]*', ', number:', %number=r'[0-9]+': print('matched!!, id=${id}, number=${number}');
+	case %fail: print('failed..');
 }
 ```
 
@@ -1344,7 +1445,7 @@ List matching is also possible,
 ```
 decode ([1,2,3,4,5])
 {
- [1, 2], %mid, [4, 5] -> print: mid;
+	case [1, 2], %mid, [4, 5]: print(mid);
 }
 ```
 
@@ -1353,8 +1454,8 @@ Above code prints \[3\]. Traditional list matching process is head:tail matching
 ```
 decode ([1,2,3,4,5])
 {
-  [] -> print: 'empty';
-  %head:%tail -> print: 'head: ${head}, tail: ${tail}';
+  case []: print('empty');
+  case %head[%tail]: print('head: ${head}, tail: ${tail}');
 }
 ```
 
@@ -1367,13 +1468,13 @@ Like the many examples of LISP, list pattern matching is done recursively. Let's
 ```
 def print_list(a)
 {
-  decode (a)
+	decode (a)
     {
-	[] -> print: 'done';
-    %head:%tail -> {
-		print: head;
-		print_list(tail);
-	}
+		case []: print('done');
+		case %head[%tail]: {
+			print: head;
+			print_list(tail);
+		}
     }
 }
 
@@ -1396,8 +1497,8 @@ But this code is so complex, So you can use def.decode for conveniance. Below co
 ```
 def.decode print_list(a)
 {
-  [] -> print: 'done';
-  %head:%tail -> {
+  case []: print('done');
+  case %head[%tail]: {
 		print: head;
 		print_list(tail);
   }
@@ -1417,14 +1518,14 @@ If you parse it by decode statement (old version) programmer may try it like thi
 ```
 def.decode tolist(str)
 {
-	'[', %body, ']' -> 
+	case '[', %body, ']':
 		{
 			ret = tolist(body);
 			if type.is_tuple(ret): 
 				return ret.list(); 
 			return [ ret ];
 		}
-	%head, ',', %tail ->
+	case %head, ',', %tail:
 		{
 			h = tolist(head);			
 			t = tolist(tail);
@@ -1434,7 +1535,7 @@ def.decode tolist(str)
 
 			return t.push_front(h);
 		}
-	%value = r'[0-9]+' ->
+	case %value = r'[0-9]+':
 		{
 			return value.integer();
 		}
@@ -1449,14 +1550,14 @@ using match;
 
 def.decode tolist(str)
 {
-	'[', %body = match.bracket, ']' -> 
+	case '[', %body = match.bracket, ']':
 		{
 			ret = tolist(body);
 			if type.is_tuple(ret): 
 				return ret.list(); 
 			return [ ret ];
 		}
-	%head = match.comma, ',', %tail ->
+	case %head = match.comma, ',', %tail:
 		{
 			h = tolist(head);			
 			t = tolist(tail);
@@ -1466,7 +1567,7 @@ def.decode tolist(str)
 
 			return t.push_front(h);
 		}
-	%value = r'[0-9]+' ->
+	case %value = r'[0-9]+':
 		{
 			return value.integer();
 		}
@@ -1509,7 +1610,7 @@ print: my.add(10, 20);
 This prints 30 If you want variable arguments,
 
 ```
-def sum_all(...) {
+def sum_all(...argv) {
     sum = 0;
     for a in argv {
         sum += a;
@@ -1522,12 +1623,12 @@ print: my.sum_all(1,2,3);
 6
 ```
 
-You can define it like above. ... means variable arguments. And those are inserted in argv list. ... must be end of parameter list. That means that def (a, ..., b) is illegal but def (a, b, ...) is correct.
+You can define it like above. ...argv means variable arguments. And those are inserted in argv list. ... must be end of parameter list. That means that def (a, ...b, c) is illegal but def (a, b, ...c) is correct.
 
 object
 ------
 
-### define object
+### object define
 
 Previous function definition is just define one object which is runnable. And now, let's define object which have member variables.
 
@@ -1941,7 +2042,7 @@ lambda
 orca supports lambda function, The grammar of lambda function is like this
 
 ```
-def.lambda() { statment_list }
+lambda() { statment_list }
 ```
 
 This code block has no name but it's same as normal orca object entirely. It could have member objects and it's owner is who define it. Belows are code in test_lambda.orca
@@ -1953,7 +2054,7 @@ def for_each(list, functor) {
     }
 }
 
-my.for_each([1..10], def.lambda(...argv){ print(argv[0]); });
+my.for_each([1..10], lambda(...argv){ print(argv[0]); });
 ```
 
 
@@ -1961,7 +2062,7 @@ my.for_each([1..10], def.lambda(...argv){ print(argv[0]); });
 below is same with above statement
 
 ```
-my.for_each: [1..10], def.lambda (...argv) {
+my.for_each: [1..10], lambda (...argv) {
     print: argv[0];
 };
 ```
@@ -1969,7 +2070,7 @@ my.for_each: [1..10], def.lambda (...argv) {
 As said before, lambda is object so
 
 ```
-$ a = def.lambda() { print: "foo"; };
+$ a = lambda() { print: "foo"; };
 $ a();
 foo
 ```
@@ -2103,10 +2204,59 @@ And there is one more things to consider about this. + and * satisfy commutative
 
 So, obj - 1 calls obj.'-'(1) is ok and 1 - obj should not call obj.'-'(1). In this case, 1 - obj calls obj.'-rev'(1) and 1 / obj calls obj.'/rev'(1).
 
-Special object
+
+folder object
+------
+
+Modulizing is required if code size is bigger. In case of python if folder has __init__.py in it. It's assume as module. In case of golang package notation is used as module define.
+
+The Orca use folder name for modulizing. If folder name has prefix of .orca, this folder become an orca object. And files in this folder become members of this folder object. If this folder object needs execution code, You can make CODE.orca in this folder and CODE.orca become an execution code of folder object. (remind virtual member is named with CAPITAL)
+
+Let's see example. make simple.orca folder and write orca files in this folder like below.
+
+```
+~$ cd sample.orca/
+~/sample.orca$ ls *.orca
+CODE.orca  bar.orca  foo.orca
+
+~/sample.orca$ cat CODE.orca
+
+print: "I'm %s" % my.NAME;
+print: "My members: ", my.MEMBERS;
+
+for k, v in my.MEMBERS {
+        v();
+}
+~/sample.orca$ cat foo.orca
+print: "I'm foo";
+~/sample.orca$ cat bar.orca
+print: "I'm bar";
+
+```
+
+
+The result of execution is like below. It prints it's name, member and result of member execution.
+
+```
+~$ orca sample.orca
+I'm sample
+My members: { 'bar':<bar - 0x1f20f50>,'foo':<foo - 0x1f220a0> }
+I'm bar
+I'm foo
+```
+
+You can see other example in the lib folder of orca. Many libraries are built as folder object in it.
+
+
+
+
+
+
+
+special object
 ==============
 
-Native object
+native object
 -------------
 
 orca is made by C++/boost so It's very easy to make native extension module. In the orca project files, find and see orcaFile.h which is describe file module.
@@ -2294,40 +2444,40 @@ below example is simple calculator examlple
 def.parse calc(str)
    {
        stmt : stmt '+' mul
-                   def.lambda (...argv) {
+                   lambda (...argv) {
                        return argv[0] + argv[2];
                    }
            | stmt '-' mul
-                   def.lambda (...argv) {
+                   lambda (...argv) {
                        return argv[0] - argv[2];
                    }
            | mul
-                   def.lambda (...argv) {
+                   lambda (...argv) {
                        return argv[0];
                    }
            ;
    
        mul : mul '*' number
-                   def.lambda (...argv) {
+                   lambda (...argv) {
                        return argv[0] * argv[2];
                    }
            |  mul '/' number 
-                   def.lambda (...argv) {
+                   lambda (...argv) {
                        return argv[0] / argv[2];
                    }
            | number
-                   def.lambda (...argv) {
+                   lambda (...argv) {
                        return argv[0];
                    }  
            ; 
    
        number : r'[0-9]+' 
-                   def.lambda (...argv) {
+                   lambda (...argv) {
                        return argv[0].integer(); 
                    } 
            ;
    
-       ~ : r'[ \t\r\n]+'
+       nil : r'[ \t\r\n]+'
 	;
 }
 ```
@@ -2336,16 +2486,16 @@ if you run my.calc('3+4*2'), It returns 11
 
 This part requires knowledge about BNF & parsing process to understand all. so, I'll describe other articles about that. In this tutorial let's see different facts with bison.
 
-strings and regular expressions in object are terminals. Orca get token from input stream by using above terminals. in grammar ~ : r'\[ \\t\\r\\n\]+', left ~ means don't use right terminal. (ignore right side terminal) if grammar is matched, lambda object of right side is called. Input parameters are argv list which is composed by return values of matched nodes.
+strings and regular expressions in object are terminals. Orca get token from input stream by using above terminals. in grammar nil : r'\[ \\t\\r\\n\]+', left nil means don't use right terminal. (ignore right side terminal) if grammar is matched, lambda object of right side is called. Input parameters are argv list which is composed by return values of matched nodes.
 
 This is simple example, So if you want another complex one, See the lib/lisp.orca. lisp.orca is common lisp module which is made by parse statement.
 
-User Define Statement(UDS) object
+context extended object
 ---------------------------------
 
-UDS object handle statements that user defines in orca source file. handle means It get it's text code and compile and make result object itself.
+Context extension object handle statements that user defines in orca source file. handle means It get it's text code and compile and make result object itself.
 
-by UDS, Orca can contain DSL in it's source code.
+by this, Orca can contain domain specipic language in it's source code.
 
 for a simple example, let's see below,
 
@@ -2362,7 +2512,7 @@ this code prints 'hello, world'. and internal codes in lambda.cpp { ... } is wri
 
 cpp module check name and timestamp. If there is no dynamic extension library or source\_datetime is newer than dynamic library, cpp module recompile statement and save it as name.so And finally, open that dynamic library and get result object.
 
-This is simillar to inline assembly in C language. but It's different because This UDS can be used for other languages or context which user want to handle. And another difference is result of UDS is independent object, so It doesn't harm readability.
+This is simillar to inline assembly in C language. but It's different because This can be used for other languages or context which user want to handle. And another difference is result of this is independent object, so It doesn't harm readability.
 
-Default supported UDS module libraries in orca are cpp, lang.lisp and lang.sh. You can see these in lib folder and understand how it works.
+Default supported context extended object module libraries in orca are html, json, cpp, lang.lisp and lang.sh. You can see these in lib folder and understand how it works.
 

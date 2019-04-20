@@ -27,7 +27,7 @@ test_vectors = [
   'test_parse',
   'test_context',
   'test_channel',
-  #'test_select',
+  'test_select',
   'test_timer',
   'test_queue',
 ];
@@ -48,7 +48,7 @@ test_modules = [
   'test_system',
   'test_math',
   'test_alg',
-  #'test_lisp',
+  'test_lisp',
   'test_xml',
   'test_json',
 #  'test_gnuplot', # to save time

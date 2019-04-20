@@ -3,8 +3,6 @@
 Orca Programming Language Tutorial
 ==================================
 
-version 0.6
------------
 
 written by Lee, Ki-Yeul (kiyeul.lee@gmail.com)  
 
@@ -12,65 +10,65 @@ written by Lee, Ki-Yeul (kiyeul.lee@gmail.com)
 Table of Contents
 =================
 
-0.  [What's this](#whats_this)
-1.  [들어가며](#start)
-2.  [변수와 자료형](#types)
-    1.  [지역변수](#local)
-    2.  [정수형](#integer)
-    3.  [실수형](#float)
-    4.  [문자열](#string)
-    5.  [정규표현식](#regex)
-    6.  [리스트](#list)
-    7.  [튜플](#tuple)
-    8.  [맵](#map)
-    9.  [조건제시법 리스트](#sbf)
-    10.  [반복자](#iterator)
-3.  [제어문](#control)
+0.  [What's this](#what's-this)
+1.  [들어가며](#들어가며)
+2.  [변수와 자료형](#변수와-자료형)
+    1.  [지역변수](#지역변수)
+    2.  [정수형](#정수형)
+    3.  [실수형](#실수형)
+    4.  [문자열](#문자열)
+    5.  [정규표현식](#정규표현식)
+    6.  [리스트](#리스트)
+    7.  [튜플](#튜플)
+    8.  [맵](#맵)
+    9.  [조건 제시법](#조건-제시법)
+    10.  [반복자](#반복자)
+3.  [제어문](#제어문)
     1.  [if](#if)
     2.  [while](#while)
-    3.  [do while](#do_while)
+    3.  [do while](#do-while)
     4.  [for](#for)
-    5.  [scope object](#scope)
-    6.  [parallel do](#parallel_do)
-    7.  [parallel for](#parallel_for)
-    8.  [decode statement](#decode)
-        1.  [문자열 매치](#string_match)
-        2.  [정규표현식 매치](#regex_match)
-        3.  [리스트 매치](#list_match)
-        4.  [decode 함수](#decode_function)
-4.  [함수와 객체](#function_object)
-    1.  [함수](#function)
-    2.  [객체](#object)
-        1.  [객체 정의](#object_define)
-        2.  [my, owner 축약식](#object_my_owner)
-        3.  [특수문자를 포함한 멤버참조](#object_special)
-        4.  [one time initializer](#object_init)
-        5.  [name'string' 표현형식](#object_string)
-    3.  [상속](#inherit)
+    5.  [scope object](#scope-object)
+    6.  [parallel do](#parallel-do)
+    7.  [parallel call](#parallel-call)
+    8.  [parallel for](#parallel-for)
+    9.  [decode statement](#decode-statement)
+        1.  [문자열 매치](#문자열-매치)
+        2.  [정규표현식 매치](#정규표현식-매치)
+        3.  [리스트 매치](#리스트-매치)
+        4.  [decode 함수](#decode-함수)
+4.  [함수와 객체](#함수와-객체)
+    1.  [함수](#함수)
+    2.  [객체](#객체)
+        1.  [객체 정의](#객체-정의)
+        2.  [my, owner 축약식](#my,-owner-축약식)
+        3.  [특수문자를 포함한 멤버참조](#특수문자를-포함한-멤버참조)
+        4.  [one time initializer](#one-time-initializer)
+        5.  [name'string' 표현형식](#name'string'-표현형식)
+    3.  [상속](#상속)
     4.  [using](#using)
-    5.  [가상멤버](#virtual_member)
-        1.  [type](#virt_type)
-        2.  [typename](#virt_typename)
-        3.  [static_members](#virt_static)
-        4.  [members](#virt_members)
-        5.  [parents](#virt_parents)
-        6.  [id](#virt_id)
-    6.  [예외](#exception)
-    7.  [람다](#lambda)
-    8.  [연산자 재정의](#operator)
-5.  [특수 객체](#special)
-    1.  [Native 객체](#native)
-    2.  [parse 객체](#parse)
-    3.  [UDS 객체](#uds)
-    4.  [one time evaluation 구문](#onetime)
-    5.  [PURE 객체](#pure)
+    5.  [가상멤버](#가상멤버)
+        1.  [TYPE](#TYPE)
+        2.  [TYPENAME](#TYPENAME)
+        3.  [STATIC_MEMBERS](#STATIC_MEMBERS)
+        4.  [MEMBERS](#MEMBERS)
+        5.  [PARENTS](#PARENTS)
+        6.  [ID](#ID)
+    6.  [예외](#예외)
+    7.  [람다](#람다)
+    8.  [연산자 재정의](#연산자-재정의)
+	9.	[폴더 객체](#폴더-객체)
+5.  [특수 객체](#특수-객체)
+    1.  [Native 객체](#Native-객체)
+    2.  [parse 객체](#parse 객체)
+    3.  [문맥 확장 객체](#문맥-확장-객체)
 
 What's this
 ===========
 
 본 문서는 오르카의 간단한 튜토리얼로서 아직 부족하지만 계속 업데이트가 이루어지고 있다.
 
-아직 부족한 부분은 본 문서외에 tests폴더 밑의 test 파일들을 참조하여 파악해주시기 바라며, 궁금한 사항은 community 게시판 (http://orca-lang.or.kr) 에 남겨주시면 감사하겠다.
+아직 부족한 부분은 본 문서외에 tests폴더 밑의 test 파일들을 참조하여 파악해주시기 바라며, 버그 및 이슈는 github(https://github.com/lynix94/orca-lang) 에 남겨주시기 바란다.
 
 본 문서는 상업적인 목적이 아니라면 변형 및 배포에 제한이 없으나 (자주 바뀔 것이기 때문에) 혹시라도 배포하게 된다면 원본의 위치를 명시해 주시기 바란다.
 
@@ -113,18 +111,18 @@ function\_name( expression\_list ) 와 같이 함수호출형의 표현식은 fu
 즉, 첫번째 파라미터의 각 요소에 대해 두번재 파라미터의 코드블럭을 실행하는 for_each 함수가 있다하면, 일반 표현식은 아래와 같지만,
 
 ```
-for_each( list_a, def.lambda(...argv) { print(argv[0]); } );
+for_each( list_a, lambda(...argv) { print(argv[0]); } );
 ```
 
 simple call statement를 이용하면 아래와 같이 표기할 수 있다.
 
 ```
-for_each: list_a, def.lambda(...argv) {
+for_each: list_a, lambda(...argv) {
     print(argv[0]);
 };
 ```
 
-불행이도 예제의 코드블럭이 길지 않아서 실감이 안나는데.. 좀 길다고 상상을 해보자 마지막 중괄호 뒤에 세미콜론을 붙이는 것을 잊지말자.
+불행이도 예제의 코드블럭이 길지 않아서 def실감이 안나는데.. 좀 길다고 상상을 해보자 마지막 중괄호 뒤에 세미콜론을 붙이는 것을 잊지말자.
 
 변수와 자료형
 =======
@@ -150,7 +148,7 @@ hello
 오르카는 동적 type 언어이기 때문에 변수에는 어떤 값이든 대입될 수 있다.
 
 정수형
----
+-----
 
 정수형의 기본적인 연산을 지원하되 0.2 버전부터 정수형의 한계를 없앴다. 때문에 이제 정수형 자료형은 크기 제한 없는 연산이 가능하다. 확인해 보면 다음과 같다.
 
@@ -214,11 +212,11 @@ $ print: 1.2.integer();
 
 
 문자열
----
+-----
 
-문자열의 구분자는 ‘, “ 둘 다 될 수 있으며 escape character를 지원한다. C/C++의 방식과 유사하나, 편의상 ‘ ‘ 구분자를 지원하는 정도만 다르다. 또한, python과 유사하게 “““, ‘‘‘ 구분자도 지원하는데, 두 구분자 사이에 있는 것은 전체를 텍스트로 처리한다. 단, ‘‘‘ 구분자는 텍스트 내의 포멧스트링 처리를 하는데 반해 “““ 구분자는 정말 변환없이 그대로 출력한다.
+문자열의 구분자는 ‘, “ 둘 다 될 수 있으며 escape character를 지원한다. C/C++의 방식과 유사하나, 편의상 ‘ ‘ 구분자를 지원하는 정도만 다르다. 또한, python과 유사하게 “““, ‘‘‘ 구분자도 지원하는데, 두 구분자 사이에 있는 것은 전체를 텍스트로 처리한다. 단, ‘‘‘ 구분자는 텍스트 내의 ${} 표현식 처리를 하는데 반해 “““ 구분자는 정말 변환없이 그대로 출력한다.
 
-스트링의 포멧처리는 ruby 스타일과 비슷한데 구분자는 ${ expression } 이다.
+스트링내의 표현식은 ruby 스타일과 비슷한데 구분자는 ${ expression } 이다.
 
 ```
 $ name = ‘james’;
@@ -250,16 +248,16 @@ le
 slicing의 index가 뒤집혀 있다면, 알아서 뒤집어서 가져온다.
 
 ```
-$ ‘hello, world’[0:5);
+$ ‘hello, world’[0:5+];
 hello,
 ```
 
-Slicing을 쓸 때 오른쪽을 ) 로 하면 가장 오른쪽 원소를 포함한 slicing된 값을 리턴한다.
+Slicing을 쓸 때 오른쪽을 +] 로 하면 가장 오른쪽 원소를 포함한 slicing된 값을 리턴한다.
 
 따라서, 위의 스트링을 뒤집고 싶다면
 
 ```
-$ ‘hello, world’[-1:0);
+$ ‘hello, world’[-1:0+];
 dlrow, olleh
 ```
 
@@ -419,12 +417,32 @@ $ print: b'01110011 01110100';
 st
 ```
 
-0.5 버전부터 python style의 포멧스트링을 지원한다. 형식은 파이썬 스타일과 같으며, 내부적으로는 string의 modulo operator를 오버라이딩하여 구현된 것이다.
+python style의 포멧스트링도 지원한다. 형식은 파이썬 스타일과 같으며, 내부적으로는 string의 modulo operator를 오버라이딩하여 구현된 것이다.
 
 ```
 $ 'i: %d, f: %f, e: %e, s: %s' % (100, 12.34, 12.34, 'hello, world!');
 i: 100, f: 12.340000, e: 1.234000e+01, s: hello, world!
 ```
+
+
+
+%TYPE 을 사용하는 포멧스트링에서 한단계 더 나아가 오르카는 맵타입의 포맷스트링도 지원한다. 이 기능은 나중에 html 모듈에서 유용하게 사용된다. 포맷스트링 안에 %{NAME} 형식의 포멧이 있으면 파라미터의 가장 마지막 인수를 map type 으로 가정하고 해당 map 에서 NAME의 값을 대입시킨다.
+
+예를들어 아래의 경우는 hello, orca 를 출력한다.
+
+```
+print: 'hello, %{name}' % ({'name':'orca'});
+```
+
+map 타입 포멧은 기존의 포멧과 같이 섞여쓸 수 있으나 map 타입 포멧은 한번만 나와야 하며 인수로서 가장 마지막에 위치해야 한다.
+
+```
+print: 'format i: %d, name: %{name}, f: %f, age: %{age}' % (10, 12.34, {'name':'orca', 'age':20});
+```
+
+출력결과는 format i: 10, name: orca, f: 12.340000, age: 20 와 같다.
+
+
 
 정규표현식
 -----
@@ -540,25 +558,57 @@ true
 $ 
 ```
 
-반복자를 반환하는 begin(), end() 인터페이스가 있다.
+list 의 반복자는 value 를 리턴하며 순회하는 value 기반 반복자를 리턴하는 iter() 인터페이스가 있고, position 기반의 반복자를 리턴하는 piter(), first(), last(), end() 가 있다. 이는 리스트, 튜플, 맵에 모두 공통이다. 자세한 내용은 뒤의 반복자 파트를 참고하기 바란다.
+
+iter() 는 리스트의 첫번째를 가르키며, next 를 실행할때마다 다음 값을 리턴하고 마지막까지 참조한 후에는 orca.iter.end exception 을 발생시킨다.
 
 ```
 $ list = [1,2,3];
-$ i = list.begin();
-$ e = list.end();
-$ print: i();
+[ 1,2,3 ]
+$ i = list.iter();
+<iter - 0x16edd70>
+$ i.next();
 1
 $ i.next();
-$ i();
-$ i(3);
+2
+$ i.next();
+3
+$ i.next();
+uncaugted exception: orca.iter.end out of range
+recent call-stack trace
+>> root (internal 0)
+```
+
+ 
+
+position 기반 iterator 중 piter 는 첫번째 아이템의 이전 (next 를 수행하면 첫번째 아이템위치의 iterator 를 리턴) 이며, first 는 첫번째 아이템, last 는 마지막 아이템, end 는 마지막 아이템의 다음 위치로 invalid 한 값을 의미한다. (c++ stl 의 end 와 같다) position iterator 는 iterator 간의 위치를 비교할 수 있으며, iterator 를 실행하면 현재위치의 값이 리턴되고, iterator 를 실행할때 값을 주면 현재 위치의 값을 변경할 수 있다. 이 점이 앞의 value iterator 보다 사용성이 뛰어난 점으로 간단히 값을 순회하기 위해서는 앞의 iter() 인터페이스를 사용하고, 추가적인 기능을 사용할 때는 piter, first, last, end 를 사용하면 된다.
+
+```
+$ list = [1,2,3];
+[ 1,2,3 ]
+$ f = list.first();
+<iter - 0x16f7f30>
+$ l = list.last();
+<iter - 0x16f82f0>
+$ f();
+1
+$ l();
+3
+$ f.next();
+<iter - 0x16f7f30>
+$ f();
+2
+$ f(3);
+3
 $ print: list;
 [ 1,3,3 ]
-$ print: i == e;
+$ print: f == l;
 false
-$ i.next();
-$ e.prev();
-$ print: i == e;
+$ f.next();
+<iter - 0x16f7f30>
+$ print: f == l;
 true
+
 ```
 
 find(value) 인터페이스는 value가 있는 위치의 반복자를 반환한다.
@@ -601,14 +651,15 @@ $ a.sort();
 $ print: a;
 [ 1,2,2,3,4 ]
 $ 
-$ a.sort(def.labmda(...argv){ return argv[0] >= argv[1]; });
+$ a.sort(labmda(...argv){ return argv[0] >= argv[1]; });
 [ 4,3,2,2,1 ]
 ```
 
 위의 예에서 마지막 부분은, 역순으로 정렬하고자 '<'와 정반대로 동작하는 람다함수를 인자로 전달한 예를 보여준다.
 
+
 튜플
---
+-----
 
 튜플은 리스트와 외형상으로는 거의 같으나 크기가 고정되어 있다는 점이 다르고 사용자에게 드러나지는 않으나 랜덤 억세스시 탐색속도가 더 빠르다는 장점이 있다.
 
@@ -648,28 +699,41 @@ $ a.empty();
 true
 ```
 
-tuple의 경우도 리스트와 유사하게 begin(), end(), find() 를 제공한다. 단, insert, remove는 제공하지 않는다.
+tuple의 경우도 리스트와 유사하게 iter(), piter(), first(), last(), end(), find() 를 제공한다. 단, insert, remove는 제공하지 않는다.
 
 ```
-$ tp = (1,2,3);
-$ i = tp.begin();
-$ e = tp.end();
-$ print: i();
+$$ tp = (1,2,3);
+( 1,2,3 )
+$ f = tp.first();
+<tupleiter - 0x16fa2d0>
+$ l = tp.last();
+<tupleiter - 0x16fa4c0>
+$ f();
 1
-$ i.next();
-$ print: i();
+$ f.next();
+<tupleiter - 0x16fa2d0>
+$ f();
 2
-$ print: i(3);
+$ f(3);
 3
 $ print: tp;
 ( 1,3,3 )
-$ print: i == e;
+$ print: f == l;
 false
-$ i.next();
-$ e.prev();
-$ print: i == e;
+$ f.next();
+<tupleiter - 0x16fa2d0>
+$ print: f== l;
 true
-$
+$ tp = (1,2,3);
+( 1,2,3 )
+$ i = tp.find(2);
+<tupleiter - 0x16fb4c0>
+$ i();
+2
+$ i.prev();
+<tupleiter - 0x16fb4c0>
+$ i();
+1
 $ tp = (1,2,3);
 $ i = tp.find(2);
 $ print: i();
@@ -679,8 +743,12 @@ $ print: i();
 1
 ```
 
-맵
--
+
+
+
+
+맵 
+-----
 
 파이썬, 루비의 딕셔너리 및 STL의 map 과 같은 자료구조이다.
 
@@ -726,37 +794,51 @@ $ print: a;
 $ 
 ```
 
-map의 경우도 begin, end 인터페이스를 지원한다. map 은 정렬연관 컨테이너이기 때문에 begin() 으로부터 end() 까지 한단계씩 진행하면 정렬 순서대로 아이템들을 억세스할 수 있다.
+map의 경우도 iter, piter, first, last, end 인터페이스를 지원한다. map 은 정렬연관 컨테이너이기 때문에 iterator 의 next로 순회하면 정렬 순서대로 아이템들을 억세스할 수 있다.
 
-반복자로부터 값을 참조하려면 반복자를 실행시키면 되는데 map의 경우는 key-value pair이다 보니 실행하면 ( key, value ) 의 튜플이 반환된다. key, value 를 따로 억세스하기 위해서는 it.first(), it.second() 인터페이스를 각각 호출한다 (STL map의 경우와 같으나 실행해야 하는 것만 다르다)
+map 의 경우 k, v 쌍이기 때문에 iter 외에 k, v 를 리턴하는 iter2 인터페이스도 제공한다.
+
+반복자로부터 값을 참조하려면 반복자를 실행시키면 되는데 map의 경우는 key-value pair이다 보니 실행하면 ( key, value ) 의 튜플이 반환된다. key, value 를 따로 억세스하기 위해서는 it.key(), it.value() 인터페이스를 각각 호출한다.
 
 ```
-$ m = { 1:100, 2:200, 3:300 };
-$ a = m.begin();
-$ print: a(), a.first(), a.second();
+$ m = {1:100, 2:200, 3:300};
+{ 1:100,2:200,3:300 }
+$ a = m.first();
+<mapiter - 0x16fc5e0>
+$ print: a(), a.key(), a.value();
 ( 1,100 )1100
 $ a.next();
-$ print: a(), a.first(), a.second();
+<mapiter - 0x16fc5e0>
+$ print: a(), a.key(), a.value();
 ( 2,200 )2200
 $ a.next();
-$ print: a(), a.first(), a.second();
+<mapiter - 0x16fc5e0>
+$ print: a(), a.key(), a.value();
 ( 3,300 )3300
 $ a.next();
-uncaugted exception: orca.iter out of range
+uncaugted exception: orca.iter.end out of range
 recent call-stack trace
+>> root (internal 0)
 ```
 
 반복자로부터 값을 변경하는 것은 반복자에 변경될 값을 입력하여 호출하면 되는데 맵의 경우 키를 바꿀 수는 없고 (키를 바꾼다는 것은 정렬순서가 바뀌는 것이며 반복자가 정렬순서를 바꾸면서 유효할 수 없다) value 값이 변경된다.
 
 ```
-$ a = { 1:100, 2:200, 3:300 };
-$ it = a.begin();
+$ a = {1:100, 2:200, 3:300};
+{ 1:100,2:200,3:300 }
+$ it = a.first();
+<mapiter - 0x1700170>
 $ it(1000);
+( 1,1000 )
 $ it.next();
+<mapiter - 0x1700170>
 $ it(2000);
+( 2,2000 )
 $ it.next();
+<mapiter - 0x1700170>
 $ it(3000);
-$ print: a;
+( 3,3000 )
+$ a;
 { 1:1000,2:2000,3:3000 }
 ```
 
@@ -807,6 +889,10 @@ $ print: a.keys();
 $ print: a.values();
 [ 'value 1',[ 1,2,3 ],2 ]
 ```
+
+
+
+
 
 조건 제시법
 ------
@@ -936,11 +1022,11 @@ factor(10)은 %\[x|x<-1~10, 10%x == 0\] 이라는 조건제시법을 리턴한�
 ```
 def.decode qsort(a)
 {
-  [] ->
+  case []:
     {
       return [];
     }
-  %x:%xs -> 
+  case %x[%xs]:
     {
       return qsort(%[a|a<-xs, a<=x]) + [x] +  qsort(%[b|b<-xs, b>x]);
     }
@@ -980,24 +1066,29 @@ $ print: a.size()
 ```
 
 반복자
----
-
-컨테이너 자료형들에 있는 반복자들은 STL 방식의 인터페이스로 구현되었다.
+-----
 
 현재 구현되어 있는 반복자들의 규칙은 다음과 같다.
 
-*   다음으로 이동하기 위해서는 반복자의 next() 를 호출하며 (변경된) 자기 자신을 리턴한다.
-*   이전으로 이동하기 위해서는 prev()를 호출하며 자기 자신을 리턴한다.
-*   next, prev의 결과가 유효범위를 벗어나면 nil을 리턴한다.
-*   반복자의 값을 참조하기 위해서는 반복자를 호출한다. (반복자가 a 라면 value = a() 와 같이)
-*   반복자가 가르키는 값을 변경하려면 변경될 값을 반복자의 파라미터로 하여 반복자를 호출한다. ( 반복자가 a 이고 1로 변경하고 싶으면 a(1) 과 같이)
-*   반복자는 동등 비교 ( ==, !=) 를 할 수 있다.
-*   map 의 반복자의 경우는 특별히 대소 비교 ( <, <=, >, >=) 까지 할 수 있다.
-*   반복자가 유효하지 않은 상황에서 참조될 경우 orca.iter exception을 발생시킨다.
+* 다음으로 이동하기 위해서는 반복자의 next() 를 호출하면 자기 자신의 위치를 변경하되 다음 값이나, 자기 자신을 리턴한다. (list 설명에서의 value 반복자와 position 반복자 참고)
+
+* 이전으로 이동하기 위해서는 prev()를 호출한다.
+
+* next, prev의 결과가 유효범위를 벗어나면 orca.iter.end exception 을 발생시킨다.
+
+* 값을 참조하기 위해서는 반복자를 호출한다. (반복자가 a 라면 value = a() 와 같이)
+
+* 반복자가 가르키는 값을 변경하려면 변경될 값을 반복자의 파라미터로 하여 반복자를 호출한다. ( 반복자가 a 이고 1로 변경하고 싶으면 a(1) 과 같이)
+
+* 반복자는 동등 비교 ( ==, !=) 를 할 수 있다.
+
+* map 의 반복자의 경우는 특별히 대소 비교 ( <, <=, >, >=) 까지 할 수 있다.
+
+  ​
 
 여기까지가 구현되어 있는 반복자들의 일반 규칙이며 추가로 각각의 컨테이너들은 다음 규칙과 같이 동작한다.
 
-*   list, tuple, map 의 첫번째 아이템의 반복자는 해당 컨테이너의 begin()을 호출하면 얻어지며
+*   list, tuple, map 의 첫번째 아이템의 반복자는 해당 컨테이너의 first()을 호출하면 얻어지며
 *   next(), prev() 는 이동 단위를 인자로 받을 수 있다. next(2) 는 next(), next() 와 같다.
 *   마지막 아이템의 반복자는 last() 를 호출하면 얻어진다
 *   마지막 아이템의 다음 반복자는 end() 를 호출하면 얻어진다
@@ -1100,7 +1191,7 @@ for i in it {
 print: sum;
 ```
 
-scope 객체
+scope object
 --------
 
 엄밀히 말해서 scope 객체가 제어문은 아니지만, 코드 흐름과 관계된 내용이어서 여기서 소개한다. 단, 본 절의 예제를 이해하려면 함수, 객체에 대한 내역을 알아야 하기 때문에 예제가 이해 안된다면 다른 부분을 먼저 본 후 다시 보기 바란다.
@@ -1113,7 +1204,7 @@ object {
 }
 ```
 
-이런 식으로 구성되면 statement list 가 실행되기 전에, object.scope\_start() 가 자동적으로 실행되고, 마지막에 object.scope\_end()가 실행된다. 또한, object.scope_end()는 exception 이 발생하거나, statement list안에서 return 을 하더라도 실행되는 것이 보장된다.
+이런 식으로 구성되면 statement list 가 실행되기 전에, object."{"() 가 자동적으로 실행되고, 마지막에 object."}"()가 실행된다. 또한, object."}"()는 exception 이 발생하거나, statement list안에서 return 을 하더라도 실행되는 것이 보장된다.
 
 예를 들어 어느 구문을 뮤텍스로 잡고 싶다면.
 
@@ -1129,11 +1220,11 @@ def scope_mutex
         ..mtx = new ipc.mutex;
     }
     
-    def scope_start {
+    def "{" {
         ..mtx.lock();
     }
     
-    def scope_end {
+    def "}" {
         ..mtx.unlock();
     }
 }
@@ -1152,17 +1243,17 @@ def fun {
 와 같은 구문을 구성하고 fun() 를 실행하면,
 
 ```
-mtx.scope_start();
+mtx."{"();
 foo();
 bar();
-mtx.scope_end();
+mtx."}"();
 ```
 
-순서대로 실행된다. 짐작하겠지만 scope\_start에서는 mutex를 얻고, scope\_end에서는 mutex를 풀며 그 사이 영역을 상호배제 시키는 예제이다.
+순서대로 실행된다. 짐작하겠지만 "{"에서는 mutex를 얻고, "}"에서는 mutex를 풀며 그 사이 영역을 상호배제 시키는 예제이다.
 
-하지만 이것이 단순히 scope\_start(), scope\_end()를 중괄호 시작과 끝에 단순 대입하는 것만은 아니다.
+하지만 이것이 단순히 {, } 를 중괄호 시작과 끝에 단순 대입하는 것만은 아니다.
 
-만일 foo(), bar() 에서 어떤 exception이 발생하고, foo에서 이를 catch하지 않아서 외부로 전파되게 되면, mtx.scope_end()가 그 시점 (stack unwinding 시점)에서 자동으로 호출된다. 또는
+만일 foo(), bar() 에서 어떤 exception이 발생하고, foo에서 이를 catch하지 않아서 외부로 전파되게 되면, mtx."}"가 그 시점 (stack unwinding 시점)에서 자동으로 호출된다. 또는
 
 ```
 mtx {
@@ -1171,7 +1262,7 @@ mtx {
 }
 ```
 
-인 상황에서도 return 전에 mtx.scope_end()가 호출된다.
+인 상황에서도 return 전에 mtx."}"가 호출된다.
 
 해서 위의 코드는 mutex unlock이 되지않아 다른 쓰레드를 데드락으로 만들지 않게 보장한다. C++의 생성자, 소멸자를 이용한 블럭킹 테크닉을 생각하면 된다. (하지만 이게 더 가독성이 높지?)
 
@@ -1287,13 +1378,13 @@ using stopwatch;
 sw = stopwatch;
 
 sw.start();
-time.msleep(1000);
+time.sleep(1.0);
 
 sw.lap('without parallel do: ');
 
 sw.start();
 parallel do {
-  time.msleep(1000);
+  time.sleep(1.0);
 }
 
 sw.lap('with parallel do: ');
@@ -1303,7 +1394,29 @@ without parallel do: 999 ms, 599 us
 with parallel do: 399 us
 ```
 
-위와 같이 parallel do 구문을 쓰면 메인 쓰레드가 msleep을 지나쳐 오므로 보기와 같이 빠르게 sw.lap() 까지 도달한다.
+위와 같이 parallel do 구문을 쓰면 메인 쓰레드가 sleep을 지나쳐 오므로 보기와 같이 빠르게 sw.lap() 까지 도달한다.
+
+
+parallel call
+-----------
+parallel 로 특정 함수를 call할수도 있다. parallel 다음에 함수호출식을 쓰면 병령로 실행된다.
+
+다음은 그 예이다.
+
+```
+using time;
+
+def foo
+{
+	time.sleep(1.0);
+	print: "I'm foo";
+}
+
+
+parallel my.foo();
+print: "may be this will be shown faster";
+
+```
 
 parallel for
 ------------
@@ -1428,9 +1541,9 @@ decode statement
 ```
 decode (A)
 {
-  pattern_list -> statement_list
-  pattern_list -> statement_list
-  pattern_list -> statement_list
+  case pattern_list: statement_list
+  case pattern_list: statement_list
+  case pattern_list: statement_list
   ...
 }
 ```
@@ -1446,8 +1559,8 @@ A에는 list, vector, list type object(SBF, iterator), string 이 올 수 있으
 ```
 decode('orca')
 {
-  'orca' -> print: 'orca, matched';
-  'python' -> print: 'python, matched';
+  case 'orca': print: 'orca, matched';
+  case 'python': print: 'python, matched';
 }
 ```
 
@@ -1458,9 +1571,9 @@ decode('orca')
 ```
 decode(str)
 {
-  'send:', %to, ':', %msg -> ..send(to, msg);
-  'connect:', %to -> ..connect(to);
-  %fail -> ..error(fail);
+  case 'send:', %to, ':', %msg: ..send(to, msg);
+  case 'connect:', %to: ..connect(to);
+  case %fail: ..error(fail);
 } 
 ```
 
@@ -1479,15 +1592,15 @@ decode(str)
 위의 예제를 다음과 같이 쓸 수도 있다.
 
 ```
-magin = '';
+magic = '';
 ...
 decode(str)
 {
-  magic, 'send:', %to, ':', %msg -> 
+  case magic, 'send:', %to, ':', %msg: 
     { 
       ..send(to, msg); 
     }
-  magic, 'connect:', %to -> 
+  case magic, 'connect:', %to:
     { 
       ..connect(to); 
     }
@@ -1496,15 +1609,15 @@ decode(str)
 
 위의 패턴 리스트에서 magic 은 패턴 비교를 위해 쓰였고, to, msg 는 패턴의 대입을 위해 쓰였다. 이 구분을 위해서 to, msg앞에 % 를 굳이 붙인 것이다.
 
-### 정규 표현식의 매치
+### 정규 표현식 매치
 
 decode 구문의 패턴에는 정규표현식이 쓰여 표현식을 더 풍부하게 해줄 수 있다.
 
 ```
 decode (str)
 {
- 'id:', r'[a-zA-Z][a-zA-Z_0-9]*', ', number:', r'[0-9]+' -> print: 'matched!!';
-  %fail -> print: 'failed..';
+ case 'id:', r'[a-zA-Z][a-zA-Z_0-9]*', ', number:', r'[0-9]+': print('matched!!');
+ case %fail: print('failed..');
 }
 ```
 
@@ -1515,8 +1628,8 @@ decode (str)
 ```
 decode (str)
 {
- 'id:', %id=r'[a-zA-Z][a-zA-Z_0-9]*', ', number:', %number=r'[0-9]+' -> print: 'matched!!, id=${id}, number=${number}';
-  %fail -> print: 'failed..';
+ case 'id:', %id=r'[a-zA-Z][a-zA-Z_0-9]*', ', number:', %number=r'[0-9]+': print('matched!!, id=${id}, number=${number}');
+ case %fail: print('failed..');
 }
 ```
 
@@ -1529,7 +1642,7 @@ decode (str)
 ```
 decode ([1,2,3,4,5])
 {
- [1, 2], %mid, [4, 5] -> print: mid;
+  case [1, 2], %mid, [4, 5]: print(mid);
 }
 ```
 
@@ -1540,8 +1653,8 @@ decode ([1,2,3,4,5])
 ```
 decode ([1,2,3,4,5])
 {
-  [] -> print: 'empty';
-  %head:%tail -> print: 'head: ${head}, tail: ${tail}';
+  case []: print('empty');
+  case %head[%tail]: print('head: ${head}, tail: ${tail}');
 }
 ```
 
@@ -1558,8 +1671,8 @@ def print_list(a)
 {
   decode (a)
     {
-	[] -> print: 'done';
-    %head:%tail -> {
+	case []: print: 'done';
+    case %head[%tail]: {
 		print: head;
 		print_list(tail);
 	}
@@ -1587,8 +1700,8 @@ done
 ```
 def.decode print_list(a)
 {
-  [] -> print: 'done';
-  %head:%tail -> {
+  case []: print: 'done';
+  case %head[%tail]: {
 		print: head;
 		print_list(tail);
   }
@@ -1602,11 +1715,11 @@ def.decode print_list(a)
 ```
 def.decode qsort(a)
 {
-  [] ->
+  case []:
     {
       return \[\];
     }
-  %x:%xs -> 
+  case %x[%xs]: 
     {
       return qsort(%[a|a<-xs, a<=x]) + [x] +  qsort(%[b|b<-xs, b>x]);
     }
@@ -1627,14 +1740,14 @@ $ print: .qsort([-7, 1.2, 30, 4]);
 ```
 def.decode tolist(str)
 {
-	'[', %body, ']' -> 
+	case '[', %body, ']':
 		{
 			ret = tolist(body);
 			if type.is_tuple(ret): 
 				return ret.list(); 
 			return [ ret ];
 		}
-	%head, ',', %tail ->
+	case %head, ',', %tail:
 		{
 			h = tolist(head);			
 			t = tolist(tail);
@@ -1644,7 +1757,7 @@ def.decode tolist(str)
 
 			return t.push_front(h);
 		}
-	%value = r'[0-9]+' ->
+	case %value = r'[0-9]+':
 		{
 			return value.integer();
 		}
@@ -1660,14 +1773,14 @@ using match;
 
 def.decode tolist(str)
 {
-	'[', %body = match.bracket, ']' -> 
+	case '[', %body = match.bracket, ']': 
 		{
 			ret = tolist(body);
 			if type.is_tuple(ret): 
 				return ret.list(); 
 			return [ ret ];
 		}
-	%head = match.comma, ',', %tail ->
+	case %head = match.comma, ',', %tail:
 		{
 			h = tolist(head);			
 			t = tolist(tail);
@@ -1677,7 +1790,7 @@ def.decode tolist(str)
 
 			return t.push_front(h);
 		}
-	%value = r'[0-9]+' ->
+	case %value = r'[0-9]+':
 		{
 			return value.integer();
 		}
@@ -1694,7 +1807,7 @@ def.decode tolist(str)
 ======
 
 함수
---
+-----
 
 일단 편의상 함수라 먼저 말하고, 멤버변수가 없는 객체를 설명하고자 한다. (다시 말해 말만 함수이지 맴버 변수가 없는 객체인 것이다)
 
@@ -1723,7 +1836,7 @@ print: my.add(10, 20);
 가변인자가 필요할 때는 선언 시
 
 ```
-def sum_all(…) {
+def sum_all(…argv) {
     sum = 0;
     for a in argv {
         sum += a;
@@ -1736,10 +1849,10 @@ print: my.sum_all(1,2,3);
 6
 ```
 
-과 같이 할 수 있다. … 는 가변인자를 받겠다는 의미이며, 받은 가변인자는 argv 리스트로 넘겨받는다. …는 함수 선언의 다른 파라미터와 섞여 사용될 수 있으나 가장 마지막에 와야 한다. 즉, def (a, …, b) 는 안되고, def (a, b, …) 는 된다는 의미이다.
+과 같이 할 수 있다. …argv 는 가변인자를 받겠다는 의미이며, 받은 가변인자는 argv 리스트로 넘겨받는다. …argv 는 함수 선언의 다른 파라미터와 섞여 사용될 수 있으나 가장 마지막에 와야 한다. 즉, def (a, …b, c) 는 안되고, def (a, b, …c) 는 된다는 의미이다.
 
 객체
---
+-----
 
 ### 객체 정의
 
@@ -1837,7 +1950,7 @@ Thread.run(my.foo);
 
 일단 현 시점에서 이해가 잘 안 된다면 일단은 python의 self대신 owner가 쓰인다고 생각하자. my가 아닌 owner인 이유는 상위 객체에 속한 멤버이기 때문이다. 내 함수(객체) 내의 멤버가 아니라.
 
-### my, owner의 축약식
+### my, owner 축약식
 
 my, owner가 의외로 치기 성가시고, 한눈에 안 들어오기 때문에 간축형을 지원한다. . 은 my. 를 의미하고, .. 은 owner. 를 의미한다. Shell의 현재, 부모 디렉토리 표식을 생각하면 된다.
 
@@ -1861,7 +1974,7 @@ def counter {
 
 로 다시 쓸 수 있다.
 
-### 특수문자를 포함한 멤버 참조
+### 특수문자를 포함한 멤버참조
 
 객체의 멤버를 정의할 때는 원칙적으로 특수문자가 없어야 하나, 특수문자를 포함한 멤버를 정의하고자 할 때는 따옴표를 주고 정의하고 참조할 수 있다.
 
@@ -1940,7 +2053,7 @@ $ date'2011-04-03' - date'2010-01-01';
 ```
 
 상속
---
+-----
 
 객체를 상속하는 방법은
 
@@ -2108,7 +2221,7 @@ $    print: io.ID;
 ```
 
 예외
---
+------
 
 Exception 이 발생했을 때 이를 throw 할 수 있고, 그 구문은 기존의 C/C++ 의 방식과 같다. 단, 프로그래머의 편의를 위해 throw 하는 첫 번째 인자는 객체가 아니라 path name 이다.
 
@@ -2162,11 +2275,11 @@ catch app -> num, msg {
 catch 시에는 tag name 뒤에 콜론을 하나 붙인 후, 받고자 하는 파라미터 목록을 나열한다.
 
 람다
---
+-----
 
 간단한 용도를 위해서 람다 객체도 지원하는데, 선언법은
 
-def.lambda { statement_list } 와 같다.
+lambda { statement_list } 와 같다.
 
 이는 이름만 없을 뿐이지 모든 면에서 일반 오르카 객체와 동일하다. 자체적으로 멤버변수를 가질 수 있고, 생성되는 람다의 owner는 람다가 정의된 객체이다.
 
@@ -2179,11 +2292,11 @@ def for_each(list, functor) {
     }
 }
 
-my.for_each([1..10], def.lambda(...argv){ print(argv[0]); });
+my.for_each([1..10], lambda(...argv){ print(argv[0]); });
 
-# below is same with above statement
+below is same with above statement
 
-my.for_each: [1..10], def.lambda(...argv) {
+my.for_each: [1..10], lambda(...argv) {
     print: argv[0];
 };
 ```
@@ -2191,7 +2304,7 @@ my.for_each: [1..10], def.lambda(...argv) {
 말했다시피 람다는 객체와 동일하기 때문에
 
 ```
-$ a = def.lambda { print: ‘foo’; };
+$ a = lambda { print: ‘foo’; };
 $ a();
 foo
 ```
@@ -2305,7 +2418,7 @@ recent call-stack trace
 
 .=은 어떤 객체 a의 멤버 b에 어떤 값을 대입할 때, 만일 b란 이름의 멤버가 존재하지 않으면 .=이 호출된다.
 
-.=(name, object) 와 같은 형태로서
+.=(name, obj는ect) 와 같은 형태로서
 
 a.b = 10; 이 란 문장이 있을 때 a가 .=을 재정의 했고, b란 멤버가 없으면 .=('b', 10) 이 호출된다.
 
@@ -2332,6 +2445,58 @@ obj + obj\_b 는 obj.'+'(obj\_b) 를 호출하지만, obj\_b + obj 은 obj\_b.'+
 단, -, / 연산자는 교환법칙이 성립하지 않는다.
 
 obj - 1 은 obj.'-'(1) 이 호출되지만 1 - obj 은 obj.'-rev'(1) 가 호출된다. -rev 객체에서 순서를 바꾼 후 처리하게 구현하면 된다.
+
+
+
+폴더 객체
+------
+
+객체의 내용이 커지면 모듈화의 필요성이 생긴다.
+파이썬의 경우 폴더에 __init__.py 의 존재 여부로 결정하고, golang 의 경우 package 정의로 구분하나 오르카에서는 좀 더 일반적이 직관적인 방식으로 정의하였다.
+
+특정 폴더의 이름이 .orca 확장자를 가지면 해당 폴더는 오르카 객체로 인식된다. 그리고 해당 폴더 안의 orca 파일들은 해당 객체의 멤버로 정의된다. 만일 이 폴더객체에 실행 코드가 필요한 경우 해당 폴더객체에 CODE.orca (오르카에서 가상 멤버는 대문자로 정의함을 기억하라) 로 정의하면 별도의 CODE 라는 멤버가 생기는게 아니라 이 폴더 객체의 실행코드가 된다. 
+
+먼저 아래와 같이 sample.orca 라는 폴더에서 아래와 같은 파일을 정의해 보자.
+
+
+```
+~$ cd sample.orca/
+~/sample.orca$ ls *.orca
+CODE.orca  bar.orca  foo.orca
+
+~/sample.orca$ cat CODE.orca
+
+print: "I'm %s" % my.NAME;
+print: "My members: ", my.MEMBERS;
+
+for k, v in my.MEMBERS {
+        v();
+}
+~/sample.orca$ cat foo.orca
+print: "I'm foo";
+~/sample.orca$ cat bar.orca
+print: "I'm bar";
+
+```
+
+
+sample.orca 를 실행하면 CODE.orca 가 실행되며 sample.orca 의 멤버들을 출력, 실행해주는 결과이다.
+
+```
+~$ orca sample.orca
+I'm sample
+My members: { 'bar':<bar - 0x1f20f50>,'foo':<foo - 0x1f220a0> }
+I'm bar
+I'm foo
+```
+
+orca 의 lib 폴더를 보면 이런식으로 다단계의 폴더 오브젝트들이 정의되어있는 것을 볼 수 있다.
+
+
+
+
+
+
 
 특수 객체
 =====
@@ -2534,40 +2699,40 @@ parse 객체
 def.parse calc(str)
    {
        stmt : stmt '+' mul
-                   def.lambda (...argv) {
+                   lambda (...argv) {
                        return argv[0] + argv[2];
                    }
            | stmt '-' mul
-                   def.lambda (...argv) {
+                   lambda (...argv) {
                        return argv[0] - argv[2];
                    }
            | mul
-                   def.lambda (...argv) {
+                   lambda (...argv) {
                        return argv[0];
                    }
            ;
 
        mul : mul '*' number
-                   def.lambda (...argv) {
+                   lambda (...argv) {
                        return argv[0] * argv[2];
                    }
            |  mul '/' number 
-                   def.lambda (...argv) {
+                   lambda (...argv) {
                        return argv[0] / argv[2];
                    }
            | number
-                   def.lambda (...argv) {
+                   lambda (...argv) {
                        return argv[0];
                    }  
            ; 
        
        number : r'[0-9]+' 
-                   def.lambda (...argv) {
+                   lambda (...argv) {
                        return argv[0].integer(); 
                    } 
            ;
        
-       ~ : r'[ \t\r\n\]+'
+       nil : r'[ \t\r\n\]+'
     ;
 }
 ```
@@ -2578,14 +2743,14 @@ def.parse calc(str)
 
 여기서는 bison과 다른 점 위주로 간단히 설명하겠다.
 
-구문안의 스트링과 정규표현식은 터미널을 의미하는데, 오르카는 구문안의 터미널들을 사용하여 입력 스트링에서 토큰들을 알아서 분리하게된다. 문법중 ~ : r'\[ \\t\\r\\n\]+' 의 경우, 왼쪽의 ~ 는 오른쪽의 터미널들은 사용하지 않고 버리겠다는 의미이다. 문법이 매칭되면 오른쪽의 람다함수가 실행되는데, 입력값은 매칭되는 노드의 값들을 argv 로 받게되며 리턴값은 새로 구성되는 논터미널의 값으로 등록된다.
+구문안의 스트링과 정규표현식은 터미널을 의미하는데, 오르카는 구문안의 터미널들을 사용하여 입력 스트링에서 토큰들을 알아서 분리하게된다. 문법중 nil : r'\[ \\t\\r\\n\]+' 의 경우, 왼쪽의 nil은 오른쪽의 터미널들은 사용하지 않고 버리겠다는 의미이다. 문법이 매칭되면 오른쪽의 람다함수가 실행되는데, 입력값은 매칭되는 노드의 값들을 argv 로 받게되며 리턴값은 새로 구성되는 논터미널의 값으로 등록된다.
 
 설명의 편의성을 위해 간단한 예제를 사용했는데, 오르카 라이브러리들 중 lisp.orca를 보면 common lisp 이 parse 구문으로 구현되어 있는 것을 확인해 볼 수 있다.
 
-UDS 객체
+문맥 확장 객체 (Context Extended Object)
 ------
 
-사용자 정의 구문(User Define Statement, UDS)은 오르카의 언어 중간에서 사용자가 정의한 함수가 해당 구역의 코드를 컴파일하고실행하는 것을 의미한다. 이 구문을 통해서 오르카 언어 내부에 사용자가 정의한 DSL(Domain Specific Language)을 내장할 수 있다.
+문맥 확장 객체는 오르카의 언어 중간에서 사용자가 정의한 함수가 해당 구역의 코드를 컴파일하고실행하는 것을 의미한다. 이 구문을 통해서 오르카 언어 내부에 사용자가 정의한 DSL(Domain Specific Language)을 내장할 수 있다.
 
 가장 간단한 예로, 다음의 예를 먼저 보고 설명한다.
 
@@ -2600,11 +2765,9 @@ a('world');
 
 위의 코드는 hello, world를 출력하는데, lambda.cpp{ ... } 로 정의된 객체의 내부 코드가 CPP 언어로 되어 있는것에 주의하자. def.name 나 lambda.name 가 선언되면 오르카는 name 모듈에게 statement 코드를 넘겨주고, 추가적으로 현재의 시간정보와 모듈의 유니크한 이름 을 넘겨준다.
 
-즉, cpp(name, timestamp, source_code, params_name_list) 을 호출한다. cpp 모듈은 name 과 timestamp 정보를 사용하여, 컴파일된 확장 라이브러리가 있는지 혹은 소스코드가 확장라이브러리보다 나 중에 바뀌었는지 확인한 후 필요하면 이를 재컴파일하고 확장라이브러리를 열어서 실행한다.
+즉, cpp(name, timestamp, source_code, pa체rams_name_list) 을 호출한다. cpp 모듈은 name 과 timestamp 정보를 사용하여, 컴파일된 확장 라이브러리가 있는지 혹은 소스코드가 확장라이브러리보다 나 중에 바뀌었는지 확인한 후 필요하면 이를 재컴파일하고 확장라이브러리를 열어서 실행한다.
 
 마치 C언어 내부의 인라인 어셈블리어와 비슷하지만 결정적으로 다른것은, 특정 문법에 고정된 것이 아니라 사용자가 재정의 할 수 있도록 범용적인 구성으로 되어 있고, 연산의 결과가 객체로서 오르카에게 전달되도록 되기 때문에, 인라인 어셈블리어의 남용시 겪게 되는 가독성 저하 및 부수효과도 방지된다.
 
-오르카에서 기본제공되는 user defined statement 처리 모듈은 cpp, lisp, sh 가 있다. 이들의 상세 내역은 모듈 레퍼런스에서 참조할 수 있고, 실제 내부 모습은 오르카 라이브러리 폴더에서 확인할 수 있다. 사용자는 이들의 방식과 유사하게 자신만의, DSL을 오르카 언어 내부에서 사용할 수 있다.
-
-기본적으로 제공되는 모듈은 cpp, sh, lisp 이 있는데 sh 은 인터프리터와 같이 동작하고(매번 재처리), cpp, lisp 은 컴파일러와 같이 동작 한다. 세 모듈의 구현내역을 참조하면 독자적인 사용자정의구문을 지원하는 모듈을 작성할 수 있을 것이다.
+오르카에서 기본제공되는 문맥확장객체 처리 모듈은 html, json, cpp, lisp, sh 가 있다. 이들의 상세 내역은 모듈 레퍼런스에서 참조할 수 있고, 실제 내부 모습은 오르카 라이브러리 폴더에서 확인할 수 있다. 사용자는 이들의 방식과 유사하게 자신만의, DSL을 오르카 언어 내부에서 사용할 수 있다.
 
