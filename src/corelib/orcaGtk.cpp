@@ -151,7 +151,7 @@ orcaGtk::orcaGtk()/*{{{*/
 	insert_native_function("set_attr", (object_fp)&orcaGtk::ex_set_attr);
 	insert_native_function("push_back", (object_fp)&orcaGtk::ex_push_back);
 
-	// for list, tree
+	// for list, tree, text(get_text)
 	insert_native_function("set_data", (object_fp)&orcaGtk::ex_set_data);
 	insert_native_function("get_data", (object_fp)&orcaGtk::ex_get_data);
 
@@ -862,6 +862,16 @@ orcaData orcaGtk::ex_get_data(orcaVM* vm, int n)/*{{{*/
 	else if (type == GUI_ENTRY) {
 		if (key.String() == "text") {
 			char* p = gtk_editable_get_chars(GTK_EDITABLE(handle), 0, -1);
+			return p;
+		}
+	}
+	else if (type == GUI_TEXT) {
+		if (key.String() == "text") {
+			GtkTextIter start_iter, end_iter;
+			GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(handle));
+			gtk_text_buffer_get_start_iter(buffer, &start_iter);
+			gtk_text_buffer_get_end_iter(buffer, &end_iter);
+			char* p = gtk_text_buffer_get_text(buffer, &start_iter, &end_iter, FALSE);
 			return p;
 		}
 	}

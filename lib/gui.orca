@@ -83,11 +83,11 @@ def window
 	{
 		def '[]='(k, v)
 		{
-			decode k
+			switch k
 			{
 			case 'text':
 				..owner.handle.set_text(v);
-			case %remain:
+			default:
 				..owner.handle.set_attr(k, v);
 			}
 
@@ -96,6 +96,10 @@ def window
 
 		def '[]'(k)
 		{
+			if k == 'text' {
+				return ..owner.handle.get_data('text');
+			}
+
 			return ..attr[k];
 		}
 
@@ -228,11 +232,11 @@ def entry : window
 	{
 		def '[]='(k, v)
 		{
-			decode k
+			switch k
 			{
 			case 'text':
 				..owner.handle.set_text(v);
-			case %remain:
+			default:
 				..owner.handle.set_attr(k, v);
 			}
 
