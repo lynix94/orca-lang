@@ -76,32 +76,9 @@ likes.. arithmetic operation, control statements(if, do, while, for)
 string processing, regular expression processing, function & object define and inheritance,
 garbage collection, redefinable operator and exception handling.
 
-orca is now developed at 
-
-http://orca-lang.sourceforge.net
-and svn path is https://orca-lang.svn.sourceforge.net/svnroot/orca-lang 
-
 I hope you enjoy this. 
 
 2009. 10. 07
 Lee, Ki-Yeul (kiyeul.lee@gmail.com)
 
-
-# BUILD
-
-in unix-like systems (actually, I tested it on linux only)
-./autogen.sh
-./configure
-make
-make install
-
-in Windows, launch visual studio with win.sln and build. or you can download build image from project site.
-
-# TEST
-
-type on console 'orca tests/test'
-and you can see the execution result of test.orca which is located in tests directory.
-or just type 'orca' invokes interpreter.
-
-another documents are will be posted soon.
 
