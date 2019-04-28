@@ -97,7 +97,10 @@ def window
 		def '[]'(k)
 		{
 			if k == 'text' {
-				return ..owner.handle.get_data('text');
+				ret = ..owner.handle.get_data('text');
+				if ret != nil {
+					return ret;
+				}
 			}
 
 			return ..attr[k];
