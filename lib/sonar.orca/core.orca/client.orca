@@ -180,7 +180,7 @@ def do_what(msg)
 	}
 	else {
 		// process post parameter
-		post_param = msg.find(r'[\r|]\n[\r|]\n([a-zA-Z_][a-zA-Z_0-9=&%+]+)');
+		post_param = msg.find(r'[\r|]\n[\r|]\n(.*)');
 
 		if post_param != nil {
 			req.post = ..get_param(post_param[1][0], req.post);
