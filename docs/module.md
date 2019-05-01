@@ -11,7 +11,7 @@ written by Lee, Ki-Yeul (kiyeul.lee@gmail.com)
 
 *   [alg](#alg)
 *   [cpp](#cpp)
-*   [date,datetime,time](#date,datetime,time)
+*   [date, datetime, time](#date,-datetime,-time)
 *   [dl](#dl)
 *   [distribute](#distribute)
     *   [dfsd](#dfsd)
@@ -23,9 +23,9 @@ written by Lee, Ki-Yeul (kiyeul.lee@gmail.com)
     *   [json](#json)
     *   [xml](#xml)
     *   [base64](#base64)
-*   [fdselect](#fdselect)
 *   [file](#file)
 *   [fun](#fun)
+*   [get](#get)
 *   [gtk](#gtk)
 *   [gui](#gui)
 *   [html](#html)
@@ -36,6 +36,7 @@ written by Lee, Ki-Yeul (kiyeul.lee@gmail.com)
     *   [sh](#sh)
 *   [log](#log)
 *   [math](#math)
+	*   [random](#random)
 *   [net](#net)
     *   [httpd](#httpd)
     *   [httplib](#httplib)
@@ -46,14 +47,13 @@ written by Lee, Ki-Yeul (kiyeul.lee@gmail.com)
 *   [os](#os)
 *   [pack](#pack)
 *   [queue](#queue)
-*   [random](#random)
+*	[range](#range)
 *   [repr](#repr)
 *   [run](#run)
 *   [selector](#selector)
 *   [socket](#socket)
 *   [sonar](#sonar)
 *   [sorted](#sorted)
-*   [stopwatch](#stopwatch)
 *   [storage](#storage)
     *   [cached](#cached)
     *   [sqlite3](#sqlite3)
@@ -68,7 +68,7 @@ written by Lee, Ki-Yeul (kiyeul.lee@gmail.com)
     *   [match](#match)
     *   [lru](#lru)
     *   [lock](#lock)
-    *   [uppper](#uppper)
+    *   [find_owner](#find_owner)
 
 
 
@@ -87,7 +87,7 @@ It's inspired from STL algorithm.
 
 ### traverse(obj, fun)
 
-traverse obj and run fun to each items.  
+traverse obj and run fun to each item.  
 
 ```
 $ using alg;
@@ -112,8 +112,8 @@ $
 
 ### for_each (begin, end, function)
 
-Run function(item) to every items between begin to end.  
-It's simillar to,
+Run function(item) to every item between begin to end.  
+It's similar with,
 
 ```
 for a in a.begin()
@@ -122,7 +122,7 @@ for a in a.begin()
 }
 ```
 
-But, you can set end iterator.  
+But you can set end iterator.  
 
 ```
 $ using alg;
@@ -158,7 +158,7 @@ $
 
 ### find (begin, end, value)
 
-find interface find value at range of begin to end. If value is exists in that range, return it's iterator.  
+find interface find value at range of begin to end. If value exists in that range, return its iterator.  
 If not, return end iterator.  
 
 ```
@@ -179,7 +179,7 @@ recent call-stack trace
 
 ### find_if (begin, end, function)
 
-find_if simillar to find but, It determinds match if function(item) return true.  
+find_if similar with find. But It decides match if function(item) return true.  
 As an example, change above example to find 7's multiplier.  
 
 ```
@@ -194,8 +194,7 @@ $ print: b();
 find_if calls function to every item from begin to end. If function return true, return that item's iterator.  
 
 ### erase (begin, end)
-
-erase interface erase all items from begin to end.  
+The erase interface erases all items from begin to end.  
 
 ```
 $ a = [1..10];
@@ -213,7 +212,7 @@ $ print: a;
 
 ### remove (begin, end, val)
 
-remove interface remove all items which is same with val from begin to end.  
+The remove interface removes all items which is same with val from begin to end.  
 
 ```
 $ a = [1,2,3,2,7,2];
@@ -225,7 +224,7 @@ $ print: a;
 
 ### remove_if (begin, end, function)
 
-remove_if interface remove all items if function(item) return true from begin to end.  
+remove_if interface removes all items if function(item) return true from begin to end.  
 If you want remove all items which are less than 10,
 
 ```
@@ -256,7 +255,7 @@ $
 
 ### copy_n(begin, n, target)
 
-copy_n interface is similar with copy, but it copy n items from begin to target iterator.  
+copy_n interface is similar with copy, but it copies n items from begin to target iterator.  
 
 ```
 $ a = [1..10];
@@ -281,7 +280,7 @@ $ alg.count(a.begin(), a.end(), 3);
 
 ### count_if(begin, end, function)
 
-count_if is similar with count, but it count items if return value of function(item) is true.  
+count_if is similar with count, but it counts items if return value of function(item) is true.  
 So, if you want to count even number, do it like below.  
 
 ```
@@ -294,10 +293,10 @@ $ alg.count_if(a.begin(), a.end(), def.lambda(...argv) { return argv[0] % 2 == 0
 
 ### equal(begin, end, begin2, function)
 
-equal interface calls function(a, b) whose parameter a comes from each eletement of begin ~ end and b comes from each element of begin2 ~ If all return values are true, equal return truel.  
-Otherwise, It returns false.  
+equal interface calls function(a, b) whose parameter a comes from each element of begin ~ end and b comes from each element of begin2 ~ If all return values are true, equal return true.  
+Otherwise, it returns false.  
 As an example, below two lists a and b have different type of items.  
-So if you evaluate a == b, it's result is false.  
+So, if you evaluate a == b, its result is false.  
 But you can do type-free compare like below,
 
 ```
@@ -340,7 +339,7 @@ $ print: a;
 
 ### replace_if(begin, end, function, to)
 
-replace_if interface is similar with replace, but it change item if function(item)'s result is true.  
+replace_if interface is similar with replace, but it changes item if function(item)'s result is true.  
 Below example show that replace_if change 3's multiplier to X
 
 ```
@@ -388,20 +387,14 @@ $ print: c;
 ```
 
 Above example sum up each item from a and b, then insert it to c.  
-List b is set-builder form list and it's length is infinite. But range is just a.begin() ~ a.end() because source one has finite range.  
-
-
-
-
-
-
+List b is set-builder form list and its length are infinite. But range is just a.begin() ~ a.end() because source one has finite range.  
 
 
 
 # cpp
 
-cpp is user define statement(UDS) module. It helps user to make dynamic extension library easily.  
-Orca supports dynamic library which is made by native C++ language. But, this methods are disturbing and have to do a lot of things to make.  
+cpp is context extended module. It helps user to make dynamic extension library easily.  
+Orca supports dynamic library which is made by native C++ language. But these methods are disturbing and have to do a lot of things to make.  
 
 ```
    using cpp;
@@ -425,16 +418,16 @@ cpp external module compile: g++ -shared -o /tmp/lib__tt_1_context.so /tmp/__tt_
 ```
 
 Then it prints 30. look at the above compile messages.  
-orca made /tmp/\_\_tt\_1\_context.cpp file from the cpp UDS of tt.orca. Then invoked native compiler (gcc) to build shared library /tmp/lib\_\_tt\_1\_context.so.  
+orca made /tmp/\_\_tt\_1\_context.cpp file from the cpp context extended object of tt.orca. Then invoked native compiler (gcc) to build shared library /tmp/lib\_\_tt\_1\_context.so.  
 
 Result dynamic modules are saved in /tmp/ so you have to add that path to LD\_LIBRARY\_PATH
 
 There are somethings to do before use cpp UDS. But if you set up one time, making native object will be very easy after that.  
 
-The parameters passed to cpp UDS object are vector argv; so, in above example, argv\[0\] and argv\[1\] is struct orcaData (in cpp struct) You can see that struct in src/vm/orcaData.h. And implicit type casting of CPP struct make it easy to use orcaData as orca object.
+The parameters passed to cpp context extended object are vector argv; so, in above example, argv\[0\] and argv\[1\] is struct orcaData (in cpp struct) You can see that struct in src/vm/orcaData.h. And implicit type casting of CPP struct make it easy to use orcaData as orca object.
 
 Below code is \_\_tt\_1_context.cpp. It's generated by orca cpp module from tt.orca.  
-You can find native code in udf which is defined at def.cpp { }
+You can find native code in context extended object which is defined at def.cpp { }
 
 ```
  #include "orcaObject.h"
@@ -470,7 +463,7 @@ You can find native code in udf which is defined at def.cpp { }
        } 
 ```
 
-When you make your own cpp code, Sometimes you have to include header or setup library path.  
+When you make your own cpp code, sometimes you have to include header or setup library path.  
 At that case,
 
 ```
@@ -482,10 +475,10 @@ At that case,
    }; 
 ```
 
-Like above, define #include, #cflags and #ldflags in UDS statement. cpp module copy #include line to top of generated file. And use clfags and ldflags as compile time option.  
+Like above, define #include, #cflags and #ldflags in context extended object. cpp module copy #include line to top of generated file. And use clfags and ldflags as compile time option.  
 
-In windows envrionment, cpp UDS objects are compiled by vscompile.bat.  
-That batch file is made up for Visual c++ express edition 2008. If you use another compiler or there are some problem to build, change that batch file.  
+In windows envrionment, cpp context extended objects are compiled by vscompile.bat.  
+That batch file is made up for Visual c++ express edition 2008. If you use another compiler or there is some problem to build, change that batch file.  
 
 
 
@@ -496,23 +489,23 @@ These modules maintain time duration & time point.
 datetime is timepoint which has years, months, days, hours, minutes, seconds and microseconds. It points out exact time point.  
 Internally, datetime is made up by module date + module time module date is time point(date point).  
 
-module time is time duration "from 00:00:00 AM" dateduration is the interval of two date. (like 2 moth ago, 2 years later) time point is exact time so time points couldn't be added to other time point.  
+module time is time duration "from 00:00:00 AM" date duration is the interval of two date. (like 2 month ago, 2 years later) time point is exact time so time points couldn't be added to other time point.  
 
-but It could be substracted from another time points and result is integer which means interval of two timepoints.  
-If time points is datetime, interval scale is microsecond.  
-and if time points is date, interval scale is day.  
+but It could be subtracted from another time points and result is integer which means interval of two timepoints.  
+If time point is datetime, interval scale is microsecond.  
+and if time point is date, interval scale is day.  
 
-Time duration is amount of time. so it could be added or be substracted to another time duration.  
+Time duration is amount of time. So, it could be added or be subtracted to another time duration.  
 and It could be multiplied or divided by integer.  
 
-If you add (or sub) time point and time duration, It make new time point which is moved from original time point to amount of time duration.  
+If you add (or sub) time point and time duration, it makes new time point which is moved from original time point to amount of time duration.  
 
 Let's see detail interface of each module.  
 
 
 # time
 
-time means time durtiaon from 00:00:00 AM. Time of day.  
+time means time duration from 00:00:00 AM. Time of day.  
 value is composed by hour, minute, second, microsecond.  
 
 ### time.clone(format)
@@ -556,7 +549,7 @@ $ print: time.clone('01:02:03') + time.hours(3) + time.microseconds(1000);
 ```
 
 It's a duration, so each field has no limit.  
-(That means, minutes could be more 60) And time could be added or substracted wich integer.  
+(That means, minutes could be more 60) And time could be added or subtracted which integer.  
 In this case, integer value means microseconds.  
 
 ```
@@ -581,6 +574,83 @@ $ print: a < b;
 true
 ```
 
+## time.stopwatch
+
+It's simple stopwatch object.  
+
+### start()
+
+Init timer.  
+
+### elapse()
+
+return elapsed time as microsecond.  
+
+```
+$ using stopwatch;
+$ 
+$ stopwatch.start();
+$ print: stopwatch.elapse();
+15007541
+$ 
+$ print: stopwatch.elapse();
+24143768
+$ 
+```
+
+### lap(msg)
+
+Prints out elapsed time in console.  
+
+```
+$ sw = stopwatch;
+$ sw.start();
+$ sw.lap('lap 1: ');
+lap 1: 17 sec, 71 ms, 530 us
+$ sw.lap();
+20 sec, 287 ms, 624 us
+$ 
+```
+
+### title(msg)
+
+Set up header message of timer.  
+After setup, this message is printed when lap() is called.  
+title returns stopwatch object.  
+
+```
+$ using time.stopwatch;
+$ sw1 = stopwatch.clone();
+$ sw1.title('[sw1]');
+$ sw2 = stopwatch.clone();
+$ sw2.title('[sw2]');
+$ 
+$ sw1.start();
+$ sw2.start();
+$ sw1.lap();
+[sw1]5 sec, 792 ms, 273 us
+$ sw2.lap();
+[sw2]5 sec, 855 ms, 888 us
+$ sw1.lap('lap1');
+[sw1]lap122 sec, 128 ms, 36 us
+$ sw2.lap('lap2: ');
+[sw2]lap2: 32 sec, 976 ms, 62 us
+$ 
+```
+
+### {, }
+
+It supports scope statement '{' is same as start, '}' is same as lap.  
+
+```
+$ sw1.title('scope statement test:') { 
+* root.time.msleep(1000);
+* }
+* 
+scope statement test:999 ms, 425 us
+$
+```
+
 # date
 
 date is date point and It is composed by year, month and day
@@ -600,10 +670,10 @@ $ print: date.today();
 2010-11-02
 ```
 
-And dateduration is date duration (no date point).  
-this dateduration object could be added or substacted to each other.  
-and It could be multiplied or diveded with integer.  
-but devide means devide each value of attributes (years, monthes, days, weeks) and remainder is lost.  
+And date duration is date duration (no date point).  
+this date duration object could be added or subtracted to each other.  
+and It could be multiplied or divided with integer.  
+but divide means divides each value of attributes (years, months, days, weeks) and remainder is lost.  
 And add, sub by integer is possible. In this case integer means days.  
 
 ```
@@ -627,12 +697,12 @@ $ print: a += 1;
 $ print: a -= 2;
 2 years -2 months 1 weeks -5 days 
 
-and now, you can add (or sub) date and dateduration then make new date.  
+and now, you can add (or sub) date and date duration then make new date.  
 
 $ print: date.clone('2000-01-01') + date.months(2);
 2000-03-01
 
-substraction between two dates means intervals in days scale.  
+subtraction between two dates means intervals in days scale.  
 
 $ using date;
 $ print: date.clone('2000-01-01');
@@ -664,7 +734,7 @@ $ print: a.date(), ' ', a.time();
 2010-11-02 23:21:56.685685
 ```
 
-date, time duration could be added or substarcted to datetime.  
+date, time duration could be added or subtracted to datetime.  
 
 ```
 $ print: a = datetime.clone('2000-01-01 03:04:05');
@@ -673,8 +743,8 @@ $ print: a + date.years(10) - date.months(30) + time.hours(100) - time.minutes(2
 2007-07-03T21:44:05
 ```
 
-substraction between two datetime means interval of them with microseconds scale.  
-and add (or sub) of integer to datetime means increase(or decrease) of microsecond value.  
+subtraction between two datetime means interval of them with microseconds scale.  
+and add (or sub) of integer to datetime means increase (or decrease) of microsecond value.  
 
 ```
 $ print: a = datetime.clone('2000-01-01 03:04:05');
@@ -687,25 +757,24 @@ $ print: datetime.clone('2010-01-01 03:04:05') - a;
 87672:00:00
 ```
 
-And aditionally, time.msleep(msec) is another static function which sleep in msec milliseconds.  
+And additionally, time.msleep(msec) is another static function which sleep in msec milliseconds.  
 
 
 
 
-
-
-# dl (TODO)
+# dl
+dl module is used to access c library. (TBD with example)
 
 
 # distribute
 
 ## fs, dfsd, cached
 
-This modules are made for distribute file system and distribute cache.  
+These modules are made for distribute file system and distribute cache.  
 dfsd is distribute file server node and cached is distribute cache node.  
-fs mounts this node to it's file system path.  
-but, mount means that it works in orca vm only. It doesn't mean mount file system in OS level.  
-dfsd starts with file path which it serve and port num which it listen.  
+fs mounts this node to its file system path.  
+But mount means that it works in orca vm only. It doesn't mean mount file system in OS level.  
+dfsd starts with file path which it serves and port num which it listens.  
 
 ```
 [Machine 192.168.0.2]
@@ -715,7 +784,7 @@ $ orca dfsd /home/lynix 8080
 $ orca dfsd /home/orca 8080
 ```
 
-You can launche file system node like above.  
+You can launch file system node like above.  
 and now, mount them by fs.mount(path, ip, port) like below,
 
 ```
@@ -726,11 +795,11 @@ fs.mount('/mnt/node_b', '192.168.0.3', 8080);
 after that, data = fs.read('/mnt/node_a/foo/bar.txt');  
 above statement read /home/lynix/foo/bar.txt from machine 192.168.0.2 and save to data.  
 data = fs.copy('/mnt/node\_a/foo/bar.txt', '/mnt/node\_b/')  
-this statement copy /home/lynix/foo/bar.txt of machine 192.168.0.2 to /home/orca of 192.168.0.3.  
+this statement copies /home/lynix/foo/bar.txt of machine 192.168.0.2 to /home/orca of 192.168.0.3.  
 but, fs.read('/etc/passwd') reads from local file because it's path is no in mounted list.  
-other members of fs is belows.  
+other members of fs are below.  
 mkdir, ls, remove, file_size, isexist, isfile, isdir, read, write, copy, rename this member works like those of os module except if path is mounted It works from file server.  
-So if you make program by using fs module (rather than os module), your program is flexible for extenstion to distribute file system or cache.  
+So, if you make program by using fs module (rather than os module), your program is flexible for extension to distribute file system or cache.  
 
 ### fs.mount\_dist\_dir(path, ...)
 
@@ -748,14 +817,14 @@ fs.write('/mnt/dir/file3', 'hello, file');
 ```
 
 fs hashing path and distributes it to some file server node.  
-after that, If you call fs.read('/mnt/dir/file1'); fs read it from server node which had wrotten.  
+after that, If you call fs.read('/mnt/dir/file1'); fs read it from server node which had written.  
 cached is key-value memory cache server.  
 But it has same interface with dfsd and just save contents in memories.  
-So, you can mount cached by using fs.mount or fs.mount\_dist\_dir but in this release cached has no function for LRU-reflacement. maybe later release should support that.  
+So, you can mount cached by using fs.mount or fs.mount\_dist\_dir but in this release cached has no function for LRU-replacement. maybe later release should support that.  
 
 ## remotec, remoted, dist
 
-This modules supports orca remote and distribute processing.  
+These modules support orca remote and distribute processing.  
 first, remoted runs remote server.  
 
 ### remoted(port)
@@ -796,7 +865,7 @@ $
 
 In this case, roo.foo.bar object is created and assigned to 10 of remote node. print: c.foo.bar reads root.foo.bar of remote node.  
 and if you referr c.foo.bar only root.foo.bar is read from remote node by socket (not all contents of root.foo) and then, let's call remote function.  
-You can set object to remote node like below, (wait, current version doesn't support it from shell inerpreter. you shoud do that from script file)
+You can set object to remote node like below, (wait, current version doesn't support it from shell interpreter. you should do that from script file)
 
 ```
 using remotec;
@@ -813,7 +882,7 @@ print: c.sum(10, 20);
 
 If you run this script file, It returns 30. You set root.sum from remote node and call it and get result from that.  
 But, in this code, client is blocked while result is calculated by remote.  
-so If you want non-block working, Do it like below
+So, If you want non-block working, Do it like below
 
 ```
 using remotec;
@@ -832,8 +901,8 @@ print: c.pop_obj();
 
 If you add virtual member \_\_nowait\_\_ after function sum, remotec call sum and non-blocking returned.  
 and you can check if remote call is done by call is_done(msec).  
-isdon(msec) check if remote call is done. In case of void parameter, It return true/false immidiatly.  
-if msec is provied as parameter, It wait remote call to msec millisecond.  
+isdon(msec) check if remote call is done. In case of void parameter, It return true/false immediately.  
+if msec is provided as parameter, it waits remote call to msec millisecond.  
 After remote call is done, you can get result by calling pop_obj() Above usages are different to other languages because It access remote object like same way of local object.  
 and It can move object to remote node with compiled byte codes and call it directly.  
 so you can use it like below with remote_do()
@@ -850,10 +919,10 @@ print: c.is_done(100);
 print: c.pop_obj();
 ```
 
-this codes return 30.  
-remoted(...) call last argv item with other argv items as paremeters.  
+this code returns 30.  
+remoted(...) call last argv item with other argv items as parameters.  
 In this example, last argv item is lambda function. It's remote call but very similar with local procedure call.  
-In nowdays, Only orca supports above easy and flexible way of remote call processing.  
+Now only orca supports above easy and flexible way of remote call processing.  
 dist module supports distribute processing environment with remoted lists.  
 
 ### dist.add(ip, port)
@@ -862,23 +931,23 @@ connect to remoted server and add it to internal list.
 
 ### dist.dist_do(...)
 
-works like remote_do but it select remote node automatically.  
+works like remote_do but it selects remote node automatically.  
 
 ### dist.dist_for(list, fun)
 
-this do disribute processessing with internal remoted lists. main procedure is blocked to all result is calculated.  
+this do distribute processing with internal remoted lists. main procedure is blocked to all result is calculated.  
 It returns result lists.  
 Let's see from example.  
-below is test_dist.orca whithc is in tests directory of orca as test vector.  
+below is test_dist.orca which is in tests directory of orca as test vector.  
 It launches remote node from port, port+1 and port+2 and call dist\_do and dist\_for.  
 dist_do call simple sum function to remote node.  
 dist_for do distribute processing to list (calculating square of each item)
 
 ```
-using remoted;
-using remotec;
-using dist;
-using random;
+using distribute.remoted;
+using distribute.remotec;
+using distribute.dist;
+using math.random;
 using time;
 
 random.seed();
@@ -929,7 +998,7 @@ print: '## now quit: ', dist.shutdown();
 return 'OK', my;
 ```
 
-belows are result of above. 30 is return as result of dist_do, And you can see square value of each item of \[1..100\] is returnend.  
+below is result of above. 30 is return as result of dist_do, And you can see square value of each item of \[1..100\] is returned.  
 
 ```
 #port: 8985
@@ -966,7 +1035,7 @@ encoding orca data structure to json string.
 ### json.beutify(obj)
 
 This also encode to json string but this make more readable string.  
-conversion rules are like below, json dectionanry is converted to orca map, json array is converted to orca list, and like xml, json dictionary can have multiple key value so like xml module, orca json module converts it as orca tuple.  
+conversion rules are like below, json dictionary is converted to orca map, json array is converted to orca list, and like xml, json dictionary can have multiple key value so like xml module, orca json module converts it as orca tuple.  
 for an example if json string is like this,
 
 ```
@@ -982,14 +1051,14 @@ this result is
 ```
 
 It's almost same shape but 'd' had been repeated so it's value is tuple like (\[1,2,3\], 3) and now, if you want to see value of 'c' you can access it like print: ret\['c'\]; and like xml module, search in json structure will be provided at later release.  
-And you can encdoing to json string from orca data structure by this, str = json.encoding(ret); and result is
+And you can encoding to json string from orca data structure by this, str = json.encoding(ret); and result is
 
 ```
 {'a':3,'b':6,'c':[1,2,3,{'a':{'b':'c'},'d':[1,2,3],'d':3},4,5,6]}
 ```
 
-and threre is another encoding function beutify which make more readable result.  
-print: str = json.beutify(ret) this prints out below,
+and there is another encoding function beautify which make more readable result.  
+print: str = json.beautify(ret) this prints out below,
 
 ```
         {'a':3,
@@ -1010,9 +1079,9 @@ print: str = json.beutify(ret) this prints out below,
 
 ## xml
 
-xml module can endode & decode xml string.  
-It's made by decode statements. and It's purpose is demonstration of decode statement.  
-so if you use cxml module (which may be out at later release) that use libxml, It'll be more faster than this.  
+xml module can encode & decode xml string.  
+It's made by decode statements. and Its purpose is demonstration of decode statement.  
+So, if you use xml module (which may be out at later release) that use libxml, it'll be faster than this.  
 
 ### xml.decoding(string)
 
@@ -1020,9 +1089,9 @@ decode xml string to orca data structure,
 
 ### xml.encoding(obj)
 
-encode orca data structure to xml stringl.  
+encode orca data structure to xml string.  
 
-### xml.beutify(obj)
+### xml.beautify(obj)
 
 is similar with encoding but, It prints out more readable format.  
 string to orca data structure encoding/ decoding rule is like below example.  
@@ -1037,7 +1106,7 @@ str = '''
 ''';
 ```
 
-this xml string is convered to
+this xml string is converted to
 
 ```
 { '$info':'xml version="1.0"',
@@ -1047,11 +1116,11 @@ this xml string is convered to
 }
 ```
 
-It is based on xml path structure, one node (tag_a) has it's name key and It's value is child nodes.  
+It is based on xml path structure, one node (tag_a) has its name key and Its value is child nodes.  
 
 And there is special nodes whose name is $attrs, $text, $info, $attrs is attributes in node, $text is tag value and $info is document information.  
 
-basic rule is like above, but orca map doesn't allow multiple key values. but xml node could be repeated. so if there is same key value in xml string, orca xml decode it as tuple.  
+basic rule is like above, but orca map doesn't allow multiple key values. but xml node could be repeated. So, if there is same key value in xml string, orca xml decodes it as tuple.  
 Let's see below example,
 
 ```
@@ -1075,7 +1144,7 @@ In this case xml module change it as below,
 ```
 
 like above, multiple tag_b nodes are represented as tuple.  
-after decoding, You can find node lists in tag_a like this,
+after decoding, you can find node lists in tag_a like this,
 
 ```
 ret = xml.decoding(str);
@@ -1090,8 +1159,8 @@ xml.encoding(ret)
 <? xml version="1.0" ?><tag_a><tag_b >text of tag b 2nd</tag_b><tag_b attr1=value1 attr2=value2 >text of tag b</tag_b></tag_a>
 ```
 
-but, this result is not easily readable.  
-so, use xml.beutify,
+But this result is not easily readable.  
+so, use xml.beautify,
 
 ```
 <? xml version="1.0" ?>
@@ -1129,12 +1198,10 @@ $ print: b = base64.dec(a);
 12345678
 ```
 
-
 # fdselect
 
-fdselect have fdselect object in it. because It have epoll object in it later.  
 fdselect interface is like below.  
-fdselect (read\_list, write\_list, exception_list, sleep) It's simillar like posix sleep API
+fdselect (read\_list, write\_list, exception_list, sleep) It's similar like posix sleep API
 
 ```
 def server {
@@ -1144,7 +1211,7 @@ def server {
     sock.listen();
 
     while true {
-        fd = fdselect.fdselect([sock.get()], [], [], 1000);
+        fd = io.fdselect([sock.get()], [], [], 1000);
 
         if fd[0] == [sock.get()] {
             new_cl = sock.accept();
@@ -1159,6 +1226,7 @@ def server {
     }
 }
 ```
+
 
 # file
 
@@ -1185,13 +1253,13 @@ tell() returns current file pointer position.
 
 # fun
 
-This moule is made for high-order functional programming.  
+This module is made for high-order functional programming.  
 This provides below interfaces.  
 
 ### map(iteratable, f)
 
 run f to each member of iteratable.  
-and make list from each results of that.  
+and make list from each result of that.  
 
 ```
 $ using fun;
@@ -1205,8 +1273,8 @@ above code works like \[ 1 * 2, 2 * 2, 3 * 2\]
 ### reduce(iteratable, fun, initial)
 
 make accumulative result of fun to each item of iteratable.  
-use initial as initila value if it is exists or set first item as initial value.  
-belows are sum up example.  
+use initial as initial value if it exists or set first item as initial value.  
+Below is sum up example.  
 
 ```
 $ using fun;
@@ -1218,7 +1286,7 @@ argv\[0\] are accumulative result and argv\[1\] is each member of list so, above
 
 ### bind_1st(fun, arg)
 
-bind first paramter of fun as arg
+bind first parameter of fun as arg
 
 ```
 def mul(a, b) 
@@ -1239,16 +1307,19 @@ $ print: mul10(2.4);
 ```
 
 new mul10 function which binds 10 to mul is created.  
-bind\_2nd, bind\_3rd are similar with bind\_1st but bind arg to 2nd and 3rd paremeter and fun.bind\_nth(fun, arg, n) bind arg to n 'th paremter of fun.  
+bind\_2nd, bind\_3rd are similar with bind\_1st but bind arg to 2nd and 3rd parameter and fun.bind\_nth(fun, arg, n) bind arg to n 'th parameter of fun.  
 
 ### apply(f, list)
 
-call f with list elements as paremeters as an example, fun.apply(foo, \[1,2,3\]) call foo(1,2,3)
+call f with list elements as parameters as an example, fun.apply(foo, \[1,2,3\]) call foo(1,2,3)
 
 
+# gtk
+The gtk module is used at gui module to access gtk handle. Gui module is recommended to build gui program than gtk module.
+GUI example is in tests/test_gui and you can see that #2 of 10min.md.
 
+Someday, win32 api will be added to support gui on windows.
 
-# gtk (TODO)
 
 
 # gui
@@ -1265,17 +1336,17 @@ gui module support GUI interface. gui module use flexible relationship of orca o
            def menu : menubar
            {
                file = [ 'open', def.lambda() {
-                                   name = dialog.fileopen(upper('main'));
+                                   name = dialog.fileopen(find_owner('main'));
                                    str= os.read(name);
-                                   upper('box').hs.edit.attr['text'] = str;
+                                   find_owner('box').hs.edit.attr['text'] = str;
                                },
                        'save', def.lambda() {
-                                   str= upper('box').hs.edit.attr['text'];
-                                   name = dialog.filesave(upper('main'));
+                                   str= find_owner('box').hs.edit.attr['text'];
+                                   name = dialog.filesave(find_owner('main'));
                                    os.write(name, str);
                                },
                        'exit', def.lambda() {
-                                   upper('main').quit();
+                                   find_owner('main').quit();
                                }
                        ];
    
@@ -1292,11 +1363,11 @@ gui module support GUI interface. gui module use flexible relationship of orca o
    }
 ```
 
-Above example is simple notepad application. If you do this with Win32 api or GTK API, It should be more complex and bothering. If you use RAD tools for it, Additional representation layer and real code has some gap so it lose intuition.  
+Above example is simple notepad application. If you do this with Win32 api or GTK API, it should be more complex and bothering. If you use RAD tools for it, Additional representation layer and real code have some gap. And it loses intuition.  
 
-But, orca gui module is different. All things in window has it's own object in code. and That objects have same relation. Real object in gui has same logical object in code.  
+But, orca gui module is different. All things in window has its own object in code. and That objects have same relation. Real object in gui has same logical object in code.  
 
-Lets imagine main window has only one 'ok' button.  
+Let¡¯s imagine main window has only one 'ok' button.  
 That button is included in window.  
 
 ```
@@ -1324,9 +1395,9 @@ my.main.show();
 ![](image/gui_first.jpg)
 
 main window with ok button appears.  
-make interface makes window with it's sub objects.  
+make interface makes window with its sub objects.  
 show interface show result window. result window is like below.  
-In this time, We don't define action of ok button. So, Nothing is happened when you click ok button.  
+This time, we don't define action of ok button. So, nothing is happened when you click ok button.  
 Let's see another example which have click event action.  
 
 ```
@@ -1349,7 +1420,7 @@ Let's see another example which have click event action.
                my.attr['wh'] = (100, 50);
                my.attr['text'] = '+';
                my.event['clicked'] = def.lambda() {
-                   upper('box').counter.attr['text'] += 1;
+                   find_owner('box').counter.attr['text'] += 1;
                };
            }
    
@@ -1359,23 +1430,23 @@ Let's see another example which have click event action.
                my.attr['wh'] = (100, 50);
                my.attr['text'] = '-';
                my.event['clicked'] = def.lambda() {
-                   upper('box').counter.attr['text'] -= 1;
+                   find_owner('box').counter.attr['text'] -= 1;
                };
            }
        }
    }
 ```
 
-Above example, Window have counter label, plus button which increase counter and minus button which decrease counter. We use box : fixed contaiter. So, we define position attribute my.attr\['xy'\]. And then, GUI event could be defined by set my.event attribute.  
+Above example, Window have counter label, plus button which increase counter and minus button which decrease counter. We use box : fixed container. So, we define position attribute my.attr\['xy'\]. And then, GUI event could be defined by set my.event attribute.  
 
-On above code, my.event\['clicked'\] has assigned by lambda code. And then, If you click plus button, GUI make clicked event and it invokes assigned lambda code def.lambda() { upper('box').counter.attr\['text'\] += 1; }.
+On above code, my.event\['clicked'\] has assigned by lambda code. And then, If you click plus button, GUI make clicked event and it invokes assigned lambda code def.lambda() { find_owner('box').counter.attr\['text'\] += 1; }.
 
-upper is util.upper interface which traverse owner link and find name is euqal. So, upper.('box').counter means main.box.counter. And lambda code increase counter text by 1. so label text of counter is changed.  
+find_owner is util.find_owner interface which traverse owner link and find name is equal. So, find_owner('box').counter means main.box.counter. And lambda code increase counter text by 1. So, label text of counter is changed.  
 
 Result window is like this,  
 ![](image/button.jpg)
 
-This simple but impressive exmaple shows that all the object in the window and there relation and events can move to code exactly.  
+This simple but impressive example shows that all the object in the window and there relation and events can move to code exactly.  
 Below gui objects are supported in current version.  
 
 *   window : top level window widget.  
@@ -1400,13 +1471,17 @@ Below gui objects are supported in current version.
 *   text : text
 *   tree : tree widght
 
-Each object represent different GTK widget. You can inherit above object and set your own attributes and events.  
+Each object represents different GTK widget. You can inherit above object and set your own attributes and events.  
 You can see many example and codes by run tests/test_gui.orca.  
 
 
 
 
-# html (TODO)
+# html
+The html module help to generate html text on web programming. The html module make html context extended object from source code.
+It also support form and tag processing.
+
+More detail info is on #4 of 10min.md.
 
 
 
@@ -1417,15 +1492,15 @@ This module handle Input and Output.
 ### print(...argv)
 
 Prints out arguments.  
-It's absolute module path is root.io.print but for conveniance, It's already in using space.  
+Its absolute module path is root.io.print but for convenience, it's already in using space.  
 
 ### put(...argv)
 
-This interface is similar with io.print. But, this interface don't change line.
+This interface is similar with io.print. But this interface doesn't change line.
 
 ### open(filename, mode)
 
-First argument is file name and Second argument is open mode (like fopen in C) It open file and return file object. (in next chapter)
+The first argument is a file name. The second argument is an open mode (like fopen in C). It opens file and returns file object. (in next chapter)
 
 ### input()
 
@@ -1437,9 +1512,6 @@ KY Lee
 $ print: 'hello, ', name;
 hello, KY Lee
 ```
-
-
-
 
 # ipc
 
@@ -1502,7 +1574,7 @@ a {
 
 It's conditional variable and provides wait and signal interface.  
 
-wait can get relative mutex which handle critical section. and it can get msec to determine waittime. If it's omitted, wait infinitely.  
+wait can get relative mutex which handle critical section. and it can get msec to determine wait time. If it's omitted, wait infinitely.  
 If you run below example, wait_thread wake up after 1 sec.  
 
 ```
@@ -1564,7 +1636,7 @@ th1.join();
 th2.join();
 ```
 
-It's result is
+Its result is
 
 ```
 produced...
@@ -1603,7 +1675,7 @@ lisp.compile(str) compiles lisp code and make compiled code as tuple.
 If you save this compiled code and use it later, use pack.save() interface and save it as file.  
 You can get execution result by call lisp.execute(code).  
 Let's see real examples.  
-Below example is copmile & excute 3 + (4 * 2) by lisp.  
+Below example is compiled & executed 3 + (4 * 2) by lisp.  
 You can see compiled code in interpreter shell.  
 
 ```
@@ -1633,7 +1705,7 @@ lisp.execute(lisp.compile('(using math) (math.sin (/ 30.0 90.0))'));
 0.327195
 ```
 
-And lisp module supports UDS (user define statement) So, You can use lisp codes in orca source code.  
+And lisp module supports UDS (user define statement) So, you can use lisp codes in orca source code.  
 
 ```
    def foo := %lisp{
@@ -1643,25 +1715,60 @@ And lisp module supports UDS (user define statement) So, You can use lisp codes 
    print: r = .foo(3, 4);
 ```
 
-Above example prints 7. Paremeters that pass to lisu UDS are named as argvN.  
+Above example prints 7. Parameters that pass to lisp context extended object are named as argvN.  
 You can see more test examples at test/test_lisp.orca and can see lib/lisp.orca as lisp module source code made by parse statement.  
 
 
 
 ## sh
 
-sh module is the wrapper of shell script for using at orca's UDS.  
-It use os.run interface and pass parameters as argv\[N\] Below example is making sh UDS object tgzip which make tar ball of input directory.  
+sh module is the wrapper of shell script for using at orca's context extended object.  
+It uses os.run interface and pass parameters as argv\[N\] Below example is making sh context extended object tgzip which make tar ball of input directory.  
 
 ```
-def tgzip = %sh{ tar -xcvf argv[0] argv[1] };
+def tgzip := lambda.sh{ tar -xcvf argv[0] argv[1] };
 my.tgzip('out.tar.gz', '/home/lynix/out');
 ```
 
 
 
 
-# log (TODO)
+# log
+log is logging library which use channel in.
+
+You can set log tag multi levels. And most explicit tag is accepted. If there is no explicit tag. It follows upper tag set. Turn on/off is set by calling that tag with true/false parameter.
+
+Below is example
+
+```
+$ log(false);
+<log - 0xd505e0>
+$ log <- 'turned off';
+$ a = 10;
+10
+$ log <- 'increaed value: %d' % (a+=1);
+$ print: a;
+10
+$ log.socket(true);
+<log - 0xd537a0>
+$ log.socket.tcp <- 'turn on by log.socket';
+[2019-04-30T12:49:50.820910] turn on by log.socket
+$ log.socket.tcp(false);
+<log - 0xd53500>
+$ log.socket.tcp <- 'explicit set is applied';
+$ log.socket <- 'so this will be printed';
+[2019-04-30T12:50:48.631508] so this will be printed
+$ log.socket.tcp.port <- 'but this is not. log.socket.tcp turn off implicit';
+$ 
+```
+
+You may know if you read tutorial that if some object return <- member as nil. The orca vm doesn't evaluate right side and skip to next statement.
+
+In case of above, logging line which prints 'increased value: %d' % (a+=1) is turned off. So, it returns <- as nil then the orca vm ignore right side. So, a is not changed and remain as 10.
+
+
+
+
 
 # math
 
@@ -1675,6 +1782,60 @@ But, some of above function in c has two output (one by return and the other by 
 so, in that case return values are returned as one tuple.  
 You can see each example at tests/test_math.orca.  
 
+## math.random
+math module has random member in it.
+random has below functions.
+
+### seed
+Set seed of random generator
+```
+$ usnig math.random;
+$ random.seed(0);
+$ random.integer();
+1804289383
+$ random.integer();
+846930886
+```
+
+### integer
+Get integer type random number.
+If limit parameter is passed, return integer between 0~limit.
+
+```
+$ random.integer();
+1804289383
+$ random.integer(100);
+86
+$ random.integer(100);
+77
+```
+
+### string
+Generate random ascii string. length is first parameter.
+
+```
+$ random.string();
+U
+$ random.string(10);
+/0rsKc26q/
+$ random.string(100);
+RnzCVPgb6OeNdlouYzOfyZpmMg23MVijWiVdBRdY6V7Uq7LNxpu0VBEOgnRBIT3ch3DpPqFB4fxnPgF+l+rca5aPOFwq7LA7+zKv
+$ 
+```
+
+### real
+Return float number between 0~1.
+
+```
+$ random.real();
+0.944297
+$ random.real();
+0.642284
+$ random.real();
+0.473466
+```
+
+
 
 # net
 
@@ -1685,16 +1846,18 @@ This is simple http server.
 ### httpd(path, port)
 
 This call launch http server with path as http root and port as http listen port.  
-This module use fs module for file management so dfsd and cached could be used for hosting.  
+This module uses fs module for file management so dfsd and cached could be used for hosting.  
 current it supports get, post and multipart post request.  
 and if URI is *.orca file, It launch thread and execute it.  
 and if URI is *.osp (orca server page), It call osp module to parsing it and launce thread and execute that.  
-currently, sample test page is http://orca-lang.or.kr:8080/hello.osp
 
-### httplib (TODO)
+### httplib
+This module request url and process response as http client.
+It will be changed to support tls later.
 
+## osp
+The osp module means orca server page. On early days, this is used for web programming. But now html and sonar module are recommended.
 
-### osp (TODO)
 
 
 
@@ -1718,7 +1881,7 @@ $ operator.'<='(3, 4);
 true
 ```
 
-These function is infix operator. So, if you want to apply them to more parameters at once, use fun.reduce or fun.apply.  
+These functions are infix operator. So, if you want to apply them to more parameters at once, use fun.reduce or fun.apply.  
 
 
 
@@ -1734,19 +1897,66 @@ str = argv\[0\]; orca.load(str);
 
 ### unload(name)
 
-unload module in runtime. It's purpose is reload dynamic pages from http, osp module.  
+unload module in runtime. Its purpose is reloading dynamic pages from http, osp module.  
 
 
 
-# orm (TODO)
+# orm
 
+The orm module map rdbms with object.
+This is used at sonar. If object inherit orm.models, That object can create table by create_table(). And can insert by save(). And can get result set by insert, where, orderby, groupby and result interface.
+
+Below is simple test.
+The dbms connection should be set by orm.set_conn before using.
+
+```
+using os;
+using orm;
+using storage.sqlite3;
+
+os.remove('tmp.db');
+
+conn = sqlite3.connect('tmp.db');
+orm.set_conn(conn);
+
+def member : orm.model
+{
+	def id := orm.type.int().primary_key();
+	def name := orm.type.text();
+	def id100 := orm.type.int();
+}
+
+my.member.create_table();
+m = my.member.new();
+m.id = 1;
+m.name = 'foo';
+m.id100 = m.id * 100;
+m.save();
+
+m = my.member.new();
+m.id = 2;
+m.name = 'bar';
+m.id100 = m.id * 100;
+m.save();
+
+rs = my.member.orderby(my.member.id).result();
+for m in rs {
+	print: m;
+	if m.id * 100 != m.id100 {
+		throw test.orm <- 'orm value invalid';
+	}
+}
+
+```
+
+Another example is in #4 of 10min.md. Which manage message board.
 
 
 # os
 
 ### run(cmd)
 
-run excutes argument. It's seem like popen.  
+run executes argument. It's seems like popen.  
 
 ```
 $ using os;
@@ -1754,7 +1964,7 @@ $ os.run("ls");
 ```
 
 This prints out file lists.  
-And for convenience, It could be like below.  
+And for convenience, it could be like below.  
 
 ```
 $ ; ls -al
@@ -1787,7 +1997,7 @@ like above, If there is __cout__ object in caller object, print results are appe
 
 ### getenv(name)
 
-It inquries environment variable.  
+It inquires environment variable.  
 
 ```
 $ print: os.getenv("PATH");
@@ -1970,7 +2180,7 @@ If there is offset as parameter, read from offset of file.
 ### write(filepath, data, offset)
 
 writes data to file.  
-If there is offset as paremeter, write from offset of file.  
+If there is offset as parameter, write from offset of file.  
 
 ### file_size(filepath)
 
@@ -1992,20 +2202,126 @@ $ print: os.last_write_time('foo.txt');
 
 
 
-# pack (TODO)
+# pack
+The pack module can serialize an orca object by save(), load() interface. It also can manage byte code by dump_code, load_code, list_code and check_code. 
+
+This module is used at distribute.remotec and distribute.remoted. To send object and execute remotely
+
+Saving and loading on local machine are simple like below.
+
+```
+using pack;
+
+def foo
+{
+        def a := 100;
+
+        print: my.MEMBERS;
+        return my.a;
+}
+
+ret = pack.save(my.foo);
+print: ret;
+
+bar = pack.load(ret);
+
+print: bar;
+ret = bar();
+if ret != 100 {
+  throw test.pack <- 'load fail';
+}
+
+print: 'OK', my;
+
+```
+
+Below is result.
+
+```
+~/lab/orca/tests$ orca test_pack.orca 
+ofoo
+Ma
+i100
+Ctest_pack
+0
+.
+
+< - 0x781a80>
+{ 'a':100 }
+OK<test_pack - 0x7811d0>
+```
+
+Saving is not supported on interpreter now.
 
 
-# queue (TODO)
 
-# random (TODO)
+# queue
+
+The queue module is an async queue collection which supports made by channel in and channel out.
+
+You can set capacity by pass size during clone. size() means item count in the queue. cap() means the capacity of queue. push() and pop() interfaces push and pop items from queue. If items exceed capacity, push() is blocked until other thread pop from the queue. If thread calls pop() from empty queue, It also be blocked until other thread push an item to queue.
+
+Push and pop can set blocking timeout by additional parameter.
+If timeout occurs during push(). It returns false as a result. pop() returns nil in case of timeout. 
+
+Below is simple push, pop example. 4th push will make timeout and the last pop will be blocked about 10 seconds.
 
 
-# repr (TODO)
+```
+$ using queue;
+$ q = queue.clone(3);
+[  ]
+$ q.size();
+0
+$ q.cap();
+3
+$ q.push(1);
+true
+$ q.push(2);
+true
+$ q.size();
+2
+$ q.push(3);
+true
+$ q.push(4, 0.1);
+false
+$ q.pop();
+1
+$ q.pop();
+2
+$ q.pop();
+3
+$ q.pop(10);
+$ 
+```
+
+The queue has <- and -> member object so it can be used at select statement. 
+There is select statement example in test_queue.orca.
+
+
+
+# repr
+
+repr return string representation of a parameter.
+If the parameter has repr() member in it, repr use that to make.
+
+
+```
+$ a = 'hello';
+hello
+$ repr(a);
+"hello"
+$ a = r'a-z+';
+r'a-z+'
+$ repr(a);
+r'a-z+'
+
+```
 
 # run
 
-You can run orca module in shell promt. but you can't run member of module directly in shell prompt.  
-That means $ orca foo # possible $ orca foo.bar # impossible But if you use run module, argv\[0\] is path of object which will be called and argv\[1:\] is paremeters so you can use like below, nil of last line is return value.  
+You can run orca module in shell prompt. but you can't run member of module directly in shell prompt.  
+That means $ orca foo # possible $ orca foo.bar # impossible But if you use run module, argv\[0\] is path of object which will be called and argv\[1:\] is parameters so you can use like below, nil of last line is return value.  
 
 ```
 $ orca run io.print hello, orca
@@ -2014,7 +2330,7 @@ nil
 ```
 
 
-# selector (TODO)
+# selector (TBD)
 
 
 # socket
@@ -2118,7 +2434,10 @@ You can build multiplexing, multithread server by using select, thread module.
 IOCP, async socket and epoll server will be added soon.  
 
 
-# sonar (TODO)
+# sonar
+sonar is the web development of orca.
+More detail information is in about_sonar.md and 10min.md.
+
 
 
 # sorted
@@ -2127,92 +2446,154 @@ sorted module is interface for sort container (list or tuple) It make sorted con
 original container is not changed.  
 
 
-# stopwatch
-
-It's simple stopwatch object.  
-
-### start()
-
-Init timer.  
-
-### elapse()
-
-return elapsed time as microsecond.  
-
-```
-$ using stopwatch;
-$ 
-$ stopwatch.start();
-$ print: stopwatch.elapse();
-15007541
-$ 
-$ print: stopwatch.elapse();
-24143768
-$ 
-```
-
-### lap(msg)
-
-Prints out elapsed time in console.  
-
-```
-$ sw = stopwatch;
-$ sw.start();
-$ sw.lap('lap 1: ');
-lap 1: 17 sec, 71 ms, 530 us
-$ sw.lap();
-20 sec, 287 ms, 624 us
-$ 
-```
-
-### title(msg)
-
-Set up header message of timer.  
-After setup, this message is printed when lap() is called.  
-title returns stopwatch object.  
-
-```
-$ using stopwatch;
-$ sw1 = stopwatch.clone();
-$ sw1.title('[sw1]');
-$ sw2 = stopwatch.clone();
-$ sw2.title('[sw2]');
-$ 
-$ sw1.start();
-$ sw2.start();
-$ sw1.lap();
-[sw1]5 sec, 792 ms, 273 us
-$ sw2.lap();
-[sw2]5 sec, 855 ms, 888 us
-$ sw1.lap('lap1');
-[sw1]lap122 sec, 128 ms, 36 us
-$ sw2.lap('lap2: ');
-[sw2]lap2: 32 sec, 976 ms, 62 us
-$ 
-```
-
-### {, }
-
-It supports scope statement '{' is same as start, '}' is same as lap.  
-
-```
-$ sw1.title('scope statement test:') { 
-* root.time.msleep(1000);
-* }
-* 
-scope statement test:999 ms, 425 us
-$
-```
-
 
 # storage
-## cached (TODO)
+## sqlite3
+sqlite3 client. This module is the default library of orca and can be used at orm module. Other dbms modules will be added soon.
 
-## sqlite3 (TODO)
+### connect
+Get connection of db.
 
-# string (TODO)
+```
+conn = sqlite3.connect('tmp.db');
+```
+Returned conn is the sqlite3conn object.
 
-# strings (TODO)
+### sqlite3conn
+
+sqlite3conn interface can execute query.
+Boolean execution result is returned in case of create, insert statement.
+A result set object is returned in case of select statement.
+
+### sqlite3result
+
+This result set object is an iterator. So, get a row value by for statement or next() interface.
+Below is an example.
+
+```
+using os;
+using storage.sqlite3;
+
+os.remove('tmp.db');
+
+conn = sqlite3.connect('tmp.db');
+print: conn;
+
+try {
+	res = conn.execute('create table t1 (a int, b string, c double)');
+	print: res();
+
+	for i in [0..10] {
+		query = "insert into t1 values(%d, 'str_%d', %f)" % (i, i, i + 0.1);
+		res = conn.execute(query);
+		print: res();
+	}
+
+	res = conn.execute('select * from t1;');
+	i = 0;
+	for r in res {
+		print: r();
+		v = r();
+		if v[0] != i || v[1] != 'str_%d' % i || v[2] != (i + 0.1) {
+			throw test.db <- 'select result is wrong';
+		}
+
+		i += 1;
+	}
+}
+catch db as e {
+	print: e.what();
+}
+```
+
+An execution result is below
+
+```
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+( 0,'str_0',0.1 )
+( 1,'str_1',1.1 )
+( 2,'str_2',2.1 )
+( 3,'str_3',3.1 )
+( 4,'str_4',4.1 )
+( 5,'str_5',5.1 )
+( 6,'str_6',6.1 )
+( 7,'str_7',7.1 )
+( 8,'str_8',8.1 )
+( 9,'str_9',9.1 )
+( 10,'str_10',10.1 )
+```
+
+
+# strings
+Utilities about strings.
+
+### join
+This interface joins parameters as a string. The first parameter is a separator. If you join the list items, use ... like below example.
+
+```
+$ strings.join(', ', 1, 2, 'three');
+1, 2, three
+$ strings.join(':', ['one', 'two', 'three']...);
+one:two:three
+```
+
+
+### builder
+A string builder.
+
+String is concatenated by write and push_back interface. And can make result string by string() interface.
+
+The orca string can be appended by += or push_back() interface.
+But, builder is more efficient and can be use from writer because it has write() interface.
+
+```
+$ b = strings.builder();
+
+$ b.write('first line\n');
+first line
+
+$ b.push_back('second line\n');
+first line
+second line
+
+$ b.string();
+first line
+second line
+```
+
+### html_escape, html_unescape
+escape and unescape string to use in html.
+Below is an example.
+
+```
+$ ret = strings.html_escape('a >= (b+c)');
+a &gt;= (b+c)
+$ strings.html_unescape(ret);
+a >= (b+c)
+```
+
+
+### url_escape, url_unescape
+escape and unescape string to use in the url.
+Below is an example.
+
+```
+$ '/info?key=%s' % strings.url_escape('abc&%_');
+/info?key=abc%26%25%5F
+$ strings.url_unescape('/info?key=abc%26%25%5F');
+/info?key=abc&%_
+```
 
 
 # system
@@ -2272,7 +2653,7 @@ hd = thread.run(my.foo, "hello, thread");
 hd.join();
 ```
 
-First argument is object which be a new thread. others are paremeter to passing.  
+First argument is object which be a new thread. others are parameters to passing.  
 
 
 # tool 
@@ -2300,7 +2681,7 @@ Before plot graph executes cmd. So, you can pass cmd like 'pause 1'.
 
 This interface clear added graph data in object.  
 Below example show x^2 and 2*x^2 graph on the screen.  
-plots are connected by line, grid lines are setted. graph appears about 1 sec.  
+plots are connected by line. Grid lines are set. graph appears about 1 sec.  
 
 ```
    a = gnuplot.clone();
@@ -2318,8 +2699,8 @@ Result graph image is like below,
 
 ### gnuplot.sadd(title, list, group)
 
-This interface add 3D data to gnuplot object.  
-title and list is same as gnuplot.add. And group means line grouping in 3D images for conveniance.  
+This interface adds 3D data to gnuplot object.  
+title and list are same as gnuplot.add. And group means line grouping in 3D images for convenience.  
 You can add this parameter as true if (x, y, z) lists are sorted by x, y.  
 
 ### gnuplot.splot(cmd)
@@ -2347,9 +2728,9 @@ Above example show z = 40*(x^2 + y^2)\*exp(-x^2-y^2) and z = 4\*y-1 Result graph
 
 This is module for type traits and make type dynamically. first, make data type at runtime like below, $ print: type.list(1,2,3); \[ 1,2,3 \] $ print: type.tuple(); ( ) $ print: type.map(1,2,3,4); { 1:2,3:4 } $ str = '\[0-9\]+'; $ print: a = type.regex(str); r'\[0-9\]+' $ print: a == '12345'; true
 
-without type.regex() programmer can make regular expression from constatant string only. (like r'\[0-9\]+'). but type.regex(str) allow to make dynamically.
+without type.regex() programmer can make regular expression from constant string only. (like r'\[0-9\]+'). but type.regex(str) allow to make dynamically.
 
-And, members of type is type type of each data type. So, you can use those for type check.
+And, members of type are type type of each data type. So, you can use those for type check.
 
 ```
 $ 1.type == type.int;
@@ -2365,6 +2746,21 @@ $
 
 This module provides simple utilities.  
 
+## match
+Utility functions which will be used at decode statement.
+The decode statement can use external function to match a string with rule.
+That's described at last part of tutorial decode statement.
+
+Below intefaces are supported.
+
+match.comma: match ',' and this considers {} and []
+match.tag(open, close, str): match tag between open and close
+match.match_string(end, str): math string which ends with end
+match.sq_string: match single quoted string.
+match.dq_string: match double quoted string.
+match.match_one_tag: mathc one html tag and this considers sub tags.
+
+
 ### lock(obj)
 
 It make lock by lang.id() of obj. below example lock to obj and make critical section.  
@@ -2377,7 +2773,7 @@ util.lock(obj) {
 
 ### lru
 
-lru interface manage lru list. It manage lru by (key, value) pair.
+lru interface manage lru list. It manages lru by (key, value) pair.
 
 ### lru.insert(k, v)
 
@@ -2389,11 +2785,11 @@ victimize interface remove oldest one from lru list.
 
 ### lru.touch(k)
 
-If k is exist in lru list, return v and move it to first of lru list. If not, return nil.
+If k exists in lru list, return v and move it to first of lru list. If not, return nil.
 
 ### lru.size()
 
-size interface return current lru list size.
+size interface returns current lru list size.
 
 ```
 $ using util.lru;
@@ -2417,418 +2813,8 @@ string: string c
 string: string b 
 ```
 
+### find_owner
+find_owner find the object whose name is same with parameter. It traverses upper direction until meet root.
+This interface is used well at the gui examples.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# cgi
-
-cgi module is made by libcgi and supports basic CGI programming.  
-This module is beta phase so It will have many changes in interface.  
-First, describe interface and show basic example.  
-
-### get_param(name)
-
-return request parameter.  
-
-```
-$ var = cgi.get_param('key');
-$ print: var;
-value
-```
-
-### urlenc(src)
-
-Encoding input string as URL format.  
-
-```
-$ print: cgi.urlenc("if a+3 > 4: print('overflow');");
-if+a%2B3+%3E+4%3A+print%28%27overflow%27%29%3B
-```
-
-### urldec(src)
-
-Decoding URL format as original string.  
-
-```
-$ print: cgi.urlenc("if a+3 > 4: print('overflow');");
-if+a%2B3+%3E+4%3A+print%28%27overflow%27%29%3B
-$ print: cgi.urldec('if+a%2B3+%3E+4%3A+print%28%27overflow%27%29%3B');
-if a+3 > 4: print('overflow');
-```
-
-### htmlenc(src)
-
-encoding symbol as html escape character.  
-
-### redirect(url)
-
-redirect document.  
-
-```
-header {
-  cgi.redirect('another.orca');
-}
-```
-
-## header
-
-cgi.header has session and cookie object.  
-cgi.header object is used as scope statement.  
-In it's scope, session and cookie setting is possible.  
-
-```
-cgi.header {
-  cgi.header.session('session_name_a');
-     ...
-  cgi.redirect('doc.orca');
-}
-```
-
-### header.session
-
-session manager object
-
-### header.session.add(name, value)
-
-add new variable in session.  
-session.add('new\_key', 'new\_value');
-
-### header.session.set(name, value)
-
-change session variable value.  
-session.set('new\_key', 'changed\_value');
-
-### header.session.get(name)
-
-return session variable value.  
-session.get('new_key');
-
-### header.session.remove(name)
-
-remove session variable.  
-session.remove('new_key');
-
-### header.session.exist(name)
-
-check whether session variable is exist.  
-session.exist('new_key');
-
-### header.session.destroy()
-
-destroy the session session.destroy();
-
-### cgi.header.cookie
-
-cookie manager object.  
-
-### header.cookie.get(name)
-
-get cookie value cookie.get('cookie');
-
-### header.cookie.set(name, value)
-
-set cookie value cookie.set('cookie', 'value');
-
-## html
-
-html text generation object.  
-
-### html.puts(msg)
-
-prints text in html document.  
-html.puts('text in html');
-
-### html.tag
-
-make new tag in html document.  
-first parameter is tag name and others are attributes.  
-
-```
-using cgi.html.tag;
-
-tag('html') {
-  tag('head') { }
-  tag('body') {
-    ...  
-  }
-}
-```
-
-### html.ctag
-
-Like , make closed tag
-
-```
-using cgi.html.tag;
-using cgi.html.ctag;
-
-tag('html') {
-  tag('head') { }
-  tag('body') {
-    ctag('img', 'src=img.jpg');
-  }
-}
-```
-
-### html.br
-
-```
-print  
-in html docuemnt.  
-
-using cgi.html.tag;
-using cgi.html.ctag;
-using cgi.html.br;
-
-tag('html') {
-  tag('head') { }
-  tag('body') {
-    ctag('img', 'src=img.jpg');
-    br();
-  }
-}
-```
-
-### html.text(msg)
-
-make new font tag.  
-First parameter is text which be printed.  
-Second parameter is font name.  
-Third parameter is size.  
-
-```
-using cgi.html.tag;
-using cgi.html.ctag;
-using cgi.html.br;
-
-tag('html') {
-  tag('head') { }
-  tag('body') {
-    ctag('img', 'src=img.jpg');
-    br();
-    text('simple text', 'gulim', 10);
-  }
-}
-```
-
-## Simple login example
-
-Here is simple login example.  
-Below file is login.orca.  
-It reads name from user and process login.  
-For more detail on source, If form is submitted, It called again and makes new session session_test and sets session variable logged as 1.  
-Then redirect to result.orca.  
-
-
-```
-using cgi;
-using cgi.header;
-using cgi.header.session;
-using cgi.header.cookie;
-
-using cgi.html.tag;
-using cgi.html.ctag;
-using cgi.html.br;
-using cgi.html.puts;
-using cgi.html.text;
-
-cgi.header {
-	session('session_test');
-	if (cgi.get_param('logout')) {
-		session.destroy();
-	}
-	if (cgi.get_param('login')) {
-		session.add('logged', '1');
-		session.add('name', cgi.get_param('username'));
-		cookie.set('key', 'value');
-		cgi.redirect('result.orca?option=false');
-		return;
-	}
-}
-
-cgi.html {
-	tag('html') {
-		tag('head') { 
-			tag('title') { 
-				puts('cgi session example');
-			}
-		}
-
-		tag('body') {
-			tag('form', ["action='login.orca'", "method='get'"]) {
-				puts: 'username'; 
-				ctag('input', "type='text' name='username'");
-				ctag('input', "type='submit' name='login' value='Click to 
-
-login'");
-			}
-		}
-	}
-}
-```
-
-Belows are result.orca It sets up session_test and check logged.  
-If logged is 1, prints more detail informations.  
-If not logged, prints "not logged in"
-
-```
-using cgi;
-using cgi.header;
-using cgi.header.session;
-using cgi.header.cookie;
-
-using cgi.html.tag;
-using cgi.html.ctag;
-using cgi.html.br;
-using cgi.html.puts;
-using cgi.html.text;
-
-cgi.header {
-	session('session_test');
-}
-
-cgi.html {
-	tag('html') {
-		tag('head') { 
-			tag('title') { 
-				puts('cgi session example');
-			}
-		}
-
-		tag('body') {
-			if (session.exist('logged')) {
-				puts: 'logged'; 
-				br();
-				puts: 'session.name =', session.get('name'); 
-				br();
-				puts: 'cookie.key =', cookie.get('key');
-				br();
-				puts: 'param.option =', cgi.get_param('option');
-				br();
-				tag('form', ["action='login.orca'", "method='get'"]) {
-					ctag('input', "type='submit' name='logout' 
-
-value='Click to logout'");
-				}
-			}
-			else {
-				puts: 'not logged in'; 
-			}
-		}
-	}
-}
-```
-
-# mysql
-
-mysql is external module so you have to build it from extlib.  
-It requires mysql to be installed before build.  
-After build it, move libmysql.so to LD\_LIBRARY\_PATH and load module by using statement.  
-using mysql;
-
-### mysql.connect(ip, id, pw, db)
-
-connect to mysql server
-
-### mysql.update(query)
-
-execute update Qeury
-
-### mysql.execute(query)
-
-execute select Query return value is mysql result iterator.  
-so you can access result value by call it.  
-Here is simple example.  
-
-```
-using mysql;
-  
-  m = mysql.clone();
-  m.connect('127.0.0.1', argv[0], argv[1], 'test');
-  
-  print: m.update('drop table t1');
-  print: m.update('create table t1 (code int)');
-  
-  for i in [1..5] {
-      print: m.update('insert into t1 values(${i})');
-  }
-  
-  
-  print: ret = m.execute('select * from t1');
-  
-  for a in ret {
-      print: a();
-  }
-
-$ orca tt root passwd
-0
-0
-0
-0
-0
-0
-0
-mysqlresult <0x8766028>
-( '1' )
-( '2' )
-( '3' )
-( '4' )
-( '5' )
-```
 

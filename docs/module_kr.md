@@ -36,6 +36,7 @@ written by Lee, Ki-Yeul (kiyeul.lee@gmail.com)
     *   [sh](#sh)
 *   [log](#log)
 *   [math](#math)
+	*   [random](#random)
 *   [net](#net)
     *   [httpd](#httpd)
     *   [httplib](#httplib)
@@ -46,7 +47,6 @@ written by Lee, Ki-Yeul (kiyeul.lee@gmail.com)
 *   [os](#os)
 *   [pack](#pack)
 *   [queue](#queue)
-*   [random](#random)
 *   [repr](#repr)
 *   [run](#run)
 *   [selector](#selector)
@@ -68,7 +68,7 @@ written by Lee, Ki-Yeul (kiyeul.lee@gmail.com)
     *   [match](#match)
     *   [lru](#lru)
     *   [lock](#lock)
-    *   [uppper](#uppper)
+    *   [find_owner](#find_owner)
 
 
 
@@ -648,11 +648,10 @@ $ print: datetime.clone('2010-01-01 03:04:05') - a;
 
 time.msleep(msec) 이것은 좀 별다른 static 함수로서 milliseconds만큼 sleep한다.
 
-# dl (TODO)
+# dl
+dl 은 c library 파일에 대해 억세스하기 위한 모듈이다. (TBD with example)
 
 # distribute
-
-
 # fs, dfsd, cached
 
 이 모듈들은 동적인 분산파일시스템, 분산캐쉬를 구현한 모듈들이다. 아직은 프로토타입 수준이지만 앞의 dist 모듈과 합쳐서 분산처리에 유용하게 쓸 수 있다.
@@ -858,10 +857,10 @@ dist.dist\_for(list, fun) list 들을 나누어 등록되어 있는 원격노드
 다음은 프로젝트에 포함되어있는 test\_dist.orca이다. 테스트 프로그램은 원격노드를 port, port+1, port+2 로 세개 띄우고 dist를 통해 dist\_do, dist\_for 를 실행시킨다. dist\_do로는 간단한 sum함수를 실행시키고 dist_for로는 1~100 까지의 리스트를 분산처리로 각각 제곱한 결과를 가져오도록 하고 있다.
 
 ```
-using remoted;
-using remotec;
-using dist;
-using random;
+using distribute.remoted;
+using distribute.remotec;
+using distribute.dist;
+using math.random;
 using time;
 
 random.seed();
@@ -1255,7 +1254,9 @@ bind\_2nd, bind\_3rd 역시 두번째, 세번째 파라미터를 특정객체로
 
 
 
-# gtk (TODO)
+# gtk
+gtk 모듈은 gui 에서 사용하 linux gtk 핸들에 대한 로우레벨 라이브러리이다. gtk 모듈을 직접 사용하기 보다는 다음의 gui 모듈을 사용하기 바란다. 예제는 tests 파일에도 있지만 10min.md 의 2장에도 설명이 되어 있다.
+추후, windows32 api 기반으로도 추가될 예정이다.
 
 
 # gui
@@ -1274,17 +1275,17 @@ bind\_2nd, bind\_3rd 역시 두번째, 세번째 파라미터를 특정객체로
            def menu : menubar
            {
                file = [ 'open', def.lambda() {
-                                   name = dialog.fileopen(upper('main'));
+                                   name = dialog.fileopen(find_owner('main'));
                                    str= os.read(name);
-                                   upper('box').hs.edit.attr['text'] = str;
+                                   find_owner('box').hs.edit.attr['text'] = str;
                                },
                        'save', def.lambda() {
-                                   str= upper('box').hs.edit.attr['text'];
-                                   name = dialog.filesave(upper('main'));
+                                   str= find_owner('box').hs.edit.attr['text'];
+                                   name = dialog.filesave(find_owner('main'));
                                    os.write(name, str);
                                },
                        'exit', def.lambda() {
-                                   upper('main').quit();
+                                   find_owner('main').quit();
                                }
                        ];
    
@@ -1361,7 +1362,7 @@ make 인터페이스는 윈도우 안의 GUI 객체들을 포함관계대로 구
                my.attr['wh'] = (100, 50);
                my.attr['text'] = '+';
                my.event['clicked'] = def.lambda() {
-                   upper('box').counter.attr['text'] += 1;
+                   find_owner('box').counter.attr['text'] += 1;
                };
            }
    
@@ -1371,7 +1372,7 @@ make 인터페이스는 윈도우 안의 GUI 객체들을 포함관계대로 구
                my.attr['wh'] = (100, 50);
                my.attr['text'] = '-';
                my.event['clicked'] = def.lambda() {
-                   upper('box').counter.attr['text'] -= 1;
+                   find_owner('box').counter.attr['text'] -= 1;
                };
            }
        }
@@ -1382,7 +1383,7 @@ make 인터페이스는 윈도우 안의 GUI 객체들을 포함관계대로 구
 
 이제, gui 이벤트는 event 어트리뷰트를 통해 정의할 수 있다. plus button 의 'clicked' 를 코드와 같이 정의하면, 해당 버튼을 클릭했을 때 그 정의된 객체가 실행된다.
 
-코드에선 upper('box').counter.attr\['text'\] += 1 이 동작한다. upper는 util.upper인터페이스로 자신의 owner들을 따라 올라가면서 이름이 같은 객체를 찾는 일을한다. 해서 upper('box').counter는 main.box.counter를 리턴하고, counter의 'text' 속성을 1 증가시킴으로써 실제 GUI 텍스트를 변경시키게 된다.
+코드에선 find_owner('box').counter.attr\['text'\] += 1 이 동작한다. find_owner는 util.find_owner인터페이스로 자신의 owner들을 따라 올라가면서 이름이 같은 객체를 찾는 일을한다. 해서 find_owner('box').counter는 main.box.counter를 리턴하고, counter의 'text' 속성을 1 증가시킴으로써 실제 GUI 텍스트를 변경시키게 된다.
 
 실제 나타나는 윈도우는 아래와 같다.  
 ![](image/button.jpg)
@@ -1418,7 +1419,10 @@ GUI 객체들은 현재 아래 목록들이 제공된다.
 
 
 
-# html (TODO)
+# html
+html 모듈은 웹 프로그래밍에서 html 템플릿을 동적생성할 수 있게 도와주는 모듈이다. html 에 대한 문맥확장객체 컴파일을 수행하고, form과 tag 에 대한 처리를 할 수 있게 지원한다.
+
+자세한 내역은 10min.md 의 4장을 참조하자.
 
 # io
 
@@ -1654,7 +1658,40 @@ def tgzip = %sh{ tar -xcvf argv[0] argv[1] };
 my.tgzip('out.tar.gz', '/home/lynix/out');
 ```
 
-# log (TODO)
+# log
+log 는 채널인으로 구현된 라이브러리이다.
+
+로그는 다단계로 설정할 수 있으며 가장 명시적으로 설정된 것이 적용되나 설정되 것이 없으면 상위의 설정을 따른다. turn on/off 는 해당 필드를 호출하면서 true/false 를 파라미터로 주면 변경할 수 있다.
+
+아래는 그 예이다
+
+```
+$ log(false);
+<log - 0xd505e0>
+$ log <- 'turned off';
+$ a = 10;
+10
+$ log <- 'increaed value: %d' % (a+=1);
+$ print: a;
+10
+$ log.socket(true);
+<log - 0xd537a0>
+$ log.socket.tcp <- 'turn on by log.socket';
+[2019-04-30T12:49:50.820910] turn on by log.socket
+$ log.socket.tcp(false);
+<log - 0xd53500>
+$ log.socket.tcp <- 'explicit set is applied';
+$ log.socket <- 'so this will be printed';
+[2019-04-30T12:50:48.631508] so this will be printed
+$ log.socket.tcp.port <- 'but this is not. log.socket.tcp turn off implicit';
+$ 
+```
+튜토리얼을 보았으면 채널인의 경우 어느 객체의 <- 멤버가 nil 인 경우 오른쪽을 evaluate 하지 않는 다는 것을 보았을 것이다.
+
+위의 예중 'increased value: %d' % (a+=1) 을 출력하는 구문인데, log 가 꺼져 있기 때문에 <- 이 nil 로 설정되었고, 오르카 VM은 오른쪽을 evaluate 하지 않고 다음 문장으로 넘어갔다. 때문에 a 값이 증가하지 않고 10으로 유지되었다.
+
+
+
 
 
 # math
@@ -1664,6 +1701,61 @@ math 는 c의 math library 에 대한 wrapper로서 다음의 인터페이스들
 acos, asin, atan, atan2, ceil, cos, cosh, exp, fabs, floor, fmod, frexp, ldexp, log, log10, modf, pow, sin, sinh, sqrt, tan, tanh
 
 함수들의 인터페이스 및 스펙은 libm 의 것과 거의 유사하다. 단, 언어의 특성상 c에서는 파라미터를 통한 output이 가능하나 오르카에서는 포인터가 없기 때문에 출력값이 2개 이상인 경우는 튜플로 리턴된다. 상세한 사용예및 테스트 백터는 tests/test_math.orca 파일을 확인해보기 바란다.
+
+## math.random
+math 모듈에는 난수 발생기도 있다.
+각각 아래와 같은 인터페이스들이 존재한다.
+
+### seed
+난수발생기의 seed 값을 준다. 
+```
+$ usnig math.random;
+$ random.seed(0);
+$ random.integer();
+1804289383
+$ random.integer();
+846930886
+```
+
+### integer
+정수형 난수를 리턴한다. 
+파라미터로 limit 을 주면 0~limit 의 값으로 리턴한다.
+
+```
+$ random.integer();
+1804289383
+$ random.integer(100);
+86
+$ random.integer(100);
+77
+```
+
+### string
+전달방은 길이만큼의 랜넘 아스키 문자열을 리턴한다.
+
+```
+$ random.string();
+U
+$ random.string(10);
+/0rsKc26q/
+$ random.string(100);
+RnzCVPgb6OeNdlouYzOfyZpmMg23MVijWiVdBRdY6V7Uq7LNxpu0VBEOgnRBIT3ch3DpPqFB4fxnPgF+l+rca5aPOFwq7LA7+zKv
+$ 
+```
+
+### real
+0~1 사이의 실수형 난수를 리턴한다.
+
+```
+$ random.real();
+0.944297
+$ random.real();
+0.642284
+$ random.real();
+0.473466
+```
+
+
 
 # net
 
@@ -1686,9 +1778,12 @@ acos, asin, atan, atan2, ceil, cos, cosh, exp, fabs, floor, fmod, frexp, ldexp, 
 
 
 
-## httplib (TODO)
+## httplib
+http client 로서 url request 를 요청하고 데이터를 받기 위한 모듈이다.
+tls 를 지원하게 한 후 한번 더 개비할 예정이다.
 
-## osp (TODO)
+## osp
+osp 는 orca server page 모듈로서 과거 웹 프로그래밍 시 서버 사이드 템플릿 처리를 위해 만들어졌었다. 그러나 이후 html 모듈과 sonar 를 이용하게 변경되면서 권고하지 않는다.
 
 
 # operator
@@ -1730,7 +1825,55 @@ orca.load(str);
 unload(name) 인터페이스는 적재된 모듈을 내리는 역할을 한다. 주용도는 httpd, osp 모듈에서 서블릿, 서버페이지 소스가 변경 되었을 때 재적재를 위한 것이다.
 
 
-# orm (TODO)
+# orm
+rdbms 를 object 로 매핑해주는 orm 모듈이다.
+sonar 에서 사용하고 있으며, orm 을 상속해서 객체를 정의한후 create_table() 로 테이블을 생성할 수 있고, save() 로 insert, where, orderby, groupby, result 로 resultset 을조회할 수 있다.
+
+아래는 간단한 테스트 이다.
+
+사용전에 orm.set_conn 으로변환이 될 dbms connection 을 지정해 주어야 한다. 
+
+```
+using os;
+using orm;
+using storage.sqlite3;
+
+os.remove('tmp.db');
+
+conn = sqlite3.connect('tmp.db');
+orm.set_conn(conn);
+
+def member : orm.model
+{
+	def id := orm.type.int().primary_key();
+	def name := orm.type.text();
+	def id100 := orm.type.int();
+}
+
+my.member.create_table();
+m = my.member.new();
+m.id = 1;
+m.name = 'foo';
+m.id100 = m.id * 100;
+m.save();
+
+m = my.member.new();
+m.id = 2;
+m.name = 'bar';
+m.id100 = m.id * 100;
+m.save();
+
+rs = my.member.orderby(my.member.id).result();
+for m in rs {
+	print: m;
+	if m.id * 100 != m.id100 {
+		throw test.orm <- 'orm value invalid';
+	}
+}
+
+```
+
+10min.md 에서 게시판 관리를 orm 으로 하는 예제가 추가로 있다.
 
 
 # os
@@ -1980,15 +2123,119 @@ $ print: os.last_write_time('foo.txt');
 ```
 
 
-# pack (TODO)
+# pack
+pack 은 save, load 를 통해 오르카 객체를 시리얼라이징할 수 있다. 뿐만 아니라 dump_code, load_code, list_code, check_code 인터페이스를 통해 객체의 실행코드까지 별도로 관리할 수 있다.
+
+이 모듈은 distribute 의 remotec, remoted 에서 객체를 원격으로 전송한 후 호출하는데 사용된다. 상세한 활용은 distribute 모듈을 참조하기 바란다.
+
+로컬에서 저장, 복원은 간단히 save, load 만으로 다음과 갈이 할 수 있다.
+
+```
+using pack;
+
+def foo
+{
+        def a := 100;
+
+        print: my.MEMBERS;
+        return my.a;
+}
+
+ret = pack.save(my.foo);
+print: ret;
+
+bar = pack.load(ret);
+
+print: bar;
+ret = bar();
+if ret != 100 {
+  throw test.pack <- 'load fail';
+}
+
+print: 'OK', my;
+
+```
+
+실행결과는 아래와 같다.
+
+```
+~/lab/orca/tests$ orca test_pack.orca 
+ofoo
+Ma
+i100
+Ctest_pack
+0
+.
+
+< - 0x781a80>
+{ 'a':100 }
+OK<test_pack - 0x7811d0>
+```
+
+현재 구현상의 문제로 인터프리터상에서는 팩으로 객체의 코드를 복원하지 못한다. 컴파일 모드에서만 지원한다.
 
 
-# queue (TODO)
+# queue
+
+queue 는 채널 인, 아웃을 지원하는 async queue 유틸이다.
+
+clone 으로 생성할 때 용량을 지정할 수 있으며, size 는 현재 queue 에 있는 아이템 갯수, cap 은 용량을 리턴한다. push, pop 으로 아이템을 넣고, 뺄 수 있는데 용량이 다 찬경우 push 하면 다른 쓰레드가 pop 할때까지 블록되고, 비어있는 queue 에서 pop 을 하면 다른 쓰레드가 push 할때까지 block 된다.
+
+단, push 의 경우 첫번째 파라미터는 넣을 아이템, 두번째는 타임아웃으로 해당 시간까지만 블록되고 타임아웃이 발생하면 false 를 리턴한다.
+
+pop에 타임아웃 파라미터를 주면 해당시간까지 대기하고 타임아웃이 발생하면 nil 을 리턴한다. 
+
+아래는 간단한 push, pop 예제이다. 네번째 push 는 타임아웃이 발생했고, 마지막 pop 은 10초간 지연되었다.
 
 
-# random (TODO)
+```
+$ using queue;
+$ q = queue.clone(3);
+[  ]
+$ q.size();
+0
+$ q.cap();
+3
+$ q.push(1);
+true
+$ q.push(2);
+true
+$ q.size();
+2
+$ q.push(3);
+true
+$ q.push(4, 0.1);
+false
+$ q.pop();
+1
+$ q.pop();
+2
+$ q.pop();
+3
+$ q.pop(10);
+$ 
+```
 
-# repr (TODO)
+queue 는 <-, -> 멤버가 있기 때문에 select 구문에서 사용할 수 있다. 상세한 예제는 test_queue.orca 를 참조하면 된다.
+
+
+# repr
+
+repr 은 입력받은 파라미터의 표현형을 출력한다.
+객체안에 repr 멤버가 있으면 해당 멤버의 결과를 리턴한다.
+
+```
+$ a = 'hello';
+hello
+$ repr(a);
+"hello"
+$ a = r'a-z+';
+r'a-z+'
+$ repr(a);
+r'a-z+'
+
+```
+
 
 # run
 
@@ -2008,7 +2255,7 @@ nil
 
 간단한 유틸리티성 모듈이다.
 
-# selector (TODO)
+# selector (TBD)
 
 # socket
 
@@ -2113,7 +2360,9 @@ Hello, socket
 
 와 같이 동작할 수 있다. select 모듈이나 thread 모듈을 이용해서 간단한 multiplexing, multithread 서버를 구성할 수도 있다. IOCP, async socket, epoll server등은 차차 추가될 예정이다.
 
-# sonar (TODO)
+# sonar
+sonar 는 오르카의 웹개발 프레임웍이다.
+상세한 내용은 about_sonar.md 나 10min.md 를 참조하기 바란다.
 
 # sorted
 
@@ -2196,13 +2445,155 @@ $
 
 # storage
 
-## cahced (TODO)
+## sqlite3
+sqlite3 클라이언트이다. 현재 오르카에 기본 탑재되어 있고 orm 에서 사용할 수 있다. 타 DBMS는 추후 추가될 예정이다.
 
-## sqlite3 (TODO)
+### connect
+DB에 대한 connection 을 얻는다. 
 
-# string (TODO)
+```
+conn = sqlite3.connect('tmp.db');
+```
+리턴되는 connection 은 다음 sqlite3conn 객체이다.
 
-# strings (TODO)
+
+### sqlite3conn
+
+execute 인터페이스를 이용하여 쿼리를 실행하고 결과를 얻는다.
+create, insert 의 경우 실행결과가, select 구문인 경우 result set 객체가 리턴된다.
+
+### sqlite3result
+
+result set 은 iterater 로서 for 문으로 순회하거나 next() 로 이동하며 값을 얻을 수 있다.
+
+아래는 종합적인 예제이다.
+
+```
+using os;
+using storage.sqlite3;
+
+os.remove('tmp.db');
+
+conn = sqlite3.connect('tmp.db');
+print: conn;
+
+try {
+	res = conn.execute('create table t1 (a int, b string, c double)');
+	print: res();
+
+	for i in [0..10] {
+		query = "insert into t1 values(%d, 'str_%d', %f)" % (i, i, i + 0.1);
+		res = conn.execute(query);
+		print: res();
+	}
+
+	res = conn.execute('select * from t1;');
+	i = 0;
+	for r in res {
+		print: r();
+		v = r();
+		if v[0] != i || v[1] != 'str_%d' % i || v[2] != (i + 0.1) {
+			throw test.db <- 'select result is wrong';
+		}
+
+		i += 1;
+	}
+}
+catch db as e {
+	print: e.what();
+}
+```
+
+위 예의 실행결과는 아래와 같다.
+
+```
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+( 0,'str_0',0.1 )
+( 1,'str_1',1.1 )
+( 2,'str_2',2.1 )
+( 3,'str_3',3.1 )
+( 4,'str_4',4.1 )
+( 5,'str_5',5.1 )
+( 6,'str_6',6.1 )
+( 7,'str_7',7.1 )
+( 8,'str_8',8.1 )
+( 9,'str_9',9.1 )
+( 10,'str_10',10.1 )
+```
+
+
+
+# strings
+문자열 처리와 관련된 유틸리티성 모듈이다.
+
+### join
+문자열을 병합한다. 첫번째 파라미터는 병합될 문자 사이게 구분자로 들어갈 값이다. 리스트를 병합하고 싶으면 아래의 두번째 예처럼 ... 을 사용해 리스트를 풀어야 한다.
+
+```
+$ strings.join(', ', 1, 2, 'three');
+1, 2, three
+$ strings.join(':', ['one', 'two', 'three']...);
+one:two:three
+```
+
+
+### builder
+문자열 생성자이다. 
+write 나 push_back 을 사용해 문자열을 계속 추가할 수 있으며 string() 을 통해 문자열로 변환할 수 있다.
+
+참고로 오르카 string 은 += 이나 push_back() 을 통해 in place update 를 할 수있다.
+
+그러나 builder 를 사용하면 write 덕타입으로 타 API에서 응용할 수 있고 string 보다는 좀 더 효율적이다.
+
+```
+$ b = strings.builder();
+
+$ b.write('first line\n');
+first line
+
+$ b.push_back('second line\n');
+first line
+second line
+
+$ b.string();
+first line
+second line
+```
+
+### html_escape, html_unescape
+스트링을 html 에서 사용할 수있게 escape, unescape 한다.
+아래는 그 예이다.
+
+```
+$ ret = strings.html_escape('a >= (b+c)');
+a &gt;= (b+c)
+$ strings.html_unescape(ret);
+a >= (b+c)
+```
+
+
+### url_escape, url_unescape
+스트링을 url 에서 사용할 수 있는 값으로 escape, unescape 한다.
+아래는 그 예이다.
+
+```
+$ '/info?key=%s' % strings.url_escape('abc&%_');
+/info?key=abc%26%25%5F
+$ strings.url_unescape('/info?key=abc%26%25%5F');
+/info?key=abc&%_
+```
+
 
 
 # system
@@ -2359,7 +2750,19 @@ $
 
 # util
 
-## match (TODO)
+## match
+decode statement 에서 외부 함수 matching 을 지원하기 위한 유틸성 모듈이다.
+상세한 사용법은 tutorial 의 decode statement 마지막 부분을 참조하면 된다.
+
+현재 제공하는 멤버는 아래와 같다.
+
+match.comma: , 하나를 매치하는데 {}, [] 가 있는 경우를 고려한다.
+match.tag(open, close, str): open, close 로 되는 tag 를 매치한다.
+match.match_string(end, str): end 를 찾을때까지 매치한다.
+match.sq_string: 작은 따옴표 스트링을 매치한다.
+match.dq_string: 큰 따옴표 스트링을 매치한다.
+match.match_one_tag: html tag 를 하나 매치한다. 태그안의 sub tag 도 고려한다.
+
 
 ## lock(obj)
 
@@ -2416,375 +2819,9 @@ string: string c
 string: string b 
 ```
 
-## upper (TODO)
+## find_owner
+find_owner 는 자신을 소유한 객체와 그 객체의 소유자들을 따라 올라가면서 이름이 같은 객체를 찾는 유틸성 함수이다.
+사용법은 gui 예제를 보면 알 수 있다.
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# cgi
-
-cgi 모듈은 libcgi 를 base로 작성되었으며 기초적인 CGI 프로그래밍을 지원한다. 이 모듈은 아직 시험적인 요소가 많아, 인터페이스 면에서 앞으로 더 많은 변화가 있을 예정이다.
-
-일단 현재까지 구현된 스펙과 프로그래밍 방식에 대해 설명하겠다. 먼저 모듈과 그것의 인터페이스부터 설명하고, 그 후 기초적인 예제를 들어 설명하겠다.
-
-### get_param(name)
-
-인자로 받은 request parameter 값을 가져온다.
-
-```
-$ var = cgi.get_param('key');
-$ print: var;
-value
-```
-
-### urlenc(src)
-
-입력받은 스트링을 url형식으로 인코딩한다.
-
-```
-$ print: cgi.urlenc("if a+3 > 4: print('overflow');");
-if+a%2B3+%3E+4%3A+print%28%27overflow%27%29%3B
-```
-
-### urldec(src)
-
-url 인코딩된 값을 복원한다.
-
-```
-$ print: cgi.urlenc("if a+3 > 4: print('overflow');");
-if+a%2B3+%3E+4%3A+print%28%27overflow%27%29%3B
-$ print: cgi.urldec('if+a%2B3+%3E+4%3A+print%28%27overflow%27%29%3B');
-if a+3 > 4: print('overflow');
-```
-
-### htmlenc(src)
-
-입력받은 스트링의 특수기호를 html 형식에 맞게 변환한다.
-
-### redirect(url)
-
-다른 문서로 redirect 시킨다.
-
-```
-header {
-  cgi.redirect('another.orca');
-}
-```
-
-## header
-
-cgi.header 객체는 scope statement 로 쓰이며 session, cookie 객체를 가지고 session 설정과 cookie 관련 작업을 수행할 수 있다. session 의 초기화와 문서의 redirect 는 이 header 의 scope 영역에서 구성되어야 한다.
-
-```
-cgi.header {
-  cgi.header.session('session_name_a');
-     ...
-  cgi.redirect('doc.orca');
-}
-```
-
-### header.session
-
-세션을 관리하는 객체이다.
-
-### header.session.add(name, value)
-
-세션에 새로운 변수를 추가한다.
-
-session.add('new\_key', 'new\_value');
-
-### header.session.set(name, value)
-
-세션에 속한 변수의 값을 변경한다.
-
-session.set('new\_key', 'changed\_value');
-
-### header.session.get(name)
-
-세션변수의 값을 읽어온다.
-
-session.get('new_key');
-
-### header.session.remove(name)
-
-세션 변수의 값을 삭제한다.
-
-session.remove('new_key');
-
-### header.session.exist(name)
-
-세션 변수가 존재하는지 확인한다.
-
-session.exist('new_key');
-
-### header.session.destroy()
-
-세션을 날린다.
-
-session.destroy();
-
-### cgi.header.cookie
-
-쿠키를 관리하는 객체이다.
-
-### header.cookie.get(name)
-
-쿠키정보를 가져온다.
-
-cookie.get('cookie');
-
-### header.cookie.set(name, value)
-
-쿠키를 설정한다.
-
-cookie.set('cookie', 'value');
-
-## html
-
-html 문서를 동적으로 쉽게 구성할 수 있는 html 객체이다. 역시 상세한 내용은 다음 절을 참고하라.
-
-### html.puts(msg)
-
-입력받은 값들을 그대로 문서에 출력한다. 이 인터페이스와 오르카의 스트링 함수 만으로도 다른 cgi프로그램들과 같은 방식으로 응답문서를 모두 구성할 수 있다. 아래의 다른 인터페이스들은 이를 보다 더 쉽게 구성하기 위한 것이다.
-
-html.puts('text in html');
-
-### html.tag
-
-응답될 html 문서안의 태그를 새로 하나 만든다. 첫번째 인자는 태그의 이름이고, 나머지 인자들은 attribute로 추가될 항목이다. attribute 로 추가될 인자가 스트링 타입이면 그대로, list 타입이면 모든 항목이, map 타입이면 key='value' pair로 들어간다.
-
-```
-using cgi.html.tag;
-
-tag('html') {
-  tag('head') { }
-  tag('body') {
-    ...
-  }
-}
-```
-
-### html.ctag
-
- 와 같이 따로 close tag를 갖지 않고 단일로 존재하는 태그를 구성한다.
-
-```
-using cgi.html.tag;
-using cgi.html.ctag;
-
-tag('html') {
-  tag('head') { }
-  tag('body') {
-    ctag('img', 'src=img.jpg');
-  }
-}
-```
-
-### html.br
-
-  
-을 출력한다.
-
-```
-using cgi.html.tag;
-using cgi.html.ctag;
-using cgi.html.br;
-
-tag('html') {
-  tag('head') { }
-  tag('body') {
-    ctag('img', 'src=img.jpg');
-    br();
-  }
-}
-```
-
-### html.text(msg)
-
-font 태그를 하나 출력한다. 첫번째 파라미터는 출력될 텍스트이고, 두번째는 폰트, 세번째 인수는 사이즈이다.
-
-```
-using cgi.html.tag;
-using cgi.html.ctag;
-using cgi.html.br;
-
-tag('html') {
-  tag('head') { }
-  tag('body') {
-    ctag('img', 'src=img.jpg');
-    br();
-    text('simple text', 'gulim', 10);
-  }
-}
-```
-
-# Simple login example
-
-간단하게 로그인 예제를 선보이겠다. 먼저 아래 파일은 login.orca 로서 사용자로부터 이름을 입력받은 후, 로그인 후 result.orca로 redirect 하는 역할을 한다.
-
-간단하게 소스를 설명하면, form 을 누르면 다시한번 호출되면서 session_test란 이름으로 세션을 하나 설정하고, 세션 변수에 logged를 1로 설정하고 몇개의 값들을 세션과 쿠키에 기록한다 (단순히 테스트 목적으로) 그리고 본 페이지인 result.orca로 redirect 한다.
-
-```
-using cgi;
-using cgi.header;
-using cgi.header.session;
-using cgi.header.cookie;
-
-using cgi.html.tag;
-using cgi.html.ctag;
-using cgi.html.br;
-using cgi.html.puts;
-using cgi.html.text;
-
-cgi.header {
-	session('session_test');
-	if (cgi.get_param('logout')) {
-		session.destroy();
-	}
-	if (cgi.get_param('login')) {
-		session.add('logged', '1');
-		session.add('name', cgi.get_param('username'));
-		cookie.set('key', 'value');
-		cgi.redirect('result.orca?option=false');
-		return;
-	}
-}
-
-cgi.html {
-	tag('html') {
-		tag('head') { 
-			tag('title') { 
-				puts('cgi session example');
-			}
-		}
-
-		tag('body') {
-			tag('form', ["action='login.orca'", "method='get'"]) {
-				puts: 'username'; 
-				ctag('input', "type='text' name='username'");
-				ctag('input', "type='submit' name='login' value='Click to 
-
-login'");
-			}
-		}
-	}
-}
-```
-
-아래는 redirect되는 result.orca로서, 앞서 설정한 session을 설정한 후, 본 페이지에서 세션변수에 logged가 있다면 로그인 되면서 설정한 값들을 출력해주고, 그렇지 않다면 not logged in 을 출력한다. logout 버튼을 클릭하면 login.orca를 호출하여 session을 날린다.
-
-```
-using cgi;
-using cgi.header;
-using cgi.header.session;
-using cgi.header.cookie;
-
-using cgi.html.tag;
-using cgi.html.ctag;
-using cgi.html.br;
-using cgi.html.puts;
-using cgi.html.text;
-
-cgi.header {
-	session('session_test');
-}
-
-cgi.html {
-	tag('html') {
-		tag('head') { 
-			tag('title') { 
-				puts('cgi session example');
-			}
-		}
-
-		tag('body') {
-			if (session.exist('logged')) {
-				puts: 'logged'; 
-				br();
-				puts: 'session.name =', session.get('name'); 
-				br();
-				puts: 'cookie.key =', cookie.get('key');
-				br();
-				puts: 'param.option =', cgi.get_param('option');
-				br();
-				tag('form', ["action='login.orca'", "method='get'"]) {
-					ctag('input', "type='submit' name='logout' 
-
-value='Click to logout'");
-				}
-			}
-			else {
-				puts: 'not logged in'; 
-			}
-		}
-	}
-}
-```
-
-로 접근 해볼 수 있다.
-
-# mysql
-
-mysql은 외장 모듈로서 따로 빌드시켜야 한다. 빌드 시 머신에 mysql이 깔려 있어야 해서 기본 라이브러리로 포함시키지 않았다.
-
-빌드 후 생성된 libmysql.so 를 공유 라이브러리 path에 복사한 후, using mysql; 로 load해서 사용한다.
-
-### mysql.connect(ip, id, pw, db)
-
-해당 접속 정보를 사용하여 mysql에 접속한다.
-
-### mysql.update(query)
-
-update(create, drop, insert, update) query를 실행한다.
-
-### mysql.execute(query)
-
-select query를 실행한다. 리턴값은 mysql result iterator이다. 반복자를 참조함으로써 해당 결과를 얻을 수 있다. 다음은 간단한 예제 프로그램이다.
-
-```
-using mysql;
-  
-  m = mysql.clone();
-  m.connect('127.0.0.1', argv[0], argv[1], 'test');
-  
-  print: m.update('drop table t1');
-  print: m.update('create table t1 (code int)');
-  
-  for i in [1..5] {
-      print: m.update('insert into t1 values(${i})');
-  }
-  
-  
-  print: ret = m.execute('select * from t1');
-  
-  for a in ret {
-      print: a();
-  }
-
-$ orca tt root passwd
-0
-0
-0
-0
-0
-0
-0
-mysqlresult <0x8766028>
-( '1' )
-( '2' )
-( '3' )
-( '4' )
-( '5' )
-```
