@@ -1,0 +1,24 @@
+
+using pack;
+
+def foo
+{
+	def a := 100;
+	
+	print: my.MEMBERS;
+	return my.a;
+}
+
+ret = pack.save(my.foo);
+print: ret;
+
+bar = pack.load(ret);
+
+print: bar;
+ret = bar();
+if ret != 100 {
+  throw test.pack <- 'load fail';
+}
+
+print: 'OK', my;
+

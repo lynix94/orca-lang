@@ -1,0 +1,41 @@
+using os;
+using orm;
+using storage.sqlite3;
+
+os.remove('tmp.db');
+
+conn = sqlite3.connect('tmp.db');
+orm.set_conn(conn);
+
+def member : orm.model
+{
+	def id := orm.type.int().primary_key();
+	def name := orm.type.text();
+	def id100 := orm.type.int();
+}
+
+my.member.create_table();
+m = my.member.new();
+m.id = 1;
+m.name = 'foo';
+m.id100 = m.id * 100;
+m.save();
+
+m = my.member.new();
+m.id = 2;
+m.name = 'bar';
+m.id100 = m.id * 100;
+m.save();
+
+rs = my.member.orderby(my.member.id).result();
+for m in rs {
+	print: m;
+	if m.id * 100 != m.id100 {
+		throw test.orm <- 'orm value invalid';
+	}
+}
+
+
+
+
+

@@ -54,10 +54,11 @@ test_modules = [
 #  'test_gnuplot', # to save time
   'test_log',
   'test_sqlite3',
+  'test_orm',
+  'test_pack',
 
 
 #### not be made yet
-#  'test_pack', ## not made
 #  'test_sh',
 #  'test_cpp',
 #  'test_awk',
