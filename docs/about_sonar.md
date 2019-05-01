@@ -55,7 +55,7 @@ server start...
 ## httpd start: ( '127.0.0.1:8000' )
 ```
 
-![](image\sonar_run_server.png)
+![](image/sonar_run_server.png)
 
 
 index.orca.html is shown on page.
@@ -122,7 +122,7 @@ https://github.com/lynix94/sonar-example
 
 You can see below page if you run this project.
 
-![](image\sonar_example.png)
+![](image/sonar_example.png)
 
 Each example links are ex1 ~ ex7 apps and those are located in ex1.orca ~ ex7.orca.
 

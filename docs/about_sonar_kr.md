@@ -56,7 +56,7 @@ server start...
 ## httpd start: ( '127.0.0.1:8000' )
 ```
 
-![](image\sonar_run_server.png)
+![](image/sonar_run_server.png)
 
 
 
@@ -124,7 +124,7 @@ https://github.com/lynix94/sonar-example
 
 해당 프로젝트를 구동한 후 구동시키면 아래와 같은 화면이 나타난다.
 
-![](image\sonar_example.png)
+![](image/sonar_example.png)
 
 
 개별 example 링크는 ex1 ~ ex7 의 app 에 해당되며 해당 app 의 내용은 ex1.orca ~ ex7.orca 안에서 볼 수있다.
