@@ -176,10 +176,17 @@ public:
 
 orcaData orcaRoot::ex_range(orcaVM* vm, int n)
 {
-	if (n < 2) vm->need_param();
+	if (n < 1) vm->need_param();
+
 	orcaRange* rp = new orcaRange();
-	rp->from = vm->get_param(0).Integer();
-	rp->to = vm->get_param(1).Integer();
+	if (n == 1) {
+		rp->from = 0;
+		rp->to = vm->get_param(0).Integer();
+	}
+	else {
+		rp->from = vm->get_param(0).Integer();
+		rp->to = vm->get_param(1).Integer();
+	}
 
 	if (n >= 3) {
 		rp->interval = vm->get_param(2).Integer();
