@@ -15,6 +15,7 @@ sudo apt install libreadline-dev
 sudo apt install libgmp-dev  
 sudo apt install libgtk2.0-dev  
 sudo apt install libsqlite3-dev  
+sudo apt install libcanberra-gtk-module    
 
 
 # configure & build like below
