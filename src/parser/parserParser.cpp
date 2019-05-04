@@ -272,7 +272,7 @@ bool parserParser::parse(const string& filename)/*{{{*/
 		int ret = yyparse();
 		if (ret != 0) {
 			try_parse(compile_string);
-			if (!g_parser->is_interactive() and !g_parser->is_eval()) {
+			if (!g_parser->is_interactive() && !g_parser->is_eval()) {
 				exit(0);
 			}
 
@@ -287,7 +287,7 @@ bool parserParser::parse(const string& filename)/*{{{*/
 	catch(const char* cp) {
 		print("[%s - %d]%s\n", filename.c_str(), lineno, cp);
 		try_parse(compile_string);
-		if (!g_parser->is_interactive() and !g_parser->is_eval()) {
+		if (!g_parser->is_interactive() && !g_parser->is_eval()) {
 			exit(0);
 		}
 		return false;
