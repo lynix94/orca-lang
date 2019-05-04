@@ -25,7 +25,7 @@ make install
 
 
 # add this environment to .bashrc
-export PATH=$HOME/orca/bin:/usr/local/go/bin:$PATH  
+export PATH=$HOME/orca/bin:$PATH  
 export ORCA_PATH=$HOME/orca/lib/orca  
 export ORCA_HOME=$HOME/orca  
 
