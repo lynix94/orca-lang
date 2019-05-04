@@ -18,7 +18,7 @@
 
 
 
-#1. 기본 컨셉 - 객체로의 완전한 일원화
+# 1. 기본 컨셉 - 객체로의 완전한 일원화
 오르카는 파이썬 스타일의 스크립트 언어이며, 파이썬과 C++, go lang 에서 영향을 받았다. 그러나, 기존 언어의 객체-함수간 관계에 어색함을 느껴 새로운 구조로 구현하였다.
 
 오르카에서 모든 객체는 def 로 선언된다. 객체는 실행 코드를 가지고 있을 수 있다. 때문에 별도로 (객체가 아닌) 함수는 없다. 
@@ -75,7 +75,7 @@ def sample #file name
 그러나, 이런 방식이 주는 장점들도 많은데 다른 부분은 튜토리얼을 참조해 보고, 가장 인상적인 장점들 중 하나로 GUI 와 웹 프로그래밍을 먼저 살펴보겠다.
 
 
-#2. GUI 프로그래밍
+# 2. GUI 프로그래밍
 
 
 
@@ -276,7 +276,7 @@ https://youtu.be/qwcmxUXFNP0
 https://youtu.be/VsmmITn2dbw
 
 
-#3. context extended object
+# 3. context extended object
 
 이제 orca 로 web 프로그래밍을 하는 부분을 설명할 예정이나, 그 전에 문맥 확장 객체에 대해서 사전 설명이 필요하다. 문맥 확장 객체(context extended object) 는 오르카의 또다른 가장 큰 특징으로, 오르카 객체를 정의하면서 그 객체를 컴파일 하는 모듈을 지정할 수 있게 된다.
 
@@ -934,11 +934,11 @@ Youtube 에 강좌를 추가할 예정이니 이를 참조하기 바란다. (계
 
 버그 리포팅, Pull Request 및 어느 타입의 공헌도 모두 환영하며 보다 자세한 사항은 아래 링크를 참조하여 문의 주시기 바란다.
 
-project page:	https://github.com/lynix94/orca-lang
-facebook page:	https://www.facebook.com/orcalang
-youtube:		https://www.youtube.com/channel/UC0bUKWj0aoWgbh9KaqJu8gw
-email:			kiyeul.lee@gmail.com
-linked-in:		https://www.linkedin.com/in/kiyeul-lee
+project page:		https://github.com/lynix94/orca-lang  
+facebook page:		https://www.facebook.com/orcalang  
+youtube:		https://www.youtube.com/channel/UC0bUKWj0aoWgbh9KaqJu8gw  
+email:			kiyeul.lee@gmail.com  
+linked-in:		https://www.linkedin.com/in/kiyeul-lee  
 
 
 

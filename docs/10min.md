@@ -10,12 +10,12 @@ This document explains basic aspects of orca on #1. in #2, show the GUI programm
 
 This document explains briefly, So I recommend below two documents later.
 
-[Tutorial](https://github.com/lynix94/orca-lang/blob/master/docs/tutorial_kr.md)
+[Tutorial](https://github.com/lynix94/orca-lang/blob/master/docs/tutorial.md)
 
-[Module reference](https://github.com/lynix94/orca-lang/blob/master/docs/module_kr.md)
+[Module reference](https://github.com/lynix94/orca-lang/blob/master/docs/module.md)
 
 
-#1. Basic concept - unified object define
+# 1. Basic concept - unified object define
 
 The Orca is python style language, and get inspiration from python, C++ and go lang. But, re-invent object-function relation because I feel some inconvenience about that.
 
@@ -76,7 +76,7 @@ But there are many advantages also. You can see those in tutorial but now Let's 
 
 
 
-#2. GUI programming
+# 2. GUI programming
 
 Previous chapter explains basic concepts of orca. Everything be defined by def and all object have relation with owner & my like tree. This scheme can design many things more easily. 
 
@@ -269,7 +269,7 @@ https://youtu.be/e3TYmBNrhZ8
 
 
 
-#3. context extended object
+# 3. context extended object
 
 Now I'd like to explain orca web programming. but concepts of context extended object should be explained first. The context extended object is another main aspect of orca programming language. It enables other context module make orca object by its rule and way.
 
@@ -427,7 +427,7 @@ And orca provides web development framework Sonar. It referenced the django of p
 
 The document about the basic usage of sonar is below link.
 
-https://github.com/lynix94/orca-lang/blob/master/docs/about_sonar_kr.md
+https://github.com/lynix94/orca-lang/blob/master/docs/about_sonar.md
 
 Then let's see the sonar example code & execution result video clip here.
 
@@ -934,11 +934,11 @@ Don't hesitate to contact or ask about the orca by below links.
 
 Thanks for reading. :)
 
-project page:	https://github.com/lynix94/orca-lang
-facebook page:	https://www.facebook.com/orcalang
-youtube:		https://www.youtube.com/channel/UC0bUKWj0aoWgbh9KaqJu8gw
-email:			kiyeul.lee@gmail.com
-linked-in:		https://www.linkedin.com/in/kiyeul-lee
+project page:		https://github.com/lynix94/orca-lang  
+facebook page:		https://www.facebook.com/orcalang  
+youtube:		https://www.youtube.com/channel/UC0bUKWj0aoWgbh9KaqJu8gw  
+email:			kiyeul.lee@gmail.com  
+linked-in:		https://www.linkedin.com/in/kiyeul-lee  
 
 
 
