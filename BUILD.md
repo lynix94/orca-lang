@@ -26,6 +26,7 @@ make install
 
 # add this environment to .bashrc
 export PATH=$HOME/orca/bin:$PATH  
+export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH  
 export ORCA_PATH=$HOME/orca/lib/orca  
 export ORCA_HOME=$HOME/orca  
 
