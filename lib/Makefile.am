@@ -24,13 +24,16 @@ orcalibsonardir = $(prefix)/lib/orca/sonar.orca
 orcalibsonar_DATA = sonar.orca/CODE.kw sonar.orca/CODE.orca
 
 orcalibsonarcoredir = $(prefix)/lib/orca/sonar.orca/core.orca
-orcalibsonarcore_DATA = sonar.orca/core.orca/CODE.kw sonar.orca/core.orca/CODE.orca sonar.orca/core.orca/client.kw sonar.orca/core.orca/client.orca sonar.orca/core.orca/httpd.kw sonar.orca/core.orca/httpd.orca sonar.orca/core.orca/manager.kw sonar.orca/core.orca/manager.orca sonar.orca/core.orca/session.kw sonar.orca/core.orca/session.orca
+orcalibsonarcore_DATA = sonar.orca/core.orca/CODE.kw sonar.orca/core.orca/CODE.orca sonar.orca/core.orca/client.kw sonar.orca/core.orca/client.orca sonar.orca/core.orca/httpd.kw sonar.orca/core.orca/httpd.orca sonar.orca/core.orca/manager.kw sonar.orca/core.orca/manager.orca sonar.orca/core.orca/session.kw sonar.orca/core.orca/session.orca sonar.orca/core.orca/reloader.kw sonar.orca/core.orca/reloader.orca
 
 orcalibsonartemplatedir = $(prefix)/lib/orca/sonar.orca/template.orca
 orcalibsonartemplate_DATA = sonar.orca/template.orca/CODE.kw sonar.orca/template.orca/CODE.orca
 
 orcalibsonarhttpdir = $(prefix)/lib/orca/sonar.orca/http.orca
 orcalibsonarhttp_DATA = sonar.orca/http.orca/request.kw sonar.orca/http.orca/request.orca
+
+orcalibsonarormdir = $(prefix)/lib/orca/sonar.orca/orm.orca
+orcalibsonarorm_DATA = sonar.orca/orm.orca/initialize.kw sonar.orca/orm.orca/initialize.orca sonar.orca/orm.orca/migrate.kw sonar.orca/orm.orca/migrate.orca
 
 orcalibsonarcontribdir = $(prefix)/lib/orca/sonar.orca/contrib.orca
 orcalibsonarcontrib_DATA = sonar.orca/contrib.orca/admin.kw sonar.orca/contrib.orca/admin.orca
