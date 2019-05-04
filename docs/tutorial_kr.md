@@ -2972,3 +2972,146 @@ a('world');
 
 오르카에서 기본제공되는 문맥확장객체 처리 모듈은 html, json, cpp, lisp, sh 가 있다. 이들의 상세 내역은 모듈 레퍼런스에서 참조할 수 있고, 실제 내부 모습은 오르카 라이브러리 폴더에서 확인할 수 있다. 사용자는 이들의 방식과 유사하게 자신만의, DSL을 오르카 언어 내부에서 사용할 수 있다.
 
+사용자는 별도로 처리하고자 하는 문맥 (html, cpp, etc...) 을 담당하는 모듈을 만들고 그 모듈에서 전달되는 문맥을 처리하면 된다. 
+현재 문맥확장객체는 html 에 내장되어 템플릿 처리를 하는 부분에서 가장 잘 쓰이고 있으며, 그 예는 아래의 10분 가이드 문서의 마지막 장에서 확인할 수 있다.
+
+문맥확장 객체를 처리하는 모듈은 아래와 같이 만든다. 설명을 위해 가장 간단한 예로 하겠다.
+
+```
+def txt(...argv) under root
+{
+    print(argv);
+
+    def txt_object
+    {
+        def template := '';
+        return my.template;
+    }
+
+    ret =  my.txt_object.clone();
+    ret.template = argv[2];
+    return ret;
+}
+
+
+def.txt txt_pure
+{
+    simple text object
+}
+```
+text 문맥을 받아서, 실행하면 해당 텍스트를 그냥 리턴하는 txt 문맥처리 모듈을 만드는 예이다. 위에서 under root 는 해당 객체를 root 아래 등록한는 의미이다. (별도로 txt.orca 로 처리하는게 일반적이나 여기서는 간단한 설명을위해...)
+
+위의 txt_pure 를 실행하면 아래와 같은 내용이 txt 에 전달된다.
+argv[0] 는 정의된 오브젝트 이름 (여기서는 txt_pure)
+argv[1] 은 파일의 최종 변경시각으로 결과물을 만드는 파서인 경우 재컴파일을 할지 여부를 판단하는데 사용된다. (인터프리터라면 상관없다)
+argv[2] 는 처리할 문맥 정보이고
+argv[3] 는 파라미터 (여기서는 사용하지 않았다)
+argv[4] 는 안에 정의되어 있는 또다른 객체의 위치인데 나중에 설명하겠다.
+```
+( 'txt_pure',2019-05-04T19:20:06,'
+    simple text object
+',(  ),{  } )
+```
+
+이 정보를 사용하여 txt 모듈은 txt_object 를 clone 한 후 txt_object 의 template 멤버에 전달받은 txt 를 그냥 대입시켰다.
+txt_object 는 실행하면 해당 template 을 리턴하는 일만 한다.
+
+아래와 같은 코드를 실행하면 결과가 그 다음과 같다.
+```
+def.txt txt_pure
+{
+    simple text object
+}
+
+print: '#### txt_pure';
+print: my.txt_pure.MEMBERS;
+print: my.txt_pure();
+```
+
+```
+#### txt_pure
+{ 'template':'
+    simple text object
+' }
+
+    simple text object
+```
+
+
+그런데 문맥확장객체는 해당 문맥의 객체안에 다른 객체를 포함할 수 있다. 위의 txt 문맥 안에 오르카 문법의 객체를 또 정의할 수 있다.
+아래와 같이 정의하면
+```
+def.txt txt_hibrid
+{
+    simple text object
+
+    def object_under_txt
+    {
+        ret = 'this is orca object under txt\n';
+        ret += 'my owners template: %s' % owner.template;
+        return ret;
+    }
+}
+
+
+print: '#### txt_hibrid';
+print: my.txt_hibrid.MEMBERS;
+print: my.txt_hibrid();
+print: my.txt_hibrid.object_under_txt();
+```
+
+아래와 같은 실행결과를 얻는다.
+```
+#### txt_hibrid
+{ 'object_under_txt':<object_under_txt - 0x55996be27cb0>,'template':'
+    simple text object
+
+
+
+
+
+
+
+' }
+
+    simple text object
+
+
+
+
+
+
+
+
+this is orca object under txt
+my owners template: 
+    simple text object
+```
+
+
+txt_hibrid 객체안에 object_under_txt 를 정의했는데, 실제 최종 객체를 보면 정말 object_under_txt 가 멤버로 존재하고, 실행가능하다는 것을 알 수 있다.
+
+그런데, txt 모듈에서는 외부 객체를 처리하는 코드가 별도로 있지 않았었다.
+txt_hibrid 를 실행하면 txt 모듈에는 아래와 같은 파라미터가 전달되는데,
+```
+( 'txt_hibrid',2019-05-04T19:20:06,'
+    simple text object
+
+
+
+
+
+
+
+',(  ),{ 'object_under_txt':3 } )
+```
+
+보면 순수 txt 문맥만 전달되고 그 안의 다른 문맥으로 정의되어 있는 (def 로 시작하는) 구문은 빠져 있는 것을 알 수 있다.
+이것은 오르카 파서가 별도로 스스로 처리하거나 해당 문맥의 모듈로 넘겨 객체를 만들고 나중에 멤버로 추가해준다. 멤버로 추가할 내역이 가장 마지막 파라미터로 추가될 멤버이름과 해당 멤버가 몇번째 줄에서 정의되어 있는지를 맵으로 전달해 준다.
+
+오르카 객체는 owner, member 로 느슨하게 연결되어 있기 때문에 할 수 있는 방법이다. 이런 방식의 가장 유용한 예가 sonar 와 html 처리이다.
+
+
+
+
+
