@@ -1021,8 +1021,8 @@ And here are additional rules of container.
 *   You can get iterator which points out last item by calling last().
 *   You can get iterator which points out next of last position, call end() (real last position is end().before())
 *   You can find item and get it's iterator by calling find()
-*   If you want erase item. call erase() interface of iterator (but tuple iterator doesn¡¯t support)
-*   If you want insert new item call insert() interface of iterator (but tuple and map doesn¡¯t support)
+*   If you want erase item. call erase() interface of iterator (but tuple iterator doesnÂ¡Â¯t support)
+*   If you want insert new item call insert() interface of iterator (but tuple and map doesnÂ¡Â¯t support)
 *   If order of container is changed, old iterators are invalid and exception occurs if they are referred.
 
 control statement
@@ -1637,7 +1637,7 @@ And decode supports user defined function as match value from 0.4 release. It's 
 as a simple example If there is string like below,  
 str = " \[1, \[2\], 3 \] "  
 
-If you want read it and convers it to list. (don¡¯t think about eval(), just decode string)
+If you want read it and convers it to list. (donÂ¡Â¯t think about eval(), just decode string)
 
 If you parse it by decode statement (old version) programmer may try it like this,
 
@@ -2095,7 +2095,7 @@ PARENTS virtual member returns parents list of an object as list interface objec
 
 ### ID
 
-ID return unique number of object If it¡¯s remained in heap memory.
+ID return unique number of object If itÂ¡Â¯s remained in heap memory.
 
 ```
 $   print: 1.ID;
@@ -2709,4 +2709,133 @@ This is similar to inline assembly in C language. but It's different because Thi
 
 Default supported context extended object module libraries in orca are html, json, cpp, lang.lisp and lang.sh. You can see these in lib folder and understand how it works.
 
+
+The module which make context extended module is made like below.
+```
+def txt(...argv) under root
+{
+    print(argv);
+
+    def txt_object
+    {
+        def template := '';
+        return my.template;
+    }
+
+    ret =  my.txt_object.clone();
+    ret.template = argv[2];
+    return ret;
+}
+
+
+def.txt txt_pure
+{
+    simple text object
+}
+```
+Above is a simple module which make txt object which just return txt. under root means location of object (Normally, make txt as txt.orca file)
+If orca read txt_pure it passes below argv to txt module like below.
+argv[0] is an object name. (txt_pure in this case)
+argv[1] is a last modified time of file to recompile in case of parser which make result (An interpreter donâ€™t need to mind it)
+argv[2] is a context body.
+argv[3] is a names of parameters. (donâ€™t use here)
+argv[4] is a location info of other context module inside. Letâ€™s see it later.
+```
+( 'txt_pure',2019-05-04T19:20:06,'
+    simple text object
+',(  ),{  } )
+```
+The txt module make txt_object as a result object with these parameters. It clones txt_object and just set context body to template member of txt_object.
+txt_object return template when it is called.
+Below code make next result. 
+```
+def.txt txt_pure
+{
+    simple text object
+}
+
+print: '#### txt_pure';
+print: my.txt_pure.MEMBERS;
+print: my.txt_pure();
+```
+
+```
+#### txt_pure
+{ 'template':'
+    simple text object
+' }
+
+    simple text object
+```
+
+And Context extended object can contain another object definition in it. So, you can define pure orca object in the text context of above.
+If you define like below,
+```
+def.txt txt_hibrid
+{
+    simple text object
+
+    def object_under_txt
+    {
+        ret = 'this is orca object under txt\n';
+        ret += 'my owners template: %s' % owner.template;
+        return ret;
+    }
+}
+
+
+print: '#### txt_hibrid';
+print: my.txt_hibrid.MEMBERS;
+print: my.txt_hibrid();
+print: my.txt_hibrid.object_under_txt();
+```
+
+It makes below result.
+```
+#### txt_hibrid
+{ 'object_under_txt':<object_under_txt - 0x55996be27cb0>,'template':'
+    simple text object
+
+
+
+
+
+
+
+' }
+
+    simple text object
+
+
+
+
+
+
+
+
+this is orca object under txt
+my owners template: 
+    simple text object
+```
+
+The example define object_under_txt in Txt_hibrid. The result object really has that as a member and can execute it.
+
+But txt module has no code to handle external object as you know.
+Below parameters are passed to txt module if txt_hibrid is parsed.
+```
+( 'txt_hibrid',2019-05-04T19:20:06,'
+    simple text object
+
+
+
+
+
+
+
+',(  ),{ 'object_under_txt':3 } )
+```
+
+Only pure txt context body is passed as argv[2]. Another object definition (which is start with def) is omitted and is not passwd to txt module.
+That definition is handled by orca parser. The orca parser make object by itself or pass that to another context extended module maker. And insert that result object to txt_hibrid object as a member. Now you can see the last parameterâ€™s meaning. That is a list of member name and its line in the txt context body.
+This is can be made because objects of orca are loosely bind. One of the most useful usage of this is html processing of sonar.
 
