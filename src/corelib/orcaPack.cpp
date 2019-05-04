@@ -182,7 +182,7 @@ string orcaPack::save(orcaData d)/*{{{*/
 /*}}}*/
 
 const char* orcaPack::getline(char** cp) {/*{{{*/
-	if (*cp == '\0')
+	if (*cp == NULL)
 		return NULL;
 
 	const char* ret = (const char*)*cp;
