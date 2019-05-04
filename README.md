@@ -1,7 +1,9 @@
 
 # Orca Programming Language
 Orca is a yet another Object Oriented Programming language.   
-It is made by C++/STL/BOOST so core source is extremely small, efficient and easily bind with C++ class.
+* It is made by C++/STL/BOOST so core source is extremely small, efficient and easily bind with C++ class.
+* support context extended object which is usefule to process domain specific language like html, web programming
+* powerful to porcess string by decode, parse object.
 
 
 ## Information
