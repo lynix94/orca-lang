@@ -1,6 +1,15 @@
 
 NOW developing 0.5 again (move to github.com/lynix94/orca-lang)
 
+* beautify grammer
+* add sonar, orm module
+* add select statement
+* add channel object
+* improve context extended object
+
+2019. 05. 05
+Lee, Ki-Yeul (kiyeul.lee@gmail.com)
+
 -----------------
 now orca release 0.4 beta
 
