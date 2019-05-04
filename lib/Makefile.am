@@ -39,7 +39,8 @@ orcalibstoragedir = $(prefix)/lib/orca/storage.orca
 orcalibstorage_DATA = storage.orca/CODE.kw storage.orca/CODE.orca storage.orca/cached.kw storage.orca/cached.orca
 
 orcalibormdir = $(prefix)/lib/orca/orm.orca
-orcaliborm_DATA = orm.orca/CODE.kw orm.orca/CODE.orca orm.orca/model.kw orm.orca/model.orca orm.orca/type.orca orm.orca/type.kw
+orcaliborm_DATA = orm.orca/CODE.kw orm.orca/CODE.orca orm.orca/model.kw orm.orca/model.orca orm.orca/type.orca orm.orca/type.kw orm.orca/query.orca orm.orca/query.kw
+
 
 orcalibhtmldir = $(prefix)/lib/orca/html.orca
 orcalibhtml_DATA = html.orca/CODE.kw html.orca/CODE.orca html.orca/jqueryui.kw html.orca/jqueryui.orca html.orca/tag.kw html.orca/tag.orca 

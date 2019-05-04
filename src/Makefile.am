@@ -87,6 +87,7 @@ liborca_la_SOURCES = \
 		$(CORELIB_DIR)/orcaSqlite3.cpp \
 		$(CORELIB_DIR)/orcaSelector.cpp \
 		$(CORELIB_DIR)/orcaSocket.cpp \
+		$(CORELIB_DIR)/orcaThread.cpp \
 		$(CORELIB_DIR)/orcaIO.cpp \
 		$(CORELIB_DIR)/orcaOS.cpp \
 		$(CORELIB_DIR)/orcaIPC.cpp \
