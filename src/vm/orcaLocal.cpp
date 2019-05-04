@@ -1,3 +1,5 @@
+/* vim: set fdc=2 foldmethod=marker ts=4 tabstop=4 sw=4 sts=4 : */
+
 /**********************************************************************
 
   orcaLocal.cpp - impl. of orca local variable stack frame
@@ -197,44 +199,44 @@ void orcaLocal::decrease(bool clean_mark)
 		if (clean_mark && is<TYPE_MARK>(lp[i])) {
 			switch(lp[i].mark().type)
 			{
-            case MARK_CATCH: 
+			case MARK_CATCH: 
 				delete (CatchList*)lp[i].mark().vp;
 				break;
 
 			case MARK_SCOPE: 
 			  {
-                orcaObject* o = (orcaObject*)lp[i].mark().vp;
-                orcaData f = o->get_member("}");
+				orcaObject* o = (orcaObject*)lp[i].mark().vp;
+				orcaData f = o->get_member("}");
 				orcaVM* vm = get_current_vm();
-                vm->m_stack->push(f);
-                vm->call(0);
-                vm->m_stack->pop(); // because it's void type
+				vm->m_stack->push(f);
+				vm->call(0);
+				vm->m_stack->pop(); // because it's void type
 				break;
-              }
-            case MARK_FOR:
+			  }
+			case MARK_FOR:
 			  {
 				orcaVM* vm = get_current_vm();
-                vm->m_for_stack->pop();
+				vm->m_for_stack->pop();
 				break;
-              }
-            case MARK_DECODE: 
+			  }
+			case MARK_DECODE: 
 			  {
 				orcaVM* vm = get_current_vm();
-                vm->m_decode_stack->pop();
+				vm->m_decode_stack->pop();
 				break;
-              }
-            case MARK_STACK: 
+			  }
+			case MARK_STACK: 
 			  {
 				orcaVM* vm = get_current_vm();
-                vm->m_stack->pop();
+				vm->m_stack->pop();
 				break;
-              }
-            case MARK_SWITCH: 
+			  }
+			case MARK_SWITCH: 
 			  {
 				orcaVM* vm = get_current_vm();
-                vm->m_switch_stack->pop();
+				vm->m_switch_stack->pop();
 				break;
-              }
+			  }
 			}
 		}
 		lp[i].rc_dec();
