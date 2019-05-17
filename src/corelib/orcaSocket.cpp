@@ -73,6 +73,8 @@ orcaSocket::orcaSocket()
 
 	insert_native_function("send", (object_fp)&orcaSocket::ex_send);
 	insert_native_function("recv", (object_fp)&orcaSocket::ex_recv);
+	insert_native_function("read", (object_fp)&orcaSocket::ex_send);
+	insert_native_function("write", (object_fp)&orcaSocket::ex_recv);
 	insert_native_function("->", (object_fp)&orcaSocket::ex_channel_out);
 	insert_native_function("size", (object_fp)&orcaSocket::ex_size);
 	insert_native_function("recv_all", (object_fp)&orcaSocket::ex_recv_all);

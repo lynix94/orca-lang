@@ -34,6 +34,7 @@
 #include "orcaQueue.h"
 #include "orcaSqlite3.h"
 #include "orcaStrings.h"
+#include "orcaTls.h"
 
 
 #define USE_GTK
@@ -84,6 +85,7 @@ orcaRoot::orcaRoot()
 	clib->insert_static("sqlite3", new orcaSqlite3());
 	clib->insert_static("base64", new orcaBase64());
 	clib->insert_static("strings", new orcaStrings());
+	clib->insert_static("tls", new orcaTlsModule());
 
 #if defined(LINUX)
 #if defined(USE_GTK)

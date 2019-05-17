@@ -1,0 +1,7 @@
+
+using __clib__;
+
+def tls := __clib__.tls;
+
+
+
