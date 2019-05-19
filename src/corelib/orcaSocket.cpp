@@ -11,6 +11,7 @@
 #include "orcaSocket.h"
 #include "orcaException.h"
 #include "orcaList.h"
+#include "kyString.h"
 
 orcaSocketModule::orcaSocketModule()
 {
@@ -73,8 +74,8 @@ orcaSocket::orcaSocket()
 
 	insert_native_function("send", (object_fp)&orcaSocket::ex_send);
 	insert_native_function("recv", (object_fp)&orcaSocket::ex_recv);
-	insert_native_function("read", (object_fp)&orcaSocket::ex_send);
-	insert_native_function("write", (object_fp)&orcaSocket::ex_recv);
+	insert_native_function("write", (object_fp)&orcaSocket::ex_send);
+	insert_native_function("read", (object_fp)&orcaSocket::ex_recv);
 	insert_native_function("->", (object_fp)&orcaSocket::ex_channel_out);
 	insert_native_function("size", (object_fp)&orcaSocket::ex_size);
 	insert_native_function("recv_all", (object_fp)&orcaSocket::ex_recv_all);
@@ -290,16 +291,36 @@ orcaData orcaSocket::ex_close(orcaVM* vm, int n) {
 }
 
 orcaData orcaSocket::ex_connect(orcaVM* vm, int n) {
-	if (n < 2) vm->need_param();
+	if (n < 1) {
+		return NIL;
+	}
 
-	string& addr = vm->get_param(0).String();
-	m_port = vm->get_param(1).Integer();
+	string host;
+	if (n == 1) {
+		string& addr = vm->get_param(0).String();
+		vector<string> toks = kyString::split(addr, ":");
+		if (toks.size() != 2) {
+			throw orcaException(vm, "orca.param", "invalid parameter, host:port or host, port");
+		}
+
+		host = toks[0];
+		m_port = boost::lexical_cast<int>(toks[1]);
+	}
+	else {
+		host = vm->get_param(0).String();
+		m_port = vm->get_param(1).Integer();
+	}
+
+	struct hostent *host_e = gethostbyname(host.c_str());
+	if (host_e == NULL) {
+		throw orcaException(vm, "io.net.dns", "Cannot resolve hostname");
+	}
 
 	SOCKADDR_IN servAddr;
 	memset(&servAddr, 0, sizeof(servAddr));
 	servAddr.sin_family=AF_INET;
-	servAddr.sin_addr.s_addr=inet_addr(addr.c_str());
 	servAddr.sin_port=htons(m_port);
+	servAddr.sin_addr.s_addr = *(long*)(host_e->h_addr);
 
 	if(::connect(m_handle, (SOCKADDR*)&servAddr, sizeof(servAddr))==SOCKET_ERROR) {
 		close();

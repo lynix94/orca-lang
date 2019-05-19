@@ -70,7 +70,7 @@ orcaData orcaTls::ex_connect(orcaVM* vm, int n)
 
 	ctx = SSL_CTX_new(method);
 	if (ctx == NULL) {
-		printf("Unable to create a new SSL context structure.\n");
+		throw orcaException(vm, "io.tls.conn", "Unable to create a new SSL context structure.");
 	}
 
 	SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2);
@@ -78,30 +78,29 @@ orcaData orcaTls::ex_connect(orcaVM* vm, int n)
 
 	struct hostent *host_e = gethostbyname(host.c_str());
 	if (host_e == NULL) {
-		printf("[Error] Cannot resolve hostname %s\n", host.c_str());
-		return -1;
+		throw orcaException(vm, "io.net.dns", "Cannot resolve hostname");
 	}
 
-	struct sockaddr_in dest_addr;
-	dest_addr.sin_family=AF_INET;
-	dest_addr.sin_port=htons(port);
-	dest_addr.sin_addr.s_addr = *(long*)(host_e->h_addr);
-	memset(&(dest_addr.sin_zero), '\0', 8);
-	int ret = connect(server_fd, (struct sockaddr *) &dest_addr, sizeof(struct sockaddr));
+	SOCKADDR_IN servAddr;
+	memset(&servAddr, 0, sizeof(servAddr));
+	servAddr.sin_family=AF_INET;
+	servAddr.sin_port=htons(port);
+	servAddr.sin_addr.s_addr = *(long*)(host_e->h_addr);
+	int ret = connect(server_fd, (SOCKADDR*) &servAddr, sizeof(servAddr));
 	if (ret == -1) {
-		return NIL;
+		throw orcaException(vm, "io.socket.conn", "connection error");
 	}
 
 	SSL_set_fd(ssl, server_fd);
 
 	ret = SSL_connect(ssl);
 	if (ret != 1) {
-		printf("Error: Could not build a SSL session\n");
+		throw orcaException(vm, "io.tls.conn", "Could not build a SSL session");
 	}
 
 	cert = SSL_get_peer_certificate(ssl);
 	if (cert == NULL) {
-		printf("Error: Could not get a certificate\n");
+		throw orcaException(vm, "io.tls.conn", "Could not get a certificate");
 	}
 
 	return NIL;
@@ -109,7 +108,6 @@ orcaData orcaTls::ex_connect(orcaVM* vm, int n)
 
 orcaData orcaTls::ex_close(orcaVM* vm, int n) 
 {
-
 	SSL_free(ssl);
 	close(server_fd);
 	X509_free(cert);
