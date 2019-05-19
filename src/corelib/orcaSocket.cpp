@@ -115,54 +115,41 @@ orcaData orcaSocket::ex_recv(orcaVM* vm, int n) {
 		throw orcaException(vm, "io.socket", "invalid handle");
 	}
 
-	double tmout = -1;
+	double timeout = -1;
 	int size = 65536;
-	char* buff;
 	if (n >= 2) {
-		tmout = vm->get_param(1).Double();
+		timeout = vm->get_param(1).Double();
 	}
 	if (n >= 1) {
 		size = vm->get_param(0).Integer();
 		if (size <= 0) size = 65536;
 	}
 
-	buff = new char[size+1];
-
-	int ret;
-	if (tmout < 0) {
-		ret = ::recv(m_handle, &buff[0], size, 0);
-		if (ret <= 0) {
-			close();
-			delete[] buff;
-			throw orcaException(vm, "io.socket.disconn", "disconnected");
-		}
-	}
-	else {
+	if (timeout >= 0) {
 		struct timeval tv;
+		tv.tv_sec = int(timeout);
+		tv.tv_usec = (long long)(timeout * 1000000) % 1000000;
+
 		fd_set fd_rd;
 		FD_ZERO(&fd_rd);
 		FD_SET(m_handle, &fd_rd);
-		tv.tv_sec = int(tmout);
-		tv.tv_usec = (long long)(tmout * 1000000) % 1000000;
-		ret = select(m_handle+1, &fd_rd, NULL, NULL, &tv);
-		if (ret) {
-			if (FD_ISSET(m_handle, &fd_rd)) {
-				ret = ::recv(m_handle, &buff[0], size, 0);
-				if (ret <= 0) {
-					close();
-					delete buff;
-					throw orcaException(vm, "io.socket.disconn", "disconnected");
-				}
-			}
+		int ret = select(m_handle+1, &fd_rd, NULL, NULL, &tv);
+		if (ret < 0) {
+			throw orcaException(vm, "io.select", "select failed");
+		}
+		else if (ret == 0) {
+			return "";
 		}
 	}
 
-	buff[ret] = 0;
 	string s;
+	s.resize(size);
+	int ret = ::recv(m_handle, &s[0], size, 0);
+	if (ret <= 0) {
+		close();
+		throw orcaException(vm, "io.socket.disconn", "disconnected");
+	}
 	s.resize(ret);
-	copy(&buff[0], &buff[ret], s.begin());
-	delete[] buff;
-
 	return s;
 }
 

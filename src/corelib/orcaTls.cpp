@@ -122,32 +122,27 @@ orcaData orcaTls::ex_read(orcaVM* vm, int n)
 		return NIL;
 	}
 
-	int size = 4096;
-	double timeout = 0;
+	int size = 65535;
+	double timeout = -1;
 	if (n > 0) {
 		size = vm->get_param(0).Integer();
+		if (size <= 0) size = 65536;
 	}
-	if (n > 1) {
+	if (n >= 2) {
 		timeout = vm->get_param(1).Double();
 	}
 
-	if (timeout != 0) {
+	if (timeout >= 0) {
 		struct timeval tv;
-		tv.tv_sec = 0;
-		tv.tv_usec = 0;
-
-		if (timeout > 0) {
-			tv.tv_sec = int (timeout * 1000000 / 1000000);
-			tv.tv_usec = int(timeout * 1000000) % 1000000;
-		}
+		tv.tv_sec = int(timeout);
+		tv.tv_usec = (long long)(timeout * 1000000) % 1000000;
 
 		fd_set fd_rd;
 		FD_ZERO(&fd_rd);
 		FD_SET(server_fd, &fd_rd);
-
 		int ret = select(server_fd+1, &fd_rd, NULL, NULL, &tv);
 		if (ret < 0) {
-			// error
+			throw orcaException(vm, "io.select", "select failed");
 		}
 		else if (ret == 0) {
 			return "";
