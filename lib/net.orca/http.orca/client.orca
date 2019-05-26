@@ -13,36 +13,12 @@ def init(host)
 	..cookie = '';
 }
 
-def client
-{
-	def s;
 
-	def connect(ip, port)
-	{
-		print: ..s.connect(ip, port);
-	}
-
-	def close()
-	{
-		..s.close();
-	}
-
-	def send(msg)
-	{
-		..s.send(msg);
-
-	}
-
-	def recv(len, out)
-	{
-		return ..s.recv(len, out);
-	}
-}
+def sock;
 
 def get(url)
 {
-	str = '''GET ${url} HTTP/1.0
-Host: ${..host}
+	str = '''GET ${url} HTTP/1.1
 User-Agent: orca/0.4
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
 Accept-Language: ko-kr,ko;q=0.8,en-us;q=0.5,en;q=0.3
@@ -53,14 +29,14 @@ Connection: keep-alive
 
 ''';
 
-	..client.s = socket.create();
-	..client.connect(..ip, 80);
-	..client.send(str);
+	..sock = socket.create();
+	..sock.connect(..ip, 80);
+	..sock.write(str);
 
 	msg = '';
 	try {
 		do {
-			ret = ..client.recv(0, 2);
+			ret = ..sock.read(0, 2);
 
 			msg += ret;
 		} while ret.length() > 0;
@@ -68,7 +44,7 @@ Connection: keep-alive
 	catch any {
 	}
 
-	..client.close();
+	..sock.close();
 	return msg;
 }
 
