@@ -1,0 +1,54 @@
+
+using socket;
+
+
+def host;
+def ip;
+def cookie;
+
+def init(host)
+{
+	..host = host;
+	..ip = socket.gethostbyname(host)[0];
+	..cookie = '';
+}
+
+
+def sock;
+
+def get(url)
+{
+	str = '''GET ${url} HTTP/1.1
+User-Agent: orca/0.4
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: ko-kr,ko;q=0.8,en-us;q=0.5,en;q=0.3
+Accept-Charset: EUC-KR,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 115
+Connection: keep-alive
+
+
+''';
+
+	..sock = socket.create();
+	..sock.connect(..ip, 80);
+	..sock.write(str);
+
+	msg = '';
+	try {
+		do {
+			ret = ..sock.read(0, 2);
+
+			msg += ret;
+		} while ret.length() > 0;
+	}
+	catch any {
+	}
+
+	..sock.close();
+	return msg;
+}
+
+
+
+
+
