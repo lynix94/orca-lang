@@ -1126,42 +1126,6 @@ orcaObject* orcaVM::exec_define(const char* c, int size, const char* code,
 			i += 1 + c[i+1];
 			break;
 
-		case OP_USING_EXT: { // OP_USING_EXT, LEN_MOD, LEN_BY, MOD_PATH_C_STR, BY_C_STR
-				PRINT2("\t\t  using context: %s, %s\n", &c[i+3], &c[i+3 + c[i+1]]);
-				bool ret = false;
-				int idx = 0;
-				string mod_path = &c[i+3];
-				const char *by = &c[i+3 + c[i+1]];
-
-				idx = mod_path.find_last_of("/");
-				if (idx > 0) { // absolute path
-					string dir = mod_path.substr(0, idx);
-					string base = mod_path.substr(idx);
-
-					int idx2 = mod_path.find_last_of(".");
-					if (idx2 > idx)
-						ret = load(mod_path.substr(0, idx2) + ".orca." + by);
-					else
-						ret = load(mod_path + ".orca." + by);
-				}
-				else { // pure name
-					idx = mod_path.find(".");
-					if (idx > 0)
-						ret = load(mod_path.substr(0, idx) + ".orca." + by);
-					else
-						ret = load(mod_path + ".orca." + by);
-				}
-
-				if (ret == false) {
-					printf("module (%s) load failure\n", mod_path.c_str());
-					throw orcaException(this, "orca.module", "module launch failure");
-				}
-			}
-
-			i += 1 + c[i+1] + 1 + c[i+2];
-			break;
-
-
 		case OP_DEF_CONTEXT_START:    // this, ctx_mod_len, ctx_mod, flag, name_len, name, code_len, code, param_n, params, pos_n, pos
 		case OP_DEF_CONTEXT_UNDER_START: { // this, ctx_mod_len, ctx_mod, flag, name_len, name, under_len, under, code_len, code, param_n, params, pos_n, pos
 			PRINT2("\t\t CODE DEF CONTEXT start (%p) - depth:%lu\n", code, v.size());
@@ -3382,24 +3346,113 @@ bool orcaVM::load_helper(const string& mod_name, const string& candidate_path,/*
 }
 /*}}}*/
 
+string orcaVM::find_file(const string& candidate_path, const string& mod_name)
+{
+	if (fs::exists(candidate_path)) {
+		return candidate_path;
+	}
+
+	string parent_path = fs::path(candidate_path).parent_path().string();
+	if (parent_path == "") parent_path = ".";
+	if (!fs::exists(parent_path)) return "";
+
+	fs::directory_iterator end, it(parent_path);
+	for (; it != end; ++it) {
+		string path = it->path().string();
+		string basename = fs::path(path).filename().string();
+		vector<string> toks = kyString::split(basename, ".", 2);
+		if (toks.size() >= 2 && toks[0] == mod_name && toks[1] == "orca") {
+			return path;
+		}
+	}
+
+	return "";
+}
+
+void orcaVM::load_directory(const string& found_file, const string& mod_name, orcaObject* owner, string owner_path)
+{
+	orcaObject* op = new orcaObject();
+	const char* cp = const_strdup(mod_name.c_str());
+	op->set_name(cp);
+	owner->insert_member(cp, op);
+
+	fs::directory_iterator m_end, m_iter = fs::directory_iterator(found_file);
+	for (; m_iter != m_end; ++m_iter) {
+		string str = m_iter->path().string();
+
+		if (fs::is_directory(*m_iter)) {
+			if (str.substr(str.length()-5) != ".orca") continue; // skip normal directory
+		}
+		else {
+			string base_name = fs::path(str).filename().string();
+			if (base_name[0] == '.') continue; // skip hidden system file
+		
+			vector<string> toks = kyString::split(base_name, ".", 2);
+			if (toks.size() < 2 || toks[1] != "orca") continue;
+		}
+
+		string new_owner_path = mod_name;
+		if (owner_path != "") {
+			new_owner_path = owner_path + "." + mod_name;
+		}
+
+		load(m_iter->path().string().c_str(), op, new_owner_path);
+	}
+}
+
 bool orcaVM::load(const string& input_path, orcaObject* owner, string owner_path) /*{{{*/
 {
 	//printf(">> load: %s\n", input_path.c_str());
-	int ret;
-
 	string base_name;   // file basename from inputname (without directory)
 	string mod_name;	// module name (not path) without suffix
 	string main_postfix; // should be orca
 	string sub_postfix;  // could be orca, html & others
 	string kw_path;	    // result module path with .kw suffix
-	string candidate_path;	// source file path (with or without suffix)
 	string mod_path;	// module path without suffix
 
-	// #1. check if already loaded
-	if (owner == NULL) owner = g_root;
 	base_name = fs::path(input_path).filename().string();
 	mod_name = base_name.substr(0, base_name.find_first_of('.')); 
 	string parent_path = fs::path(input_path).parent_path().string();
+	mod_path = parent_path + "/" + mod_name;
+
+	// #1. check if already loaded
+	if (owner == NULL) owner = g_root;
+	if (owner->has_member(mod_name.c_str())) {	// alreay loaded
+		return true;
+	}
+
+	// #2. set candidate_path & find from current working directory
+	string found_file  = find_file(input_path, mod_name);
+	//printf(">> found in current: '%s'\n", found_file.c_str());
+
+	// #3. find module from current & mod_pathes
+	if (found_file == "") {
+		// iterate module path and find
+		vector<fs::path>::iterator it = m_module_path.begin();
+		for(; it != m_module_path.end(); ++it) {
+			string candidate_path = (*it).string() + "/" + mod_path;
+			//printf(">> candidate: %s\n", candidate_path.c_str());
+			found_file = find_file(candidate_path, mod_name);
+			if (found_file != "") {
+				break;
+			}
+		}
+	}
+
+	// #4. Try to cpp at last
+	if (found_file == "") {
+		if (load_cpp(input_path)) { // check cpp module 
+			return true;
+		}
+
+		cout << "module " << input_path << " not exists" << endl;
+		exit(0);
+	}
+	
+	//printf(">> found: %s\n", found_file.c_str());
+	// #5. make target path
+	base_name = fs::path(found_file).filename().string();
+	parent_path = fs::path(found_file).parent_path().string();
 	if (parent_path.length() > 0) {
 		kw_path = parent_path + "/" + mod_name + ".kw";
 		mod_path = parent_path + "/" + mod_name;
@@ -3409,11 +3462,7 @@ bool orcaVM::load(const string& input_path, orcaObject* owner, string owner_path
 		mod_path = mod_name;
 	}
 
-	if (owner->has_member(mod_name.c_str())) {	// alreay loaded
-		return true;
-	}
-
-	// #2. set main_postfix, sub_postfix & kw_path.
+	// #6. set main_postfix, sub_postfix & kw_path.
 	vector<string> toks = kyString::split(base_name, ".", 2);
 	switch (toks.size())
 	{
@@ -3427,88 +3476,23 @@ bool orcaVM::load(const string& input_path, orcaObject* owner, string owner_path
 			sub_postfix = "orca";
 			break;
 	}
-	
+
 	if (main_postfix != "orca") {
 		printf("load failed abnormal name: %s\n", input_path.c_str());
 		return false;
 	}
 
-
-	// #3. set candidate_path & find from current working directory
-	candidate_path = input_path;
-	if (!fs::exists(candidate_path)) {	// if not, change name ( + .orca)
-		candidate_path += ".orca";
-	}
-
-	// #4. find module from current & mod_pathes
-	if (!fs::exists(candidate_path)) {
-		bool flag = false;
-
-		// iterate module path and find
-		vector<fs::path>::iterator it = m_module_path.begin();
-		for(; it != m_module_path.end(); ++it) {
-			candidate_path = (*it).string() + "/" + mod_path;
-			kw_path = candidate_path + ".kw";
-
-			if (!fs::exists(candidate_path)) {
-				candidate_path += ".orca";
-			}
-
-			//printf(">> candidate_path: %s\n", candidate_path.c_str());
-			if (fs::exists(candidate_path)) {
-				flag = true;
-				break;
-			}
+	// #7. load
+	if (fs::is_directory(found_file)) {
+		if (kyString::ends_with(found_file, ".orca")) {
+			load_directory(found_file, mod_name, owner, owner_path);
 		}
-
-		if (flag == false) {
-			if (load_cpp(input_path)) { // check cpp module 
-				return true;
-			}
-
-			cout << "module " << input_path << " not exists" << endl;
-			exit(0);
-		}
-	}
-
-
-	// #5. load
-	if (fs::is_directory(candidate_path)) {
-		if (kyString::ends_with(candidate_path, ".orca")) {/*{{{*/
-			orcaObject* op = new orcaObject();
-			const char* cp = const_strdup(mod_name.c_str());
-			op->set_name(cp);
-			owner->insert_member(cp, op);
-
-			fs::directory_iterator m_end, m_iter = fs::directory_iterator(candidate_path);
-			for (; m_iter != m_end; ++m_iter) {
-				string str = m_iter->path().string();
-
-				if (str[0] == '.') continue; // skip hidden system file
-				
-				if (fs::is_directory(*m_iter)) {
-					if (str.substr(str.length()-5) != ".orca") continue; // skip normal directory
-				}
-				else {
-					string base_name = fs::path(str).filename().string();
-					vector<string> toks = kyString::split(base_name, ".", 2);
-					if (toks.size() < 2 || toks[1] != "orca") continue;
-				}
-
-				string new_owner_path = mod_name;
-				if (owner_path != "") {
-					new_owner_path = owner_path + "." + mod_name;
-				}
-
-				load(m_iter->path().string().c_str(), op, new_owner_path);
-			}
-		}/*}}}*/
 	}
 	else {
-		load_helper(mod_name, candidate_path, sub_postfix, kw_path, owner, owner_path);
+		load_helper(mod_name, found_file, sub_postfix, kw_path, owner, owner_path);
 	}
 
-	// #6. do init_once
+	// #8. do init_once
 	if (mod_name == "CODE") {
 		return true;
 	}

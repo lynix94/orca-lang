@@ -144,7 +144,6 @@
 #define OP_DEF_CODE					0xC3
 #define OP_DEF_SUPER				0xC4
 #define OP_USING					0xC5
-#define OP_USING_EXT				0xC6
 #define OP_DEF_START_PARSER			0xC7
 #define OP_DEF_INIT					0xC8
 #define OP_DEF_UNDER_START			0xC9

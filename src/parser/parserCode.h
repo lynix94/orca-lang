@@ -36,7 +36,7 @@ public:
 
 	static void init();
 
-	void using_object(const char* s, const char* by = NULL);
+	void using_object(const char* s);
 	char* find_in_space(const char* s);
 
 	void reg_object(const char* s, int flag = 0);

@@ -380,20 +380,11 @@ parserCode::~parserCode() /*{{{*/
 }
 /*}}}*/
 
-void parserCode::using_object(const char* s, const char* by) /*{{{*/
+void parserCode::using_object(const char* s) /*{{{*/
 {
-	if (by == NULL) {
-		m_def.push_back(OP_USING);
-		m_def.push_back(strlen(s)+1);
-		copy(s, s+strlen(s)+1, back_inserter(m_def));
-	}
-	else {
-		m_def.push_back(OP_USING_EXT);
-		m_def.push_back(strlen(s)+1);
-		m_def.push_back(strlen(by)+1);
-		copy(s, s+strlen(s)+1, back_inserter(m_def));
-		copy(by, by+strlen(by)+1, back_inserter(m_def));
-	}
+	m_def.push_back(OP_USING);
+	m_def.push_back(strlen(s)+1);
+	copy(s, s+strlen(s)+1, back_inserter(m_def));
 
 	string path = s;
 	string basename = s;

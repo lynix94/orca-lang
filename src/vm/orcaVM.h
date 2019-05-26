@@ -142,8 +142,10 @@ public:
 	orcaObject* load_parse_object(const string& name, const string& path);
 
 	void exec_code(const char* c, const char* offset=NULL);
+	string find_file(const string& candidate, const string& mod_name);
 	bool load(const string& module_name, orcaObject* owner = NULL, string owner_path = "");
 	bool load_cpp(const string& mod_name);
+	void load_directory(const string& found_file, const string& mod_name, orcaObject* owner, string owner_path);
 	bool load_helper(const string& mod_name, const string& candidate_name,
 					 const string& sub_postfix, const string& kw_name,
 					 orcaObject* owner, string owner_path);
