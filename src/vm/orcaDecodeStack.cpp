@@ -166,7 +166,7 @@ bool orcaDecodeStack::match_str_shift(orcaData p2, short idx, short shift)
 
 	if (is<TYPE_STR>(p2)) {
 		int s = p1.find(p2.s(), get_idx());
-		if (s > 0) {
+		if (s >= 0) {
 
 			if (idx >= 0)  {
 				m_local->set(idx, p2);
