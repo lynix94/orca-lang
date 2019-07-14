@@ -1,5 +1,6 @@
 
 using type;
+using strings;
 using ipc;
 using __clib__;
 
@@ -46,5 +47,21 @@ def find_owner(name)
 	return nil;
 }
 
+def abs_path(obj)
+{
+	owner_list = [];
+	curr = obj;
+
+	while true {
+		if curr == root {
+			break;
+		}
+
+		owner_list.push_front(curr.NAME);
+		curr = curr.owner;
+	}
+
+	return strings.join('.', owner_list...);
+}
 
 
