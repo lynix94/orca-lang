@@ -442,6 +442,10 @@ retry:
 			if (*cp != '\0') {
 				add_history(line);
 			}
+			else {
+				return 0;
+			}
+			
 
 			strncpy(buff, line, max_size);
 			free(line);
