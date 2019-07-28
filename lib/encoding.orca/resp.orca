@@ -1,0 +1,105 @@
+
+def encoding(src)
+{
+	switch src.TYPE
+	{
+	case type.string:
+		return '$%d\r\n%s\r\n' % (src.length(), src);
+
+	case type.int:
+		return ':%d\r\n' % src;
+
+	case type.list:
+		fallthrough;
+	case type.tuple:
+
+		ret = '*%d\r\n' % src.size();
+		for i in src {
+			ret += encoding(i);
+		}
+
+		return ret;
+
+	default:
+		str = string(src);
+		return '$%d\r\n%s\r\n' % (str.length(), str);
+	}
+}
+
+def.decode decoding(src, out)
+{
+	case '*', %count, '\r\n', %remain:
+		count = count.integer();
+
+		result = [];
+		decoding(remain, result);
+
+		if out == nil { # most outer
+			return result;
+		}
+		else {
+			out.push_back(result[:count]);
+			if result.size() > count {
+				out.push_back(result[count:]...);
+			}
+		}
+
+
+	case '$', %len, '\r\n', %remain:
+		len = len.integer();
+		msg = remain[:len];
+		remain = remain[len:];
+
+		if out != nil {
+			out.push_back(msg);
+			decoding(remain[2:], out);
+		}
+		else {
+			if remain != '\r\n' {
+				throw resp.protocol <- 'resp protocol error';
+			}
+
+			return msg;
+		}
+
+	case ':', %num, '\r\n', %remain:
+		if out != nil {
+			out.push_back(num.integer());
+			decoding(remain, out);
+		}
+		else {
+			if remain != '' {
+				throw resp.protocol <- 'resp protocol error';
+			}
+
+			return num.integer();
+		}
+
+	case '+', %msg, '\r\n', %remain:
+		if out != nil {
+			out.push_back(msg);
+			decoding(remain, out);
+		}
+		else {
+			if remain != '' {
+				throw resp.protocol <- 'resp protocol error';
+			}
+
+			return msg;
+		}
+
+	case '-', %error, '\r\n', remain:
+		if out != nil {
+			out.push_back('-' + error);
+			decoding(remain, out);
+		}
+		else {
+			if remain != '' {
+				throw resp.protocol <- 'resp protocol error';
+			}
+
+			return '-' +error;
+		}
+}
+
+
