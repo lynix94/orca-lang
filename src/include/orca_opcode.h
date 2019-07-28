@@ -37,6 +37,7 @@
 #define OP_NOT						0x1B
 #define OP_MOD						0x1C
 #define OP_EVAL						0x1D
+#define OP_COMPILE					0x1E
 
 #define OP_JMP_TRUE					0x20	
 #define OP_JMP_FALSE				0x21

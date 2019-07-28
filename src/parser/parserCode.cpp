@@ -18,6 +18,8 @@ namespace fs = boost::filesystem;
 #include "parserParser.h"
 #include "parserOP.h"
 #include "orcaVM.h"
+#include "orcaObject.h"
+#include "orcaRoot.h"
 
 #pragma warning (disable : 4309)  // 0xf2 to push_char
 
@@ -687,6 +689,20 @@ void parserCode::eval(orcaVM* vm)/*{{{*/
 	}
 
 	vm->exec_code(&m_code[0]);
+}
+/*}}}*/
+
+orcaObject* parserCode::compile(orcaVM* vm)/*{{{*/
+{
+	// TODO: check name (parameter add) & remove if exists
+	pop_code_stack();
+	char* new_def = new char[m_def.size()];
+	copy(m_def.begin(), m_def.end(), new_def);
+
+
+	orcaObject* compiled = g_root->get_member("compiled").Object();
+	orcaObject* op = vm->exec_define(new_def, m_def.size(), NULL, compiled, 0, "");
+	return op;
 }
 /*}}}*/
 

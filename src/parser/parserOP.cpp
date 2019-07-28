@@ -222,6 +222,11 @@ void parserOP::eval()
 	code_top->push_char(OP_EVAL);
 }
 
+void parserOP::compile()
+{
+	code_top->push_char(OP_COMPILE);
+}
+
 void parserOP::extract()
 {
 	code_top->push_char(OP_EXTRACT);

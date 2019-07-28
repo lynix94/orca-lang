@@ -59,6 +59,7 @@ public:
 	void dup();
 	void dup2();
 	void eval();
+	void compile();
 	void do_scope_start();
 	void do_scope_end();
 	void do_rc_inc();

@@ -89,6 +89,7 @@ public:
 	bool parse_context_file(const string& filename, const string& mod_name, const string& sub_postfix);
 	bool interpret(orcaVM* vm);
 	orcaData eval(orcaVM* vm, const string& src);
+	orcaData compile(orcaVM* vm, const string& name, const string& src);
 	void try_parse(const string& src);
 
 	void set_interactive(bool flag);

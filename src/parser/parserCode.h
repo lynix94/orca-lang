@@ -19,6 +19,7 @@
 #include "orca_common.h"
 
 class orcaVM;
+class orcaObject;
 
 
 using namespace std;
@@ -86,6 +87,7 @@ public:
 
 	// for interpreter
 	void interpret(orcaVM* vm);
+	orcaObject* compile(orcaVM* vm);
 	void eval(orcaVM* vm);
 	void init_current();
 

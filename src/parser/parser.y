@@ -179,6 +179,7 @@ using namespace std;
 %token PARALLEL
 %token ASSIGNMENT
 %token EVAL
+%token COMPILE
 %token LAMBDA
 %token UNDER
 %token IR_BRACKET
@@ -2216,6 +2217,7 @@ primary_object:/*{{{*/
 
 reserved_functions:/*{{{*/
 	eval_function
+	| compile_function
 	;
 /*}}}*/
 
@@ -2223,6 +2225,17 @@ eval_function:/*{{{*/
 	EVAL '(' expression ')'
 		{
 			g_op->eval();
+		}
+	;
+/*}}}*/
+
+compile_function:/*{{{*/
+	COMPILE '(' expression_list ')'
+		{
+			if ($3 != 2) {
+				throw g_parser->strdup("insufficient parameter to compile");
+			}
+			g_op->compile();
 		}
 	;
 /*}}}*/

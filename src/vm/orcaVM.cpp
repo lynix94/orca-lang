@@ -1591,7 +1591,18 @@ fast_jmp:
 				}
 
 				d = g_parser->eval(this, p1.s());
-				d.dump();
+				m_stack->push(d);
+				break;
+
+			case OP_COMPILE:
+				PRINT1("\t\t%p : compile\n", c);
+				p1 = m_stack->pop();
+				p2 = m_stack->pop();
+				if (is<TYPE_STR>(p1) == false || is<TYPE_STR>(p2) == false) {
+					throw orcaException(this, "orca.type", "compile parameter should be a string");
+				}
+
+				d = g_parser->compile(this, p2.s(), p1.s());
 				m_stack->push(d);
 				break;
 

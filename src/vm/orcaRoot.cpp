@@ -87,6 +87,11 @@ orcaRoot::orcaRoot()
 	clib->insert_static("strings", new orcaStrings());
 	clib->insert_static("tls", new orcaTlsModule());
 
+	orcaObject* compiled = new orcaObject();
+	compiled->set_name("compiled");
+	insert_static("compiled", compiled);
+	
+
 #if defined(LINUX)
 #if defined(USE_GTK)
 	if (gtk_init_check(NULL, NULL) == false) {

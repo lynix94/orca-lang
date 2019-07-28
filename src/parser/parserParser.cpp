@@ -197,7 +197,6 @@ void parser_split_ctx_def(const string& src, string& ctx, string& def, map<strin
 
 
 
-
 parserParser::parserParser()/*{{{*/
 {
 	curr_fp = NULL;
@@ -479,6 +478,46 @@ orcaData parserParser::eval(orcaVM* vm, const string& src)/*{{{*/
 }
 /*}}}*/
 
+orcaData parserParser::compile(orcaVM* vm, const string& name, const string& src)/*{{{*/
+{
+	set_eval(true);
+
+	//printf(">>> compile: %s\n", src.c_str());
+	curr_fp = fmemopen((void*)src.c_str(), src.size(), "r");
+
+	// init
+	parserCode::init();
+	parserCode::push_code_stack((char*)name.c_str(), NULL);
+
+	// parse
+	int rv;
+	try {
+		init();
+		try {
+			rv = yyparse();
+		}
+		catch(const char* cp) {
+			printf("%s\n", cp);
+			rv = -1;
+		}
+
+		if (rv == 0) {
+			orcaObject* op = code_top->compile(vm);
+			set_eval(false);
+			return op;
+		}
+	}
+	catch(orcaException& e) {
+		printf("uncaugted exception: %s %s\n", e.who(), e.what());
+		cout << e.m_stack_trace << endl;
+	}
+
+	parserCode::init();
+	set_eval(false);
+	return NIL;
+}
+/*}}}*/
+
 bool parserParser::interpret(orcaVM* vm)/*{{{*/
 {
 	curr_fp = stdin;
@@ -507,8 +546,9 @@ bool parserParser::interpret(orcaVM* vm)/*{{{*/
 				code_top->interpret(vm);
 			}
 
-			if (!is<TYPE_NIL>(g_last_pop_stack))
+			if (!is<TYPE_NIL>(g_last_pop_stack)) {
 				cout << g_last_pop_stack.string_(vm) << endl;
+			}
 			g_last_pop_stack = NIL;
 
 			code_top->init_current();
@@ -521,7 +561,6 @@ bool parserParser::interpret(orcaVM* vm)/*{{{*/
 			code_top->init_current();
 			continue;
 		}
-
 	} while( true );
 
 	// clean up

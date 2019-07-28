@@ -113,6 +113,7 @@ nil					{ g_parser->n_tok++; return NIL_; }
 parallel			{ g_parser->n_tok++; return PARALLEL; }
 
 eval				{ g_parser->n_tok++; return EVAL; }
+compile				{ g_parser->n_tok++; return COMPILE; }
 lambda				{ g_parser->n_tok++; return LAMBDA; }
 under				{ g_parser->n_tok++; return UNDER; }
 
