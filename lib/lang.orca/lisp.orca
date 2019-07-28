@@ -25,7 +25,7 @@ elif os.last_write_time(dstfile) < src_time {
 }
 
 if recompile {
-	code = .compile(argv[2]);
+	code = .compile_lisp(argv[2]);
 	bytecode = pack.save(code);
 	os.write(dstfile, bytecode);
 }
@@ -164,7 +164,7 @@ def function
 	}
 }
 
-def compile(src)
+def compile_lisp(src)
 {
 	..fmap = { 'T':true, 'F':false };
 	..fmap['car'] = ..car;
