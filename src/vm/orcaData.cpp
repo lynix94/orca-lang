@@ -34,6 +34,11 @@ string format_str(orcaVM* vm, string& format, vector<orcaData>& params)/*{{{*/
 {
 	orcaData d = params[params.size()-1];
 
+	bool flag_dict_only = false;
+	if (params.size() == 1 && isobj<orcaMap>(params[0]) && format.find("%{") > 0) {
+		flag_dict_only = true;
+	}
+
 	stringstream ss;
 	vector<orcaData>::iterator it = params.begin();
 	for (int i=0; i<format.length(); i++) {
@@ -63,7 +68,7 @@ string format_str(orcaVM* vm, string& format, vector<orcaData>& params)/*{{{*/
 					continue;
 				}
 			}
-			else {
+			else if (flag_dict_only == false) {
 				string new_format;
 
 				int count = 0;
@@ -226,6 +231,9 @@ string format_str(orcaVM* vm, string& format, vector<orcaData>& params)/*{{{*/
 
 				it++;
 				ss << buff;
+			}
+			else {
+				ss << format[i];
 			}
 		}
 		else {
