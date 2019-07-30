@@ -590,12 +590,8 @@ const char* orcaFlexLexer::get_comment(char end)/*{{{*/
 
 		if (c == end) {
 			char c2 = lexer->yyinput();
-			if (c2 == '\r' || c2 == '\n') { g_parser->lineno++; }
-
 			if (c2 == end) {
 				char c3 = lexer->yyinput();
-				if (c3 == '\r' || c3 == '\n') { g_parser->lineno++; }
-
 				if (c3 == end) {
 					g_string_var = 0;
 					g_comment = false;
@@ -604,10 +600,6 @@ const char* orcaFlexLexer::get_comment(char end)/*{{{*/
 				lexer->yyunput(c3, (char*)lexer->YYText());
 			}
 			lexer->yyunput(c2, (char*)lexer->YYText());
-		}
-
-		if (c == '\r' || c == '\n') { 
-			g_parser->lineno++;
 		}
 
 		if (end == '\'' && c == '$') {
