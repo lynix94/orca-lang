@@ -29,9 +29,6 @@ orcalibsonarcore_DATA = sonar.orca/core.orca/CODE.kw sonar.orca/core.orca/CODE.o
 orcalibsonartemplatedir = $(prefix)/lib/orca/sonar.orca/template.orca
 orcalibsonartemplate_DATA = sonar.orca/template.orca/CODE.kw sonar.orca/template.orca/CODE.orca
 
-orcalibsonarhttpdir = $(prefix)/lib/orca/sonar.orca/http.orca
-orcalibsonarhttp_DATA = sonar.orca/http.orca/request.kw sonar.orca/http.orca/request.orca
-
 orcalibsonarormdir = $(prefix)/lib/orca/sonar.orca/orm.orca
 orcalibsonarorm_DATA = sonar.orca/orm.orca/initialize.kw sonar.orca/orm.orca/initialize.orca sonar.orca/orm.orca/migrate.kw sonar.orca/orm.orca/migrate.orca
 
@@ -46,7 +43,8 @@ orcaliborm_DATA = orm.orca/CODE.kw orm.orca/CODE.orca orm.orca/model.kw orm.orca
 
 
 orcalibhtmldir = $(prefix)/lib/orca/html.orca
-orcalibhtml_DATA = html.orca/CODE.kw html.orca/CODE.orca html.orca/jqueryui.kw html.orca/jqueryui.orca html.orca/tag.kw html.orca/tag.orca 
+orcalibhtml_DATA = html.orca/CODE.kw html.orca/CODE.orca html.orca/jqueryui.kw html.orca/jqueryui.orca html.orca/tag.kw html.orca/tag.orca html.orca/dom.orca html.orca/dom.kw html.orca/rad.orca html.orca/rad.kw html.orca/request.orca html.orca/request.kw
+
 
 orcalibformdir = $(prefix)/lib/orca/html.orca/form.orca
 orcalibform_DATA = html.orca/form.orca/CODE.kw html.orca/form.orca/CODE.orca html.orca/form.orca/input.kw html.orca/form.orca/input.orca

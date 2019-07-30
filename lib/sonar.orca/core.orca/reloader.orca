@@ -24,6 +24,39 @@ return !ret; # true means same -> don't reload
 
 
 
+def get_source_code(path)
+{
+	src_map = {,};
+	it = os.dir_traverser(path);
+	for i in it {
+		if os.isdir(i()) {
+			continue;
+		}
+
+		basename = os.path.basename(i());
+		if basename.find('orca') > 0 {
+			if basename.find('kw') > 0 {
+				continue;
+			}
+
+			if basename.starts_with('.') {
+				continue;
+			}
+
+			code = os.read(i());
+
+			m = i()[path.length()+1:];
+			m = m.replace(r'\\.orca\\..*', '');
+			m = m.replace('.orca', '');
+			m = m.replace('/', '.');
+			src_map[m] = (i(), code);
+		}
+	}
+
+	return src_map;
+}
+
+
 def get_fileinfo(path)
 {
 	src_list = {,};

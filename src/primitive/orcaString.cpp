@@ -616,7 +616,7 @@ orcaData orcaString::ex_list_format(orcaVM* vm, string& str, int param_n)
 	orcaList* lp = new orcaList();
 	int start = s;
 
-	for (int i=0; i<str.length()-1; i++) {
+	for (int i=0; i<int(str.length())-1; i++) {
 		if (str[i] == '%' && str[i+1] == '{') {
 			int j = i+2;
 			for (; j<str.length() && str[j] != '}'; j++) {

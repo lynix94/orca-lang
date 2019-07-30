@@ -1,0 +1,280 @@
+// TODO: logger & log to page
+
+using os;
+using io;
+using time;
+
+
+
+def handle_rad_post(req, dom)
+{
+	switch req.post['rad']
+	{
+	case 'edit':
+		my.do_post_edit(req, dom);
+		
+	case 'del':
+		my.do_post_delete(req, dom);
+
+	case 'append':
+		my.do_post_append(req, dom);
+
+	case 'edit_page':
+		my.do_post_publish_page(req, dom);
+
+	case 'publish_page':
+		my.do_post_publish_page(req, dom);
+
+	case 'cancel_page':
+		my.do_post_cancel_page(req, dom);
+	}
+
+
+	def do_post_edit(req, dom)
+	{
+		// change to use members (not itself)
+		id = req.post['id'];
+		print: '## process edit: %s - "%s"' % (id, req.post['code']);
+		if req.post.has_key('cancel') {
+			return;
+		}
+
+		new_obj = compile(id, req.post['code']);
+		if new_obj == nil {
+			print: 'fail to compile code'; 
+			return;
+		}
+
+		keys = new_obj.MEMBERS.keys();
+		if keys.size() != 1 {
+			print: 'more than 1 object';
+			return;
+		}
+
+		obj = new_obj.MEMBERS[keys[0]];
+		obj.MEMBERS['SOURCE'] = req.post['code'];
+		dom.MEMBERS[id] = obj;
+	}
+
+
+	def do_post_append(req, dom)
+	{
+		id = req.post['id'];
+		print: '## process append: %s - "%s"' % (id, req.post['code']);
+		if req.post.has_key('cancel') {
+			return;
+		}
+
+		code = req.post['code'];
+		new_obj = compile('%s_append' % id, code);
+		if new_obj == nil {
+			print: 'fail to compile code'; 
+			return;
+		}
+
+		keys = new_obj.MEMBERS.keys();
+		if keys.size() != 1 {
+			print: 'need 1 object';
+			return;
+		}
+
+		obj = new_obj.MEMBERS[keys[0]];
+		name = obj.NAME;
+		obj.MEMBERS['SOURCE'] = code;
+		dom.MEMBERS[name] = obj;
+
+		if id == 'header' {
+			pos = 0;
+		}
+		else {
+			pos = dom.__position[id];
+		}
+
+		dom.__position[name] = pos + 1;
+	}
+
+	def do_post_delete(req, dom)
+	{
+		id = req.post['id'];
+		print: '## process del: %s' % id;
+		if req.post.has_key('cancel') {
+			return;
+		}
+
+		dom.MEMBERS.erase_key(id);
+		dom.__position.erase_key(id);
+	}
+
+	def do_post_publish_page(req, dom)
+	{
+		print: '## process edit_page, publish';
+		if req.post.has_key('cancel') || req.post.has_key('no') {
+			return;
+		}
+
+		code = req.post['code'];
+		code = code.replace('\r\n', '\n');
+		code = code.replace('\n\n\n\n', '\n\n');
+		code = code.replace('\n\n\n', '\n\n');
+
+		fh = io.open(dom.FILE_PATH, 'w');
+		fh.write(code);
+	}
+
+	def do_post_cancel_page(req, dom)
+	{
+		print: '## process cancel';
+		if req.post.has_key('cancel') || req.post.has_key('no') {
+			return;
+		}
+
+		os.touch(dom.FILE_PATH);
+	}
+}
+
+
+
+def decorator(req, object, id, class)
+{
+	param = req.get;
+
+	# edit
+	if param['rad'] == 'edit' && param['id'] == id {
+		ret = '''<div class="%s" id="%s">
+<form method="POST" action="/%s?rad">
+<div class="code">
+<textarea cols="80" name="code" rows="10">
+%s
+</textarea>
+</div>
+<div class="control">
+<input type="hidden"  name="rad" value="edit"/>
+<input type="hidden"  name="id" value="%s"/>
+<input type="submit" name="submit" value="submit"/>
+<input type="submit" name="cancel" value="cancel"/>
+</div>
+</form>
+</div>''' % (class, id, req.uri, object.SOURCE, id);
+		return ret;
+	}
+	
+	# del
+	if param['rad'] == 'del' && param['id'] == id {
+		ret = '''<div class="%s" id="%s">
+<form method="POST" action="/%s?rad">
+are you sure?
+</div>
+<div class="control">
+<input type="hidden"  name="rad" value="del"/>
+<input type="hidden"  name="id" value="%s"/>
+<input type="submit" name="submit" value="submit"/>
+<input type="submit" name="cancel" value="cancel"/>
+</div>
+</form>
+</div>''' % (class, id, req.uri, id);
+		return ret;
+	}
+
+	# embed
+	if id.starts_with('embed_') || id.ends_with('_anonymous') {
+		ret = '''<div class="%s" id="%s">
+<div class="contents">
+%s
+</div>
+<div class="control">
+<a href="/%s?rad=edit&id=%s">edit</a>&nbsp
+<a href="/%s?rad=del&id=%s">del</a>&nbsp
+<a href="/%s?rad=append&id=%s">append</a>
+</div>
+</div>''' % (class, id, object(req), req.uri, id, req.uri, id, req.uri, id);
+	}
+	else {
+		ret = '''<div class="%s" id="%s">
+<div class="contents">
+OBJECT '%s'
+</div>
+<div class="control">
+<a href="/%s?rad=edit&id=%s">edit</a>&nbsp
+<a href="/%s?rad=del&id=%s">del</a>&nbsp
+<a href="/%s?rad=append&id=%s">append</a>
+</div>
+</div>''' % (class, id, id, req.uri, id, req.uri, id, req.uri, id);
+	}
+
+	# append
+	if param['rad'] == 'append' && param['id'] == id {
+		edit = '''<div class="%s" id="%s">
+<form method="POST" action="/%s?rad">
+<div class="code">
+<textarea cols="80" name="code" rows="10">
+</textarea>
+</div>
+<div class="control">
+<input type="hidden"  name="rad" value="append"/>
+<input type="hidden"  name="id" value="%s"/>
+<input type="submit" name="submit" value="submit"/>
+<input type="submit" name="cancel" value="cancel"/>
+</div>
+</form>
+</div>''' % (class, id, req.uri, id);
+
+		ret += edit;
+	}
+
+	return ret;
+}
+
+def analyze(src)
+{
+	// code
+	src_map = {,};
+	my.split_def(src, src_map);
+print: '>>>>>>>>>> ', src_map;
+	return src_map;
+
+	def.decode split_def(src, src_map)
+	{
+	case %head,
+		%type=r'def[^ \\t\\r\\n]*[ \\t\\r\\n]+', 
+		%name=r'[a-zA-Z_][a-zA-Z0-9_]*[ \\t\\r\\n]+',
+		%body=..match_def,
+		%tail:
+
+		src_map[name.strip().split('(')[0]] = type + name + body;
+		split_def(tail, src_map);
+		
+	case %head,
+		%type=r'def[^ \\t\\r\\n]*[ \\t\\r\\n]+', 
+		%tail:
+
+		split_def(tail, src_map);
+
+	case %remain:
+		print: '>> remain: ', remain;
+	}
+
+	def match_def(src)
+	{
+		o_start = src.find('{');
+		if o_start < 0 {
+			return '';
+		}
+		idx = o_start;
+		
+		do {
+			idx = src.find('}', idx+1);
+			if idx < 0 {
+				return '';
+			}
+
+			oc = src.find_all('{', o_start, idx).size();
+			cc = src.find_all('}', o_start, idx).size();
+
+			if oc == cc {
+				return src[:idx+1];
+			}
+		} while true;
+	}
+}
+
+

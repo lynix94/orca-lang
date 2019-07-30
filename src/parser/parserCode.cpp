@@ -692,15 +692,18 @@ void parserCode::eval(orcaVM* vm)/*{{{*/
 }
 /*}}}*/
 
-orcaObject* parserCode::compile(orcaVM* vm)/*{{{*/
+orcaObject* parserCode::compile(const string& name, orcaVM* vm)/*{{{*/
 {
-	// TODO: check name (parameter add) & remove if exists
 	pop_code_stack();
 	char* new_def = new char[m_def.size()];
 	copy(m_def.begin(), m_def.end(), new_def);
 
 
 	orcaObject* compiled = g_root->get_member("compiled").Object();
+	if (compiled->has_member(name.c_str())) {
+		compiled->remove_member(name.c_str());
+	}
+
 	orcaObject* op = vm->exec_define(new_def, m_def.size(), NULL, compiled, 0, "");
 	return op;
 }

@@ -502,7 +502,7 @@ orcaData parserParser::compile(orcaVM* vm, const string& name, const string& src
 		}
 
 		if (rv == 0) {
-			orcaObject* op = code_top->compile(vm);
+			orcaObject* op = code_top->compile(name, vm);
 			set_eval(false);
 			return op;
 		}

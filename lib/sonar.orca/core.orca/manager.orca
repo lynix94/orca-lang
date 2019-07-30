@@ -50,6 +50,9 @@ orca manage migrate ''';
 		}
 
 		print: 'runserver...';
+		src_map = sonar.core.reloader.get_source_code(os.cwd());
+		root.MEMBERS['RAD_SRC_MAP'] = src_map;
+		
 		while true {
 			pid = os.fork();
 			if pid == 0 {
@@ -101,6 +104,7 @@ orca manage migrate ''';
 def server(addr)
 {
 	def addr;
+	def src_map;
 
 	print: addr;
 	my.addr = addr;

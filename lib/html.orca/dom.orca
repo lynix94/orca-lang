@@ -1,0 +1,328 @@
+using sorted;
+using util;
+using strings;
+using html;
+
+############################
+# run time generation code
+############################
+
+if argv == nil || argv.size() == 0 {
+	req = html.request.clone();
+}
+else {
+	req = argv[0];
+}
+
+return my.generate(req);
+
+
+#
+# definition
+#
+def __id;
+def __head := '';
+def __tail := '';
+def __template;
+def __position; # position map for embedding object
+
+def init(...argv)
+{
+	..__id = argv[0];
+	..__template = argv[2];
+	..__position = argv[4];
+}
+
+
+def generate(req)
+{
+	# STEP 0: prepare rad if exists
+	if !owner.MEMBERS.has_key('SOURCE') && root.MEMBERS.has_key('RAD_SRC_MAP') {
+		abs_path = util.abs_path(owner);
+print: '>>>>>>>>>>>>>> ', abs_path;
+		path_src = root.RAD_SRC_MAP[abs_path];
+		if path_src != nil {
+			owner.MEMBERS['FILE_PATH'] = path_src[0];
+			owner.MEMBERS['SOURCE'] = path_src[1];
+			src_map = html.rad.analyze(path_src[1]);
+			for k, v in owner.MEMBERS {
+				if src_map.has_key(k) {
+					v.MEMBERS['SOURCE'] = src_map[k];
+				}
+			}
+		}
+	}
+
+
+	# STEP 1: process page modify
+	switch req.get['rad'] # invoke by get & submit by post
+	{
+	case 'edit_page':
+		return ..generate_edit_page(req, owner);
+
+	case 'publish_page':
+		return ..generate_publish_page(req, owner);
+
+	case 'cancel_page':
+		return ..generate_cancel_page(req, owner);
+	}
+
+	if req.post.has_key('rad') {
+		html.rad.handle_rad_post(req, owner);
+	}
+	req.post.erase_key('rad');
+
+
+
+	# STEP 2: process prepare & redirect
+	if ..MEMBERS.has_key('prepare') {
+		ret = ..prepare(req);
+		if ret.TYPE == ''.TYPE {
+			return ret;
+		}
+	}
+
+	if ..MEMBERS.has_key('redirect') {
+		ret = ..redirect(req);
+		if ret != nil {
+			return ret;
+		}
+	}
+
+	# STEP 3: process embedded object & dictionary format
+	template = '';
+	if req.get.has_key('rad') && !(owner.NAME.starts_with('embed')) { # only most outer has header
+		template += ..rad_header(req);
+	}
+
+	template += ..process_embed(req);
+
+	keys = template.list_format();
+
+	dict = {,};
+	for key in sorted(keys) {
+		if ..MEMBERS.has_key(key) {
+			value = ..MEMBERS[key](req);
+			dict[key] = value;
+		}
+		elif owner.MEMBERS.has_key(key) {
+			value = owner.MEMBERS[key](req);
+			dict[key] = value;
+		}
+		elif req.get.has_key(key) {
+			dict[key] = req.get[key];
+		}
+		elif req.post.has_key(key) {
+			dict[key] = req.post[key];
+		}
+		elif html.tool.has_key(key) {
+			dict[key] = html.tool[key](req);
+		}
+		else {
+			dict[key] = '';
+		}
+	}
+
+	result = '';
+	result += ..__head;
+	result += template % dict;
+
+	# STEP 4: process script
+	for key, value in ..MEMBERS {
+		if key.starts_with('script_') {
+			result += value(req);
+		}
+		elif key.starts_with('on_') {
+			template = '''
+	<script>
+	$(document).ready(function() {
+	$("#%s").%s(function(){
+	%s;
+	});
+	});
+	</script>
+	''';
+			event = key.split('_', 1)[1];
+			code = value(req);
+			result += template % (..__id, event, code);
+		}
+	}
+
+	result += ..__tail;
+	return result;
+}
+
+
+def rad_header(req)
+{
+	header = '''
+<div class="control" style="background-color:#e6e6fa">
+<a href="/%s?rad=edit_page">edit_page</a>&nbsp
+<a href="/%s?rad=publish_page">publish_page</a>&nbsp
+<a href="/%s?rad=cancel_page">cancel_page</a>&nbsp
+<a href="/%s?rad=append&id=header">append</a>&nbsp
+</div>
+<hr/>
+''' % (req.uri, req.uri, req.uri, req.uri);
+
+	if req.get['rad'] == 'append' && req.get['id'] == 'header' {
+        header += '''<div class="embed" id="header">
+<form method="POST" action="/%s?rad">
+<div class="code">
+<textarea cols="80" name="code" rows="10">
+</textarea>
+</div>
+<div class="control">
+<input type="hidden"  name="rad" value="append"/>
+<input type="hidden"  name="id" value="header"/>
+<input type="submit" name="submit" value="submit"/>
+<input type="submit" name="cancel" value="cancel"/>
+</div>
+</form>
+</div>''' % (req.uri);
+	}
+
+	return header;
+}
+
+
+def process_embed(req)
+{
+print: '>>>> ', ..__position;
+	result = '';
+
+	rad_mode = false;
+	decorator = lambda(req, object, id, class) { return object(req); };
+	if req.get.has_key('rad') {
+		decorator = html.rad.decorator;
+		rad_mode = true;
+	}
+
+	token = {,};
+	for key, value in ..MEMBERS {
+		if !..__position.has_key(key) {
+			continue;
+		}
+
+		ret = decorator(req, value, key, 'embed');
+		pos = ..__position[key];
+		token[pos] = ret;
+	}
+
+	start = 0;
+	pos = 0;
+	lines = ..__template.split('\n');
+	for pos, value in token { // as you know, it's ordered
+		if pos > start {
+			result += strings.join('\n', lines[start:pos]...) + '\n';
+		}
+
+		if rad_mode {
+			result += '<hr/>\n';
+		}
+		result += value + '\n';
+		start = pos;
+	}
+
+
+	if rad_mode && token.size() > 0 {
+		result += '<hr/>\n';
+	}
+	result += strings.join('\n', lines[pos:]...) + '\n';
+	return result;
+}
+
+def rewrite()
+{
+	result = '';
+
+	token = {,};
+	for name, pos in ..__position {
+		if ..MEMBERS[name].MEMBERS.has_key('SOURCE') == false {
+			continue;
+		}
+
+		token[pos] = ..MEMBERS[name].SOURCE;
+	}
+
+	start = 0;
+	lines = ..__template.split('\n');
+	for pos, value in token { // as you know, it's ordered
+		if pos > start {
+			result += strings.join('\n', lines[start:pos]...) + '\n';
+		}
+
+		result += value + '\n';
+		start = pos;
+	}
+
+	result += strings.join('\n', lines[start:]...) + '\n';
+
+	result = result.replace('\r\n', '\n');
+	result = result.replace('\n\n\n\n', '\n\n');
+	result = result.replace('\n\n\n', '\n\n');
+	return result;
+}
+
+
+def generate_edit_page(req, dom)
+{
+	print: '## process edit page';
+	source = dom.rewrite();
+
+	ret = '''<div class="edit">
+<form method="POST" action="/%s?rad">
+<div class="code">
+<textarea cols="120" name="code" rows="40">
+%s
+</textarea>
+</div>
+<div class="control">
+<input type="hidden"  name="rad" value="edit_page"/>
+<input type="hidden"  name="id" value="%s"/>
+<input type="submit" name="submit" value="submit"/>
+<input type="submit" name="cancel" value="cancel"/>
+</div>
+</form>
+</div>''' % (req.uri, source, dom.NAME);
+	return ret;
+}
+
+def generate_publish_page(req, dom)
+{
+	print: '## process publish';
+	source = dom.rewrite();
+
+	ret = '''<div class="edit">
+<form method="POST" action="/%s?rad">
+Are you sure publish page?
+<div class="control">
+<input type="hidden"  name="rad" value="publish_page"/>
+<input type="hidden"  name="id" value="%s"/>
+<input type="hidden"  name="code" value="%s"/>
+<input type="submit" name="yes" value="yes"/>
+<input type="submit" name="no" value="no"/>
+</div>
+</form>
+</div>''' % (req.uri, dom.NAME, source);
+	return ret;
+}
+
+def generate_cancel_page(req, dom)
+{
+	print: '## process cancel';
+
+	ret = '''<div class="edit">
+<form method="POST" action="/%s?rad">
+Are you sure cancel change?
+<div class="control">
+<input type="hidden"  name="rad" value="cancel_page"/>
+<input type="hidden"  name="id" value="%s"/>
+<input type="submit" name="yes" value="yes"/>
+<input type="submit" name="no" value="no"/>
+</div>
+</form>
+</div>''' % (req.uri, dom.NAME);
+	return ret;
+}
+
