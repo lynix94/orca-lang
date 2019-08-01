@@ -47,7 +47,7 @@ or just type 'orca' invokes interpreter.
 ## Contacts
 project page:	https://github.com/lynix94/orca-lang  
 facebook page:	https://www.facebook.com/orcalang  
-youtube:    https://www.youtube.com/channel/UC2pE7poic6InC9URKfYuwOgk    
+youtuble:   https://www.youtube.com/channel/UC2pE7poic6InC9URKfYuwOg    
 email:			kiyeul.lee@gmail.com  
 
 
