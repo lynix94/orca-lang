@@ -935,8 +935,8 @@ Youtube 에 강좌를 추가할 예정이니 이를 참조하기 바란다. (계
 버그 리포팅, Pull Request 및 어느 타입의 공헌도 모두 환영하며 보다 자세한 사항은 아래 링크를 참조하여 문의 주시기 바란다.
 
 project page:		https://github.com/lynix94/orca-lang  
-facebook page:		https://www.facebook.com/orcalang  
-youtube:		https://www.youtube.com/channel/UC0bUKWj0aoWgbh9KaqJu8gw  
+facebook page:		https://www.facebook.com/orcalang    
+youtuble:		https://www.youtube.com/channel/UC2pE7poic6InC9URKfYuwOg   
 email:			kiyeul.lee@gmail.com  
 linked-in:		https://www.linkedin.com/in/kiyeul-lee  
 

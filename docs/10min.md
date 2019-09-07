@@ -935,8 +935,8 @@ Don't hesitate to contact or ask about the orca by below links.
 Thanks for reading. :)
 
 project page:		https://github.com/lynix94/orca-lang  
-facebook page:		https://www.facebook.com/orcalang  
-youtube:		https://www.youtube.com/channel/UC0bUKWj0aoWgbh9KaqJu8gw  
+facebook page:		https://www.facebook.com/orcalang    
+youtube:		https://www.youtube.com/channel/UC2pE7poic6InC9URKfYuwOg   
 email:			kiyeul.lee@gmail.com  
 linked-in:		https://www.linkedin.com/in/kiyeul-lee  
 
