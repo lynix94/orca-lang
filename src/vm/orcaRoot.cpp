@@ -35,6 +35,7 @@
 #include "orcaSqlite3.h"
 #include "orcaStrings.h"
 #include "orcaTls.h"
+#include "orcaUnsafe.h"
 
 
 #define USE_GTK
@@ -74,6 +75,8 @@ orcaRoot::orcaRoot()
 	insert_static("cpp", new orcaCPP());
 	insert_static("system", new orcaSystem());
 	insert_static("queue", new orcaQueue());
+	insert_static("unsafe", new orcaUnsafe());
+
 	insert_native_function("string", (object_fp)&orcaRoot::ex_string);
 	insert_native_function("repr", (object_fp)&orcaRoot::ex_repr);
 	insert_native_function("range", (object_fp)&orcaRoot::ex_range);

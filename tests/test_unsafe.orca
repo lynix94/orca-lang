@@ -1,0 +1,62 @@
+
+
+
+using unsafe;
+
+
+print: '=== pointer test ===';
+d = '0000000000' * 10;
+
+print: unsafe.pointer.int32(d, 0);
+print: unsafe.pointer.int32(d, 0, 1000);
+
+print: d;
+
+
+print: '=== struct test ===';
+
+s = unsafe.struct(d);
+s.int8('a', 0);
+s.int8('b', 1);
+s.int16('c', 2);
+s.int32('d', 4);
+s.int32('e', 8);
+s.int64('f', 12);
+s.uint64('g', 20);
+s.str('h', 30);
+print: s;
+
+print: s.a;
+print: s.b;
+print: s.c;
+print: s.d;
+print: s.e;
+print: s.f;
+print: s.g;
+print: s.h;
+
+
+s.a = 1;
+s.b = 2;
+s.c = 3;
+s.d = 4;
+s.e = 5;
+s.f = 9223372036854775807;
+s.g = 18446744073709551615;
+s.h = 'abcdefg\r\n';
+
+
+print: s.a;
+print: s.b;
+print: s.c;
+print: s.d;
+print: s.e;
+print: s.f;
+print: s.g;
+print: s.h;
+
+
+
+print: d;
+
+
