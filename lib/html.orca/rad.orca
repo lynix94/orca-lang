@@ -103,6 +103,8 @@ def handle_rad_post(req, dom)
 
 		dom.MEMBERS.erase_key(id);
 		dom.__position.erase_key(id);
+
+		req.post['reload'] = true;
 	}
 
 	def do_post_publish_page(req, dom)
@@ -119,6 +121,8 @@ def handle_rad_post(req, dom)
 
 		fh = io.open(dom.FILE_PATH, 'w');
 		fh.write(code);
+
+		req.post['reload'] = true;
 	}
 
 	def do_post_cancel_page(req, dom)
@@ -129,6 +133,7 @@ def handle_rad_post(req, dom)
 		}
 
 		os.touch(dom.FILE_PATH);
+		req.post['reload'] = true;
 	}
 }
 
@@ -229,7 +234,6 @@ def analyze(src)
 	// code
 	src_map = {,};
 	my.split_def(src, src_map);
-print: '>>>>>>>>>> ', src_map;
 	return src_map;
 
 	def.decode split_def(src, src_map)

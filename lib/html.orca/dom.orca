@@ -39,7 +39,6 @@ def generate(req)
 	# STEP 0: prepare rad if exists
 	if !owner.MEMBERS.has_key('SOURCE') && root.MEMBERS.has_key('RAD_SRC_MAP') {
 		abs_path = util.abs_path(owner);
-print: '>>>>>>>>>>>>>> ', abs_path;
 		path_src = root.RAD_SRC_MAP[abs_path];
 		if path_src != nil {
 			owner.MEMBERS['FILE_PATH'] = path_src[0];
@@ -72,7 +71,10 @@ print: '>>>>>>>>>>>>>> ', abs_path;
 	}
 	req.post.erase_key('rad');
 
-
+	// post['reload'] is set by edit, publish, cancel page
+	if req.post['reload'] == true {
+		return ..reload_page(req);
+	}
 
 	# STEP 2: process prepare & redirect
 	if ..MEMBERS.has_key('prepare') {
@@ -188,7 +190,6 @@ def rad_header(req)
 
 def process_embed(req)
 {
-print: '>>>> ', ..__position;
 	result = '';
 
 	rad_mode = false;
@@ -262,6 +263,22 @@ def rewrite()
 	result = result.replace('\n\n\n\n', '\n\n');
 	result = result.replace('\n\n\n', '\n\n');
 	return result;
+}
+
+def reload_page(req)
+{
+	print: '## reloading';
+
+	ret = '''
+	<script>
+		setTimeout(function() {
+			window.location.href = '%s';
+		},5000);
+	</script>
+	reloading...
+	''' % (req.url);
+
+	return ret;
 }
 
 
