@@ -239,16 +239,18 @@ def analyze(src)
 	def.decode split_def(src, src_map)
 	{
 	case %head,
-		%type=r'def[^ \\t\\r\\n]*[ \\t\\r\\n]+', 
-		%name=r'[a-zA-Z_][a-zA-Z0-9_]*[ \\t\\r\\n]+',
+		%type=r'def(\\.[^ \\t\\r\\n]*)?[ \\t\\r\\n]+', 
+		%name=r'[a-zA-Z_][a-zA-Z0-9_]*[ \\t\\r\\n]*',
+		%param=r'\\([a-zA-Z_][a-zA-Z0-9_]*\\)?',
+		r'[ \\t\\r\\n]+',
 		%body=..match_def,
 		%tail:
 
-		src_map[name.strip().split('(')[0]] = type + name + body;
+		src_map[name.strip()] = type + name + param + body;
 		split_def(tail, src_map);
 		
 	case %head,
-		%type=r'def[^ \\t\\r\\n]*[ \\t\\r\\n]+', 
+		%type=r'def(\\.[^ \\t\\r\\n]*)?[ \\t\\r\\n]+', 
 		%tail:
 
 		split_def(tail, src_map);
