@@ -54,6 +54,7 @@ test_modules = [
 #  'test_gnuplot', # to save time
   'test_log',
   'test_sqlite3',
+  'test_leveldb',
   'test_orm',
   'test_pack',
 

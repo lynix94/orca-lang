@@ -46,6 +46,7 @@ AC_CHECK_LIB([boost_system], [main])
 AC_CHECK_LIB([gmp], [main])
 AC_CHECK_LIB([gtk], [main])
 AC_CHECK_LIB([sqlite3], [main])
+AC_CHECK_LIB([leveldb], [main])
 AC_CHECK_LIB([ssl], [main])
 AC_CHECK_LIB([crypto], [main])
 

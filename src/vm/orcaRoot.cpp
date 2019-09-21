@@ -36,6 +36,7 @@
 #include "orcaStrings.h"
 #include "orcaTls.h"
 #include "orcaUnsafe.h"
+#include "orcaLeveldb.h"
 
 
 #define USE_GTK
@@ -86,6 +87,7 @@ orcaRoot::orcaRoot()
 	insert_static("__clib__", clib);
 	clib->insert_static("lru", new orcaUtilLru());
 	clib->insert_static("sqlite3", new orcaSqlite3());
+	clib->insert_static("leveldb", new orcaLeveldb());
 	clib->insert_static("base64", new orcaBase64());
 	clib->insert_static("strings", new orcaStrings());
 	clib->insert_static("tls", new orcaTlsModule());

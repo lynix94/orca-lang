@@ -1,5 +1,7 @@
 
 using __clib__;
 
+def leveldb := __clib__.leveldb;
 def sqlite3 := __clib__.sqlite3;
+
 

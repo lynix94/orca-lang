@@ -1,0 +1,76 @@
+
+using os;
+using storage.leveldb;
+
+
+os.system('rm -rf level.db');
+
+db = leveldb.open('level.db');
+print: db;
+
+ret = db.put('key', 'value');
+if ret != true {
+  throw test.leveldb <- 'leveldb failed';
+}
+
+ret = db.get('key');
+if ret != 'value' {
+  throw test.leveldb <- 'leveldb failed';
+}
+
+ret = db.del('key');
+if ret != true {
+  throw teseveldb <- 'leveldb failed';
+}
+
+ret = db.del('key');
+if ret != true {
+  throw test.leveldb <- 'leveldb failed';
+}
+
+for i in range(10) {
+	db.put('key_%d' % i, 'value_%d' % i);
+}
+
+for a in db {
+	print: a;
+}
+
+for a, b in db {
+	print: a, b;
+}
+
+a = db.first();
+if a() != 'value_0' {
+	throw test.leveldb <- 'leveldb failed';
+}
+
+a = a.next();
+if a != 'value_1' {
+	throw test.leveldb <- 'leveldb failed';
+}
+
+
+a = db.last();
+print: a();
+if a() != 'value_9' {
+	throw test.leveldb <- 'leveldb failed';
+}
+
+b = db.end();
+
+if a == b {
+	throw test.leveldb <- 'leveldb failed';
+}
+
+c = db.find('unexists');
+
+if c != b {
+	throw test.leveldb <- 'leveldb failed';
+}
+
+
+os.system('rm -rf level.db');
+
+print: 'OK: ', my;
+
