@@ -64,7 +64,7 @@ orcaData orcaListIterator::ex_next(orcaVM* vm, int n)
 	// in case of iter()
 	if (flag_ready == false) {
 		flag_ready = true;
-		return this;
+		return *m_iter;
 	}
 
 	++m_iter;
@@ -73,7 +73,7 @@ orcaData orcaListIterator::ex_next(orcaVM* vm, int n)
 		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
-	return this;
+	return *m_iter;
 }
 
 orcaData orcaListIterator::ex_prev(orcaVM* vm, int n)
@@ -84,7 +84,7 @@ orcaData orcaListIterator::ex_prev(orcaVM* vm, int n)
 
 	--m_iter;
 
-	return this;
+	return *m_iter;
 }
 
 orcaData orcaListIterator::ex_eq(orcaVM* vm, int n)

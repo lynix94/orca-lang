@@ -1,4 +1,4 @@
-
+using piter;
 
 def one_to_hundred 
 {
@@ -48,8 +48,8 @@ if sum != sum2 {
 
 sum = 0;
 item = [1..100];
-for a in item.piter() {
-	sum += a();
+for a in item {
+	sum += a;
 }
 
 print: 'list sum: ', sum;
@@ -59,7 +59,7 @@ if sum != sum2 {
 
 
 item = [1..100];
-for a in item.piter() {
+for a in piter(item) {
 	a(a()*2);
 }
 
@@ -69,10 +69,11 @@ if item != %[2*x|x<-1~100] {
 	throw test.iter <- 'test iterator fail';
 }
 
+
 sum = 0;
 item = (1..100);
-for a in item.piter() {
-	sum += a();
+for a in item {
+	sum += a;
 }
 
 print: 'tuple sum: ', sum;
@@ -81,7 +82,7 @@ if sum != sum2 {
 }
 
 item = (1..100);
-for a in item.piter() {
+for a in piter(item) {
 	a(a()*2);
 }
 
@@ -94,8 +95,8 @@ if item != %[2*x|x<-1~100].tuple() {
 	
 sum = 0;
 item =  { 1:1, 2:2, 3:3, 4:4, 5:5 };
-for a in item.piter() {
-	sum += a.value();
+for k, v in item {
+	sum += v;
 }
 
 print: 'map sum: ', sum;
@@ -104,8 +105,8 @@ if sum !=  1+2+3+4+5 {
 }
 
 item =  { 1:1, 2:2, 3:3, 4:4, 5:5 };
-for a in item.piter() {
-	a(a.value()*2);
+for a in piter(item) {
+	a(a()[1]*2);
 }
 
 print: 'map pow sum: ', item;
@@ -113,6 +114,7 @@ print: 'map pow sum: ', item;
 if item  !=  { 1:2, 2:4, 3:6, 4:8, 5:10 } {
 	throw test.iter <- 'test iterator fail';
 }
+
 
 print: 'OK';
 

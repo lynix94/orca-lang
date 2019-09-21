@@ -561,7 +561,7 @@ true
 $ 
 ```
 
-list 의 반복자는 value 를 리턴하며 순회하는 value 기반 반복자를 리턴하는 iter() 인터페이스가 있고, position 기반의 반복자를 리턴하는 piter(), first(), last(), end() 가 있다. 이는 리스트, 튜플, 맵에 모두 공통이다. 자세한 내용은 뒤의 반복자 파트를 참고하기 바란다.
+list 의 반복자는 value 를 리턴하며 순회하는 value 기반 반복자를 리턴하는 iter() 인터페이스가 있고 추가로 first(), last(), end() 가 있다. 이는 리스트, 튜플, 맵에 모두 공통이다. 자세한 내용은 뒤의 반복자 파트를 참고하기 바란다.
 
 iter() 는 리스트의 첫번째를 가르키며, next 를 실행할때마다 다음 값을 리턴하고 마지막까지 참조한 후에는 orca.iter.end exception 을 발생시킨다.
 
@@ -584,22 +584,20 @@ recent call-stack trace
 
  
 
-position 기반 iterator 중 piter 는 첫번째 아이템의 이전 (next 를 수행하면 첫번째 아이템위치의 iterator 를 리턴) 이며, first 는 첫번째 아이템, last 는 마지막 아이템, end 는 마지막 아이템의 다음 위치로 invalid 한 값을 의미한다. (c++ stl 의 end 와 같다) position iterator 는 iterator 간의 위치를 비교할 수 있으며, iterator 를 실행하면 현재위치의 값이 리턴되고, iterator 를 실행할때 값을 주면 현재 위치의 값을 변경할 수 있다. 이 점이 앞의 value iterator 보다 사용성이 뛰어난 점으로 간단히 값을 순회하기 위해서는 앞의 iter() 인터페이스를 사용하고, 추가적인 기능을 사용할 때는 piter, first, last, end 를 사용하면 된다.
+ first 는 첫번째 아이템, last 는 마지막 아이템, end 는 마지막 아이템의 다음 위치로 invalid 한 값을 의미한다. (c++ stl 의 end 와 같다)   iterator 는 iterator 간의 위치를 비교할 수 있으며, iterator 를 실행하면 현재위치의 값이 리턴되고, iterator 를 실행할때 값을 주면 현재 위치의 값을 변경할 수 있다. 
 
 ```
 $ list = [1,2,3];
 [ 1,2,3 ]
 $ f = list.first();
-<iter - 0x16f7f30>
+<iter - 0x55d692dd5400>
 $ l = list.last();
-<iter - 0x16f82f0>
+<iter - 0x55d692dc9200>
 $ f();
 1
 $ l();
 3
 $ f.next();
-<iter - 0x16f7f30>
-$ f();
 2
 $ f(3);
 3
@@ -608,10 +606,10 @@ $ print: list;
 $ print: f == l;
 false
 $ f.next();
-<iter - 0x16f7f30>
+3
 $ print: f == l;
 true
-
+$ 
 ```
 
 find(value) 인터페이스는 value가 있는 위치의 반복자를 반환한다.
@@ -702,20 +700,18 @@ $ a.empty();
 true
 ```
 
-tuple의 경우도 리스트와 유사하게 iter(), piter(), first(), last(), end(), find() 를 제공한다. 단, insert, remove는 제공하지 않는다.
+tuple의 경우도 리스트와 유사하게 iter(), first(), last(), end(), find() 를 제공한다. 단, insert, remove는 제공하지 않는다.
 
 ```
-$$ tp = (1,2,3);
+$ tp = (1,2,3);
 ( 1,2,3 )
-$ f = tp.first();
-<tupleiter - 0x16fa2d0>
-$ l = tp.last();
-<tupleiter - 0x16fa4c0>
+$ f=tp.first();
+<tupleiter - 0x55d692e378e0>
+$ l=tp.last();
+<tupleiter - 0x55d692e37ab0>
 $ f();
 1
 $ f.next();
-<tupleiter - 0x16fa2d0>
-$ f();
 2
 $ f(3);
 3
@@ -724,26 +720,18 @@ $ print: tp;
 $ print: f == l;
 false
 $ f.next();
-<tupleiter - 0x16fa2d0>
-$ print: f== l;
+3
+$ print: f==l;
 true
 $ tp = (1,2,3);
 ( 1,2,3 )
 $ i = tp.find(2);
-<tupleiter - 0x16fb4c0>
+<tupleiter - 0x55d692e389b0>
 $ i();
 2
 $ i.prev();
-<tupleiter - 0x16fb4c0>
-$ i();
 1
-$ tp = (1,2,3);
-$ i = tp.find(2);
-$ print: i();
-2
-$ i.prev();
-$ print: i();
-1
+
 ```
 
 
@@ -797,7 +785,7 @@ $ print: a;
 $ 
 ```
 
-map의 경우도 iter, piter, first, last, end 인터페이스를 지원한다. map 은 정렬연관 컨테이너이기 때문에 iterator 의 next로 순회하면 정렬 순서대로 아이템들을 억세스할 수 있다.
+map의 경우도 iter, first, last, end 인터페이스를 지원한다. map 은 정렬연관 컨테이너이기 때문에 iterator 의 next로 순회하면 정렬 순서대로 아이템들을 억세스할 수 있다.
 
 map 의 경우 k, v 쌍이기 때문에 iter 외에 k, v 를 리턴하는 iter2 인터페이스도 제공한다.
 
@@ -807,21 +795,21 @@ map 의 경우 k, v 쌍이기 때문에 iter 외에 k, v 를 리턴하는 iter2 
 $ m = {1:100, 2:200, 3:300};
 { 1:100,2:200,3:300 }
 $ a = m.first();
-<mapiter - 0x16fc5e0>
+<mapiter - 0x55d692e39fb0>
 $ print: a(), a.key(), a.value();
 ( 1,100 )1100
 $ a.next();
-<mapiter - 0x16fc5e0>
+2
 $ print: a(), a.key(), a.value();
 ( 2,200 )2200
 $ a.next();
-<mapiter - 0x16fc5e0>
+3
 $ print: a(), a.key(), a.value();
 ( 3,300 )3300
 $ a.next();
 uncaugted exception: orca.iter.end out of range
 recent call-stack trace
->> root (internal 0)
+>> root	(internal 0)	
 ```
 
 반복자로부터 값을 변경하는 것은 반복자에 변경될 값을 입력하여 호출하면 되는데 맵의 경우 키를 바꿀 수는 없고 (키를 바꾼다는 것은 정렬순서가 바뀌는 것이며 반복자가 정렬순서를 바꾸면서 유효할 수 없다) value 값이 변경된다.
@@ -834,11 +822,11 @@ $ it = a.first();
 $ it(1000);
 ( 1,1000 )
 $ it.next();
-<mapiter - 0x1700170>
+2
 $ it(2000);
 ( 2,2000 )
 $ it.next();
-<mapiter - 0x1700170>
+3
 $ it(3000);
 ( 3,3000 )
 $ a;
@@ -1075,7 +1063,7 @@ $ print: a.size()
 
 현재 구현되어 있는 반복자들의 규칙은 다음과 같다.
 
-* 다음으로 이동하기 위해서는 반복자의 next() 를 호출하면 자기 자신의 위치를 변경하되 다음 값이나, 자기 자신을 리턴한다. (list 설명에서의 value 반복자와 position 반복자 참고)
+* 다음으로 이동하기 위해서는 반복자의 next() 를 호출하면 자기 자신의 위치를 변경하되 다음 값을 리턴한다.
 
 * 이전으로 이동하기 위해서는 prev()를 호출한다.
 
@@ -1089,7 +1077,7 @@ $ print: a.size()
 
 * map 의 반복자의 경우는 특별히 대소 비교 ( <, <=, >, >=) 까지 할 수 있다.
 
-  ​
+  
 
 여기까지가 구현되어 있는 반복자들의 일반 규칙이며 추가로 각각의 컨테이너들은 다음 규칙과 같이 동작한다.
 

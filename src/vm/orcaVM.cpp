@@ -48,9 +48,9 @@ namespace fs = boost::filesystem;
 #include "orcaFloat.h"
 #include "orcaString.h"
 #include "orcaTuple.h"
-#include "orcaTupleVIter.h"
+#include "orcaTupleIter.h"
 #include "orcaList.h"
-#include "orcaListVIterator.h"
+#include "orcaListIterator.h"
 #include "orcaSbf.h"
 #include "orcaVirtList.h"
 #include "orcaMap.h"
@@ -2798,11 +2798,11 @@ fast_jmp:
 
 				if (isobj<orcaTuple>(p1)) {
 					tp = castobj<orcaTuple>(p1);
-					iterator = tit = new orcaTupleVIter(tp->begin(), tp, false);
+					iterator = tit = new orcaTupleIter(tp->begin(), tp, false);
 				}
 				else if (isobj<orcaList>(p1)) {
 					lp = castobj<orcaList>(p1);
-					iterator = lit = new orcaListVIterator(lp->begin(), lp->begin(), lp->end(), false);
+					iterator = lit = new orcaListIterator(lp->begin(), lp->begin(), lp->end(), false);
 				}
 				else {
 					orcaData out;

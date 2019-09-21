@@ -14,7 +14,6 @@
 #include "orcaSbf.h"
 #include "orcaVirtList.h"
 #include "orcaListIterator.h"
-#include "orcaListVIterator.h"
 
 #include "orcaStack.h"
 #include "orcaException.h"
@@ -57,7 +56,6 @@ orcaList::orcaList()
 	insert_native_function("pop_front", (object_fp)&orcaList::ex_pop_front);
 	insert_native_function("find", (object_fp)&orcaList::ex_find);
 	insert_native_function("iter", (object_fp)&orcaList::ex_iter);
-	insert_native_function("piter", (object_fp)&orcaList::ex_piter);
 	insert_native_function("first", (object_fp)&orcaList::ex_first);
 	insert_native_function("last", (object_fp)&orcaList::ex_last);
 	insert_native_function("end", (object_fp)&orcaList::ex_end);
@@ -446,11 +444,6 @@ orcaData orcaList::ex_find(orcaVM* vm, int n)
 }
 
 orcaData orcaList::ex_iter(orcaVM* vm, int n) 
-{
-	return new orcaListVIterator(begin(), begin(), end(), false);
-}
-
-orcaData orcaList::ex_piter(orcaVM* vm, int n) 
 {
 	return new orcaListIterator(begin(), begin(), end(), false);
 }

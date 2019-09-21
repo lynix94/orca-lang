@@ -13,7 +13,7 @@
 #include "orcaTuple.h"
 #include "orcaException.h"
 
-orcaMapIter::orcaMapIter(orcamap_iterator it, orcaMap* mp, bool flag_ready)
+orcaMapIter::orcaMapIter(orcamap_iterator it, orcaMap* mp, bool flag_ready, bool is_iter2)
 { 
 	set_name("mapiter"); 
 	insert_native_function("key", (object_fp)&orcaMapIter::ex_key);
@@ -29,6 +29,7 @@ orcaMapIter::orcaMapIter(orcamap_iterator it, orcaMap* mp, bool flag_ready)
 	m_mp = mp;
 	m_timestamp = mp->get_timestamp();
 	this->flag_ready = flag_ready;
+	this->is_iter2 = is_iter2;
 }
 
 bool orcaMapIter::valid()
@@ -120,7 +121,15 @@ orcaData orcaMapIter::ex_next(orcaVM* vm, int n)
 
 	if (flag_ready == false) {
 		flag_ready = true;
-		return this;
+		if (is_iter2) {
+			orcaTuple* tp = new orcaTuple(2);
+			tp->update(0, m_iter->first);
+			tp->update(1, m_iter->second);
+			return tp;
+		}
+		else {
+			return m_iter->first;
+		}
 	}
 
 	++m_iter;
@@ -129,7 +138,15 @@ orcaData orcaMapIter::ex_next(orcaVM* vm, int n)
 		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
-	return this;
+	if (is_iter2) {
+		orcaTuple* tp = new orcaTuple(2);
+		tp->update(0, m_iter->first);
+		tp->update(1, m_iter->second);
+		return tp;
+	}
+	else {
+		return m_iter->first;
+	}
 }
 
 orcaData orcaMapIter::ex_prev(orcaVM* vm, int n) 
@@ -144,7 +161,15 @@ orcaData orcaMapIter::ex_prev(orcaVM* vm, int n)
 
 	--m_iter;
 
-	return this;
+	if (is_iter2) {
+		orcaTuple* tp = new orcaTuple(2);
+		tp->update(0, m_iter->first);
+		tp->update(1, m_iter->second);
+		return tp;
+	}
+	else {
+		return m_iter->first;
+	}
 }
 
 orcaData orcaMapIter::ex_eq(orcaVM* vm, int n) 

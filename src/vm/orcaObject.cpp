@@ -496,12 +496,13 @@ orcaData orcaObject::update_member(const char* name, orcaData d)
 {
 	bool flag_static = false;
 	cp_map<orcaData>::Type::iterator mi;
+
+	// first, find at static
 	if (m_static) {
 		mi = m_static->find(name);
 		flag_static = true;
 	}
 
-	// first, find at static
 	if (m_static == NULL || mi == m_static->end()) {
 
 		// second, find at member
@@ -558,10 +559,10 @@ orcaData orcaObject::update_member(const char* name, orcaData d)
 	mi->second.rc_inc();
 	if (is<TYPE_OBJ>(d)) {
 		if (flag_static) {
-			m_member[name].o()->m_owner = this->m_original;
+			d.o()->m_owner = this->m_original;
 		}
 		else {
-			m_member[name].o()->m_owner = this;
+			d.o()->m_owner = this;
 		}
 	}
 

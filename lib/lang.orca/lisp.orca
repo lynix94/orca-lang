@@ -3,6 +3,7 @@ using operator;
 using fun;
 using pack;
 using lang.lisp;
+using piter;
 
 
 # handle context lisp
@@ -440,7 +441,7 @@ def execute(pair, local, base)
 					}
 				}
 
-				it = path.piter().next();
+				it = piter(path).next();
 				curr = base;
 
 				# find module first
@@ -516,7 +517,7 @@ def execute(pair, local, base)
 				return code[1];
 			}
 			elif code[0] == 'backquote' {
-				for sub_expr in code[1].piter() {
+				for sub_expr in piter(code[1]) {
 					if sub_expr().TYPE == type.tuple && sub_expr()[0] == 'comma' {
 						ret = execute((sub_expr()[1], fmap), local, base);
 						sub_expr(ret);
@@ -532,7 +533,7 @@ def execute(pair, local, base)
 		return code;
 	}
 	
-	for expr in code.piter() {
+	for expr in piter(code) {
 		ret = execute((expr(), fmap), local, base);
 		expr(ret);
 	}

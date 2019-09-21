@@ -531,7 +531,7 @@ true
 $ 
 ```
 
-iter() is value based iterator. this interface return iterator which return value of list. piter(), first(), last() and end() are position based iterator. these specs are common on tuple and map.
+iter() is value based iterator. this interface return iterator which return value of list. , first(), last() and end() are position based iterator. these specs are common on tuple and map.
 
 
 iter() means first item of iterator and it return next value if next() is called. if it moves to end of list, then it raises orca.iter.end exception
@@ -555,23 +555,21 @@ recent call-stack trace
 
  
 
-piter returns an iterator whose position is previous of first item (if it calls next() it return first item position), first() returns the position of first item, last() returns the position of last item. end() means invalid position like c++ stl end. position iterators are can be check as equal or not. If position iterator is called, it returns the value of current position. And if it is called with parameter, It change the value of current position. These aspects are more useful than value based iterator. 
-  
+ first() returns the position of first item, last() returns the position of last item. end() means invalid position like c++ stl end. position iterators are can be check as equal or not. If position iterator is called, it returns the value of current position. And if it is called with parameter, It change the value of current position. These aspects are more useful than value based iterator. 
+
 
 ```
 $ list = [1,2,3];
 [ 1,2,3 ]
 $ f = list.first();
-<iter - 0x16f7f30>
+<iter - 0x55d692dd5400>
 $ l = list.last();
-<iter - 0x16f82f0>
+<iter - 0x55d692dc9200>
 $ f();
 1
 $ l();
 3
 $ f.next();
-<iter - 0x16f7f30>
-$ f();
 2
 $ f(3);
 3
@@ -580,10 +578,10 @@ $ print: list;
 $ print: f == l;
 false
 $ f.next();
-<iter - 0x16f7f30>
+3
 $ print: f == l;
 true
-
+$ 
 ```
 
 find(value) function find position which have value and return its iterator.
@@ -612,7 +610,7 @@ $ print: list;
 [ 1,2,3 ]
 ```
 
-list and iterator have timestamp in it. So, if there is change in container (list, tuple and map). its old iterators are invalidated. So, if these iterators are used, exception occurs. list has sort interface which sort its internal items. If you call this interface without parameter, Default comparison is worked and items are sorted in increase order. If you pass compare function when you call sort, Sort use it as '<' operator.
+list and iterator have a timestamp in it. So, if there is change in container (list, tuple and map). its old iterators are invalidated. So, if these iterators are used, exception occurs. list has sort interface which sort its internal items. If you call this interface without parameter, Default comparison is worked and items are sorted in increase order. If you pass compare function when you call sort, Sort use it as '<' operator.
 
 ```
 $ a = [1,3,2,4,2];
@@ -668,20 +666,18 @@ true
 ```
 
 
-tuple provides iter(), piter(), first(), last(), end(), find() interfaces but insert() and remove() are not supported.
+tuple provides iter(), first(), last(), end(), find() interfaces but insert() and remove() are not supported.
 
 ```
-$$ tp = (1,2,3);
+$ tp = (1,2,3);
 ( 1,2,3 )
-$ f = tp.first();
-<tupleiter - 0x16fa2d0>
-$ l = tp.last();
-<tupleiter - 0x16fa4c0>
+$ f=tp.first();
+<tupleiter - 0x55d692e378e0>
+$ l=tp.last();
+<tupleiter - 0x55d692e37ab0>
 $ f();
 1
 $ f.next();
-<tupleiter - 0x16fa2d0>
-$ f();
 2
 $ f(3);
 3
@@ -690,25 +686,16 @@ $ print: tp;
 $ print: f == l;
 false
 $ f.next();
-<tupleiter - 0x16fa2d0>
-$ print: f== l;
+3
+$ print: f==l;
 true
 $ tp = (1,2,3);
 ( 1,2,3 )
 $ i = tp.find(2);
-<tupleiter - 0x16fb4c0>
+<tupleiter - 0x55d692e389b0>
 $ i();
 2
 $ i.prev();
-<tupleiter - 0x16fb4c0>
-$ i();
-1
-$ tp = (1,2,3);
-$ i = tp.find(2);
-$ print: i();
-2
-$ i.prev();
-$ print: i();
 1
 ```
 
@@ -759,7 +746,7 @@ $ print: a;
 $ 
 ```
 
-map also provides iter(), piter(), first(), last(), end() interface. map is sorted collection so if you iterate by next() you can get sorted result.
+map also provides iter(), first(), last(), end() interface. map is sorted collection so if you iterate by next() you can get sorted result.
 
 map is composed by key and value so you can get it directly with iter2() interface.
 
@@ -769,21 +756,21 @@ The return type is (key, value) tuple if you call iterator. If you want to get k
 $ m = {1:100, 2:200, 3:300};
 { 1:100,2:200,3:300 }
 $ a = m.first();
-<mapiter - 0x16fc5e0>
+<mapiter - 0x55d692e39fb0>
 $ print: a(), a.key(), a.value();
 ( 1,100 )1100
 $ a.next();
-<mapiter - 0x16fc5e0>
+2
 $ print: a(), a.key(), a.value();
 ( 2,200 )2200
 $ a.next();
-<mapiter - 0x16fc5e0>
+3
 $ print: a(), a.key(), a.value();
 ( 3,300 )3300
 $ a.next();
 uncaugted exception: orca.iter.end out of range
 recent call-stack trace
->> root (internal 0)
+>> root	(internal 0)	
 ```
 
 Calling iterator with parameter means change the value of current position. In map it changes the value (not key of course) of map.
@@ -796,11 +783,11 @@ $ it = a.first();
 $ it(1000);
 ( 1,1000 )
 $ it.next();
-<mapiter - 0x1700170>
+2
 $ it(2000);
 ( 2,2000 )
 $ it.next();
-<mapiter - 0x1700170>
+3
 $ it(3000);
 ( 3,3000 )
 $ a;
@@ -1005,7 +992,7 @@ iterator
 
 Iterators of container have similar interface with STL. Rules of current implementation are like below.
 
-*   If you want to move next item, call next() and it change its position and return itself or its value.
+*   If you want to move next item, call next() and it change its position and return its value.
 *   If you want to move prev item, call prev() and it change its position and return itself or its value.
 *   If result of next and prev is out of range, next, prev raise orca.iter.end exception.
 *   If you want value of item which iterator points out. call iterator. (like, value = it(); )

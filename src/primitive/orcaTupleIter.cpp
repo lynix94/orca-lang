@@ -78,7 +78,7 @@ orcaData orcaTupleIter::ex_next(orcaVM* vm, int n)
 
 	if (flag_ready == false) {
 		flag_ready = true;
-		return this;
+		return *m_iter;
 	}
 
 	++m_iter;
@@ -87,7 +87,7 @@ orcaData orcaTupleIter::ex_next(orcaVM* vm, int n)
 		throw orcaException(vm, "orca.iter.end", "out of range");
 	}
 
-	return this;
+	return *m_iter;
 }
 
 orcaData orcaTupleIter::ex_prev(orcaVM* vm, int n) 
@@ -102,7 +102,7 @@ orcaData orcaTupleIter::ex_prev(orcaVM* vm, int n)
 
 	--m_iter;
 
-	return this;
+	return *m_iter;
 }
 
 orcaData orcaTupleIter::ex_eq(orcaVM* vm, int n) 

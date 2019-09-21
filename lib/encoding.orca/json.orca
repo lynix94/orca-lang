@@ -2,6 +2,7 @@
 using util.match;
 using alg;
 using strings;
+using piter;
 
 # context parser
 return my.decoding(argv[2]);
@@ -110,24 +111,24 @@ def encoding(obj)
 	ret = strings.builder();
 	if obj.TYPE == type.map {
 		ret += '{';
-		for a in obj.piter() {
-			if a.value().TYPE == type.tuple {
-				for b in a.value().piter() {
-					ret += encoding(a.key());
+		for key, value in obj {
+			if value.TYPE == type.tuple {
+				for it in piter(value) {
+					ret += encoding(key);
 					ret += ':';
-					ret += encoding(b());
-					if b != a.value().last() {
+					ret += encoding(it());
+					if it != value.last() {
 						ret += ',';
 					}
 				}
 			}
 			else {
-				ret += encoding(a.key());
+				ret += encoding(key);
 				ret += ':';
-				ret += encoding(a.value());
+				ret += encoding(value);
 			}
 
-			if a != obj.last() {
+			if key != obj.last().key() {
 				ret += ',';
 			}
 		}
@@ -135,7 +136,7 @@ def encoding(obj)
 	}
 	elif obj.TYPE == type.list {
 		ret += '[';
-		for a in obj.piter() {
+		for a in piter(obj) {
 			ret += encoding(a());
 			if a != obj.last() {
 				ret += ',';
@@ -166,24 +167,24 @@ def beutify(obj, tab)
 	ret = strings.builder();
 	if obj.TYPE == type.map {
 		ret += '\t{';
-		for a in obj.piter() {
-			if a.value().TYPE == type.tuple {
-				for b in a.value().piter() {
-					ret += beutify(a.key(), tab);
+		for key, value in obj {
+			if value.TYPE == type.tuple {
+				for it in piter(value) {
+					ret += beutify(key, tab);
 					ret += ':';
-					ret += beutify(b(), tab);
-					if b != a.value().last() {
+					ret += beutify(it(), tab);
+					if it != value.last() {
 						ret += ',\n' + '\t'*tab;
 					}
 				}
 			}
 			else {
-				ret += beutify(a.key(), tab);
+				ret += beutify(key, tab);
 				ret += ':';
-				ret += beutify(a.value(), tab);
+				ret += beutify(value, tab);
 			}
 
-			if a != obj.last() {
+			if key != obj.last().key() {
 				ret += ',\n' + '\t'*tab;
 			}
 		}
@@ -191,7 +192,7 @@ def beutify(obj, tab)
 	}
 	elif obj.TYPE == type.list {
 		ret += '\t[';
-		for a in obj.piter() {
+		for a in piter(obj) {
 			ret += beutify(a(), tab);
 			if a != obj.last() {
 				ret += ',\n' + '\t'*tab;

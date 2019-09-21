@@ -1,0 +1,40 @@
+
+
+def iterator(v)
+{
+	def it;
+
+	def init(p)
+	{
+		if p.MEMBERS.has_key('next') {
+			..it = p;
+		}
+		else {
+			..it = p.iter();
+		}
+	}
+
+	def next()
+	{
+		..it.next();
+		return owner;
+	}
+
+	def prev()
+	{
+		..it.prev();
+		return owner;
+	}
+
+	if (v != nil) {
+		return my.it(v);
+	}
+
+	return my.it(); 
+}
+
+
+ret = my.iterator.clone(argv[0]);
+return ret;
+
+

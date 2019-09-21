@@ -1,8 +1,9 @@
 
 using math;
+using piter;
 
 sin = [0..1 : 0.1];
-for i in sin.piter() {
+for i in piter(sin) {
 	ret = math.sin(i());
 	i(ret);
 }
@@ -14,7 +15,7 @@ if sin[0] != 0 {
 
 	
 cos = [0..1 : 0.1];
-for i in cos.piter() {
+for i in piter(cos) {
 	ret = math.cos(i());
 	i(ret);
 }
@@ -25,7 +26,7 @@ if cos[0] != 1 {
 	
 
 tan = [0..1 : 0.1];
-for i in tan.piter() {
+for i in piter(tan) {
 	ret = math.tan(i());
 	i(ret);
 }
@@ -36,7 +37,7 @@ if tan[0] != 0 {
 
 
 asin = [0..1 : 0.1];
-for i in asin.piter() {
+for i in piter(asin) {
 	ret = math.asin(i());
 	i(ret);
 }
@@ -46,7 +47,7 @@ if asin[0] != 0 {
 }
 	
 acos = [0..1 : 0.1];
-for i in acos.piter() {
+for i in piter(acos) {
 	ret = math.acos(i());
 	i(ret);
 }
@@ -57,7 +58,7 @@ if acos[0] <= 1.5707 || acos[0] >= 1.5709 {
 	
 
 atan = [0..1 : 0.1];
-for i in atan.piter() {
+for i in piter(atan) {
 	ret = math.atan(i());
 	i(ret);
 }
@@ -67,7 +68,7 @@ if atan[0] != 0 {
 }
 
 sinh = [0..1 : 0.1];
-for i in sinh.piter() {
+for i in piter(sinh) {
 	ret = math.sinh(i());
 	i(ret);
 }
@@ -78,7 +79,7 @@ if sinh[0] != 0 {
 }
 
 cosh = [0..1 : 0.1];
-for i in cosh.piter() {
+for i in piter(cosh) {
 	ret = math.cosh(i());
 	i(ret);
 }
@@ -88,7 +89,7 @@ if cosh[0] != 1 {
 }
 
 atan2 = [0..1 : 0.1];
-for i in atan2.piter() {
+for i in piter(atan2) {
 	ret = math.atan2(i(), 0);
 	i(ret);
 }

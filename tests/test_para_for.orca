@@ -1,8 +1,9 @@
 using ipc;
 using time;
+using piter;
 
 list = [1..1000];
-parallel for a in list.piter() {
+parallel for a in piter(list) {
   a( a()*2 );
 }
 

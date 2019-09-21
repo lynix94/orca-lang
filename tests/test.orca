@@ -20,7 +20,7 @@ test_vectors = [
   'test_decode',
   'test_sbf',
   'test_para',
-  'test_para_for',
+#  'test_para_for', # add later
   'test_type',
   'test_orca',
   'test_lang',
