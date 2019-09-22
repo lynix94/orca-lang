@@ -1,0 +1,23 @@
+
+using md;
+
+
+def.md test
+{
+	# he***ll***o
+	## hea**di**ng 2
+
+	body with ***line
+	new*** line
+
+	- list 1
+	    - list 2
+	    - list 3
+		1. number 1
+		2. number 2
+	- list 4
+}
+
+
+print: my.test();
+

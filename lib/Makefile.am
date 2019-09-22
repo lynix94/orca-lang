@@ -1,6 +1,6 @@
 
 orcalibdir = $(prefix)/lib/orca
-orcalib_DATA = alg.kw alg.orca fun.kw fun.orca gui.kw gui.orca run.kw run.orca log.kw log.orca get.orca get.kw piter.orca piter.kw
+orcalib_DATA = alg.kw alg.orca fun.kw fun.orca gui.kw gui.orca run.kw run.orca log.kw log.orca get.orca get.kw piter.orca piter.kw md.orca md.kw
 
 orcalibdistributedir = $(prefix)/lib/orca/distribute.orca
 orcalibdistribute_DATA = distribute.orca/remotec.orca distribute.orca/remotec.kw distribute.orca/remoted.orca distribute.orca/remoted.kw distribute.orca/dist.orca distribute.orca/dist.kw distribute.orca/fs.orca distribute.orca/fs.kw distribute.orca/dfsd.orca distribute.orca/dfsd.kw

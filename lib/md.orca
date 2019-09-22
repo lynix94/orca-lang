@@ -1,0 +1,182 @@
+using strings;
+
+#print: argv;
+
+if argv == nil || argv.size() <5 {
+	return;
+}
+
+name = argv[0];
+body = argv[2];
+
+ret = my.md_object.clone();
+ret.__name = name;
+ret.__template = body;
+return ret;
+
+
+
+def md_object
+{
+	out = [];
+	my.convert(my.__template, out);
+
+	ret = strings.join('\n', out...);
+	return ret;
+
+
+	def __name;
+	def __template;
+
+	def decorate(src)
+	{
+		pos = src.find_all('***');
+		if pos.size() == 2 && pos[1] - pos[0] > 3 {
+			src = src.replace('***', '</em></strong>', pos[1], pos[1] + 3);
+			src = src.replace('***', '<strong><em>', pos[0], pos[0] + 3);
+		}
+		
+		pos = src.find_all('**');
+		if pos.size() == 2 && pos[1] - pos[0] > 3 {
+			src = src.replace('**', '</strong>', pos[1], pos[1] + 3);
+			src = src.replace('**', '<strong>', pos[0], pos[0] + 3);
+		}
+
+		pos = src.find_all('*');
+		if pos.size() == 2 && pos[1] - pos[0] > 3 {
+			src = src.replace('*', '</em>', pos[1], pos[1] + 3);
+			src = src.replace('*', '<em>', pos[0], pos[0] + 3);
+		}
+
+		return src;
+	}
+
+
+
+
+	def paragraph(src, out)
+	{
+		ret = src.find(r'^[ ]*[-+*] ');
+		if ret == nil {
+			ret = src.find(r'^[ ]*[0-9+]\. ');
+		}
+		if ret == nil {
+			ret = src.find(r'^#+ ');
+		}
+
+		p = src;
+		if ret != nil {
+			p = src[:ret[1]];
+			remain = src[ret[1]:];
+		}
+
+		out.push_back('\n<p>%s</p>\n' % ..decorate(p));
+
+		if ret != nil {
+			..heading(remain, out);
+		}
+	}
+
+
+	def.decode listing(src, out, m)
+	{
+	case %indent = r'[ ]*', r'[-+*] ', %line, '\n', %remain:
+		level = indent.length()/4;
+
+		if level > m[-1][1] {
+			m.push_back(('</ul>', level));
+			out.push_back('<ul>');
+		}
+		elif level < m[-1][1] {
+			out.push_back(m[-1][0]);
+			m.pop_back();
+		}
+		out.push_back('<li>%s</li>' % ..decorate(line));
+
+		listing(remain, out, m);
+
+	case %indent = r'[ ]*', r'[-+*] ', %line:
+		level = indent.length()/4;
+
+		if level > m[-1][1] {
+			m.push_back(('</ul>', level));
+			out.push_back('<ul>');
+		}
+		if level < m[-1][1] {
+			out.push_back(m[-1][0]);
+			m.pop_back();
+		}
+		out.push_back('<li>%s</li>' % ..decorate(line));
+		while m.size() > 1 {
+			out.push_back(m[-1][0]);
+			m.pop_back();
+		}
+
+	case %indent = r'[ ]*', r'[0-9]+\. ', %line, '\n', %remain:
+		level = indent.length()/4;
+
+		if level > m[-1][1] {
+			m.push_back(('</ol>', level));
+			out.push_back('<ol>');
+		}
+		elif level < m[-1][1] {
+			out.push_back(m[-1][0]);
+			m.pop_back();
+		}
+		out.push_back('<li>%s</li>' % ..decorate(line));
+
+		listing(remain, out, m);
+
+	case %indent = r'[ ]*', r'[0-9]+\. ', %line:
+		level = indent.length()/4;
+
+		if level > m[-1][1] {
+			m.push_back(('</ol>', level));
+			out.push_back('<ol>');
+		}
+		elif level < m[-1][1] {
+			out.push_back(m[-1][0]);
+			m.pop_back();
+		}
+		out.push_back('<li>%s</li>' % ..decorate(line));
+		while m.size() > 1 {
+			out.push_back(m[-1][0]);
+			m.pop_back();
+		}
+
+	case %remain:
+		while m.size() > 1 {
+			out.push_back(m[-1][0]);
+			m.pop_back();
+		}
+		..paragraph(remain, out);
+	}
+
+
+	def.decode heading(src, out)
+	{
+	case %h = r'#+ ', %line, '\n', %remain:
+		l = h.length()-1;
+		out.push_back('<h%d>%s</h%d>' % (l, ..decorate(line), l));
+		heading(remain.strip(), out);
+
+	case %h = r'#+ ', %line:
+		l = h.length()-1;
+		out.push_back('<h%d>%s</h%d>' % (l, ..decorate(line), l));
+
+	case %remain:
+		..listing(remain, out, [(nil, -1)]);
+	}
+
+
+	def.decode convert(src, out)
+	{
+	case %p, '\n\n', %remain:
+		..heading(p.strip(), out);
+		convert(remain.strip(), out);
+
+	case %remain:
+		..heading(remain.strip(), out);
+	}
+}
+
