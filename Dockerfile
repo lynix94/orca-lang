@@ -4,7 +4,7 @@ MAINTAINER lynix94
 RUN apt -y update; \
 	apt install -y git; \
 	apt install -y gcc g++ make autoconf automake git; \
-	apt install -y net-tools telnet vim; \
+	apt install -y iputils-ping net-tools telnet vim; \
 	apt install -y libtool flex bison \
 		libboost-all-dev libreadline-dev libgmp-dev \
 		libgtk2.0-dev libsqlite3-dev libleveldb-dev \
