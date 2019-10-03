@@ -2406,7 +2406,7 @@ fast_jmp:
 				const char* cont = m_for_stack->cont(&lv1, &p1, &lv2, &p2);
 				if (cont != 0) { // continue
 					m_local->set(lv1, p1);
-					if (lv2 > 0) {
+					if (lv2 >= 0) {
 						m_local->set(lv2, p2);
 					}
 					c = cont;

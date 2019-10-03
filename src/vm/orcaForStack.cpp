@@ -195,7 +195,7 @@ const char* orcaForStack::cont(int* lv1, orcaData* d1, int *lv2, orcaData* d2)
 		vm->push_stack(f->next);
 		vm->call(0); // iter.next();
 		orcaData result = vm->m_stack->pop();
-		if (f->lv2 > 0) {
+		if (f->lv2 >= 0) {
 			if (f->is_iter2) {
 				orcaTuple* tp = castobj<orcaTuple>(result);
 				if (tp == NULL || tp->size() != 2) {
