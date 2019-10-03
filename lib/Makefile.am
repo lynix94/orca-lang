@@ -12,7 +12,8 @@ orcaliblangdir = $(prefix)/lib/orca/lang.orca
 orcaliblang_DATA = lang.orca/lisp.orca lang.orca/lisp.kw lang.orca/sh.kw lang.orca/sh.orca
 
 orcalibencodingdir = $(prefix)/lib/orca/encoding.orca
-orcalibencoding_DATA = encoding.orca/CODE.orca encoding.orca/CODE.kw encoding.orca/xml.kw encoding.orca/json.kw encoding.orca/xml.orca encoding.orca/json.orca
+orcalibencoding_DATA = encoding.orca/CODE.orca encoding.orca/CODE.kw encoding.orca/xml.kw encoding.orca/xml.orca encoding.orca/json.kw encoding.orca/json.orca encoding.orca/resp.kw encoding.orca/resp.orca 
+
 
 orcalibutildir = $(prefix)/lib/orca/util.orca
 orcalibutil_DATA = util.orca/CODE.kw util.orca/match.kw util.orca/CODE.orca util.orca/match.orca
