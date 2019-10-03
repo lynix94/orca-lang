@@ -173,7 +173,6 @@ orcaData orcaObject::operator()(orcaVM* vm, int param_n)
 	}
 
 	orcaObject* curr_back = vm->m_curr;
-
 	vm->m_curr = this;
 	const char** cptr_back = vm->m_cptr;
 

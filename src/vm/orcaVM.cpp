@@ -1348,13 +1348,17 @@ fast_jmp:
 				PRINT1("\t\t%p : NOP\n", c);
 				break;
 
-			case OP_CALL: 
+			case OP_CALL: {
 				PRINT2("\t\t%p : call (param: %d)\n", c, c[1]); 
 				j = c[1];
+
 				call(j);
+				m_cptr = &c;
+
 				c += 1 + FJ_INC;
 				goto fast_jmp;
 				break; 
+			  }
 
 			case OP_ASSIGN_LOCAL:	
 				PRINT2("\t\t%p : assign local (%d)\n", c, TO_SHORT(&c[1]));
@@ -2737,6 +2741,8 @@ fast_jmp:
 					int addr = TO_INT(&c[i*sizeof(int)]);
 
 					exec_code(new_code, new_code+addr);
+					m_cptr = &c;
+
 					p1 = m_stack->pop();
 					if (p1.i() == 1) {
 						p4 = m_stack->pop();
@@ -3125,6 +3131,7 @@ fast_jmp:
 			}
 		}
 		catch (orcaException& e) {
+			m_cptr = &c;
 			do {
 				d = handle_throw(e.who());
 				if (is<TYPE_NIL>(d)) {
