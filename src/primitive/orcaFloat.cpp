@@ -184,6 +184,17 @@ orcaData orcaFloat::ex_string(orcaVM* vm, double f, int param_n)
 
 orcaData orcaFloat::ex_integer(orcaVM* vm, double f, int param_n) 
 {
+	if (f > INT_MAX) {
+		orcaData d;
+		mpz_t b;
+		mpz_init(b);
+		mpz_set_d(b, f);
+		d.bn_set(b);
+		mpz_clear(b);
+
+		return d;
+	}
+
 	return static_cast<int>(f);
 }
 
