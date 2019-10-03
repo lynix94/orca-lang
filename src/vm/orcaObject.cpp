@@ -177,7 +177,14 @@ orcaData orcaObject::operator()(orcaVM* vm, int param_n)
 	vm->m_curr = this;
 	const char** cptr_back = vm->m_cptr;
 
-	vm->exec_code(m_code);
+	try {
+		vm->exec_code(m_code);
+	}
+	catch (orcaException& e) {
+		vm->m_curr = curr_back;
+		vm->m_cptr = cptr_back;
+		throw e;
+	}
 
 	vm->m_curr = curr_back;
 	vm->m_cptr = cptr_back;

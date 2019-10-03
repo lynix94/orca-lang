@@ -73,7 +73,7 @@ thread_pool::~thread_pool()
 }
 
 
-bool thread_pool::signal_restart(thread_arg_u arg)
+bool thread_pool::signal_restart(thread_arg_u *arg)
 {
 	map<pthread_t, thread_pool_t*>::iterator it;
 	for (it = m_map.begin(); it != m_map.end(); ++it) {
@@ -90,40 +90,34 @@ bool thread_pool::signal_restart(thread_arg_u arg)
 	return false;
 }
 
-void thread_pool::work(thread_arg_u arg)
+void thread_pool::work(thread_arg_u *arg)
 {
-	PRINT1("thread added, tid:%d\n", (int)arg.p_do.tid);
-	pthread_t tid = arg.p_do.tid; // p_do.tid == p_for.tid == p_call.tid (same addr)
+	PRINT1("thread added, tid:%d\n", (int)arg->p_do.tid);
+	pthread_t tid = arg->p_do.tid; // p_do.tid == p_for.tid == p_call.tid (same addr)
 	thread_pool_t* pool = new thread_pool_t;
 	m_map[tid] = pool;
 	m_map[tid]->running = true;
 	m_map[tid]->arg = arg;
 
-	orcaVM* vm = new orcaVM;
-	vm->init();
-
 	do {
-		orcaVM* vm_main;
-
 		arg = get_arg(tid);
-		switch (arg.p_do.type)
+
+		orcaVM* vm = arg->p_do.vm_main; // p_do.vm_main == p_for.vm_main
+		set_current_vm(vm);
+
+		switch (arg->p_do.type)
 		{
 		case 'f':
-			if (arg.p_for.iter != NULL) {
-				vm->m_stack->push(arg.p_for.iter);
-				vm->m_stack->push(arg.p_for.per);
+			if (arg->p_for.iter != NULL) {
+				vm->m_stack->push(arg->p_for.iter);
+				vm->m_stack->push(arg->p_for.per);
 			}
 			// fallthrough
 		case 'd':
-			vm_main = arg.p_do.vm_main; // p_do.vm_main == p_for.vm_main
-			vm->m_module = vm_main->m_module;
-			vm->m_curr = vm_main->m_curr;
-			vm_main->m_local->duplicate(vm->m_local);
-
 			set_start(tid);
 
 			try {
-				vm->exec_code(arg.p_do.code, arg.p_do.offset);
+				vm->exec_code(arg->p_do.code, arg->p_do.offset);
 				vm->m_local->decrease();
 			}
 			catch (orcaException& e) {
@@ -136,13 +130,10 @@ void thread_pool::work(thread_arg_u arg)
 			break;
 
 		case 'c':
-			orcaData func = *arg.p_call.func;
-			vector<orcaData>* params = arg.p_call.params;
+			orcaData func = *arg->p_call.func;
+			vector<orcaData>* params = arg->p_call.params;
 			int param_n = params->size();
 
-			vm_main = arg.p_call.vm_main;
-			vm->m_module = vm_main->m_module;
-			vm->m_curr = vm_main->m_curr;
 			vm->m_local->reset(); // resued thread lp is to 0 so set it FRAME SIZE
 
 			vm->push_stack(func);
@@ -166,24 +157,31 @@ void thread_pool::work(thread_arg_u arg)
 			}
 		}
 
+
+
+		// wait next job
 		if (is_exit()) {
 			set_stop(tid);
-			vm->cleanup();
-			delete vm;
+			// clean & free arg
+			arg->p_do.vm_main->cleanup();
+			delete arg->p_do.vm_main;
+			delete arg;
+
 			return;
 		}
 
 		set_stop(tid);
+		// clean & free arg
+		arg->p_do.vm_main->cleanup();
+		delete arg->p_do.vm_main;
+		delete arg;
 
 		if (is_exit()) {
-			vm->cleanup();
-			delete vm;
 			return;
 		}
+
 	} while (true);
 
-	vm->cleanup();
-	delete vm;
 	return;
 }
 
@@ -258,7 +256,7 @@ void thread_pool::set_stop(pthread_t tid)
 	m_map[tid]->mutex.unlock();
 }
 
-thread_arg_u thread_pool::get_arg(pthread_t tid)
+thread_arg_u* thread_pool::get_arg(pthread_t tid)
 {
 	return m_map[tid]->arg;
 }
@@ -270,15 +268,15 @@ bool thread_pool::is_exit()
 
 void thread_pool::inc_run(pthread_t tid)
 {
-	if (m_map[tid]->arg.p_for.run_count) {
-		(*m_map[tid]->arg.p_for.run_count)++;
+	if (m_map[tid]->arg->p_for.run_count) {
+		(*m_map[tid]->arg->p_for.run_count)++;
 	}
 }
 
 void thread_pool::dec_run(pthread_t tid)
 {
-	if (m_map[tid]->arg.p_for.run_count) {
-		(*m_map[tid]->arg.p_for.run_count)--;
+	if (m_map[tid]->arg->p_for.run_count) {
+		(*m_map[tid]->arg->p_for.run_count)--;
 	}
 }
 

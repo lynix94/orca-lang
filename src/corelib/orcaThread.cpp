@@ -45,6 +45,7 @@ orcaData orcaThread::ex_join(orcaVM* vm, int n)
 
 void orcaThread::execute(orcaObject* arg) {
 	m_vm.init();
+	set_current_vm(&m_vm);
 
 	m_vm.m_module = g_root;
 	m_vm.m_curr = g_root;

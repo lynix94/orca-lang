@@ -32,6 +32,7 @@ int main(int argc, char* argv[])
 
 		orcaVM vm;
 		vm.init();
+		set_current_vm(&vm);
 
 		bool flag = true;
 		if (!interactive) {

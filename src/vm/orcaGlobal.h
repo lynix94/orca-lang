@@ -82,7 +82,7 @@ struct thread_pool_t
 	portMutex mutex;
 
 	bool running;
-	thread_arg_u arg;
+	thread_arg_u *arg;
 
 	thread_pool_t() {
 		running = false;
@@ -95,8 +95,8 @@ public:
 	thread_pool();
 	~thread_pool();
 
-	bool signal_restart(thread_arg_u arg);
-	void work(thread_arg_u arg);
+	bool signal_restart(thread_arg_u *arg);
+	void work(thread_arg_u *arg);
 
 	void join_all();
 
@@ -109,7 +109,7 @@ public:
 private:
 	void set_start(pthread_t tid);
 	void set_stop(pthread_t tid);
-	thread_arg_u get_arg(pthread_t tid);
+	thread_arg_u* get_arg(pthread_t tid);
 
 	bool is_exit();
 	void inc_run(pthread_t tid);
