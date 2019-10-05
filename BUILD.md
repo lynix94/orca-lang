@@ -16,7 +16,8 @@ sudo apt install libgmp-dev
 sudo apt install libgtk2.0-dev  
 sudo apt install libsqlite3-dev  
 sudo apt install libcanberra-gtk-module    
-
+sudo apt install libssl-dev
+sudo apt install libleveldb-dev
 
 # configure & build like below
 ./autogen.sh  
