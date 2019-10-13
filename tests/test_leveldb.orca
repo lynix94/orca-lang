@@ -18,12 +18,12 @@ if ret != 'value' {
   throw test.leveldb <- 'leveldb failed';
 }
 
-ret = db.del('key');
+ret = db.erase_key('key');
 if ret != true {
   throw teseveldb <- 'leveldb failed';
 }
 
-ret = db.del('key');
+ret = db.erase_key('key');
 if ret != true {
   throw test.leveldb <- 'leveldb failed';
 }
@@ -41,19 +41,18 @@ for a, b in db {
 }
 
 a = db.first();
-if a() != 'value_0' {
+if a.key() != 'key_0' {
 	throw test.leveldb <- 'leveldb failed';
 }
 
-a = a.next();
-if a != 'value_1' {
+a.next();
+if a.key() != 'key_1' {
 	throw test.leveldb <- 'leveldb failed';
 }
 
 
 a = db.last();
-print: a();
-if a() != 'value_9' {
+if a.key() != 'key_9' {
 	throw test.leveldb <- 'leveldb failed';
 }
 

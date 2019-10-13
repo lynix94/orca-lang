@@ -13,7 +13,11 @@ orcaLeveldbIterator::orcaLeveldbIterator(leveldb::DB* db, leveldb::Iterator* it,
 	set_name("leveldb_iterator");
 	insert_native_function("next", (object_fp)&orcaLeveldbIterator::ex_next);
 	insert_native_function("prev", (object_fp)&orcaLeveldbIterator::ex_prev);
+	insert_native_function("key", (object_fp)&orcaLeveldbIterator::ex_key);
+	insert_native_function("value", (object_fp)&orcaLeveldbIterator::ex_value);
+	insert_native_function("erase", (object_fp)&orcaLeveldbIterator::ex_erase);
 	insert_native_function("==", (object_fp)&orcaLeveldbIterator::ex_eq);
+	insert_native_function("<", (object_fp)&orcaLeveldbIterator::ex_lt);
 
 	this->db = db;
 	this->it = it;
@@ -41,7 +45,28 @@ orcaData orcaLeveldbIterator::operator()(orcaVM* vm, int n)
 		return NIL;
 	}
 
-	if (it->Valid() == false) {
+	if (is_begin || it->Valid() == false) {
+		throw orcaException(vm, "orca.iter.end", "done");
+	}
+
+	orcaTuple* tp = new orcaTuple(2);
+	tp->update(0, it->key().ToString());
+	tp->update(1, it->value().ToString());
+	return tp;
+}
+
+orcaData orcaLeveldbIterator::ex_key(orcaVM* vm, int n)
+{
+	if (is_begin || it->Valid() == false) {
+		throw orcaException(vm, "orca.iter.end", "done");
+	}
+
+	return it->key().ToString();
+}
+
+orcaData orcaLeveldbIterator::ex_value(orcaVM* vm, int n)
+{
+	if (is_begin || it->Valid() == false) {
 		throw orcaException(vm, "orca.iter.end", "done");
 	}
 
@@ -72,12 +97,12 @@ orcaData orcaLeveldbIterator::ex_next(orcaVM* vm, int n)
 		return tp;
 	}
 
-	return it->value().ToString();
+	return it->key().ToString();
 }
 
 orcaData orcaLeveldbIterator::ex_prev(orcaVM* vm, int n)
 {
-	if (it->Valid() == false) {
+	if (is_begin || it->Valid() == false) {
 		throw orcaException(vm, "orca.iter.end", "done");
 	}
 
@@ -122,13 +147,46 @@ orcaData orcaLeveldbIterator::ex_eq(orcaVM* vm, int n)
 	return false;
 }
 
+orcaData orcaLeveldbIterator::ex_lt(orcaVM* vm, int n)
+{
+	if (n < 1) vm->need_param(1);
+
+
+	orcaLeveldbIterator* ip = castobj<orcaLeveldbIterator>(vm->get_param(0));
+	if (ip == NULL) {
+		throw orcaException(vm, "orca.type", "invalid iterator");
+	}
+
+	if (it->Valid() && ip->it->Valid()) {
+		if (is_begin == ip->is_begin) {
+			return it->key().ToString() < ip->it->key().ToString();
+		}
+	}
+
+	return false;
+}
+
+orcaData orcaLeveldbIterator::ex_erase(orcaVM* vm, int n)
+{
+	if (is_begin || it->Valid() == false) {
+		throw orcaException(vm, "orca.iter.end", "done");
+	}
+
+	leveldb::Status s = db->Delete(leveldb::WriteOptions(), it->key().ToString());
+	if (s.ok() == false) {
+		throw orcaException(vm, "leveldb.get", s.ToString());
+	}
+
+	return true;
+}
+
 
 orcaLeveldbHandle::orcaLeveldbHandle(leveldb::DB* db)
 {
 	set_name("leveldb_handle");
 	insert_native_function("put", (object_fp)&orcaLeveldbHandle::ex_put);
 	insert_native_function("get", (object_fp)&orcaLeveldbHandle::ex_get);
-	insert_native_function("del", (object_fp)&orcaLeveldbHandle::ex_del);
+	insert_native_function("erase_key", (object_fp)&orcaLeveldbHandle::ex_erase_key);
 	insert_native_function("iter", (object_fp)&orcaLeveldbHandle::ex_iter);
 	insert_native_function("iter2", (object_fp)&orcaLeveldbHandle::ex_iter2);
 	insert_native_function("find", (object_fp)&orcaLeveldbHandle::ex_find);
@@ -177,7 +235,7 @@ orcaData orcaLeveldbHandle::ex_get(orcaVM* vm, int n)
 	return value;
 }
 
-orcaData orcaLeveldbHandle::ex_del(orcaVM* vm, int n)
+orcaData orcaLeveldbHandle::ex_erase_key(orcaVM* vm, int n)
 {
 	if (n < 1) vm->need_param(1);
 

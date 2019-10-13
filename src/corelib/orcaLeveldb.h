@@ -15,7 +15,11 @@ public:
 	orcaData operator()(orcaVM* vm, int n);
 	orcaData ex_next(orcaVM* vm, int n);
 	orcaData ex_prev(orcaVM* vm, int n);
+	orcaData ex_key(orcaVM* vm, int n);
+	orcaData ex_value(orcaVM* vm, int n);
 	orcaData ex_eq(orcaVM* vm, int n);
+	orcaData ex_lt(orcaVM* vm, int n);
+	orcaData ex_erase(orcaVM* vm, int n);
 
 private:
 	leveldb::DB *db;
@@ -36,7 +40,7 @@ public:
 
 	orcaData ex_put(orcaVM* vm, int n);
 	orcaData ex_get(orcaVM* vm, int n);
-	orcaData ex_del(orcaVM* vm, int n);
+	orcaData ex_erase_key(orcaVM* vm, int n);
 	orcaData ex_iter(orcaVM* vm, int n);
 	orcaData ex_iter2(orcaVM* vm, int n);
 	orcaData ex_find(orcaVM* vm, int n);
