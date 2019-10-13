@@ -151,7 +151,7 @@ public:
 	BnObject(long long ll)	
 	{
 		mpz_init(bn); 
-		if (ll < INT_MAX) {
+		if (ll <= INT_MAX && ll >= INT_MIN) {
 			mpz_set_si(bn, (int)ll); 
 		}
 		else {
@@ -160,6 +160,20 @@ public:
 			mpz_set_str(bn, buff, 10);
 		}
 	}
+
+	BnObject(unsigned long long ull)	
+	{
+		mpz_init(bn); 
+		if (ull <= INT_MAX) {
+			mpz_set_si(bn, (int)ull); 
+		}
+		else {
+			char buff[128];
+			sprintf(buff, "%llu", ull);
+			mpz_set_str(bn, buff, 10);
+		}
+	}
+
 
 	BnObject(const char* s)	
 	{
@@ -318,6 +332,7 @@ struct LIBORCA_API orcaData
 	void bn_set(mpz_t& bn)			{ t=TYPE_BIGNUM; v.bo = new BnObject(bn); }
 	void bn_set(const char* s)		{ t=TYPE_BIGNUM; v.bo = new BnObject(s); }
 	void bn_set(long long ll)		{ t=TYPE_BIGNUM; v.bo = new BnObject(ll); }
+	void bn_set(unsigned long long ull)		{ t=TYPE_BIGNUM; v.bo = new BnObject(ull); }
 	void pair_set(int i, int j)		{ t=TYPE_PAIR; v.sl.from=i; v.sl.to=j; }
 	void extract_set(orcaObject* o)	{ t=TYPE_EXTRACT; v.o = o; }
 

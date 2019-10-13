@@ -18,6 +18,53 @@
 #include "orcaTuple.h"
 #include "orcaMap.h"
 
+class orcaLimits : public orcaObject 
+{
+public:
+	orcaLimits() 
+	{
+		set_name("limits");
+		orcaData d;
+
+		d.i_set(CHAR_MAX);
+		insert_static("int8_max", d);
+		d.i_set(CHAR_MIN);
+		insert_static("int8_min", d);
+		d.i_set(UCHAR_MAX);
+		insert_static("uint8_max", d);
+
+		d.i_set(SHRT_MAX);
+		insert_static("int16_max", d);
+		d.i_set(SHRT_MIN);
+		insert_static("int16_min", d);
+		d.i_set(USHRT_MAX);
+		insert_static("uint16_max", d);
+
+		d.i_set(INT_MAX);
+		insert_static("int32_max", d);
+		d.i_set(INT_MIN);
+		insert_static("int32_min", d);
+		d.bn_set((long long)UINT_MAX);
+		insert_static("uint32_max", d);
+
+		d.bn_set(LLONG_MAX);
+		insert_static("int64_max", d);
+		d.bn_set(LLONG_MIN);
+		insert_static("int64_min", d);
+		d.bn_set(ULLONG_MAX);
+		insert_static("uint64_max", d);
+
+		d.r_set(FLT_MAX);
+		insert_static("float32_max", d);
+		d.r_set(FLT_MIN);
+		insert_static("float32_max", d);
+
+		d.r_set(DBL_MAX);
+		insert_static("float64_max", d);
+		d.r_set(DBL_MIN);
+		insert_static("float64_max", d);
+	}
+};
 
 class orcaTypes : public orcaObject 
 {
@@ -70,6 +117,8 @@ public:
 		d.v.type.t = TYPE_OBJ;
 		d.v.type.vp = m_mp;
 		insert_static("map", d);
+
+		insert_static("limits", new orcaLimits());
 
 		insert_static_native_function("is_iterable", (object_fp)&orcaTypes::ex_iterable);
 		insert_static_native_function("is_indexable", (object_fp)&orcaTypes::ex_indexable);
@@ -128,6 +177,7 @@ public:
 	orcaList* m_lp;
 	orcaTuple* m_tp;
 	orcaMap* m_mp;
+	orcaLimits* m_limits;
 };
 
 #endif
