@@ -165,7 +165,7 @@ Next time, many other interesting things will be back.
 
 You can see full video clip & demonstration by below link.
 
-### TODO: add link
+https://youtu.be/rxIoiE1uFc0
 
 Thanks for reading.
 
