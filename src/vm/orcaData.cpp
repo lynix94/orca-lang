@@ -74,6 +74,7 @@ string format_str(orcaVM* vm, string& format, vector<orcaData>& params)/*{{{*/
 				int count = 0;
 				bool loop = true;
 				bool flag = true;
+				bool flag_prec = false;
 				char type = 0;
 				do {
 					new_format += format[i];
@@ -114,17 +115,26 @@ string format_str(orcaVM* vm, string& format, vector<orcaData>& params)/*{{{*/
 						break;
 
 					case '%':
-					case '.':
 					case '+':				
 					case '-':
 					case '#':
-						if (count != 0) {
+						if (count != 0) { // should flow after % (%+10d)
 							flag = false;
 						}
 						else {
 							loop = true;
 						}
 						count++;
+						break;
+
+					case '.':				
+						if (flag_prec == true) { // only 1 time
+							flag = false;
+						}
+						else {
+							flag_prec = true;
+							loop = true;
+						}
 						break;
 
 					default: 
