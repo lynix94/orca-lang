@@ -33,6 +33,7 @@ struct FOR
 	bool is_iter2;
 
 	orcaObject* m_curr_back;
+	orcaData source; 
 	orcaData iter; 
 	orcaData next; 
 

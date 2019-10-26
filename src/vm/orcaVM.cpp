@@ -1641,6 +1641,7 @@ fast_jmp:
 
 			case OP_JMP_TRUE:
 				PRINT2("\t\t%p : jmp if true (to: %x)\n", c, TO_INT(&c[1]));
+				m_local->cleanup_gc(false);
 				d = m_stack->pop();
 				if (istrue(d)) {
 					c = code + TO_INT(&c[1]);
@@ -1655,6 +1656,7 @@ fast_jmp:
 
 			case OP_JMP_FALSE:	
 				PRINT2("\t\t%p : jmp if false (to: %x)\n", c, TO_INT(&c[1]));
+				m_local->cleanup_gc(false);
 				d = m_stack->pop();
 				if (isfalse(d)) {
 					c = code + TO_INT(&c[1]);
@@ -1771,6 +1773,7 @@ fast_jmp:
 
 			case OP_JMP:	
 				PRINT2("\t\t%p : jmp (to: %x)\n", c, TO_INT(&c[1]));
+				m_local->cleanup_gc(false);
 				c = code + TO_INT(&c[1]);
 				goto fast_jmp;
 				break;
@@ -2403,6 +2406,7 @@ fast_jmp:
 				int lv1;
 				int lv2;
 				
+				m_local->cleanup_gc(false);
 				const char* cont = m_for_stack->cont(&lv1, &p1, &lv2, &p2);
 				if (cont != 0) { // continue
 					m_local->set(lv1, p1);

@@ -75,6 +75,7 @@ public:
 	}
 
 	void save_gc(orcaData d);
+	void cleanup_gc(bool flag_delete);
 
 	orcaData& unwind();
 	void more();

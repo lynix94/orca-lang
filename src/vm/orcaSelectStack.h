@@ -58,7 +58,7 @@ struct SELECT
 	{
 		mutex.lock();
 		curr_val++;
-		write(efd, &curr_val, sizeof(uint64_t));
+		size_t ret = write(efd, &curr_val, sizeof(uint64_t));
 		mutex.unlock();
 	}
 };

@@ -24,6 +24,7 @@ void FOR::dump()
 bool orcaForStack::push(const char* code, int lv, orcaObject* obj, orcaData& out, orcaObject* curr) 
 {
 	FOR* f = new FOR(code, lv, -1, curr);
+	f->source = obj;
 
 	orcaData next, iter;
 	if (obj->has_member((char*)"iter", iter)) {
@@ -61,6 +62,7 @@ bool orcaForStack::push_2(const char* code, int lv1, int lv2,
 						orcaObject* obj, orcaData& out1, orcaData& out2, orcaObject* curr) 
 {
 	FOR *f = new FOR(code, lv1, lv2, curr);
+	f->source = obj;
 
 	orcaData next, iter;
 	if (obj->has_member((char*)"iter2", iter)) {
@@ -104,6 +106,7 @@ bool orcaForStack::push_sub(const char* code, int lv, orcaObject* obj,
 {
 	FOR *f = new FOR(code, lv, -1, curr);
 	f->limit = per;
+	f->source = obj;
 
 	orcaData next, iter;
 	if (obj->has_member((char*)"iter", iter)) {
@@ -141,6 +144,7 @@ void orcaForStack::push(FOR* f)
 {
 	f->iter.rc_inc();
 	f->next.rc_inc();
+	f->source.rc_inc();
 	m_stack.push_back(f);
 
 	//printf("### push result\n");
@@ -165,6 +169,7 @@ void orcaForStack::pop()
 	FOR* f = top();
 	f->iter.rc_dec();
 	f->next.rc_dec();
+	f->source.rc_dec();
 
 	delete f;
 	m_stack.pop_back();

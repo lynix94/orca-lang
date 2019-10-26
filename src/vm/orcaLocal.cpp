@@ -82,6 +82,22 @@ void orcaLocal::save_gc(orcaData d)
 	vp->push_back(d);
 }
 
+void orcaLocal::cleanup_gc(bool flag_delete)
+{
+	vector<orcaData>* vp = (vector<orcaData>*)lp[IDX_GC].o();
+	if (vp) {
+		for(int i=0; i<vp->size(); i++) {
+			(*vp)[i].rc_dec();
+		}
+
+		vp->clear();
+		if (flag_delete) {
+			delete vp;
+		}
+	}
+}
+
+
 int orcaLocal::recount_extract_from_stack(orcaStack* st, int count) 
 {
 	int ret = 0;
@@ -245,16 +261,7 @@ void orcaLocal::decrease(bool clean_mark)
 
 	//lp[IDX_CALLER].rc_dec();	// cause, set_caller does'nt increase count
 	lp[IDX_CALLER] = NIL;
-
-	vector<orcaData>* vp = (vector<orcaData>*)lp[IDX_GC].o();
-	if (vp) {
-		for(int i=0; i<vp->size(); i++) {
-			(*vp)[i].rc_dec();
-		}
-
-		vp->clear();
-		delete vp;
-	}
+	cleanup_gc(true);
 	lp[IDX_GC] = NIL;
 	lp[IDX_CURSIZE] = NIL;
 	lp[IDX_PREVSIZE] = NIL;
