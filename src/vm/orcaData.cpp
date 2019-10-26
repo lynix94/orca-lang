@@ -569,6 +569,7 @@ void orcaData::rc_inc() /*{{{*/
 	case TYPE_REGEX:
 	case TYPE_STR:
 	case TYPE_BIGNUM:
+	case TYPE_EXTRACT:
 		((RC_Object*)v.o)->rc_inc();
 
 	case TYPE_INTERNAL:
@@ -584,6 +585,7 @@ void orcaData::rc_dec() {/*{{{*/
 	case TYPE_REGEX:
 	case TYPE_STR:
 	case TYPE_BIGNUM:
+	case TYPE_EXTRACT:
 		((RC_Object*)v.o)->rc_dec();
 
 	case TYPE_INTERNAL:
@@ -599,6 +601,7 @@ int orcaData::get_rc() {/*{{{*/
 	case TYPE_REGEX:
 	case TYPE_STR:
 	case TYPE_BIGNUM:
+	case TYPE_EXTRACT:
 		return ((RC_Object*)v.o)->get_rc();
 	}
 
@@ -614,6 +617,7 @@ void orcaData::set_rc(int rc) {/*{{{*/
 	case TYPE_REGEX:
 	case TYPE_STR:
 	case TYPE_BIGNUM:
+	case TYPE_EXTRACT:
 		((RC_Object*)v.o)->set_rc(rc);
 	}
 }

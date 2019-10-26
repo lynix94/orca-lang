@@ -126,6 +126,7 @@ void orcaLocal::copy_from_stack(orcaStack* st, int count)
 			for(int k=0; k<tp->size(); k++) {
 				set(j++, tp->at(k));
 			}
+			tp->rc_dec();
 		} else {
 			set(j++, d);
 		}
