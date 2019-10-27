@@ -96,10 +96,11 @@ void orcaException::make_trace()
 
 CatchList::CatchList(const char* code, int num, orcaObject* my) : m_my(my)
 {
-	catch_t p;
 	const char* cp = code;
 
 	for(int i=0; i<num; i++) {
+		catch_t p;
+
 		// name
 		int len = cp[0];
 		if (len == 0) {
@@ -124,8 +125,20 @@ CatchList::CatchList(const char* code, int num, orcaObject* my) : m_my(my)
 		// address
 		p.address = *(int*)cp;
 		cp += sizeof(int);
-
 		catch_list.push_back(p);
+	}
+}
+
+void CatchList::dump()
+{
+	vector<catch_t>::iterator vi = catch_list.begin();
+	for(; vi!=catch_list.end(); ++vi) {
+		catch_t* ct = &(*vi);
+		printf("# catch: %s, varnum:%d, ", ct->name, (int)ct->lv.size());
+		for (int i=0; i<ct->lv.size(); i++)
+			printf("%d, ", ct->lv[i]);
+
+		printf("\n");
 	}
 }
 

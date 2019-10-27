@@ -845,7 +845,6 @@ orcaData& orcaVM::handle_throw(const char* name)/*{{{*/
 			orca_error("fatal.. invalid exception\n");
 		}
 	} while(true);
-
 }
 /*}}}*/
 

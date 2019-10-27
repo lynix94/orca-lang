@@ -78,6 +78,8 @@ struct CatchList
 	{
 		catch_list.clear();
 	}
+
+	void dump();
 };
 
 #endif
