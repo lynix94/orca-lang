@@ -1364,8 +1364,11 @@ fast_jmp:
 			case OP_ASSIGN_LOCAL:	
 				PRINT2("\t\t%p : assign local (%d)\n", c, TO_SHORT(&c[1]));
 				j = TO_SHORT(&c[1]);
-				p1 = m_stack->pop();
+
+				p1 = m_stack->top();
 				m_local->set(j, p1);
+				m_stack->dummy_pop();
+
 				m_stack->push(m_local->get(j));
 				c += sizeof(short) + FJ_INC;
 				goto fast_jmp;
@@ -1373,17 +1376,21 @@ fast_jmp:
 
 			case OP_ASSIGN_MEMBER:	
 				PRINT2("\t\t%p : assign member (%s)\n", c, &c[2]);
-				p2 = m_stack->pop();
-				p1 = m_stack->top();
-				m_stack->replace(p1.Object()->update_member(&c[2], p2));
+
+				p2 = m_stack->at(0);
+				p1 = m_stack->at(1);
+				d = p1.Object()->update_member(&c[2], p2);
+				m_stack->dummy_pop();
+				m_stack->replace(d);
+
 				c += c[1] + 1 + FJ_INC;
 				goto fast_jmp;
 				break;				
 
 			case OP_ASSIGN_RESERVED:	
 				PRINT2("\t\t%p : assign reserved (%d)\n", c, c[1]);
-				p2 = m_stack->pop();
-				p1 = m_stack->top();
+				p2 = m_stack->at(0);
+				p1 = m_stack->at(1);
 				switch(c[1])
 				{
 				case OP_PUSH_OWNER:
@@ -1397,6 +1404,7 @@ fast_jmp:
 					break;
 				}
 
+				m_stack->dummy_pop();
 				c += 1 + FJ_INC;
 				goto fast_jmp;
 				break;				
@@ -1410,7 +1418,9 @@ fast_jmp:
 
 				PRINT2("\t\t%p : assign list (include right?: %d)\n", c, flag);
 
-				p3 = m_stack->pop();
+				p3 = m_stack->at(0);
+				p3.rc_inc(); // this param will be set to collection. prevent save gc
+				m_stack->dummy_pop();
 				p2 = m_stack->pop();
 				p1 = m_stack->top();
 
@@ -1418,9 +1428,11 @@ fast_jmp:
 					flag = set_collection_at(p1, p2, p3, d, flag, this);
 				}
 				catch (orcaException& e) {
-					m_stack->pop(); // clear unpoped stack
+					p3.rc_dec();
+					m_stack->dummy_pop(); // clear unpoped stack
 					throw e;
 				}
+				p3.rc_dec();
 
 				if (flag == true) { // operator[] & set result
 					m_stack->pop();
