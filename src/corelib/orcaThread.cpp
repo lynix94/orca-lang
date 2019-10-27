@@ -2,6 +2,10 @@
 
 #include "orcaThread.h"
 
+portMutex mutex;
+portCond cond;
+
+
 orcaThread::orcaThread() 
 {
 	set_name("thread");
@@ -16,21 +20,25 @@ orcaData orcaThread::ex_run(orcaVM* vm, int n)
 		return NIL;
 	}
 
-	orcaThread* tp = new orcaThread();
+	mutex.lock();
+		orcaThread* tp = new orcaThread();
 
-	tp->m_arg = vm->get_param(0).Object();
-	tp->m_tid = 0;
+		tp->m_arg = vm->get_param(0).Object();
+		tp->m_tid = 0;
 
-	for(int i=1; i<n; i++) {
-		tp->m_param.push_back(vm->get_param(i));
-	}
+		for(int i=1; i<n; i++) {
+			tp->m_param.push_back(vm->get_param(i));
+		}
 
-	if(pthread_create(&tp->m_tid, NULL, orcaThread::entryPoint, tp) < 0) {
-		printf("Thread Start Error, ThreadID: %d\n", (int)tp->m_tid);
-		return NIL;
-	}
+		if(pthread_create(&tp->m_tid, NULL, orcaThread::entryPoint, tp) < 0) {
+			printf("Thread Start Error, ThreadID: %d\n", (int)tp->m_tid);
+			return NIL;
+		}
 
-	m_remains.insert(tp->m_tid);
+		cond.wait(&mutex);
+		m_remains.insert(tp->m_tid);
+	mutex.unlock();
+
 	return tp;
 }
 
@@ -44,19 +52,25 @@ orcaData orcaThread::ex_join(orcaVM* vm, int n)
 }
 
 void orcaThread::execute(orcaObject* arg) {
-	m_vm.init();
-	set_current_vm(&m_vm);
+	mutex.lock();
+		m_vm.init();
+		set_current_vm(&m_vm);
 
-	m_vm.m_module = g_root;
-	m_vm.m_curr = g_root;
+		m_vm.m_module = g_root;
+		m_vm.m_curr = g_root;
 
-	m_vm.m_local->increase(1024);
-	m_vm.push_stack(arg);
-	arg->rc_inc();
+		m_vm.m_local->increase(1024);
+		m_vm.push_stack(arg);
+		arg->rc_inc();
+		arg->get_owner()->rc_inc();
 
-	for (int i=0; i<m_param.size(); i++) {
-		m_vm.push_stack(m_param[i]);
-	}
+		for (int i=0; i<m_param.size(); i++) {
+			m_vm.push_stack(m_param[i]);
+			m_param[i].rc_inc();
+		}
+
+		cond.signal();
+	mutex.unlock();
 
 	try {
 		m_vm.call(m_param.size());
@@ -70,6 +84,7 @@ void orcaThread::execute(orcaObject* arg) {
 		return;
 	}
 
+	arg->get_owner()->rc_dec();
 	arg->rc_dec();
 	m_vm.cleanup();
 }

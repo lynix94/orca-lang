@@ -72,10 +72,14 @@ orcaData& orcaLocal::unwind()
 
 void orcaLocal::save_gc(orcaData d)
 {
+	if (is<TYPE_OBJ>(lp[IDX_GC]) == false) {
+		lp[IDX_GC].o_set(NULL);
+	}
+
 	vector<orcaData>*vp = (vector<orcaData>*)lp[IDX_GC].o();
 	if (vp == NULL) {
 		vp = new vector<orcaData>();
-		lp[IDX_GC].o((orcaObject*)vp);
+		lp[IDX_GC].o_set((orcaObject*)vp);
 	}
 
 	d.rc_inc();
@@ -84,15 +88,18 @@ void orcaLocal::save_gc(orcaData d)
 
 void orcaLocal::cleanup_gc(bool flag_delete)
 {
-	vector<orcaData>* vp = (vector<orcaData>*)lp[IDX_GC].o();
-	if (vp) {
-		for(int i=0; i<vp->size(); i++) {
-			(*vp)[i].rc_dec();
-		}
+	if (is<TYPE_OBJ>(lp[IDX_GC])) {
+		vector<orcaData>* vp = (vector<orcaData>*)lp[IDX_GC].o();
+		if (vp) {
+			for(int i=0; i<vp->size(); i++) {
+				(*vp)[i].rc_dec();
+			}
 
-		vp->clear();
-		if (flag_delete) {
-			delete vp;
+			vp->clear();
+			if (flag_delete) {
+				delete vp;
+				lp[IDX_GC].o_set(NULL);
+			}
 		}
 	}
 }
@@ -138,7 +145,15 @@ void orcaLocal::copy_from_stack(orcaStack* st, int count)
 void orcaLocal::dump() 
 {
 	int idx = lp[IDX_CURSIZE].i();
-	printf("# orcaLocal Dump: %d\n", idx);
+	printf("# orcaLocal Dump: local(%p), lp(%p), idx(%d)\n", this, lp, idx);
+
+	printf("gc: %p\n", lp[IDX_GC].o());
+	printf("caller: ");
+	lp[IDX_CALLER].dump();
+	printf("cursize: ");
+	lp[IDX_CURSIZE].dump();
+	printf("prevsize: ");
+	lp[IDX_PREVSIZE].dump();
 	for(int i=0; i< idx; i++) {
 		printf("  [%d] ", i);
 		get(i).dump();
