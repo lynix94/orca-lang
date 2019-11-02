@@ -35,6 +35,7 @@
 #include "orcaSqlite3.h"
 #include "orcaStrings.h"
 #include "orcaTls.h"
+#include "orcaCrypto.h"
 #include "orcaUnsafe.h"
 #include "orcaLeveldb.h"
 
@@ -82,6 +83,7 @@ orcaRoot::orcaRoot()
 	insert_native_function("repr", (object_fp)&orcaRoot::ex_repr);
 	insert_native_function("range", (object_fp)&orcaRoot::ex_range);
 	insert_native_function("selector", (object_fp)&orcaRoot::ex_selector);
+	insert_static("crypto", new orcaCrypto());
 
 	orcaObject* clib = new orcaObject();
 	insert_static("__clib__", clib);
