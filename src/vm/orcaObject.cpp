@@ -912,6 +912,8 @@ orcaData orcaObject::operator_set(orcaVM* vm, const char* name, orcaData& p)
 			throw orcaException(vm, "orca.object", "operator .= nested");
 		}
 
+		vm->m_local->mark_return(p);
+
 		m_flag |= BIT_IN_ATTR;
 		vm->push_param(d);
 		vm->push_param(name);
