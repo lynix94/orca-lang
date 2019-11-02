@@ -487,7 +487,10 @@ orcaData parserParser::compile(orcaVM* vm, const string& name, const string& src
 
 	// init
 	parserCode::init();
-	parserCode::push_code_stack((char*)name.c_str(), NULL);
+	name_list_t* vs = g_parser->new_name_list();
+	vs->push_back("...argv");
+	parserCode::push_code_stack((char*)name.c_str(), vs);
+	code_top->set_argv_on();	// enable argv 
 
 	// parse
 	int rv;

@@ -704,7 +704,9 @@ orcaObject* parserCode::compile(const string& name, orcaVM* vm)/*{{{*/
 		compiled->remove_member(name.c_str());
 	}
 
+	orcaObject* curr_back = vm->m_curr;
 	orcaObject* op = vm->exec_define(new_def, m_def.size(), NULL, compiled, 0, "");
+	vm->m_curr = curr_back;
 	return op;
 }
 /*}}}*/
