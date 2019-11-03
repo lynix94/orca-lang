@@ -1653,6 +1653,8 @@ fast_jmp:
 				break;
 
 			case OP_JMP_TRUE:
+				emergency_stop_check();
+
 				PRINT2("\t\t%p : jmp if true (to: %x)\n", c, TO_INT(&c[1]));
 				m_local->cleanup_gc(false);
 				d = m_stack->pop();
@@ -1668,6 +1670,8 @@ fast_jmp:
 				break;
 
 			case OP_JMP_FALSE:	
+				emergency_stop_check();
+
 				PRINT2("\t\t%p : jmp if false (to: %x)\n", c, TO_INT(&c[1]));
 				m_local->cleanup_gc(false);
 				d = m_stack->pop();
@@ -1785,6 +1789,8 @@ fast_jmp:
 				break;
 
 			case OP_JMP:	
+				emergency_stop_check();
+
 				PRINT2("\t\t%p : jmp (to: %x)\n", c, TO_INT(&c[1]));
 				m_local->cleanup_gc(false);
 				c = code + TO_INT(&c[1]);
@@ -2322,10 +2328,14 @@ fast_jmp:
 				break;
 
 			case OP_RETURN:
+				emergency_stop_check();
+
 				PRINT1("\t\t%p : return\n", c); 
 				return;
 
 			case OP_RETURN_NIL	:
+				emergency_stop_check();
+
 				PRINT1("\t\t%p : return nil\n", c); 
 				m_stack->push(NIL);
 				return;
@@ -2415,6 +2425,8 @@ fast_jmp:
 			}
 
 			case OP_FOR_END: {		
+				emergency_stop_check();
+
 				PRINT1("\t\t%p : for end\n", c); 
 				int lv1;
 				int lv2;
@@ -3772,6 +3784,19 @@ void orcaVM::channel_signal(orcaObject* op)/*{{{*/
 	}
 }
 /*}}}*/
+
+void orcaVM::emergency_stop_check()
+{
+	if (emergency_stop == true) {
+		emergency_stop = false;
+		throw "emergency stop";
+	}
+}
+
+void orcaVM::set_emergency_stop(bool flag)
+{
+	emergency_stop = flag;
+}
 
 int orca_launch_module(orcaVM* vm, char* module, int argc, char** argv)/*{{{*/
 {

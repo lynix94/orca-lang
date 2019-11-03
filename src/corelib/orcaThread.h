@@ -39,6 +39,7 @@ public:
 	orcaThread();
 	orcaData ex_run(orcaVM* vm, int n);
 	orcaData ex_join(orcaVM* vm, int n);
+	orcaData ex_stop(orcaVM* vm, int n);
 
 public:
 	orcaObject* m_arg;

@@ -127,7 +127,7 @@ class LIBORCA_API orcaVM
 {
 friend class orcaLocal;
 public:
-	orcaVM() { m_cptr = NULL; m_cp = NULL; }
+	orcaVM() { m_cptr = NULL; m_cp = NULL; emergency_stop = false; }
 	void init_once();
 	void init();
 	void cleanup();
@@ -172,6 +172,9 @@ public:
 	bool channel_out(orcaData d, int num);
 	void channel_signal(orcaObject* op);
 
+	void emergency_stop_check();
+	void set_emergency_stop(bool flag);
+
 private:
 	orcaData& handle_throw(const char* name);
 	orcaForStack* m_for_stack;
@@ -195,6 +198,8 @@ public:
 	static map<const char*, string> m_debug_name;
 	static map<const char*, string> m_debug_line;
 	static vector<fs::path> m_module_path;
+
+	bool emergency_stop;
 };
 
 LIBORCA_API int orca_launch_module(orcaVM* vm, char* module, 

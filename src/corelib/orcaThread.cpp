@@ -12,6 +12,7 @@ orcaThread::orcaThread()
 
 	insert_native_function("run", (object_fp)&orcaThread::ex_run);
 	insert_native_function("join", (object_fp)&orcaThread::ex_join);
+	insert_native_function("stop", (object_fp)&orcaThread::ex_stop);
 }
 
 orcaData orcaThread::ex_run(orcaVM* vm, int n) 
@@ -96,5 +97,11 @@ void orcaThread::join_remains()
 	for (; it != m_remains.end(); ++it) {
 		pthread_join((*it), (void**)&status);
 	}
+}
+
+orcaData orcaThread::ex_stop(orcaVM* vm, int n) 
+{
+	m_vm.set_emergency_stop(true);
+	return NIL;
 }
 
