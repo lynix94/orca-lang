@@ -15,6 +15,11 @@ orcaThread::orcaThread()
 	insert_native_function("stop", (object_fp)&orcaThread::ex_stop);
 }
 
+orcaThread::~orcaThread()
+{
+	m_result.rc_dec();
+}
+
 orcaData orcaThread::ex_run(orcaVM* vm, int n) 
 {
 	if (n<1) {
@@ -49,7 +54,7 @@ orcaData orcaThread::ex_join(orcaVM* vm, int n)
 	pthread_join(m_tid, (void**)&status);
 	m_remains.erase(m_remains.find(m_tid));
 
-	return (int)status;
+	return m_result;
 }
 
 void orcaThread::execute(orcaObject* arg) {
@@ -75,6 +80,8 @@ void orcaThread::execute(orcaObject* arg) {
 
 	try {
 		m_vm.call(m_param.size());
+		m_result = m_vm.pop_stack();
+		m_result.rc_inc();
 	}
 	catch(orcaException& e) {
 		printf("uncaugted exception in thread: %s %s\n", e.who(), e.what());

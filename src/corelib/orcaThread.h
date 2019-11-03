@@ -34,9 +34,14 @@ using namespace std;
 class LIBORCA_API orcaThread : public orcaObject 
 {
 public:
-	DEFAULT_NATIVE_DEFINE(orcaThread);
-
 	orcaThread();
+	virtual ~orcaThread();
+
+	orcaThread(void* vp) {}
+	orcaObject* v_clone() {
+		return new orcaThread((void*)NULL);
+	}
+
 	orcaData ex_run(orcaVM* vm, int n);
 	orcaData ex_join(orcaVM* vm, int n);
 	orcaData ex_stop(orcaVM* vm, int n);
@@ -55,6 +60,7 @@ public:
 private:
 	orcaVM m_vm;
 	vector<orcaData> m_param;
+	orcaData m_result;
 
 	static set<pthread_t> m_remains;
 
