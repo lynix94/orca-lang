@@ -56,25 +56,35 @@ string dl_get_filename(const string& mod_name)/*{{{*/
 // mutex
 // WINDOWS mutex /*{{{*/
 #ifdef WINDOWS
-void pthread_mutex_init(pthread_mutex_t* mutex, void* vp)
+int pthread_mutex_init(pthread_mutex_t* mutex, void* vp)
 {
 	*mutex = CreateMutex(NULL, false, NULL);
+	return 0;
 }
 
-void pthread_mutex_destroy(pthread_mutex_t* mutex)
+int pthread_mutex_destroy(pthread_mutex_t* mutex)
 {
 	CloseHandle(*mutex);
 	*mutex = NULL;
+	return 0;
 }
 
-void pthread_mutex_lock(pthread_mutex_t* mutex)
+int pthread_mutex_lock(pthread_mutex_t* mutex)
 {
 	WaitForSingleObject(*mutex, INFINITE);
+	return 0;
 }
 
-void pthread_mutex_unlock(pthread_mutex_t *mutex)
+int pthread_mutex_trylock(pthread_mutex_t* mutex)
+{
+	int ret = WaitForSingleObject(*mutex, 0);
+	return ret == WAIT_OBJCT_0;
+}
+
+int pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
 	ReleaseMutex(*mutex);
+	return 0;
 }
 #endif
 /*}}}*/
@@ -494,6 +504,12 @@ portMutex::~portMutex() /*{{{*/
 void portMutex::lock()/*{{{*/
 {
 	pthread_mutex_lock(&m_mutex);
+}
+/*}}}*/
+
+bool portMutex::trylock()/*{{{*/
+{
+	return pthread_mutex_trylock(&m_mutex) == 0;
 }
 /*}}}*/
 

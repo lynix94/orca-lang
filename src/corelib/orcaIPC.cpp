@@ -132,6 +132,7 @@ orcaMutex::orcaMutex()
 {
 	set_name("mutex");
 	insert_native_function("lock", (object_fp)&orcaMutex::ex_lock);
+	insert_native_function("trylock", (object_fp)&orcaMutex::ex_trylock);
 	insert_native_function("unlock", (object_fp)&orcaMutex::ex_unlock);
 	insert_native_function("{", (object_fp)&orcaMutex::ex_lock);
 	insert_native_function("}", (object_fp)&orcaMutex::ex_unlock);
@@ -142,6 +143,12 @@ orcaData orcaMutex::ex_lock(orcaVM* vm, int n)
 	m_mutex.lock();
 	return NIL;
 }
+
+orcaData orcaMutex::ex_trylock(orcaVM* vm, int n) 
+{
+	return m_mutex.trylock();
+}
+
 
 orcaData orcaMutex::ex_unlock(orcaVM* vm, int n) 
 { 

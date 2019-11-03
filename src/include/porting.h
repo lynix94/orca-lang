@@ -97,10 +97,11 @@ struct timespec {
 };
 
 typedef HANDLE pthread_mutex_t;
-LIBORCA_API void pthread_mutex_init(pthread_mutex_t* mutex, void* vp);
-LIBORCA_API void pthread_mutex_destroy(pthread_mutex_t* mutex);
-LIBORCA_API void pthread_mutex_lock(pthread_mutex_t* mutex);
-LIBORCA_API void pthread_mutex_unlock(pthread_mutex_t* mutex);
+LIBORCA_API int pthread_mutex_init(pthread_mutex_t* mutex, void* vp);
+LIBORCA_API int pthread_mutex_destroy(pthread_mutex_t* mutex);
+LIBORCA_API int pthread_mutex_lock(pthread_mutex_t* mutex);
+LIBORCA_API int pthread_mutex_trylock(pthread_mutex_t* mutex);
+LIBORCA_API int pthread_mutex_unlock(pthread_mutex_t* mutex);
 
 typedef HANDLE pthread_cond_t;
 LIBORCA_API void pthread_cond_init(pthread_cond_t* cond, void* vp);
@@ -209,6 +210,7 @@ public:
 	portMutex();
 	~portMutex();
 	void lock();
+	bool trylock();
 	void unlock();
 	pthread_mutex_t* handle();
 

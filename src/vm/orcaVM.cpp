@@ -204,6 +204,7 @@ void orcaVM::init()/*{{{*/
 
 	m_cptr = NULL;
 	m_cp = NULL;
+	emergency_stop = false;
 }
 /*}}}*/
 
@@ -3211,6 +3212,14 @@ fast_jmp:
 
 			// not found.. on this frame
 			throw e;
+		}
+		catch(const char* cp) {
+			if (strcmp("emergency stop", cp) == 0) {
+				throw cp;
+			}
+			else {
+				printf("unknown exception: %s\n", cp);
+			}
 		}
 		catch(...) {
 			printf("unknown exception...\n");

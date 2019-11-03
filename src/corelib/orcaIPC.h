@@ -35,6 +35,7 @@ public:
 	orcaMutex();
 
 	orcaData ex_lock(orcaVM* vm, int n);
+	orcaData ex_trylock(orcaVM* vm, int n);
 	orcaData ex_unlock(orcaVM* vm, int n);
 	portMutex* handle();
 

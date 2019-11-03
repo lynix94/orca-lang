@@ -84,6 +84,14 @@ void orcaThread::execute(orcaObject* arg) {
 		m_vm.cleanup();
 		return;
 	}
+	catch(const char* cp) {
+		if (strcmp("emergency stop", cp) == 0) {
+			printf("thread emergency stopped\n");
+		}
+		else {
+			throw cp;
+		}
+	}
 
 	arg->get_owner()->rc_dec();
 	arg->rc_dec();
