@@ -502,6 +502,7 @@ orcaData orcaString::ex_integer(orcaVM* vm, string& s, int param_n) /*{{{*/
 {
 	orcaData d;
 	orcaData zero = 0;
+	orcaData default_value = vm->get_param(0);
 
 	string str = kyString::strip(s);;
 	if (str.length() > 9)  {
@@ -510,6 +511,10 @@ orcaData orcaString::ex_integer(orcaVM* vm, string& s, int param_n) /*{{{*/
 			for (int i=0; i<str.length(); i++) {
 				if (!isdigit(str[i])) {
 					if (i == 0 && str[0] == '-') continue;
+
+					if (default_value != NIL) {
+						return default_value;
+					}
 		
 					throw orcaException(vm, "orca.type", string("invalid format to integer: ") + str);
 				}
@@ -522,6 +527,9 @@ orcaData orcaString::ex_integer(orcaVM* vm, string& s, int param_n) /*{{{*/
 			d.i_set(lexical_cast<int>(str)); 
 		}
 		catch(...) {
+			if (default_value != NIL) {
+				return default_value;
+			}
 			throw orcaException(vm, "orca.type", string("invalid format to integer: ") + str);
 		}
 	}
@@ -534,11 +542,15 @@ orcaData orcaString::ex_float(orcaVM* vm, string& s, int param_n) /*{{{*/
 {
 	orcaData d;
 	string str = kyString::strip(s);;
+	orcaData default_value = vm->get_param(0);
 
 	try {
 		d.r_set(lexical_cast<double>(str)); 
 	}
 	catch(...) {
+		if (default_value != NIL) {
+			return default_value;
+		}
 		throw orcaException(vm, "orca.type", string("invalid format to float: ") + str);
 	}
 

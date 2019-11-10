@@ -89,6 +89,60 @@ if ret != 34236 {
 	throw test.string <- 'string to integer fail';
 }
 
+catched = false;
+try {
+	print(ret = 'abc'.integer());
+}
+catch orca.type {
+	catched = true;
+}
+
+if catched == false {
+	throw test.string <- 'invalid cast not catched';
+}
+
+# default value if fails
+print(ret = 'abc'.integer(false));
+if ret != false {
+	throw test.string <- 'string to integer fail';
+}
+
+print(ret = 'abc'.integer(0));
+if ret != 0 {
+	throw test.string <- 'string to integer fail';
+}
+
+
+str = '34.236';
+print(ret = str.float());
+if ret != 34.236 {
+	throw test.string <- 'string to float fail';
+}
+
+catched = false;
+try {
+	print(ret = 'abc'.float());
+}
+catch orca.type {
+	catched = true;
+}
+
+if catched == false {
+	throw test.string <- 'invalid cast not catched';
+}
+
+# default value if fails
+print(ret = 'abc'.float(false));
+if ret != false {
+	throw test.string <- 'string to integer fail';
+}
+
+print(ret = 'abc'.float(0));
+if ret != 0 {
+	throw test.string <- 'string to integer fail';
+}
+
+
 # str cat
 a = '111';
 b = '222';
