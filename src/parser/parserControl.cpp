@@ -164,6 +164,22 @@ void parserControl::while_end() /*{{{*/
 }
 /*}}}*/
 
+void parserControl::scope_start() /*{{{*/
+{
+	code_top->push_char(OP_SCOPE_START);
+	context ctx(CONTROL_SCOPE);
+	m_ctl.push_back(ctx);
+}
+/*}}}*/
+
+void parserControl::scope_end() /*{{{*/
+{
+	code_top->push_char(OP_SCOPE_END);
+	context& ctx = m_ctl[m_ctl.size()-1];
+	m_ctl.pop_back();
+}
+/*}}}*/
+
 void parserControl::for_start(const char* name) /*{{{*/
 {
 	int idx = code_top->find_lvar(name);
@@ -586,6 +602,9 @@ void parserControl::do_continue() /*{{{*/
 {
 	int idx;
 	for (idx = m_ctl.size()-1; idx >= 0; idx--) {
+		if (m_ctl[idx].type == CONTROL_SCOPE) {
+			code_top->push_char(OP_SCOPE_END);
+		}
 		if (is_continuable(m_ctl[idx])) {
 			break;
 		}
@@ -636,6 +655,10 @@ void parserControl::do_break()/*{{{*/
 {
 	int idx;
 	for (idx = m_ctl.size()-1; idx >= 0; idx--) {
+		if (m_ctl[idx].type == CONTROL_SCOPE) {
+			code_top->push_char(OP_SCOPE_END);
+		}
+
 		if (is_breakable(m_ctl[idx])) {
 			break;
 		}

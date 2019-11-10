@@ -453,11 +453,13 @@ channel_assign_target:/*{{{*/
 scope_stmt:/*{{{*/
 	expression
 		{
-			g_op->do_scope_start();
+			//g_op->do_scope_start();
+			g_ctl->scope_start();
 		}
 	statement_block
 		{
-			g_op->do_scope_end();
+			//g_op->do_scope_end();
+			g_ctl->scope_end();
 		}
 	;
 /*}}}*/

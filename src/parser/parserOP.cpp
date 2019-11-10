@@ -460,16 +460,6 @@ void parserOP::push_string(const char* s)
 	}
 }
 
-void parserOP::do_scope_start()
-{
-	code_top->push_char(OP_SCOPE_START);
-}
- 
-void parserOP::do_scope_end()
-{
-	code_top->push_char(OP_SCOPE_END);
-}
-
 void parserOP::dump_stack()		
 {
 	code_top->push_char(OP_DUMP_STACK); 

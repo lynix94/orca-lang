@@ -60,8 +60,6 @@ public:
 	void dup2();
 	void eval();
 	void compile();
-	void do_scope_start();
-	void do_scope_end();
 	void do_rc_inc();
 	void do_rc_dec();
 	void extract();

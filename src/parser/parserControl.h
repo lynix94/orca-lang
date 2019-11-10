@@ -34,6 +34,7 @@ enum control_type_e
 	CONTROL_CHANNEL_IN, 
 	CONTROL_CHANNEL_OUT, 
 	CONTROL_SELECT, 
+	CONTROL_SCOPE, 
 };
 
 class parserControl 
@@ -56,6 +57,9 @@ public:
 	void while_start_1();
 	void while_start_2();
 	void while_end();
+
+	void scope_start();
+	void scope_end();
 
 	void for_start(const char* name);
 	void for_start_2(const char* key, const char* name);
