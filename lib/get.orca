@@ -4,7 +4,7 @@ using strings;
 def usage()
 {
 	print: 'USAGE:  orca get GITHUB_PATH';
-	print: ' ex) orca get https://github.com/lynix94/raft/raft';
+	print: ' ex) orca get https://github.com/lynix94/orca-krill/krill';
 }
 
 if argv == nil || argv.size() < 1{
@@ -21,25 +21,25 @@ if toks[0] != 'https:' {
 	return;
 }
 
-if toks[1] != 'github.com' {
+if toks[2] != 'github.com' {
 	.usage();
 	return;
 }
 
-if toks.size() < 4 {
+if toks.size() < 5 {
 	.usage();
 	return;
 }
 
-zip_url = 'https://' + strings.join('/', toks[1:4]...) + '/archive/master.zip';
+zip_url = 'https://' + strings.join('/', toks[2:5]...) + '/archive/master.zip';
 print: 'zip url: ', zip_url;
 
-full_path = toks[1:];
+full_path = toks[2:];
 #print: full_path;
-sub_path = toks[4:];
+sub_path = toks[5:];
 #print: sub_path;
 
-repo_name = toks[3];
+repo_name = toks[4];
 mod_name = toks[-1];
 
 lib_base = os.getenv('ORCA_PATH');
