@@ -20,6 +20,7 @@
 
 orcaLocal::orcaLocal(int size) 
 { 
+	depth = 0;
 	m_size = size;
 	m_frame = new orcaData[m_size];
 	memset(m_frame, 0x00, sizeof(orcaData) * m_size);
@@ -39,6 +40,7 @@ orcaLocal::~orcaLocal()
 
 void orcaLocal::reset()
 {
+	depth = 0;
 	//printf("### reset frame:%d, lp:%d\n", m_size, lp-m_frame);
 	memset(m_frame, 0x00, sizeof(orcaData) * FRAME_HEADER_SIZE);
 	lp = &m_frame[FRAME_HEADER_SIZE];
@@ -191,6 +193,16 @@ void orcaLocal::increase(int size)
 	// caller
 	// for gc
 	//
+
+	depth += 1;
+}
+
+void orcaLocal::depth_check(orcaVM* vm)
+{
+	if (depth > 1024) {
+		throw orcaException(vm, "orca.runtime", "calling depth exceeds 1024 maybe infinite recursion");
+
+	}
 }
 
 orcaData orcaLocal::get_mark(mark_e t)
@@ -224,6 +236,8 @@ void orcaLocal::clean_mark(mark_e t)
 
 void orcaLocal::decrease(bool clean_mark) 
 {
+	depth -= 1;
+
 	int cur_size = lp[IDX_CURSIZE].i();
 	int old_size = lp[IDX_PREVSIZE].i();
 

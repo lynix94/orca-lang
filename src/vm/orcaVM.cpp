@@ -616,6 +616,7 @@ struct auto_local/*{{{*/
 
 void orcaVM::call(int param_n)/*{{{*/
 {
+	m_local->depth_check(this);
 #ifdef _VM_DEBUG_
 	char buff[1024]; // for debug message
 #endif

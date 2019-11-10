@@ -84,9 +84,12 @@ public:
 	void mark_return(orcaData d);
 	void duplicate(orcaLocal* lp);
 
+	void depth_check(orcaVM* vm);
+
 private:
 	orcaData* m_frame;
 	int m_size;
+	int depth;
 	orcaData* lp;
 
 	list<orcaData> m_mark;
