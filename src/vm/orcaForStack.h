@@ -53,6 +53,7 @@ public:
 	void pop();
 	void push(FOR* f);
 	const char* cont(int* lv1, orcaData* d1, int* lv2, orcaData* d2);
+	const char* cont(orcaLocal* local);
 
 	int size() { return m_stack.size(); }
 	void dump();

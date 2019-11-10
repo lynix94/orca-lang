@@ -237,3 +237,59 @@ const char* orcaForStack::cont(int* lv1, orcaData* d1, int *lv2, orcaData* d2)
 	return f->code;
 }
 
+const char* orcaForStack::cont(orcaLocal* local)
+{
+	FOR f2 = *top();
+	FOR* f = top();
+	int depth = m_stack.size();
+	f->idx++;
+
+	// check limit (per for parallel for sub group)
+	if (f->limit >= 0) {
+		f->limit--;
+		if (f->limit < 0) {
+			return 0;
+		}
+	}
+
+	try {
+		orcaVM* vm = get_current_vm();
+		vm->push_stack(f->next);
+		vm->call(0, true); // iter.next();
+		orcaData result = vm->m_stack->top();
+		if (f->lv2 >= 0) {
+			if (f->is_iter2) {
+				orcaTuple* tp = castobj<orcaTuple>(result);
+				if (tp == NULL || tp->size() != 2) {
+					vm->m_stack->pop();
+					throw orcaException(NULL, "orca.type", "iter2 should return tuple (pair)");
+				}
+
+				local->set(f->lv1, tp->at(0));
+				local->set(f->lv2, tp->at(1));
+			}
+			else {
+				local->set(f->lv1, f->idx);
+				local->set(f->lv2, result);
+			}
+		}
+		else {
+			local->set(f->lv1, result);
+		}
+
+		vm->m_stack->pop();
+	}
+	catch(orcaException& e) {
+		if (string("orca.iter.end") != e.who()) {
+			throw e;
+		}
+
+		e.rc_dec();
+
+		get_current_vm()->m_curr = f->m_curr_back;
+		return 0;
+	}
+
+	return f->code;
+}
+

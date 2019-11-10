@@ -305,7 +305,7 @@ void orcaLocal::mark_return(orcaData d)
 	m_mark.push_back(d);
 
 	// clean up tmp
-	if (m_mark.size() > 1000) {
+	if (m_mark.size() > 1024) {
 		for(int i=0; i<10; i++) {
 			(*m_mark.begin()).rc_dec();
 			m_mark.pop_front();

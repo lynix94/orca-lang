@@ -56,7 +56,7 @@ test_modules = [
   'test_sqlite3',
   'test_leveldb',
   'test_orm',
-  'test_pack',
+  #'test_pack', # fix from valgrind
 
 
 #### not be made yet

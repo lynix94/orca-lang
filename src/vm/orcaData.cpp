@@ -561,6 +561,22 @@ long long orcaData::id()/*{{{*/
 }
 /*}}}*/
 
+bool orcaData::is_rc() /*{{{*/
+{
+	switch(t)
+	{
+	case TYPE_OBJ:
+	case TYPE_REGEX:
+	case TYPE_STR:
+	case TYPE_BIGNUM:
+	case TYPE_EXTRACT:
+		return true;
+	}
+
+	return false;
+}
+/*}}}*/
+
 void orcaData::rc_inc() /*{{{*/
 {
 	switch(t)
@@ -1848,7 +1864,7 @@ orcaObject* orcaData::Object()/*{{{*/
 
 void RC_Object::cleanup()/*{{{*/
 {
-		delete this;
+	delete this;
 }
 /*}}}*/
 

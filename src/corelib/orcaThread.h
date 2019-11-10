@@ -37,7 +37,7 @@ public:
 	orcaThread();
 	virtual ~orcaThread();
 
-	orcaThread(void* vp) {}
+	orcaThread(void* vp) { inited = false; }
 	orcaObject* v_clone() {
 		return new orcaThread((void*)NULL);
 	}
@@ -58,6 +58,7 @@ public:
 	virtual void execute(orcaObject* arg);
 
 private:
+	bool inited;
 	orcaVM m_vm;
 	vector<orcaData> m_param;
 	orcaData m_result;

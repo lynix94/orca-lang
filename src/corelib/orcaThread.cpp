@@ -13,10 +13,16 @@ orcaThread::orcaThread()
 	insert_native_function("run", (object_fp)&orcaThread::ex_run);
 	insert_native_function("join", (object_fp)&orcaThread::ex_join);
 	insert_native_function("stop", (object_fp)&orcaThread::ex_stop);
+
+	inited = false;
 }
 
 orcaThread::~orcaThread()
 {
+	if (inited) {
+		m_vm.cleanup();
+	}
+
 	m_result.rc_dec();
 }
 
@@ -60,6 +66,8 @@ orcaData orcaThread::ex_join(orcaVM* vm, int n)
 void orcaThread::execute(orcaObject* arg) {
 	mutex.lock();
 		m_vm.init();
+		inited = true;
+
 		set_current_vm(&m_vm);
 
 		m_vm.m_module = g_root;
@@ -87,8 +95,8 @@ void orcaThread::execute(orcaObject* arg) {
 		printf("uncaugted exception in thread: %s %s\n", e.who(), e.what());
 		cout << e.m_stack_trace << endl;
 
+		arg->get_owner()->rc_dec();
 		arg->rc_dec();
-		m_vm.cleanup();
 		return;
 	}
 	catch(const char* cp) {
@@ -102,7 +110,6 @@ void orcaThread::execute(orcaObject* arg) {
 
 	arg->get_owner()->rc_dec();
 	arg->rc_dec();
-	m_vm.cleanup();
 }
 
 void orcaThread::join_remains()

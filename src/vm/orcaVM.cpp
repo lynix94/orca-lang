@@ -614,7 +614,7 @@ struct auto_local/*{{{*/
 };
 /*}}}*/
 
-void orcaVM::call(int param_n)/*{{{*/
+void orcaVM::call(int param_n, bool dont_mark)/*{{{*/
 {
 	m_local->depth_check(this);
 #ifdef _VM_DEBUG_
@@ -672,7 +672,10 @@ void orcaVM::call(int param_n)/*{{{*/
 				auto_trace at(this);
 				m_trace->top_name = m_curr->get_name();
 				orcaData ret = (*f.o())(this, param_size);
-				m_local->mark_return(ret);
+				if (dont_mark == false) {
+					m_local->mark_return(ret);
+				}
+
 				m_stack->push(ret);
 			}}
 		}}
@@ -2430,16 +2433,9 @@ fast_jmp:
 				emergency_stop_check();
 
 				PRINT1("\t\t%p : for end\n", c); 
-				int lv1;
-				int lv2;
-				
 				m_local->cleanup_gc(false);
-				const char* cont = m_for_stack->cont(&lv1, &p1, &lv2, &p2);
+				const char* cont = m_for_stack->cont(m_local);
 				if (cont != 0) { // continue
-					m_local->set(lv1, p1);
-					if (lv2 >= 0) {
-						m_local->set(lv2, p2);
-					}
 					c = cont;
 				}
 				else {			// end

@@ -263,6 +263,7 @@ struct LIBORCA_API orcaData
 	orcaData(long long ll) : t(TYPE_BIGNUM)			{ v.bo = new BnObject(ll); }
 	orcaData(orcaObject* o, object_fp fp, const char* name);
 
+	bool is_rc();
 	void rc_inc();
 	void rc_dec();
 	int get_rc();
