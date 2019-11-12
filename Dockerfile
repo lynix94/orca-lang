@@ -1,14 +1,5 @@
-FROM ubuntu:18.04
+FROM lynix94/orca-build-base:1.0
 MAINTAINER lynix94
-
-RUN apt -y update; \
-	apt install -y git; \
-	apt install -y gcc g++ make autoconf automake git; \
-	apt install -y iputils-ping net-tools telnet vim; \
-	apt install -y libtool flex bison \
-		libboost-all-dev libreadline-dev libgmp-dev \
-		libgtk2.0-dev libsqlite3-dev libleveldb-dev \
-		libcanberra-gtk-module libssl-dev
 
 RUN set -ex; \
 	git clone https://github.com/lynix94/orca-lang; \
