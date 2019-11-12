@@ -20,6 +20,15 @@ def encoding(src)
 
 		return ret;
 
+	case type.map:
+
+		ret = '*%d\r\n' % src.size();
+		for k, v in src {
+			ret += encoding((k, v));
+		}
+
+		return ret;
+
 	default:
 		str = string(src);
 		return '$%d\r\n%s\r\n' % (str.length(), str);
