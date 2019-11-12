@@ -420,6 +420,10 @@ void orcaData::string_(orcaVM* vm, string& str) const/*{{{*/
 		}
 		break;
 
+	case TYPE_EXTRACT:
+		sprintf(buff, "extract");
+ 		break;
+
 	default:
 		orca_error("unknown type(%d)...\n", t);
 	}
@@ -525,6 +529,10 @@ char* orcaData::dump(char* buff) const/*{{{*/
 
 	case TYPE_TYPE:
 		sprintf(buff, "type: %d", v.type.t);
+ 		break;
+
+	case TYPE_EXTRACT:
+		sprintf(buff, "extract");
  		break;
 
 	default:

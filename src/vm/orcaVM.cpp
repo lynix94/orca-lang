@@ -656,7 +656,9 @@ void orcaVM::call(int param_n, bool dont_mark)/*{{{*/
 		int inc_size=param_size;
 		if (f.o()->m_code != NULL) {
 			int frame_size = ((CodeHeader*)(f.o()->m_code))->frame_size;
-			if (frame_size > param_n) {
+			// not param_n, param_size
+			// param_size can be smaller than param_n if empty extract case. param_n = 1, param_size = 0
+			if (frame_size > param_size) {
 				inc_size = frame_size;
 			}
 		}
