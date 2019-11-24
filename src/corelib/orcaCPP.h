@@ -144,6 +144,7 @@ public:
 		}\n\n\
 		orcaData operator()(orcaVM* vm, int param_n)\n\
 		{\n\
+			if (param_n < %d) vm->need_param(%d);\n\n\
 			vector<orcaData> argv;\n\
 			for (int i=0; i<param_n; i++)\n\
 				argv.push_back(vm->get_param(i));\n\n\
@@ -166,14 +167,21 @@ public:
 
 		char param_buff[1024];
 		for (int i=0; i<vp->size(); i++) {
-			sprintf(param_buff, "orcaData %s = __argv[%d];\n", (*vp)[i].String().c_str(), i);
+			const char* name = (*vp)[i].String().c_str();
+			if (strncmp("...", name, 3) == 0) {
+				printf("cpp extended object can not use ...argv\n");
+				return false;
+			}
+
+			sprintf(param_buff, "orcaData %s = __argv[%d];\n", name, i);
 			params += param_buff;
 		}
 
 		int len = params.length() + strlen(format) + strlen(name)*4 + header.length() + code.length() + 256;
 		char* buff = (char*)malloc(len);
 
-		sprintf(buff, format, header.c_str(), name, params.c_str(), code.c_str(), name, name, name);
+		sprintf(buff, format, header.c_str(), name, params.c_str(), code.c_str(),
+				vp->size(), vp->size(), name, name, name);
 
 		fs::remove(mod);
 		FILE* fp = fopen(file_name.c_str(), "w");
