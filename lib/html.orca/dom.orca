@@ -7,7 +7,7 @@ using html;
 # run time generation code
 ############################
 
-if argv == nil || argv.size() == 0 {
+if argv.size() == 0 {
 	req = html.request.clone();
 }
 else {
@@ -201,7 +201,7 @@ def process_embed(req)
 
 	token = {,};
 	for key, value in ..MEMBERS {
-		if !..__position.has_key(key) {
+		if !key.starts_with('embed_') || !..__position.has_key(key) {
 			continue;
 		}
 

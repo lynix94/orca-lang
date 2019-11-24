@@ -50,7 +50,7 @@ def '.'(name)
 }
 
 
-if argv != nil && argv.size() > 0 {
+if argv.size() > 0 {
 	if argv[0] == true {
 		my.'<-' = my.print_log;
 	}

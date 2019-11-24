@@ -2,9 +2,6 @@
 def template_manage :=
 '''
 using sonar;
-if argv == nil {
-	argv = type.tuple();
-}
 sonar.core.manager.execute(argv...);
 ''';
 

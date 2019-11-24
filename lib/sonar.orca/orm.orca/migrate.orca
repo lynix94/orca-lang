@@ -4,7 +4,7 @@ using orm;
 using os;
 
 print: '# migrate dir: ', argv;
-if argv == nil || argv.size() < 1 {
+if argv.size() < 1 {
 	return false;
 }
 

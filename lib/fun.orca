@@ -2,10 +2,6 @@
 
 def bind_result(...argv)
 {
-	if argv == nil {
-		argv = type.tuple();
-	}
-
 	list = [];
 	if my.order > 1 {
 		list += argv[0:my.order-1].list();

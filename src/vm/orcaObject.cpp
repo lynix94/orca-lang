@@ -171,6 +171,10 @@ orcaData orcaObject::operator()(orcaVM* vm, int param_n)
 			}
 		}
 	}
+	else if (get_flag_argv() && param_n >= 0) {
+		orcaTuple *tp = new orcaTuple();
+		vm->set_param(as, tp);
+	}
 
 	orcaObject* curr_back = vm->m_curr;
 	vm->m_curr = this;

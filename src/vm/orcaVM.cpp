@@ -3856,17 +3856,15 @@ int orca_launch_module(orcaVM* vm, char* module, int argc, char** argv)/*{{{*/
 		vm->m_local->set(IDX_CURSIZE, cursize);
 
 		// set argv
-		if (argc > 0) {
-			orcaTuple* tp = new orcaTuple(argc);
+		orcaTuple* tp = new orcaTuple(argc);
 
-			for(int i=0; i<argc; i++) {
-				tp->update(i, argv[i]);
-			}
-
-			vm->m_local->set(0, tp);
+		for(int i=0; i<argc; i++) {
+			tp->update(i, argv[i]);
 		}
 
-		(*vm->m_module)(vm, 0);
+		vm->m_local->set(0, tp);
+
+		(*vm->m_module)(vm, -1); // -1 is special marker 
 	}
 	catch(orcaException& e) {
 		if (flag_cd) {

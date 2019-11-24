@@ -3,7 +3,7 @@ using io.open;
 
 #print: argv;
 
-if argv == nil || argv.size() < 2 {
+if argv.size() < 2 {
 	print: 'usage: orca sonar create NEW_PROJECT_NAME';
 	return;
 }

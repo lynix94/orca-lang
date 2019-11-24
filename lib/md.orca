@@ -2,7 +2,7 @@ using strings;
 
 #print: argv;
 
-if argv == nil || argv.size() <5 {
+if argv.size() <5 {
 	return;
 }
 

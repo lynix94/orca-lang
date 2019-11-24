@@ -8,7 +8,7 @@ using piter;
 
 # handle context lisp
 
-if argv == nil {
+if argv.size() < 3 {
 	return;
 }
 
@@ -45,12 +45,10 @@ return ret;
 def context_obj(...argv)
 {
 	local = type.map();
-	if argv != nil {
-		for i in [0..argv.size()-1] {
-			local['argv'+i] = argv[i];
-		}
-		local['argv'] = argv.list();
+	for i in [0..argv.size()-1] {
+		local['argv'+i] = argv[i];
 	}
+	local['argv'] = argv.list();
 
 	return lisp.execute(.code, local, .base);
 

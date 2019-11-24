@@ -3,7 +3,7 @@ using os;
 using time;
 
 #print: argv;
-if argv == nil || argv.size() < 1 {
+if argv.size() < 1 {
 	return false;
 }
 
