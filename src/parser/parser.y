@@ -61,6 +61,11 @@ using namespace std;
 
 %error-verbose
 
+%left '+' '-'
+%left '*' '/'
+%left UMINUS
+
+
 
 // type define/*{{{*/
 %type <cp> name
@@ -73,7 +78,6 @@ using namespace std;
 %type <cp> superclass_path
 %type <cp> opt_under
 %type <cp> big_number
-%type <cp> minus_big_number
 %type <cp> lambda_object
 %type <cp> lambda_define_header
 %type <cp> lambda_context_header
@@ -82,7 +86,6 @@ using namespace std;
 
 
 %type <integer> number					// integer
-%type <integer> minus_number			// integer
 %type <integer> expression_stmt			// num of expr
 %type <integer> expression_list			// num of expr
 %type <integer> expr_extract_list		// num of expr
@@ -100,7 +103,6 @@ using namespace std;
 %type <integer> channel_assign_target_list
 
 %type <real> real
-%type <real> minus_real
 
 %type <vector_cp> name_list
 %type <vector_cp> opt_argument_list
@@ -194,11 +196,8 @@ using namespace std;
 %token<cp> SHELL_STRING_HEAD
 
 %token<integer> NUMBER
-%token<integer> MINUS_NUMBER
 %token<cp> BIG_NUMBER
-%token<cp> MINUS_BIG_NUMBER
 %token<real> REAL
-%token<real> MINUS_REAL
 /*}}}*/
 
 %%
@@ -1932,21 +1931,6 @@ add_expr:/*{{{*/
 		{
 			g_op->sub();
 		}
-	| add_expr minus_number
-		{
-			g_op->push_integer($2);
-			g_op->add();
-		}
-	| add_expr minus_big_number
-		{
-			g_op->push_bignum('-', $2);
-			g_op->add();
-		}
-	| add_expr minus_real
-		{
-			g_op->push_real($2);
-			g_op->add();
-		}
 	| mul_expr
 	;
 /*}}}*/
@@ -1973,13 +1957,13 @@ unary_expr:/*{{{*/
 		{
 			unary_minus = true;
 		}
-	  object
+	  object 
 		{
 			if (unary_minus)
 				g_op->minus();
 
 			unary_minus = false;
-		}
+		} %prec UMINUS
 	| '+' object
 	| object
 	;
@@ -2168,23 +2152,11 @@ primary_object:/*{{{*/
 		{
 			g_op->push_integer($1);
 		}
-	| minus_number
-		{
-			g_op->push_integer($1);
-		}
 	| big_number
 		{
 			g_op->push_bignum('+', $1);
 		}
-	| minus_big_number
-		{
-			g_op->push_bignum('-', $1);
-		}
 	| real
-		{
-			g_op->push_real($1);
-		}
-	| minus_real
 		{
 			g_op->push_real($1);
 		}
@@ -2470,18 +2442,8 @@ name: // char* /*{{{*/
 	;
 /*}}}*/
 
-minus_number: /*{{{*/
-	MINUS_NUMBER
-	;
-/*}}}*/
-
 number: /*{{{*/
 	NUMBER
-	;
-/*}}}*/
-
-minus_big_number: /*{{{*/
-	MINUS_BIG_NUMBER 
 	;
 /*}}}*/
 
@@ -2492,11 +2454,6 @@ big_number: /*{{{*/
 
 real: /*{{{*/
 	REAL 
-	;
-/*}}}*/
-
-minus_real: /*{{{*/
-	MINUS_REAL 
 	;
 /*}}}*/
 

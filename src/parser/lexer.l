@@ -148,14 +148,9 @@ under				{ g_parser->n_tok++; return UNDER; }
 						return NAME; 
 					}
 
--?[0-9]+			{
+[0-9]+			{
 						g_parser->n_tok++;
 						bool minus = false;
-						if (yytext[0] == '-') {
-							minus = true;
-							yytext++;
-						}
-							
 						bool f_overflow = false;
 						
 						if (strlen(yytext) > 10) {
@@ -170,29 +165,16 @@ under				{ g_parser->n_tok++; return UNDER; }
 						if (f_overflow) {
 							yylval.cp = g_parser->strdup(yytext);
 
-							if (minus) {
-								return MINUS_BIG_NUMBER; 
-							}
-
 							return BIG_NUMBER;
 						}
 						
 						yylval.integer = atoi(yytext);
-						if (minus) {
-							yylval.integer *= -1;
-							return MINUS_NUMBER; 
-						}
-
 						return NUMBER; 
 					}
 
--?0x[0-9a-fA-F]+	{
+0x[0-9a-fA-F]+	{
 						g_parser->n_tok++;
 						bool minus = false;
-						if (yytext[0] == '-') {
-							minus = true;
-							yytext++;
-						}
 							
 						char* c = yytext+2;
 						int i = 0;
@@ -200,10 +182,6 @@ under				{ g_parser->n_tok++; return UNDER; }
 						while (c[i] != '\0') {
 							if (val > UINT_MAX) {
 								yylval.cp = g_parser->strdup(yytext);
-								if (minus) {
-									return MINUS_BIG_NUMBER; 
-								}
-
 								return BIG_NUMBER;
 							}
 							else if (c[i] >= '0' && c[i] <='9') 
@@ -217,32 +195,18 @@ under				{ g_parser->n_tok++; return UNDER; }
 						}
 
 						yylval.integer = val;
-						if (minus) {
-							yylval.integer *= -1;
-							return MINUS_NUMBER; 
-						}
-
 						return NUMBER; 
 					}
 
--?0b[01]+				{
+0b[01]+				{
 						g_parser->n_tok++;
 						bool minus = false;
-						if (yytext[0] == '-') {
-							minus = true;
-							yytext++;
-						}
-
 						char* c = yytext+2;
 						int i = 0;
 						unsigned long long val = 0;
 						while (c[i] != '\0') {
 							if (val > UINT_MAX) {
 								yylval.cp = g_parser->strdup(yytext);
-								if (minus) {
-									return MINUS_BIG_NUMBER; 
-								}
-
 								return BIG_NUMBER;
 							}
 
@@ -251,27 +215,13 @@ under				{ g_parser->n_tok++; return UNDER; }
 						}
 
 						yylval.integer = val;
-						if (minus) {
-							yylval.integer *= -1;
-							return MINUS_NUMBER; 
-						}
-
 						return NUMBER; 
 					}
 
-(-?[0-9]+[Ee][\+\-]?[0-9]+)|(-?[0-9]*\.[0-9]+([Ee][\+\-]?[0-9]+)?)  {
+([0-9]+[Ee][\+\-]?[0-9]+)|(-?[0-9]*\.[0-9]+([Ee][\+\-]?[0-9]+)?)  {
 						g_parser->n_tok++;
 						bool minus = false;
-						if (yytext[0] == '-') {
-							minus = true;
-							yytext++;
-						}
-							
 						yylval.real = atof(yytext);
-						if (minus) {
-							yylval.real *= -1;
-							return MINUS_REAL;
-						}
 						return REAL;
 					}
 

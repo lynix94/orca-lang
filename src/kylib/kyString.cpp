@@ -386,14 +386,10 @@ string kyString::sprintf(const string& fmt, ...)/*{{{*/
 	while (true) {
 		va_list ap;
 		va_start(ap, fmt);
-		ret = vsnprintf(bp, 4096, fmt.c_str(), ap);
+		ret = vsnprintf(bp, size, fmt.c_str(), ap);
 		va_end(ap);
 
 		if (ret < size) {
-			if (bp != buff) {
-				free(bp);
-			}
-
 			if (bp != buff) {
 				string ret = bp;
 				free(bp);
