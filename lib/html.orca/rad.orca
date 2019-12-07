@@ -3,6 +3,7 @@
 using os;
 using io;
 using time;
+using html;
 
 
 
@@ -115,12 +116,18 @@ def handle_rad_post(req, dom)
 		}
 
 		code = req.post['code'];
+		code = html.unescape(code);
 		code = code.replace('\r\n', '\n');
 		code = code.replace('\n\n\n\n', '\n\n');
 		code = code.replace('\n\n\n', '\n\n');
 
 		fh = io.open(dom.FILE_PATH, 'w');
 		fh.write(code);
+		fh.close();
+
+		fh = io.open(dom.FILE_PATH);
+		buff = fh.read();
+		fh.close();
 
 		req.post['reload'] = true;
 	}
@@ -241,22 +248,34 @@ def analyze(src)
 	case %head,
 		%type=r'def(\\.[^ \\t\\r\\n]*)?[ \\t\\r\\n]+', 
 		%name=r'[a-zA-Z_][a-zA-Z0-9_]*[ \\t\\r\\n]*',
-		%param=r'\\([a-zA-Z_][a-zA-Z0-9_]*\\)?',
-		r'[ \\t\\r\\n]+',
+		%param=r'\\([a-zA-Z_][a-zA-Z0-9_]*\\)',
+		r'[ \\t\\r\\n]*',
 		%body=..match_def,
 		%tail:
 
+		#print: '>>> case 1: ', name;
 		src_map[name.strip()] = type + name + param + body;
+		split_def(tail, src_map);
+		
+	case %head,
+		%type=r'def(\\.[^ \\t\\r\\n]*)?[ \\t\\r\\n]+', 
+		%name=r'[a-zA-Z_][a-zA-Z0-9_]*[ \\t\\r\\n]*',
+		%body=..match_def,
+		%tail:
+
+		#print: '>>> case 2: ', name;
+		src_map[name.strip()] = type + name + body;
 		split_def(tail, src_map);
 		
 	case %head,
 		%type=r'def(\\.[^ \\t\\r\\n]*)?[ \\t\\r\\n]+', 
 		%tail:
 
+		#print: '>>> case 3: ', tail;
 		split_def(tail, src_map);
 
 	case %remain:
-		print: '>> remain: ', remain;
+		#print: '>>> case 4: ', remain;
 	}
 
 	def match_def(src)

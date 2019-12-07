@@ -126,9 +126,13 @@ public:
 			switch (s[i])
 			{
 			case '\"':	ss << "&quot;"; break;
+			case '\'':	ss << "&#x27;"; break;
 			case '<':	ss << "&lt;"; break;
 			case '>':	ss << "&gt;"; break;
 			case '&':	ss << "&amp;";	break;
+			case '/':	ss << "&#x2F;";	break;
+			case '`':	ss << "&#x60;";	break;
+			case '=':	ss << "&#x3D;";	break;
 			default:	ss << s[i];
 			}
 		}
@@ -144,6 +148,18 @@ public:
 		stringstream ss;
 		for (int i=0; i<s.length(); i++) {
 			if (s[i] == '&') {
+				if (i+5 < s.length() && strncmp(s.c_str() + i + 1, "#x", 2) == 0) {
+					
+					char buff[3];
+					buff[0] = *(char*)(s.c_str() + i + 3);
+					buff[1] = *(char*)(s.c_str() + i + 4);
+					buff[2] = 0;
+					int code = strtol(buff, NULL, 16);
+					ss << char(code);
+					i += 5;
+					continue;
+				}
+
 				if (i+5 < s.length() && strncmp(s.c_str() + i + 1, "quot;", 5) == 0) {
 					ss << '\"';
 					i += 5;
