@@ -60,7 +60,6 @@ orcaRoot::orcaRoot()
 	set_name("root");
 	rc_inc(); // for permanant life
 
-	insert_static("io", new orcaIO());
 	insert_static("os", new orcaOS());
 	insert_static("thread", new orcaThread());
 	insert_static("socket", new orcaSocketModule());
@@ -93,11 +92,11 @@ orcaRoot::orcaRoot()
 	clib->insert_static("base64", new orcaBase64());
 	clib->insert_static("strings", new orcaStrings());
 	clib->insert_static("tls", new orcaTlsModule());
+	clib->insert_static("io", new orcaIO());
 
 	orcaObject* compiled = new orcaObject();
 	compiled->set_name("compiled");
 	insert_static("compiled", compiled);
-	
 
 #if defined(LINUX)
 #if defined(USE_GTK)

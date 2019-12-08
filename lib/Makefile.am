@@ -53,3 +53,6 @@ orcalibform_DATA = html.orca/form.orca/CODE.kw html.orca/form.orca/CODE.orca htm
 orcalibstringsdir = $(prefix)/lib/orca/strings.orca
 orcalibstrings_DATA = strings.orca/CODE.kw strings.orca/CODE.orca
 
+orcalibiodir = $(prefix)/lib/orca/io.orca
+orcalibio_DATA = io.orca/CODE.orca io.orca/CODE.kw io.orca/buffer.orca io.orca/buffer.kw
+

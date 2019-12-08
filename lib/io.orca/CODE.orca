@@ -1,0 +1,12 @@
+using __clib__;
+
+def print := __clib__.io.print;
+def put := __clib__.io.put;
+def open := __clib__.io.open;
+def input := __clib__.io.input;
+def stdin := __clib__.io.stdin;
+def stdout := __clib__.io.stdout;
+def stderr := __clib__.io.stderr;
+def fdselect := __clib__.io.fdselect;
+def fdreadable := __clib__.io.fdreadable;
+

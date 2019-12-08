@@ -1,0 +1,96 @@
+
+using datetime;
+
+
+def handle;
+def buffer := '';
+
+def init(handle)
+{
+	..handle = handle;
+}
+
+
+def read_line(timeout)
+{
+	start = datetime.now().timestamp();
+	while true {
+		idx = ..buffer.find('\n');
+
+		if idx > 0 {
+			line = ..buffer[:idx+1];
+			..buffer = ..buffer[idx+1:];
+			return line;
+		}
+
+		..buffer += ..handle.read(4096, timeout);
+
+		if timeout != nil {
+			now = datetime.now().timeout();
+			if now - start > timeout {
+				return '';
+			}
+		}
+	}
+}
+
+
+def read(size, timeout)
+{
+	start = datetime.now().timestamp();
+	while true {
+		if size == nil && ..buffer.length() > 0 {
+			ret = ..buffer;
+			..buffer = '';
+			return ret;
+		}
+
+		if ..buffer.length() >= size {
+			ret = ..buffer[:size];
+			..buffer = ..buffer[size:];
+			return ret;
+		}
+
+		..buffer += ..handle.read(4096, timeout);
+
+
+		if timeout != nil {
+			now = datetime.now().timeout();
+			if now - start > timeout {
+				return '';
+			}
+		}
+	}
+}
+
+
+def read_until(until, timeout)
+{
+	start = datetime.now().timestamp();
+	while true {
+		idx = ..buffer.find(until);
+
+		if idx > 0 {
+			line = ..buffer[:idx+until.size()];
+			..buffer = ..buffer[idx+until.size():];
+			return line;
+		}
+
+		..buffer += ..handle.read(4096, timeout);
+
+		if timeout != nil {
+			now = datetime.now().timeout();
+			if now - start > timeout {
+				return '';
+			}
+		}
+	}
+}
+
+
+def write(msg)
+{
+	return ..handle.write(msg);
+}
+
+

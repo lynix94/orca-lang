@@ -118,7 +118,9 @@ orcaData orcaSocket::ex_recv(orcaVM* vm, int n) {
 	double timeout = -1;
 	int size = 65536;
 	if (n >= 2) {
-		timeout = vm->get_param(1).Double();
+		if (vm->get_param(1) != NIL) {
+			timeout = vm->get_param(1).Double();
+		}
 	}
 	if (n >= 1) {
 		size = vm->get_param(0).Integer();

@@ -34,6 +34,9 @@ int main(int argc, char* argv[])
 		vm.init();
 		set_current_vm(&vm);
 
+		// load initial modules
+		vm.load("io");
+
 		bool flag = true;
 		if (!interactive) {
 			flag = orca_launch_module(&vm, argv[1], argc-2, &argv[2]);
