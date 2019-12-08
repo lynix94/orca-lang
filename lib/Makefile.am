@@ -6,7 +6,7 @@ orcalibdistributedir = $(prefix)/lib/orca/distribute.orca
 orcalibdistribute_DATA = distribute.orca/remotec.orca distribute.orca/remotec.kw distribute.orca/remoted.orca distribute.orca/remoted.kw distribute.orca/dist.orca distribute.orca/dist.kw distribute.orca/fs.orca distribute.orca/fs.kw distribute.orca/dfsd.orca distribute.orca/dfsd.kw
 
 orcalibnetdir = $(prefix)/lib/orca/net.orca
-orcalibnet_DATA = net.orca/http.orca/client.orca net.orca/http.orca/server.orca net.orca/url.orca net.orca/http.orca/client.kw net.orca/http.orca/server.kw net.orca/url.kw
+orcalibnet_DATA = net.orca/http.orca/client.orca net.orca/http.orca/server.orca net.orca/url.orca net.orca/http.orca/client.kw net.orca/http.orca/server.kw net.orca/url.kw net.orca/krillc.orca net.orca/krillc.kw
 
 orcaliblangdir = $(prefix)/lib/orca/lang.orca
 orcaliblang_DATA = lang.orca/lisp.orca lang.orca/lisp.kw lang.orca/sh.kw lang.orca/sh.orca

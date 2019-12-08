@@ -1,0 +1,62 @@
+
+# krill client
+
+using socket;
+
+
+def addr;
+def ip;
+def port;
+def sock;
+def buffer;
+
+def init(addr)
+{
+	..addr = addr;
+	toks = addr.split(':');
+
+	..ip = socket.gethostbyname(toks[0])[0];
+	..port = toks[1].integer();
+
+	..sock = socket.create();
+	..buffer = io.buffer.clone(..sock);
+}
+
+def connect()
+{
+	..sock.connect(..ip, ..port);
+}
+
+
+def tsadd(...param)
+{
+	msg = 'tsadd ';
+	idx = 0;
+	while idx + 2 < param.size() {
+		msg += '%s %f %f ' % (param[idx], param[idx+1], param[idx+2]);
+		idx += 3;
+	}
+
+	..buffer.write(msg + '\r\n');
+	ret = ..buffer.read_line();
+	return ret;
+}
+
+def tsrange(start, end, ...key_list)
+{
+	msg = 'tsrange %f %f ' % (start, end);
+
+	for key in key_list {
+		msg += '%s ' % key;
+	}
+
+	..buffer.write(msg + '\r\n');
+	ret = ..buffer.read_line();
+	len = ret[1:].integer();
+	ret = ..buffer.read(len+2); # include \r\n
+	return ret;
+}
+
+
+
+
