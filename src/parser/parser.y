@@ -1859,20 +1859,44 @@ or_expr:/*{{{*/
 	;
 /*}}}*/
 
-and_expr:/*{{{*/
+and_expr:
 	and_expr AND 
 		{
 			g_op->dup();
 			g_ctl->if_start();
 		}
-	not_expr
+	bit_or_expr
 		{
 			g_op->do_and();
 			g_ctl->if_end();
 		}
+	| bit_or_expr
+	;
+
+
+bit_or_expr:
+	bit_or_expr '|' bit_xor_expr
+		{
+			g_op->bit_or();
+		}
+	| bit_xor_expr
+	;
+
+bit_xor_expr:
+	bit_xor_expr '^' bit_and_expr
+		{
+			g_op->bit_xor();
+		}
+	| bit_and_expr
+	;
+
+bit_and_expr:
+	bit_and_expr '&' not_expr
+		{
+			g_op->bit_and();
+		}
 	| not_expr
 	;
-/*}}}*/
 
 not_expr:/*{{{*/
 	'!' logical_compare_expr
@@ -2044,7 +2068,7 @@ sbf:/*{{{*/
 			g_lvar_nil_check--;
 			g_ctl->sbf_start();
 		}
-	sbf_result '|' 
+	sbf_result ':' 
 		{
 			g_ctl->sbf_rule_start();
 		}

@@ -94,7 +94,7 @@ def splot(cmd_end)
 	for j in [0..owner.sdata.size()-1] {
 		f = io.open(file_name + (j+1),'w');
 
-		for i in %[x|x<-0~] {
+		for i in %[x:x<-0~] {
 			if i >= ..sdata[j].size() {
 				break;
 			}
@@ -143,7 +143,7 @@ def plot(cmd_end)
 
 	f = io.open(file_name,'w');
 
-	for i in %[x|x<-0~] {
+	for i in %[x:x<-0~] {
 		if i >= ..data[0].size() {
 			break;
 		}

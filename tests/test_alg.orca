@@ -97,7 +97,7 @@ alg.remove_if(a.first(), a.end(), lambda(it){ return it % 3 == 0; });
 
 print: a;
 
-if a != %[x|x<-1~100, x%3!=0] {
+if a != %[x:x<-1~100, x%3!=0] {
 	throw test.alg <- 'remove_if failed';
 }
 

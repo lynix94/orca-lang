@@ -65,7 +65,7 @@ for a in piter(item) {
 
 print: 'item: ', item;
 
-if item != %[2*x|x<-1~100] {
+if item != %[2*x:x<-1~100] {
 	throw test.iter <- 'test iterator fail';
 }
 
@@ -88,7 +88,7 @@ for a in piter(item) {
 
 print: 'tuple pow sum: ', item;
 
-if item != %[2*x|x<-1~100].tuple() {
+if item != %[2*x:x<-1~100].tuple() {
 	throw test.iter <- 'test iterator fail';
 }
 

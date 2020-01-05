@@ -35,6 +35,9 @@ public:
 	void do_and();
 	void do_and_short_check();
 	void do_or();
+	void bit_and();
+	void bit_xor();
+	void bit_or();
 	void gt();
 	void ge();
 	void lt();

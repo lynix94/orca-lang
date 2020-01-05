@@ -44,7 +44,7 @@ list = [1..100];
 rs = dist.dist_for(list, lambda(a) { return a * a; } );
 print: rs;
 
-if rs != %[ x*x | x<-1~100 ] {
+if rs != %[ x*x : x<-1~100 ] {
 	throw test.dist <- 'dist_do failed';
 }
 

@@ -48,6 +48,9 @@
 #define OP_EQ						0x26
 #define OP_NEQ						0x27
 #define OP_JMP						0x28
+#define OP_BIT_AND					0x29
+#define OP_BIT_XOR					0x2A
+#define OP_BIT_OR					0x2B
 
 #define OP_PUSH_LVAR				0x30
 #define OP_PUSH_MVAR				0x31

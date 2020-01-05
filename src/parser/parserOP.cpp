@@ -123,19 +123,34 @@ void parserOP::div()
 	code_top->push_char(OP_DIV); 
 }
 
-void parserOP::sub()		
+void parserOP::sub()
 {
 	code_top->push_char(OP_SUB);
 }
 
-void parserOP::do_and()		
+void parserOP::do_and()
 {
 	code_top->push_char(OP_AND);
 }
 
-void parserOP::do_or()		
+void parserOP::do_or()
 {
 	code_top->push_char(OP_OR);
+}
+
+void parserOP::bit_and()
+{
+	code_top->push_char(OP_BIT_AND);
+}
+
+void parserOP::bit_xor()
+{
+	code_top->push_char(OP_BIT_XOR);
+}
+
+void parserOP::bit_or()
+{
+	code_top->push_char(OP_BIT_OR);
 }
 
 void parserOP::gt()		

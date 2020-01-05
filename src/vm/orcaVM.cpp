@@ -1804,6 +1804,139 @@ fast_jmp:
 				goto fast_jmp;
 				break;
 
+			case OP_BIT_AND:
+				PRINT1("\t\t%p : bit and\n", c); 
+				p2 = m_stack->pop();
+				p1 = m_stack->top();
+
+				if (is<TYPE_INT>(p1)) {
+					if (is<TYPE_INT>(p2)) {
+						m_stack->replace(p1.i() & p2.i());
+						break;
+					}
+					else if (is<TYPE_BIGNUM>(p2)) {
+						mpz_t bn;
+						mpz_init(bn);
+						mpz_set_si(bn, p1.i());
+						mpz_and(bn, bn, p2.bn());
+						m_stack->replace(bn);
+						mpz_clear(bn);
+						break;
+					}
+				}
+				else if (is<TYPE_BIGNUM>(p1)) {
+					if (is<TYPE_INT>(p2)) {
+						mpz_t bn;
+						mpz_init(bn);
+						mpz_set_si(bn, p2.i());
+						mpz_and(bn, p1.bn(), bn);
+						m_stack->replace(bn);
+						mpz_clear(bn);
+						break;
+					}
+					else if (is<TYPE_BIGNUM>(p2)) {
+						mpz_t bn;
+						mpz_init(bn);
+						mpz_and(bn, p1.bn(), p2.bn());
+						m_stack->replace(bn);
+						mpz_clear(bn);
+						break;
+					}
+				}
+
+				throw orcaException(this, "orca.type", "bitwise operation needs integer");
+				break;
+
+			case OP_BIT_XOR: {
+				PRINT1("\t\t%p : bit xor\n", c); 
+				p2 = m_stack->pop();
+				p1 = m_stack->top();
+
+				if (is<TYPE_INT>(p1)) {
+					if (is<TYPE_INT>(p2)) {
+						m_stack->replace(p1.i() ^ p2.i());
+						break;
+					}
+					else if (is<TYPE_BIGNUM>(p2)) {
+						mpz_t bn;
+						mpz_init(bn);
+						mpz_set_si(bn, p1.i());
+						mpz_xor(bn, bn, p2.bn());
+						m_stack->replace(bn);
+						mpz_clear(bn);
+						break;
+					}
+				}
+				else if (is<TYPE_BIGNUM>(p1)) {
+					if (is<TYPE_INT>(p2)) {
+						mpz_t bn;
+						mpz_init(bn);
+						mpz_set_si(bn, p2.i());
+						mpz_xor(bn, p1.bn(), bn);
+						m_stack->replace(bn);
+						mpz_clear(bn);
+						break;
+					}
+					else if (is<TYPE_BIGNUM>(p2)) {
+						mpz_t bn;
+						mpz_init(bn);
+						mpz_xor(bn, p1.bn(), p2.bn());
+						m_stack->replace(bn);
+						mpz_clear(bn);
+						break;
+					}
+				}
+				else {
+					throw orcaException(this, "orca.type", "bitwise operation needs integer");
+				}
+
+				break;
+			}
+
+			case OP_BIT_OR: {
+				PRINT1("\t\t%p : bit or\n", c); 
+				p2 = m_stack->pop();
+				p1 = m_stack->top();
+
+				if (is<TYPE_INT>(p1)) {
+					if (is<TYPE_INT>(p2)) {
+						m_stack->replace(p1.i() | p2.i());
+						break;
+					}
+					else if (is<TYPE_BIGNUM>(p2)) {
+						mpz_t bn;
+						mpz_init(bn);
+						mpz_set_si(bn, p1.i());
+						mpz_ior(bn, bn, p2.bn());
+						m_stack->replace(bn);
+						mpz_clear(bn);
+						break;
+					}
+				}
+				else if (is<TYPE_BIGNUM>(p1)) {
+					if (is<TYPE_INT>(p2)) {
+						mpz_t bn;
+						mpz_init(bn);
+						mpz_set_si(bn, p2.i());
+						mpz_ior(bn, p1.bn(), bn);
+						m_stack->replace(bn);
+						mpz_clear(bn);
+						break;
+					}
+					else if (is<TYPE_BIGNUM>(p2)) {
+						mpz_t bn;
+						mpz_init(bn);
+						mpz_ior(bn, p1.bn(), p2.bn());
+						m_stack->replace(bn);
+						mpz_clear(bn);
+						break;
+					}
+				}
+
+				throw orcaException(this, "orca.type", "bitwise operation needs integer");
+				break;
+			}
+
 			case OP_PUSH_LVAR:	
 				PRINT2("\t\t%p : push local (%d)\n", c, TO_SHORT(&c[1]));
 				j = TO_SHORT(&c[1]);
