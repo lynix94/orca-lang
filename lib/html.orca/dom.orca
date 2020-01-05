@@ -321,7 +321,7 @@ Are you sure publish page?
 <input type="submit" name="no" value="no"/>
 </div>
 </form>
-</div>''' % (req.uri, dom.NAME, source);
+</div>''' % (req.uri, dom.NAME, html.escape(source));
 	return ret;
 }
 
