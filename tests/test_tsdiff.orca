@@ -1,0 +1,36 @@
+
+using compress;
+
+ts = compress.tsdiff.clone(0, 0);
+for i in range(100) {
+	ts.push_back(i, i);
+}
+
+print: ts.count();
+print: ts.size();
+print:  'compressed: %f' % (ts.size()/(ts.count()*64.0*2*8)*100);
+print: ts.uncompress();
+
+
+ts = compress.tsdiff.clone(0, -1);
+for i in range(100) {
+	ts.push_back(i, i*1.1);
+}
+
+print: ts.count();
+print: ts.size();
+print:  'compressed: %f' % (ts.size()/(ts.count()*64.0*2*8)*100);
+print: ts.uncompress();
+
+
+ts = compress.tsdiff.clone(3, 3);
+for i in range(100) {
+	ts.push_back(i*1.1, i*1.1);
+}
+
+print: ts.count();
+print: ts.size();
+print:  'compressed: %f' % (ts.size()/(ts.count()*64.0*2*8)*100);
+print: ts.uncompress();
+
+

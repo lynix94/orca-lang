@@ -38,6 +38,7 @@
 #include "orcaCrypto.h"
 #include "orcaUnsafe.h"
 #include "orcaLeveldb.h"
+#include "orcaCompress.h"
 
 
 #define USE_GTK
@@ -77,6 +78,7 @@ orcaRoot::orcaRoot()
 	insert_static("system", new orcaSystem());
 	insert_static("queue", new orcaQueue());
 	insert_static("unsafe", new orcaUnsafe());
+	insert_static("compress", new orcaCompress());
 
 	insert_native_function("string", (object_fp)&orcaRoot::ex_string);
 	insert_native_function("repr", (object_fp)&orcaRoot::ex_repr);
