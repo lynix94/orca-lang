@@ -35,6 +35,7 @@ enum control_type_e
 	CONTROL_CHANNEL_OUT, 
 	CONTROL_SELECT, 
 	CONTROL_SCOPE, 
+	CONTROL_TRY, 
 };
 
 class parserControl 
@@ -70,6 +71,8 @@ public:
 	void do_continue();
 	void do_break();
 	void do_fallthrough();
+	void do_try();
+	void clean_try();
 
 	void decode_start();
 	void decode_func_start();

@@ -228,6 +228,10 @@ void orcaLocal::clean_mark(mark_e t)
 			if (d.mark().type == t) {
 				d = NIL;
 				set(i, d);
+
+				if (i == lp[IDX_CURSIZE].i() - 1) {
+					pop_back();
+				}
 				break;
 			}
 		}

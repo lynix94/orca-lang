@@ -598,6 +598,19 @@ void parserControl::do_return(int i) /*{{{*/
 }
 /*}}}*/
 
+void parserControl::do_try() /*{{{*/
+{
+	context ctx(CONTROL_TRY);
+	m_ctl.push_back(ctx);
+}
+/*}}}*/
+
+void parserControl::clean_try() /*{{{*/
+{
+	m_ctl.pop_back();
+}
+/*}}}*/
+
 void parserControl::do_continue() /*{{{*/
 {
 	int idx;
@@ -605,6 +618,10 @@ void parserControl::do_continue() /*{{{*/
 		if (m_ctl[idx].type == CONTROL_SCOPE) {
 			code_top->push_char(OP_SCOPE_END);
 		}
+		if (m_ctl[idx].type == CONTROL_TRY) {
+			code_top->push_char(OP_DONE_TRY);
+		}
+
 		if (is_continuable(m_ctl[idx])) {
 			break;
 		}
@@ -617,7 +634,6 @@ void parserControl::do_continue() /*{{{*/
 
 	int offset = m_ctl[idx].start;
 	control_type_e type = m_ctl[idx].type;
-
 
 	if (type == CONTROL_SWITCH) {
 		printf("switch statement not allow continue\n");
@@ -657,6 +673,9 @@ void parserControl::do_break()/*{{{*/
 	for (idx = m_ctl.size()-1; idx >= 0; idx--) {
 		if (m_ctl[idx].type == CONTROL_SCOPE) {
 			code_top->push_char(OP_SCOPE_END);
+		}
+		if (m_ctl[idx].type == CONTROL_TRY) {
+			code_top->push_char(OP_DONE_TRY);
 		}
 
 		if (is_breakable(m_ctl[idx])) {

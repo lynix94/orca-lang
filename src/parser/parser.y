@@ -564,10 +564,12 @@ try_stmt:/*{{{*/
 	TRY
 		{
 			g_ex->push();
+			g_ctl->do_try();
 		}
 	statement_block
 		{
 			g_ex->goto_end();
+			g_ctl->clean_try();
 		}
 	;
 /*}}}*/

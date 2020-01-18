@@ -86,7 +86,7 @@ struct InternalFunction
 class LIBORCA_API RC_Object /*{{{*/
 {
 public:
-	RC_Object() : m_rc(0) { }
+	RC_Object();
 	virtual ~RC_Object() { }
 
 	void rc_inc();

@@ -28,6 +28,9 @@
 #define snprintf _snprintf
 #endif
 
+unsigned long long g_rc_new = 0;
+unsigned long long g_rc_delete = 0;
+
 LIBORCA_API orcaData NIL;
 
 string format_str(orcaVM* vm, string& format, vector<orcaData>& params)/*{{{*/
@@ -1870,8 +1873,30 @@ orcaObject* orcaData::Object()/*{{{*/
 }
 /*}}}*/
 
+RC_Object::RC_Object()
+{
+	m_rc = 0;
+
+/*
+	pthread_mutex_lock(&g_rc_mutex);
+	g_rc_new++;
+	if (g_rc_new % 10000 == 0) {
+		printf("# rc new: %d\n", g_rc_new);
+	}
+	pthread_mutex_unlock(&g_rc_mutex);
+*/
+}
+
 void RC_Object::cleanup()/*{{{*/
 {
+/*
+	pthread_mutex_lock(&g_rc_mutex);
+	g_rc_delete++;
+	if (g_rc_delete % 10000 == 0) {
+		printf("# rc del: %d\n", g_rc_delete);
+	}
+	pthread_mutex_unlock(&g_rc_mutex);
+*/
 	delete this;
 }
 /*}}}*/
