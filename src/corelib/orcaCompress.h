@@ -14,7 +14,7 @@ struct float64_diff
 	int get_leading_zeros(unsigned long long value);
 	int get_meaning_bits(unsigned long long value, int leading_zeros);
 	void float64_append(double value);
-	int uncompress(vector<double>& result, int until = INT_MAX);
+	int uncompress(vector<double>& result, double until = -1, int limit = INT_MAX);
 
 	orcaBitStream bs;
 	long long last_lvalue;
@@ -32,7 +32,7 @@ struct int64_diff
 
 	void int64_append(long long value);
 	void diff_diff_append(long long value);
-	int uncompress(vector<long long>& result, int until = INT_MAX);
+	int uncompress(vector<long long>& result, long long until = -1, int limit = INT_MAX);
 
 	orcaBitStream bs;
 	long long last_value;

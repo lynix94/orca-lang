@@ -104,10 +104,10 @@ void float64_diff::float64_append(double value)
 	last_lvalue = lvalue;
 }
 
-int float64_diff::uncompress(vector<double>& result, int until)
+int float64_diff::uncompress(vector<double>& result, double until, int limit)
 {
-	if (until > count) {
-		until = count;
+	if (limit > count) {
+		limit = count;
 	}
 
 	//printf("# uncompress: %d\n", count);
@@ -118,7 +118,7 @@ int float64_diff::uncompress(vector<double>& result, int until)
 	//printf("# first: %lld, %f\n", first_value, *(double*)&first_value);
 	result.push_back(*(double*)&first_value);
 	c++, idx += 64;
-	if (c > until) {
+	if (c > limit) {
 		return c;
 	}
 
@@ -167,10 +167,14 @@ int float64_diff::uncompress(vector<double>& result, int until)
 
 		//printf("## tag: %d, diff: %016llx, value: %016llx, value: %f\n", tag & 0x03, diff, value, *(double*)&value);
 
+		if (until >= 0 && *(double*)&value >= until) {
+			break;
+		}
+
 		result.push_back(*(double*)&value);
 		last_value = value;
 		c++;
-	} while(c < until);
+	} while(c < limit);
 }
 
 
@@ -248,10 +252,10 @@ void int64_diff::diff_diff_append(long long value)
 	bs.bitappend(64, value);
 }
 
-int int64_diff::uncompress(vector<long long>& result, int until)
+int int64_diff::uncompress(vector<long long>& result, long long until, int limit)
 {
-	if (until > count) {
-		until = count;
+	if (limit > count) {
+		limit = count;
 	}
 
 	//printf("# uncompress: %d\n", count);
@@ -262,7 +266,7 @@ int int64_diff::uncompress(vector<long long>& result, int until)
 	//printf("# first: %lld\n", first_value);
 	result.push_back(first_value);
 	c++, idx += 64;
-	if (c > until) {
+	if (c > limit) {
 		return c;
 	}
 
@@ -270,7 +274,7 @@ int int64_diff::uncompress(vector<long long>& result, int until)
 	//printf("# second: %lld\n", second_value);
 	result.push_back(second_value);
 	c++, idx += 64;
-	if (c > until) {
+	if (c > limit) {
 		return c;
 	}
 
@@ -318,11 +322,15 @@ int int64_diff::uncompress(vector<long long>& result, int until)
 
 		//printf("## diff_diff: %lld, diff: %lld, value: %lld, idx:%d, last_diff: %lld, last_value: %lld\n", diff_diff, diff, value, idx, last_diff, last_value);
 
+		if (until >= 0 && value >= until) {
+			break;
+		}
+
 		result.push_back(value);
 		last_value = value;
 		last_diff = diff;
 		c++;
-	} while(c < until);
+	} while(c < limit);
 }
 
 
@@ -408,29 +416,42 @@ orcaData orcaTsDiff::ex_push_back(orcaVM* vm, int n)
 
 orcaData orcaTsDiff::ex_uncompress(orcaVM* vm, int n)
 {
+	double until = -1;
+	int limit = INT_MAX;
+
+	if (n >= 1) {
+		until = vm->get_param(0).Double();
+	}
+	if (n >= 2) {
+		limit = vm->get_param(1).Integer();
+	}
+
 	vector<long long> its_result;
 	vector<double> dts_result;
 	if (ts_precision == 0) {
-		its.uncompress(its_result);
+		its.uncompress(its_result, (long long)until, limit);
+		limit = its_result.size();
 	}
 	else if (ts_precision > 0) {
-		its.uncompress(its_result);
+		its.uncompress(its_result, (long long)until, limit);
+		limit = its_result.size();
 		for (int i=0; i<count(); i++) {
 			double d = (double)its_result[i] / pow(10, ts_precision);
 			dts_result.push_back(d);
 		}
 	}
 	else {
-		dts.uncompress(dts_result);
+		dts.uncompress(dts_result, until, limit);
+		limit = dts_result.size();
 	}
 
 	vector<long long> iresult;
 	vector<double> dresult;
 	if (precision == 0) {
-		iv.uncompress(iresult);
+		iv.uncompress(iresult, -1, limit);
 	}
 	else if (precision > 0) {
-		iv.uncompress(iresult);
+		iv.uncompress(iresult, -1, limit);
 
 		for (int i=0; i<count(); i++) {
 			double d = (double)iresult[i] / pow(10, precision);
@@ -438,11 +459,11 @@ orcaData orcaTsDiff::ex_uncompress(orcaVM* vm, int n)
 		}
 	}
 	else {
-		dv.uncompress(dresult);
+		dv.uncompress(dresult, -1, limit);
 	}
 
 	orcaList *lp = new orcaList();
-	for (int i=0; i<count(); i++) {
+	for (int i=0; i<limit; i++) {
 		orcaTuple *tp = new orcaTuple(2);
 
 		if (ts_precision == 0) {
