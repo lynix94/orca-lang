@@ -813,7 +813,7 @@ orcaData orcaData::operator_lt(orcaVM* vm, orcaData& rhs) /*{{{*/
 		}
 
 		if (is<TYPE_OBJ>(*this)) {
-			return (void*)this < (void*)rhs.o();
+			return (void*)o() < (void*)rhs.o();
 		}
 
 		return true;
@@ -1036,7 +1036,7 @@ orcaData orcaData::operator_eq(orcaVM* vm, orcaData& rhs) /*{{{*/
 		}
 
 		if (is<TYPE_OBJ>(*this)) { // if not defined, chose by addr
-			return (void*)this == (void*)rhs.o();
+			return (void*)o() == (void*)rhs.o();
 		}
 	}
 
