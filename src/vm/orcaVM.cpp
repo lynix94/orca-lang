@@ -3183,41 +3183,45 @@ fast_jmp:
 			case OP_SELECT_START: {
 				PRINT1("\t\t%p : select start\n", c);
 				SELECT *sp = m_select_stack->top();
-
 				do {
-					sp->mutex.lock();
+					
+					g_select.mutex.lock();
+					//printf("# selec in the mutex: %p\n", sp);
 					for (int i=0; i<sp->cases.size(); i++) {
 						CASE *ca = &sp->cases[i];
 						if (ca->src == NULL) { // default
 							c = ca->code;
-							sp->mutex.unlock();
+							g_select.mutex.unlock();
 							goto fast_jmp; // out from this loop
 						}
 
 						if (ca->src->has_member("size", d) == false) {
-							sp->mutex.unlock();
+							g_select.mutex.unlock();
 							throw orcaException(this, "orca.select", string("unselectable item: ")
 								+ ca->src->dump_str());
 						}
 
 						m_stack->push(d);
 						call(0);
+						//printf("size: %d\n", m_stack->top().Integer());
 						if (m_stack->pop().Integer() <= 0) { // not ready yet
 							continue;
 						}
 
 						if (channel_out(ca->src, ca->out_num)) {
+							//printf("channel out..\n");
 							c = ca->code;
-							sp->mutex.unlock();
+							g_select.mutex.unlock();
 							goto fast_jmp; // out from this loop
 						}
 						else {
-							sp->mutex.unlock();
+							g_select.mutex.unlock();
 							throw orcaException(this, "orca.select", string("channel out failed: ")
 								+ ca->src->dump_str());
 						}
 					}
 
+					//printf("start efd wait\n");
 					int maxfd = sp->efd;
 					fd_set fd_rd;
 					FD_ZERO(&fd_rd);
@@ -3239,7 +3243,7 @@ fast_jmp:
 					}
 
 					g_select.regist(sp);
-					sp->mutex.unlock();
+					g_select.mutex.unlock();
 
 					int ret = select(maxfd+1, &fd_rd, NULL, NULL, NULL);
 					if (ret) {
@@ -3249,9 +3253,7 @@ fast_jmp:
 						}
 					}
 
-					sp->mutex.lock();
 					g_select.unregist(sp);
-					sp->mutex.unlock();
 				} while(true);
 
 				break;
@@ -3921,7 +3923,12 @@ void orcaVM::channel_signal(orcaObject* op)/*{{{*/
 {
 	SELECT* sp = g_select.find_select(op);
 	if (sp != NULL) {
+//printf("## signal processed: %p\n", sp);
 		sp->signal();
+	}
+	else {
+//printf("## select not found: %d\n", g_select.selects.size());
+
 	}
 }
 /*}}}*/

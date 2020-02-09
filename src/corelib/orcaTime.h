@@ -59,6 +59,14 @@ public:
 	void push_timer(double time, orcaTimer* to);
 	void pop_timer(orcaTimer* to);
 
+
+	void push_timer_gc(orcaTimer* to)
+	{
+		mutex_gc.lock();
+		timer_gc.push_back(to);
+		mutex_gc.unlock();
+	}
+
 private:
 	void push_timer_wo_lock(double time, orcaTimer* to);
 
@@ -69,6 +77,9 @@ private:
 	portMutex mutex;
 	pthread_t tid;
 	bool flag_quit;
+
+	portMutex mutex_gc;
+	vector<orcaTimer*> timer_gc;
 };
 
 extern orcaGlobalTimer* g_timer;
@@ -82,7 +93,9 @@ public:
 
 	virtual ~orcaTimer() 
 	{
-		g_timer->pop_timer(this);
+		if (!invalid) {
+			g_timer->pop_timer(this);
+		}
 	}
 
 	orcaObject* v_clone() {
@@ -104,6 +117,7 @@ public:
 		insert_native_function("->", (object_fp)&orcaTimer::ex_out);
 
 		nano_ts = -1;
+		invalid = false;
 	}
 
 	orcaData ex_stop(orcaVM* vm, int n) 
@@ -140,7 +154,14 @@ public:
 		get_current_vm()->channel_signal(this);
 	}
 
+	void invalidate()
+	{
+		invalid = true;
+		g_timer->push_timer_gc(this);
+	}
+
 	long long nano_ts;
+	bool invalid;
 };
 
 class orcaTicker : public orcaTimer 
@@ -150,7 +171,9 @@ public:
 
 	virtual ~orcaTicker() 
 	{
-		g_timer->pop_timer(this);
+		if (!invalid) {
+			g_timer->pop_timer(this);
+		}
 	}
 
 	orcaObject* v_clone() {
@@ -172,6 +195,7 @@ public:
 		insert_native_function("->", (object_fp)&orcaTimer::ex_out);
 
 		nano_ts = -1;
+		invalid = false;
 	}
 
 	double interval;

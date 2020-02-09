@@ -36,13 +36,37 @@ void orcaGlobalTimer::do_timer()
 			break;
 		}
 
+		// cleanup timer gc
+		mutex_gc.lock();
+		for (int i=0; i<timer_gc.size(); i++) {
+			multimap<long long, orcaTimer*>::iterator it = timers.begin();
+			for(; it != timers.end(); ++it) {
+				if (it->second == timer_gc[i]) {
+					timers.erase(it);
+					break;
+				}
+			}
+
+			delete timer_gc[i];
+		}
+
+		timer_gc.clear();
+		mutex_gc.unlock();
+
+
 		long long cns = current_ns();
 
 		multimap<long long, orcaTimer*>::iterator from = timers.begin();
 		multimap<long long, orcaTimer*>::iterator to = timers.upper_bound(cns);
 		for(; from != to; ++from) {
-			from->second->alarm(cns);
-			orcaTicker* tp = dynamic_cast<orcaTicker*>(from->second);
+			orcaTimer* timer = from->second;
+			if (timer->invalid) { // special case. erased by local.mark_return
+				delete timer;
+				continue;
+			}
+
+			timer->alarm(cns);
+			orcaTicker* tp = dynamic_cast<orcaTicker*>(timer);
 			if (tp != NULL) {
 				tickers.push_back(tp);
 			}
@@ -64,7 +88,6 @@ void orcaGlobalTimer::do_timer()
 	mutex.unlock();
 }
 
-
 void orcaGlobalTimer::push_timer(double time, orcaTimer* to)
 {
 	mutex.lock();
@@ -80,7 +103,7 @@ void orcaGlobalTimer::push_timer_wo_lock(double time, orcaTimer* to)
 	long long now = current_ns();
 	long long abs = now + rel;
 
-	if (abs > now) {
+	if (abs >= now) {
 		timers.insert(make_pair(abs, to));
 	}
 }

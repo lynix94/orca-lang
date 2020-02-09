@@ -26,7 +26,7 @@ public:
 	void unregist(SELECT* sp);
 	SELECT* find_select(orcaObject* op);
 
-private:
+//private:
 	set<SELECT*> selects; // machine wide select set
 	portMutex mutex;
 };
@@ -46,12 +46,19 @@ struct SELECT
 	{
 		efd = eventfd(0, 0);
 		curr_val = 0;
+		triggered = false;
+	}
+
+	~SELECT()
+	{
+		close(efd);
 	}
 
 	vector<CASE> cases;
 	portMutex mutex;
 	int efd;
 	uint64_t curr_val;
+	bool triggered;
 
 	void push_case(orcaObject* src, int out_num, const char* code);
 	void signal()
@@ -59,6 +66,7 @@ struct SELECT
 		mutex.lock();
 		curr_val++;
 		size_t ret = write(efd, &curr_val, sizeof(uint64_t));
+//printf("efd written\n");
 		mutex.unlock();
 	}
 };
@@ -70,7 +78,7 @@ public:
 
 	bool push()
 	{
-		SELECT sel;
+		SELECT* sel = new SELECT();
 		m_stack.push_back(sel);
 	};
 
@@ -80,19 +88,21 @@ public:
 			return NULL;
 		}
 
-		SELECT *sel = &m_stack[m_stack.size()-1];
+		SELECT* sel = m_stack[m_stack.size()-1];
 		return sel;
 	};
 
 	void pop()
 	{
+		SELECT* sel = top();
 		m_stack.pop_back();
+		delete sel;
 	};
 
 	void push_case(orcaObject* src, int out_num, const char* code);
 
-private:
-	vector<SELECT> m_stack;
+public:
+	vector<SELECT*> m_stack;
 	orcaVM* m_vm;
 };
 

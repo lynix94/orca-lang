@@ -17,6 +17,7 @@
 #include "orcaSwitchStack.h"
 #include "orcaException.h"
 #include "orcaTuple.h"
+#include "orcaTime.h"
 
 orcaLocal::orcaLocal(int size) 
 { 
@@ -311,7 +312,19 @@ void orcaLocal::mark_return(orcaData d)
 	// clean up tmp
 	if (m_mark.size() > 1024) {
 		for(int i=0; i<10; i++) {
-			(*m_mark.begin()).rc_dec();
+			orcaData d = (*m_mark.begin());
+			if (d.get_rc() == 1) {
+				if (is<TYPE_OBJ>(d)) {
+					if (isobj<orcaTimer>(d) || isobj<orcaTicker>(d)) {
+						orcaTimer *tp = static_cast<orcaTimer*>(d.o());
+						tp->invalidate(); // clean up later
+						m_mark.pop_front();
+						continue;
+					}
+				}
+			}
+
+			d.rc_dec();
 			m_mark.pop_front();
 		}
 	}

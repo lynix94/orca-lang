@@ -18,9 +18,9 @@ using namespace std;
 orcaGlobalSelect g_select;
 void orcaGlobalSelect::regist(SELECT* sp)
 {
-	mutex.lock();
+	//mutex.lock();
 	selects.insert(sp);
-	mutex.unlock();
+	//mutex.unlock();
 }
 
 void orcaGlobalSelect::unregist(SELECT* sp)
@@ -48,6 +48,7 @@ SELECT* orcaGlobalSelect::find_select(orcaObject* op)
 }
 
 
+// TODO: inc rc
 void SELECT::push_case(orcaObject* src, int out_num, const char* code)
 {
 	CASE new_case;
