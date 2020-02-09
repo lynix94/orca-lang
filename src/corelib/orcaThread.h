@@ -51,7 +51,10 @@ public:
 	pthread_t m_tid;
 
 	static THREAD_RET entryPoint(void* pthis) {
-		((orcaThread*)pthis)->execute( ((orcaThread*)pthis)->m_arg );
+		orcaThread* tp = (orcaThread*)pthis;
+		tp->rc_inc(); // keep rc until end
+		tp->execute( ((orcaThread*)pthis)->m_arg );
+		tp->rc_dec();
 		return 0;
 	}
 
