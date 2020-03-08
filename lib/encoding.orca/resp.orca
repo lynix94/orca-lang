@@ -1,4 +1,17 @@
 
+using encoding.resp;
+
+def error(msg)
+{
+	def message;
+
+	err = my.clone();
+	err.message = msg;
+
+	return err;
+}
+
+
 def encoding(src)
 {
 	switch src.TYPE
@@ -12,7 +25,6 @@ def encoding(src)
 	case type.list:
 		fallthrough;
 	case type.tuple:
-
 		ret = '*%d\r\n' % src.size();
 		for i in src {
 			ret += encoding(i);
@@ -21,7 +33,6 @@ def encoding(src)
 		return ret;
 
 	case type.map:
-
 		ret = '*%d\r\n' % src.size();
 		for k, v in src {
 			ret += encoding((k, v));
@@ -29,86 +40,65 @@ def encoding(src)
 
 		return ret;
 
+	case resp.error.TYPE:
+		return '-%s\r\n' % (src.message);
+
+	case nil.TYPE:
+		return '$-1\r\n';
+
+	case type.bool:
+		if src == true {
+			return ':1\r\n';
+		}
+		else {
+			return ':0\r\n';
+		}
+		
 	default:
 		str = string(src);
 		return '$%d\r\n%s\r\n' % (str.length(), str);
 	}
 }
 
-def.decode decoding(src, out)
+def.decode decoding(src)
 {
 	case '*', %count, '\r\n', %remain:
 		count = count.integer();
 
 		result = [];
-		decoding(remain, result);
-
-		if out == nil { # most outer
-			return result;
-		}
-		else {
-			out.push_back(result[:count]);
-			if result.size() > count {
-				out.push_back(result[count:]...);
+		for i in range(count) {
+			ret = decoding(remain);
+			if ret[0] == nil {
+				return [nil, src];
 			}
+
+			result.push_back(ret[0]);
+			remain = ret[1];
 		}
 
+		return [result, remain];
 
 	case '$', %len, '\r\n', %remain:
 		len = len.integer();
+		if remain.length() < len {
+			return [nil, src];
+		}
+
 		msg = remain[:len];
-		remain = remain[len:];
+		remain = remain[len+2:];
 
-		if out != nil {
-			out.push_back(msg);
-			decoding(remain[2:], out);
-		}
-		else {
-			if remain != '\r\n' {
-				throw resp.protocol <- 'resp protocol error';
-			}
-
-			return msg;
-		}
+		return [msg, remain];
 
 	case ':', %num, '\r\n', %remain:
-		if out != nil {
-			out.push_back(num.integer());
-			decoding(remain, out);
-		}
-		else {
-			if remain != '' {
-				throw resp.protocol <- 'resp protocol error';
-			}
-
-			return num.integer();
-		}
+		return [num.integer(), remain];
 
 	case '+', %msg, '\r\n', %remain:
-		if out != nil {
-			out.push_back(msg);
-			decoding(remain, out);
-		}
-		else {
-			if remain != '' {
-				throw resp.protocol <- 'resp protocol error';
-			}
+		return [msg, remain];
 
-			return msg;
-		}
+	case '-', %error, '\r\n', %remain:
+		return [resp.error(error), remain];
 
-	case '-', %error, '\r\n', remain:
-		if out != nil {
-			out.push_back('-' + error);
-			decoding(remain, out);
-		}
-		else {
-			if remain != '' {
-				throw resp.protocol <- 'resp protocol error';
-			}
-
-			return '-' +error;
-		}
+	case %remain:
+		return [nil, remain];
 }
-
 

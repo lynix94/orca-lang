@@ -1,5 +1,6 @@
 
 using datetime;
+using encoding.resp;
 
 
 def handle;
@@ -26,7 +27,7 @@ def read_line(timeout)
 		..buffer += ..handle.read(4096, timeout);
 
 		if timeout != nil {
-			now = datetime.now().timeout();
+			now = datetime.now().timestamp();
 			if now - start > timeout {
 				return '';
 			}
@@ -55,7 +56,7 @@ def read(size, timeout)
 
 
 		if timeout != nil {
-			now = datetime.now().timeout();
+			now = datetime.now().timestamp();
 			if now - start > timeout {
 				return '';
 			}
@@ -79,7 +80,7 @@ def read_until(until, timeout)
 		..buffer += ..handle.read(4096, timeout);
 
 		if timeout != nil {
-			now = datetime.now().timeout();
+			now = datetime.now().timestamp();
 			if now - start > timeout {
 				return '';
 			}
@@ -87,10 +88,46 @@ def read_until(until, timeout)
 	}
 }
 
+def read_resp(timeout, allow_line)
+{
+	start = datetime.now().timestamp();
+	while true {
+		ret = resp.decoding(..buffer);
+		if ret[0] == nil && allow_line == true {
+			idx = ret[1].find('\r\n');
+			if idx >= 0 {
+				result = ret[1][:idx];
+				..buffer = ret[1][idx+2:]; 
+				return result;
+			}
+		}
+
+		if ret[0] == nil {
+			..buffer += ..handle.read(4096, timeout);
+			if timeout != nil {
+				now = datetime.now().timestamp();
+				if now - start > timeout {
+					return '';
+				}
+			}
+
+			continue;
+		}
+
+		..buffer = ret[1];
+		return ret[0];
+	}
+}
+
 
 def write(msg)
 {
 	return ..handle.write(msg);
+}
+
+def write_resp(msg)
+{
+	return ..handle.write(resp.encoding(msg));
 }
 
 

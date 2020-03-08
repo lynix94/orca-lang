@@ -103,12 +103,12 @@ def generate(req)
 
 	dict = {,};
 	for key in sorted(keys) {
-		if ..MEMBERS.has_key(key) {
-			value = ..MEMBERS[key](req);
+		if owner.MEMBERS.has_key(key) {
+			value = owner.MEMBERS[key](req);
 			dict[key] = value;
 		}
-		elif owner.MEMBERS.has_key(key) {
-			value = owner.MEMBERS[key](req);
+		elif owner.owner.MEMBERS.has_key(key) {
+			value = owner.owner.MEMBERS[key](req);
 			dict[key] = value;
 		}
 		elif req.get.has_key(key) {
