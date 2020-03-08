@@ -13,11 +13,18 @@
 #include "orcaTime.h"
 
 #include "orcaThread.h"
+
+#include "boost/date_time/posix_time/posix_time.hpp"
+#include "boost/date_time/local_time_adjustor.hpp"
+#include "boost/date_time/c_local_time_adjustor.hpp"
+typedef boost::date_time::c_local_adjustor<ptime> local_adj;
+
 set<pthread_t> orcaThread::m_remains;
 
 cp_map<orcaData>::Type orcaDate::m_static_date;
 cp_map<orcaData>::Type orcaTime::m_static_time;
 cp_map<orcaData>::Type orcaDatetime::m_static_datetime;
+
 
 void orcaDatetime::__init()
 {
@@ -66,8 +73,14 @@ orcaData orcaDatetime::ex_init(orcaVM* vm, int n)
 		return this;
 	}
 
-	string format = vm->get_param(0).String();
-	init_by_string(format);
+	orcaData p = vm->get_param(0);
+	if (is<TYPE_INT>(p) || is<TYPE_REAL>(p)) {
+		m_ptime = local_adj::utc_to_local(from_time_t(p.Integer()));
+	}
+	else {
+		string format = p.String();
+		init_by_string(format);
+	}
 	return this;
 }
 
