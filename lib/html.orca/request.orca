@@ -6,6 +6,8 @@ def post := {,};
 
 def cookies := {,};
 
+def session := {,};
+
 def multipart := {,};
 
 def url := '';
@@ -15,8 +17,9 @@ def uri := '';
 def string()
 {
 	b = strings.builder();
-	b.push_back("Request{url:%s, uri:%s, get:%s, post:%s, cookies:%s, multipart:%s}" % (..url, ..uri, ..get, ..post, ..cookies, ..multipart));
+	b.push_back("Request{url:%s, uri:%s, get:%s, post:%s, cookies:%s, session:%s, multipart:%s}" % (..url, ..uri, ..get, ..post, ..cookies, ..session, ..multipart));
 
 	return b.string();
 }
+
 

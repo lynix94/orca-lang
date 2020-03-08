@@ -18,7 +18,7 @@ def send(msg)
 def send_error(msg)
 {
 	res = '''HTTP/1.1 ${msg}
-Server: Orca/0.4 (Unix)  (Red-Hat/Linux)
+Server: Orca/0.9 (Unix)  (Red-Hat/Linux)
 Accept-Ranges: bytes
 Content-Length: ${msg.length()}
 Connection: close
@@ -96,6 +96,7 @@ def run()
 			..sock.close();
 			break;
 		}
+
 	} while(true);
 
 	print: 'thread ${my.ID} done';
@@ -150,6 +151,11 @@ def do_what(msg)
 		for a in str_list {
 			req.cookies = ..get_param(a, req.cookies);
 		}
+	}
+
+	// process session
+	if req.cookies.has_key('sonar-session') {
+		req.session = core.session.get_session(req.cookies['sonar-session'], true);
 	}
 
 	// process multipart parameters

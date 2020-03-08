@@ -151,7 +151,13 @@ def generate(req)
 	}
 
 	result += ..__tail;
-	return result;
+
+	header = '';
+	if req.MEMBERS['__SONAR_SESSION__'] != nil {
+		header = 'Set-Cookie: sonar-session=%s\r\n' % req.__SONAR_SESSION__;
+	}
+
+	return (header, result);
 }
 
 

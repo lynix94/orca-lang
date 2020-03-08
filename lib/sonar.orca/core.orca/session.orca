@@ -6,19 +6,26 @@ def init_once
 	random.seed();
 }
 
+# TODO: LRU delete
+# TODO: mutex
 def session;
 
 def alloc_session()
 {
 	id = random.string(20);
-	..session[id] = type.map();
+	..session[id] = {,};
 
 	return id;
 }
 
-def get_session(id)
+def get_session(id, create)
 {
 	if ..session.has_key(id) {
+		return ..session[id];
+	}
+
+	if create {
+		..session[id]= {,};
 		return ..session[id];
 	}
 
