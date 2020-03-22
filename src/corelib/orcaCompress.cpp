@@ -222,9 +222,9 @@ void int64_diff::int64_append(long long value)
 
 // timestamp
 // 0: same
-// 10xx xxxx: -63 ~ 64, 6bit
-// 110x xxxx xxxx xxxx: -8191, 8192, 13bit
-// 1110 xxxx xxxx xxxx xxxx xxxx xxxx xxxx: -268435455, 268435456, 28bit
+// 10xx xxxx: -32 ~ 31, 6bit
+// 110x xxxx xxxx xxxx: -4096, 4095, 13bit
+// 1110 xxxx xxxx xxxx xxxx xxxx xxxx xxxx: -134,217,728, 134,217,727, 28bit
 // 1111 xxxx*: 64bit
 void int64_diff::diff_diff_append(long long value)
 {
@@ -233,19 +233,19 @@ void int64_diff::diff_diff_append(long long value)
 		return;
 	}
 
-	if (value > -63 && value < 64) {
+	if (value >= -32 && value <= 31) {
 		bs.bitappend(2, 1); // 01
 		bs.bitappend(6, value);
 		return;
 	}
 	
-	if (value > -8191 && value < 8192) {
+	if (value >= -4096 && value <= 4095) {
 		bs.bitappend(3, 3); //  011
 		bs.bitappend(13, value);
 		return;
 	}
 	
-	if (value > -268435455 && value < 268435456) {
+	if (value > -134217728 && value < 134217727) {
 		bs.bitappend(4, 7); // 0111
 		bs.bitappend(28, value);
 		return;
@@ -340,6 +340,10 @@ int int64_diff::uncompress(vector<long long>& result, long long until, int limit
 
 orcaData orcaTsDiff::ex_init(orcaVM* vm, int n)
 {
+	block_ts_precision = 0;
+	block_precision = 0;
+	closed = false;
+
 	if (n == 0) {
 		ts_precision = 3;
 		precision = -1;
@@ -417,8 +421,136 @@ orcaData orcaTsDiff::ex_push_back(orcaVM* vm, int n)
 	return NIL;
 }
 
+orcaData orcaTsDiff::ex_batch_compress(orcaVM* vm, int n)
+{
+	if (n != 1) {
+		vm->need_param(1);
+	}
+
+	orcaList* lp = castobj<orcaList>(vm->get_param(0));
+	if (lp == NULL) {
+		throw orcaException(vm, "orca.type", "list type expected");
+	}
+
+	vector<long long> v_ts;
+	vector<long long> v_value;
+
+	long long ts_scaleup = pow(10, ts_precision);
+	long long v_scaleup = pow(10, precision);
+
+	list<orcaData>* us_lp = lp->unsafe_list();
+	list<orcaData>::iterator it = us_lp->begin();
+
+	//for (int i=0; i<lp->size(); i++) {
+		//orcaTuple* tp = castobj<orcaTuple>(lp->at(i));
+	for (; it != us_lp->end(); ++it) {
+		orcaTuple* tp = castobj<orcaTuple>(*it);
+		
+		if (tp == NULL) {
+			throw orcaException(vm, "orca.type", "tuple type expected");
+		}
+		
+		orcaData ts = tp->at(0);
+		orcaData value = tp->at(1);
+
+		if (ts_precision < 0) {
+			dts.float64_append(ts.Double());
+		}
+		else {
+			if (ts_precision == 0) {
+				v_ts.push_back(ts.Integer());
+			}
+			else {
+				double d = ts.Double();
+				d *= ts_scaleup;
+				long long ll = (long long)d;
+				v_ts.push_back(ll);
+			}
+		}
+
+		if (precision < 0) {
+			dv.float64_append(value.Double());
+		}
+		else {
+			if (precision == 0) {
+				v_value.push_back(value.Integer());
+			}
+			else {
+				double d = value.Double();
+				d *= v_scaleup;
+				long long ll = (long long)d;
+				v_value.push_back(ll);
+			}
+		}
+	}
+
+
+	if (ts_precision > 0) {
+		int scale = 0;
+		int p = 10;
+		for (; p<1000000000; p*=10, scale++) {
+			bool passed = true;
+			for (int i=0; i<v_ts.size(); i++) {
+				if ((v_ts[i]%p) != 0) {
+					passed = false;
+					break;
+				}
+			}
+
+			if (passed == false) {
+				p /= 10;
+				break;
+			}
+		}
+
+		for (int i=0; i<v_ts.size(); i++) {
+			v_ts[i] = v_ts[i]/p;
+		}
+
+		block_ts_precision = scale;
+	}
+
+	if (precision > 0) {
+		int scale = 0;
+		int p = 10;
+		for (; p<1000000000; p*=10, scale++) {
+			bool passed = true;
+			for (int i=0; i<v_value.size(); i++) {
+				if ((v_value[i]%p) != 0) {
+					passed = false;
+					break;
+				}
+			}
+
+			if (passed == false) {
+				p /= 10;
+				break;
+			}
+		}
+
+		for (int i=0; i<v_value.size(); i++) {
+			v_value[i] = v_value[i]/p;
+		}
+
+		block_precision = scale;
+	}
+
+
+	for (int i=0; i<v_ts.size(); i++) {
+		its.int64_append(v_ts[i]);
+	}
+
+	for (int i=0; i<v_value.size(); i++) {
+		iv.int64_append(v_value[i]);
+	}
+
+	return NIL;
+}
+
+
 orcaData orcaTsDiff::ex_uncompress(orcaVM* vm, int n)
 {
+	//printf("[uncompress] ts_prec: %d, prec: %d, b_ts_prec:%d, b_prec:%d\n", ts_precision, precision, block_ts_precision, block_precision);
 	double until = -1;
 	int limit = INT_MAX;
 
@@ -431,38 +563,50 @@ orcaData orcaTsDiff::ex_uncompress(orcaVM* vm, int n)
 
 	vector<long long> its_result;
 	vector<double> dts_result;
-	if (ts_precision == 0) {
+	long long b_ts_scaleup = pow(10, block_ts_precision);
+	long long ts_scaledown = pow(10, ts_precision);
+
+	if (ts_precision >= 0) {
 		its.uncompress(its_result, (long long)until, limit);
 		limit = its_result.size();
-	}
-	else if (ts_precision > 0) {
-		its.uncompress(its_result, (long long)until, limit);
-		limit = its_result.size();
-		for (int i=0; i<count(); i++) {
-			double d = (double)its_result[i] / pow(10, ts_precision);
-			dts_result.push_back(d);
-		}
 	}
 	else {
 		dts.uncompress(dts_result, until, limit);
 		limit = dts_result.size();
 	}
 
+	for (int i=0; i<its_result.size(); i++) {
+		if (block_ts_precision > 0) {
+			its_result[i] = its_result[i] * b_ts_scaleup;
+		}
+
+		if (ts_precision > 0) {
+			double d = (double)its_result[i] / ts_scaledown;
+			dts_result.push_back(d);
+		}
+	}
+
+
 	vector<long long> iresult;
 	vector<double> dresult;
-	if (precision == 0) {
+	long long b_scaleup = pow(10, block_precision);
+	long long scaledown = pow(10, precision);
+	if (precision >= 0) {
 		iv.uncompress(iresult, -1, limit);
-	}
-	else if (precision > 0) {
-		iv.uncompress(iresult, -1, limit);
-
-		for (int i=0; i<count(); i++) {
-			double d = (double)iresult[i] / pow(10, precision);
-			dresult.push_back(d);
-		}
 	}
 	else {
 		dv.uncompress(dresult, -1, limit);
+	}
+
+	for (int i=0; i<iresult.size(); i++) {
+		if (block_precision > 0) {
+			iresult[i] = iresult[i] * b_scaleup;
+		}
+
+		if (precision > 0) {
+			double d = (double)iresult[i] / scaledown;
+			dresult.push_back(d);
+		}
 	}
 
 	orcaList *lp = new orcaList();

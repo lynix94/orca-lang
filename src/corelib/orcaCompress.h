@@ -53,6 +53,7 @@ public:
 		insert_native_function("size", (object_fp)&orcaTsDiff::ex_size);
 		insert_native_function("push_back", (object_fp)&orcaTsDiff::ex_push_back);
 		insert_native_function("uncompress", (object_fp)&orcaTsDiff::ex_uncompress);
+		insert_native_function("batch_compress", (object_fp)&orcaTsDiff::ex_batch_compress);
 	}
 
 	~orcaTsDiff() { }
@@ -68,12 +69,18 @@ public:
 	orcaData ex_size(orcaVM* vm, int n);
 	orcaData ex_push_back(orcaVM* vm, int n);
 	orcaData ex_uncompress(orcaVM* vm, int n);
+	orcaData ex_batch_compress(orcaVM* vm, int n);
 
 	int count();
 
 private:
 	int ts_precision; // -1: double, 0: integer, >1: per n
 	int precision; // -1: double, 0: integer, >1: per n
+
+	int block_ts_precision; // internal precision
+	int block_precision;
+	bool closed;
+
 
 	int64_diff its;
 	float64_diff dts;

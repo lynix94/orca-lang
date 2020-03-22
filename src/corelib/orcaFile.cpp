@@ -82,11 +82,14 @@ orcaData orcaFile::ex_read_line(orcaVM* vm, int n)
 	string line;
 	do {
 		char buff[4*ONE_K];
-		if (fgets(buff, sizeof(buff), m_fp) != NULL) {
-			line += buff;
+		char* cp = fgets(buff, sizeof(buff), m_fp);
+		if (cp == NULL) {
+			throw orcaException(vm, "orca.file.eof", "EOF");
 		}
 
-		if (buff[sizeof(buff)-1] != 0 || buff[sizeof(buff)-2] == 0) {
+		line += cp;
+		int len = strlen(cp);
+		if (cp[len-1] == '\n') {
 			break;
 		}
 	} while (true);

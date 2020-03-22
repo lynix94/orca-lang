@@ -452,6 +452,8 @@ size_t orcaBitStream::bitappend(int size, long long value)
 			if (value & ((long long)1 << i)) {
 				data[byte_idx] = (b | ((long long)1 << bit_offset));
 			}
+			else {
+			}
 		}
 
 		bit_size++;

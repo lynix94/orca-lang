@@ -424,7 +424,12 @@ void orcaData::string_(orcaVM* vm, string& str) const/*{{{*/
 		break;
 
 	case TYPE_EXTRACT:
-		sprintf(buff, "extract");
+		str += "extract";
+ 		break;
+
+	case TYPE_PAIR:
+		sprintf(buff, "%d:%d", v.sl.from, v.sl.to);
+		str += buff;
  		break;
 
 	default:
@@ -536,6 +541,10 @@ char* orcaData::dump(char* buff) const/*{{{*/
 
 	case TYPE_EXTRACT:
 		sprintf(buff, "extract");
+ 		break;
+
+	case TYPE_PAIR:
+		sprintf(buff, "slice: %d:%d", v.sl.from, v.sl.to);
  		break;
 
 	default:

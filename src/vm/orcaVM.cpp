@@ -4116,8 +4116,16 @@ orcaData get_collection_at(orcaData& src, orcaData& idx, bool ir, orcaVM* vm)/*{
 			vm = get_current_vm();
 		}
 
+		orcaData p = idx;
+		if (is<TYPE_PAIR>(idx)) {
+			orcaTuple* tp = new orcaTuple();
+			tp->push_back(idx.sl().from);
+			tp->push_back(idx.sl().to);
+			p = tp;
+		}
+
 		vm->push_stack(d);
-		vm->push_param(idx);
+		vm->push_param(p);
 		vm->call(1);
 		ret = vm->pop_stack();
 	}
