@@ -66,4 +66,26 @@ def button(id, action)
 	return my.__template % {'id':id, 'action':action() };
 }
 
+def datetimepicker(id, label, action)
+{
+	def __template := '''
+		%{label}
+		<div id="div_%{id}" style="display:inline">
+			<input type="text" id="%{id}" value="" autocomplete="off">
+			<script type="text/javascript">
+				$('#%{id}').datetimepicker({
+					showSecond: true,
+					dateFormat: 'yy-mm-dd',
+					timeFormat: 'HH:mm:ss',
+					onClose: function(dateTimeText, inst) {
+						%{action};
+					}
+				})
+			</script>
+		</div>
+		''';
+
+	return my.__template % {'id':id, 'label':label, 'action':action()};
+}
+
 

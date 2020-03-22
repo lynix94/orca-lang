@@ -209,8 +209,11 @@ void int64_diff::int64_append(long long value)
 	else {
 		long long diff = value - last_value;
 		long long diff_diff = diff - last_diff;
+		//printf("value: %lld, last_value: %lld, diff: %lld, last_diff: %lld, diff_diff: %lld\n", value, last_value, diff, last_diff, diff_diff);
+
 		last_diff = diff;
 		diff_diff_append(diff_diff);
+
 	}
 	
 	count++;
@@ -304,7 +307,7 @@ int int64_diff::uncompress(vector<long long>& result, long long until, int limit
 		}
 		else if ((tag & 0x0F) == 7) { // 0111
 			diff_diff = bs.bitget(idx+4, 28);
-			if (diff_diff & 0x10000000000000) {
+			if (diff_diff & 0x8000000) {
 				diff_diff = (long long)(0xFFFFFFFFF0000000) | diff_diff;
 			}
 			idx+=32;

@@ -411,6 +411,7 @@ long long orcaBitStream::bitget(int bit_idx, int size)
 		bit_idx++;
 	}
 
+
 	return ret;
 }
 
@@ -422,9 +423,9 @@ void orcaBitStream::bitset(int bit_idx, int size, long long value)
 
 		char b = data[byte_idx];
 		if (value & ((long long)1 << i)) {
-			data[byte_idx] = b | ((long long)1 << bit_offset);
+			data[byte_idx] = (b | ((long long)1 << bit_offset));
 		} else {
-			data[byte_idx] = b & ~((long long)1 << bit_offset);
+			data[byte_idx] = (b & ~((long long)1 << bit_offset));
 		}
 
 		bit_idx++;
@@ -449,7 +450,7 @@ size_t orcaBitStream::bitappend(int size, long long value)
 		else {
 			char b = data[byte_idx];
 			if (value & ((long long)1 << i)) {
-				data[byte_idx] = b | ((long long)1 << bit_offset);
+				data[byte_idx] = (b | ((long long)1 << bit_offset));
 			}
 		}
 

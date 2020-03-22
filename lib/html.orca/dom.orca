@@ -157,7 +157,11 @@ def generate(req)
 		header = 'Set-Cookie: sonar-session=%s\r\n' % req.__SONAR_SESSION__;
 	}
 
-	return (header, result);
+	if header != '' {
+		return (header, result);
+	}
+
+	return result;
 }
 
 
