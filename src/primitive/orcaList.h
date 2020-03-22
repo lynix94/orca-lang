@@ -94,6 +94,12 @@ public:
 	virtual orcaListIter begin();
 	virtual orcaListIter end();
 
+	// unsafe
+	list<orcaData>* unsafe_list()
+	{
+		return &m_value;
+	}
+
 protected:
 	list<orcaData> m_value;
 	static cp_map<orcaData>::Type m_static_list;
