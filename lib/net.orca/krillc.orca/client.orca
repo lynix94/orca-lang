@@ -27,6 +27,12 @@ def connect()
 	..sock.connect(..ip, ..port);
 }
 
+def disconnect()
+{
+	..sock.close();
+}
+
+
 
 def tsadd(...param)
 {
@@ -38,22 +44,40 @@ def tsadd(...param)
 	}
 
 	..buffer.write(msg + '\r\n');
-	ret = ..buffer.read_line();
+	ret = ..buffer.read_resp();
 	return ret;
 }
 
 def tsrange(start, end, ...key_list)
 {
-	msg = 'tsrange %f %f ' % (start, end);
+	if start == nil {
+		start = '0';
+	}
+	if end == nil {
+		end = '2000000000';
+	}
+
+	msg = 'tsrange %s %s ' % (start, end);
 
 	for key in key_list {
 		msg += '%s ' % key;
 	}
 
 	..buffer.write(msg + '\r\n');
-	ret = ..buffer.read_line();
-	len = ret[1:].integer();
-	ret = ..buffer.read(len+2); # include \r\n
+	ret = ..buffer.read_resp();
+	return ret;
+}
+
+def tslist(param)
+{
+	if param == nil {
+		..buffer.write('tslist\r\n');
+	}
+	else {
+		..buffer.write('tslist %s\r\n' % param);
+	}
+
+	ret = ..buffer.read_resp();
 	return ret;
 }
 

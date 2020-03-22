@@ -1,0 +1,50 @@
+
+using net.krillc;
+using socket;
+using ipc;
+
+def addr;
+def ip;
+def port;
+
+def conns;
+def lock;
+
+
+def init(addr)
+{
+	..addr = addr;
+	toks = addr.split(':');
+
+	..ip = socket.gethostbyname(toks[0])[0];
+	..port = toks[1].integer();
+
+	..conns = [];
+	..lock = ipc.mutex.clone();
+}
+
+
+def get()
+{
+	..lock {
+		if !..conns.empty() {
+			c = ..conns[-1];
+			..conns.pop_back();
+			
+			return c;
+		}
+	}
+
+	c = krillc.client.clone(..addr);
+	c.connect();
+	return c;
+}
+
+
+def release(c)
+{
+	..lock {
+		..conns.push_back(c);
+	}
+}
+
