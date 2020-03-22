@@ -47,20 +47,7 @@ public:
 	orcaData ex_eq(orcaVM* vm, int n); 
 	orcaData ex_timestamp(orcaVM* vm, int n); 
 
-	void init_by_string(string& format)
-	{
-		try {
-			if (format.length() <= 15) {
-				m_ptime = from_iso_string(format);
-			}
-			else {
-				m_ptime = time_from_string(format);
-			}
-		}
-		catch (...) {
-			throw orcaException(NULL, "orca.format", "invalid time format");
-		}
-	}
+	void init_by_string(string& format);
 
 	virtual string pack_save()
 	{

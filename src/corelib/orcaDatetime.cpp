@@ -54,7 +54,7 @@ orcaDatetime::orcaDatetime(ptime t)
 orcaDatetime::orcaDatetime(time_t t)
 {
 	__init();
-	m_ptime = from_time_t(t);
+	m_ptime = local_adj::utc_to_local(from_time_t(t));
 }
 
 ptime& orcaDatetime::get_ptime()
@@ -84,6 +84,27 @@ orcaData orcaDatetime::ex_init(orcaVM* vm, int n)
 	return this;
 }
 
+void orcaDatetime::init_by_string(string& format)
+{
+	try {
+		if (format.length() <= 15) {
+			m_ptime = from_iso_string(format);
+		}
+		else {
+			if (format.find('T') != string::npos) {
+				int idx = format.find('T');
+				format.replace(idx, 1, " ");
+			}
+
+			m_ptime = time_from_string(format);
+		}
+	}
+	catch (...) {
+		throw orcaException(NULL, "orca.format", string("invalid time format: ") + format);
+	}
+}
+
+
 orcaData orcaDatetime::ex_now(orcaVM* vm, int n) 
 {
 	return new orcaDatetime(microsec_clock::local_time());
@@ -101,7 +122,7 @@ orcaData orcaDatetime::ex_time(orcaVM* vm, int n)
 
 orcaData orcaDatetime::ex_timestamp(orcaVM* vm, int n) 
 {
-	ptime from = from_time_t(0);
+	ptime from = local_adj::utc_to_local(from_time_t(0));
 	time_duration diff = m_ptime - from;
 
 	double d = diff.total_seconds() + (diff.fractional_seconds()/1000000.0);
