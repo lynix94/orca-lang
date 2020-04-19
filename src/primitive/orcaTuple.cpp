@@ -168,7 +168,22 @@ orcaData orcaTuple::slice(int start, int end, bool include_right)
 void orcaTuple::update(int idx, orcaData d) 
 {
 	int len = m_value.size();
-	if (idx < 0) idx += len;
+
+	if (idx >= len) {
+		throw orcaException(NULL, "orca.index", string("out of index. size: ") + 
+				boost::lexical_cast<string>(len) + " index: " + 
+				boost::lexical_cast<string>(idx));
+	}
+
+	if (idx < 0) {
+		idx = len + idx;
+
+		if (idx < 0) {
+			throw orcaException(NULL, "orca.index", string("out of index. size: ") + 
+					boost::lexical_cast<string>(len) + " index: " + 
+					boost::lexical_cast<string>(idx));
+		}
+	}
 
 	m_value[idx].rc_dec();
 	m_value[idx] = d;
