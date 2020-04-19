@@ -16,8 +16,9 @@
 
 class LIBORCA_API orcaListIterator : public orcaObject
 {
+friend class orcaList;
 public:
-	orcaListIterator(orcaListIter it, orcaListIter begin, orcaListIter end, bool flag_ready=true);
+	orcaListIterator(orcaListIter it, orcaListIter begin, orcaListIter end, bool flag_ready, orcaObject* source);
 	orcaListIterator(void *) {}
 	orcaObject* v_clone();
 	virtual ~orcaListIterator();
@@ -41,6 +42,8 @@ protected:
 	orcaListIter m_iter;
 	orcaListIter m_begin;
 	orcaListIter m_end;
+
+	orcaObject* source;
 };
 #endif
 

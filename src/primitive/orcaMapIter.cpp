@@ -30,6 +30,8 @@ orcaMapIter::orcaMapIter(orcamap_iterator it, orcaMap* mp, bool flag_ready, bool
 	m_timestamp = mp->get_timestamp();
 	this->flag_ready = flag_ready;
 	this->is_iter2 = is_iter2;
+
+	m_mp->rc_inc();
 }
 
 bool orcaMapIter::valid()
@@ -46,7 +48,10 @@ orcaObject* orcaMapIter::v_clone()
 	return new orcaMapIter(m_iter, m_mp, flag_ready);
 }
 
-orcaMapIter::~orcaMapIter() { }
+orcaMapIter::~orcaMapIter()
+{
+	m_mp->rc_dec();
+}
 
 orcaData orcaMapIter::ex_key(orcaVM* vm, int n) 
 {

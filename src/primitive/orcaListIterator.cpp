@@ -13,7 +13,7 @@
 
 
 
-orcaListIterator::orcaListIterator(orcaListIter it, orcaListIter begin, orcaListIter end, bool flag_ready)
+orcaListIterator::orcaListIterator(orcaListIter it, orcaListIter begin, orcaListIter end, bool flag_ready, orcaObject* source)
 {
 	set_name("iter"); 
 	insert_native_function("next", (object_fp)&orcaListIterator::ex_next);
@@ -26,15 +26,21 @@ orcaListIterator::orcaListIterator(orcaListIter it, orcaListIter begin, orcaList
 	m_begin = begin;
 	m_end = end;
 	this->flag_ready = flag_ready;
+	this->source = source;
+	this->source->rc_inc();
 }
 
 orcaObject* orcaListIterator::v_clone()
 {
-	orcaListIterator* lp = new orcaListIterator(m_iter, m_begin, m_end, flag_ready);
+	orcaListIterator* lp = new orcaListIterator(m_iter, m_begin, m_end, flag_ready, source);
+
 	return lp;
 }
 
-orcaListIterator::~orcaListIterator() { }
+orcaListIterator::~orcaListIterator()
+{
+	source->rc_dec();
+}
 
 orcaData orcaListIterator::operator()(orcaVM* vm, int n)
 {

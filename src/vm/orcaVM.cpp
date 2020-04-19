@@ -3007,7 +3007,7 @@ fast_jmp:
 				}
 				else if (isobj<orcaList>(p1)) {
 					lp = castobj<orcaList>(p1);
-					iterator = lit = new orcaListIterator(lp->begin(), lp->begin(), lp->end(), false);
+					iterator = lit = new orcaListIterator(lp->begin(), lp->begin(), lp->end(), false, lp);
 				}
 				else {
 					orcaData out;

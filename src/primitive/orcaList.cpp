@@ -436,34 +436,34 @@ orcaData orcaList::ex_find(orcaVM* vm, int n)
 	orcaListIter it_end = end();
 	for (; it!=it_end; ++it) {
 		if ((*it).operator_eq(vm, val).Boolean()) {
-			return new orcaListIterator(it, begin(), it_end);
+			return new orcaListIterator(it, begin(), it_end, true, this);
 		}
 	}
 
-	return new orcaListIterator(it_end, begin(), it_end);
+	return new orcaListIterator(it_end, begin(), it_end, true, this);
 }
 
 orcaData orcaList::ex_iter(orcaVM* vm, int n) 
 {
-	return new orcaListIterator(begin(), begin(), end(), false);
+	return new orcaListIterator(begin(), begin(), end(), false, this);
 }
 
 orcaData orcaList::ex_first(orcaVM* vm, int n) 
 {
-	return new orcaListIterator(begin(), begin(), end());
+	return new orcaListIterator(begin(), begin(), end(), true, this);
 }
 
 orcaData orcaList::ex_last(orcaVM* vm, int n) 
 {
 	orcaListIter li = end();
 	--li;
-	return new orcaListIterator(li, begin(), end());
+	return new orcaListIterator(li, begin(), end(), true, this);
 }
 
 
 orcaData orcaList::ex_end(orcaVM* vm, int n) 
 {
-	return new orcaListIterator(end(), begin(), end());
+	return new orcaListIterator(end(), begin(), end(), true, this);
 }
 
 void orcaList::sort(orcaVM* vm, orcaData fun)

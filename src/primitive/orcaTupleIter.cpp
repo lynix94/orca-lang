@@ -25,6 +25,7 @@ orcaTupleIter::orcaTupleIter(orcatuple_iterator it, orcaTuple* tp, bool flag_rea
 	m_timestamp = tp->get_timestamp();
 
 	this->flag_ready = flag_ready;
+	m_tp->rc_inc();
 }
 
 bool orcaTupleIter::valid()
@@ -41,7 +42,10 @@ orcaObject* orcaTupleIter::v_clone()
 	return new orcaTupleIter(m_iter, m_tp, flag_ready);
 }
 
-orcaTupleIter::~orcaTupleIter() { }
+orcaTupleIter::~orcaTupleIter()
+{
+	m_tp->rc_dec();
+}
 
 orcaData orcaTupleIter::operator()(orcaVM* vm, int n) 
 {
