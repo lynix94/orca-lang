@@ -133,7 +133,7 @@ public:
 	void cleanup();
 
 	inline orcaData invoke_internal_func(InternalFunction& in, int param_n);
-	void call(int param_n, bool dont_mark=false);
+	void call(int param_n, orcaData* out=NULL);
 
 	orcaObject* find_object_by_path(const char* path);
 	orcaObject* exec_define(const char* c, int size, const char* code, 

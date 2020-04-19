@@ -614,7 +614,7 @@ struct auto_local/*{{{*/
 };
 /*}}}*/
 
-void orcaVM::call(int param_n, bool dont_mark)/*{{{*/
+void orcaVM::call(int param_n, orcaData* value_out)/*{{{*/ // value_out used for for
 {
 	m_local->depth_check(this);
 #ifdef _VM_DEBUG_
@@ -634,6 +634,10 @@ void orcaVM::call(int param_n, bool dont_mark)/*{{{*/
 
 			r = invoke_internal_func(f.internal(), param_n);
 			m_stack->push(r);
+			if (value_out != NULL) {
+				*value_out = m_stack->top();
+				value_out->rc_inc();
+			}
 		}}
 	}
 	else if (is<TYPE_NATIVE>(f)) {
@@ -646,6 +650,10 @@ void orcaVM::call(int param_n, bool dont_mark)/*{{{*/
 
 			r = f.native_call(this, param_size);
 			m_stack->push(r);
+			if (value_out != NULL) {
+				*value_out = m_stack->top();
+				value_out->rc_inc();
+			}
 		}}
 	}
 	else if (is<TYPE_OBJ>(f)) {
@@ -674,11 +682,15 @@ void orcaVM::call(int param_n, bool dont_mark)/*{{{*/
 				auto_trace at(this);
 				m_trace->top_name = m_curr->get_name();
 				orcaData ret = (*f.o())(this, param_size);
-				if (dont_mark == false) {
-					m_local->mark_return(ret);
-				}
 
 				m_stack->push(ret);
+				if (value_out != NULL) {
+					*value_out = m_stack->top();
+					value_out->rc_inc();
+				}
+				else {
+					m_local->mark_return(ret);
+				}
 			}}
 		}}
 	}
@@ -778,6 +790,11 @@ void orcaVM::call(int param_n, bool dont_mark)/*{{{*/
 				m_stack->replace(NIL);
 				break;
 			}
+
+			if (value_out != NULL) {
+				*value_out = m_stack->top();
+				value_out->rc_inc();
+			}
 		}}
 	}
 	else {
@@ -785,6 +802,10 @@ void orcaVM::call(int param_n, bool dont_mark)/*{{{*/
 
 			m_local->copy_from_stack(m_stack, param_n);
 			//m_stack->pop();	// return itself
+			if (value_out != NULL) {
+				*value_out = m_stack->top();
+				value_out->rc_inc();
+			}
 		}}
 	}
 }

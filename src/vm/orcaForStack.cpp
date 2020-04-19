@@ -255,8 +255,9 @@ const char* orcaForStack::cont(orcaLocal* local)
 	try {
 		orcaVM* vm = get_current_vm();
 		vm->push_stack(f->next);
-		vm->call(0, true); // iter.next();
-		orcaData result = vm->m_stack->top();
+		orcaData result;
+		vm->call(0, &result); // iter.next(); // value out is optimization for for_stmt (to avoid mark return)
+
 		if (f->lv2 >= 0) {
 			if (f->is_iter2) {
 				orcaTuple* tp = castobj<orcaTuple>(result);
@@ -278,6 +279,7 @@ const char* orcaForStack::cont(orcaLocal* local)
 		}
 
 		vm->m_stack->pop();
+		result.rc_dec(); // pair of rc_inc() by call() above
 	}
 	catch(orcaException& e) {
 		if (string("orca.iter.end") != e.who()) {
