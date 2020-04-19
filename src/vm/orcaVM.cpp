@@ -2653,7 +2653,7 @@ fast_jmp:
 			case OP_MARK_TRY: {
 				PRINT1("\t\t  mark try: (to: %x)\n", TO_INT(&c[1]));
 				CatchList* cp =  new CatchList(code + TO_INT(&c[1]), 
-									TO_INT(&c[1+sizeof(int)]), m_curr); 
+									TO_INT(&c[1+sizeof(int)]), m_curr, m_stack->size()); 
 				p1.mark_catch(cp);
 				m_local->push_back(p1);
 
@@ -3330,6 +3330,12 @@ fast_jmp:
 				}
 
 				CatchList* cl = (CatchList*)d.mark().vp;
+				int org_stack_size = cl->stack_size;
+				int curr_stack_size = m_stack->size();
+				for (int i=0; i<curr_stack_size - org_stack_size; i++) {
+					m_stack->pop();
+				}
+
 				catch_t* ct;
 				ct = cl->compare(e.who());
 				if (ct != NULL) {

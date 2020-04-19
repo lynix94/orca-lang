@@ -100,6 +100,11 @@ public:
 		}
 	}
 
+	int size()
+	{
+		return m_sp;
+	}
+
 private:
 	orcaData* m_frame;
 	orcaLocal* m_local;

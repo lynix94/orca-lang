@@ -126,6 +126,7 @@ enum FUNCTION_INDEX
 class LIBORCA_API orcaVM
 {
 friend class orcaLocal;
+friend class orcaForStack;
 public:
 	orcaVM() { m_cptr = NULL; m_cp = NULL; emergency_stop = false; }
 	void init_once();

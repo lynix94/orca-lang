@@ -195,6 +195,7 @@ const char* orcaForStack::cont(int* lv1, orcaData* d1, int *lv2, orcaData* d2)
 		}
 	}
 
+	int org_stack_size = get_current_vm()->m_stack->size();
 	try {
 		orcaVM* vm = get_current_vm();
 		vm->push_stack(f->next);
@@ -224,9 +225,14 @@ const char* orcaForStack::cont(int* lv1, orcaData* d1, int *lv2, orcaData* d2)
 			throw e;
 		}
 
-		e.rc_dec();
+		int curr_stack_size = get_current_vm()->m_stack->size();
+		for (int i=0; i<curr_stack_size - org_stack_size; i++) {
+			get_current_vm()->m_stack->pop();
+		}
 
+		e.rc_dec();
 		get_current_vm()->m_curr = f->m_curr_back;
+
 		return 0;
 	}
 
@@ -252,6 +258,7 @@ const char* orcaForStack::cont(orcaLocal* local)
 		}
 	}
 
+	int org_stack_size = get_current_vm()->m_stack->size();
 	try {
 		orcaVM* vm = get_current_vm();
 		vm->push_stack(f->next);
@@ -286,9 +293,14 @@ const char* orcaForStack::cont(orcaLocal* local)
 			throw e;
 		}
 
-		e.rc_dec();
+		int curr_stack_size = get_current_vm()->m_stack->size();
+		for (int i=0; i<curr_stack_size - org_stack_size; i++) {
+			get_current_vm()->m_stack->pop();
+		}
 
+		e.rc_dec();
 		get_current_vm()->m_curr = f->m_curr_back;
+
 		return 0;
 	}
 

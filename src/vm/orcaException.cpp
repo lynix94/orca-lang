@@ -94,7 +94,7 @@ void orcaException::make_trace()
 }
 
 
-CatchList::CatchList(const char* code, int num, orcaObject* my) : m_my(my)
+CatchList::CatchList(const char* code, int num, orcaObject* my, int stack_size) : m_my(my), stack_size(stack_size)
 {
 	const char* cp = code;
 
@@ -126,6 +126,7 @@ CatchList::CatchList(const char* code, int num, orcaObject* my) : m_my(my)
 		p.address = *(int*)cp;
 		cp += sizeof(int);
 		catch_list.push_back(p);
+
 	}
 }
 

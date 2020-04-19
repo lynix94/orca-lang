@@ -70,8 +70,9 @@ struct CatchList
 {
 	vector<catch_t> catch_list;
 	orcaObject* m_my;
+	int stack_size;
 
-	CatchList(const char* code, int num, orcaObject* my);
+	CatchList(const char* code, int num, orcaObject* my, int stack_size);
 	catch_t* compare(const char* name);
 
 	void clear()
