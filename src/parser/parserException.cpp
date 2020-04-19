@@ -108,7 +108,7 @@ void parserException::catch_start(const char* s, const char* lvar, vector<const 
 			push_short(ex.init_code, idx);
 		}
 		else {
-			ex.init_code.push_back(-1);
+			push_short(ex.init_code, -1);
 		}
 
 		for (int i=0; i<vp->size(); i++) { // vars
