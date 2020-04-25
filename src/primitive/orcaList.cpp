@@ -455,8 +455,17 @@ orcaData orcaList::ex_first(orcaVM* vm, int n)
 
 orcaData orcaList::ex_last(orcaVM* vm, int n) 
 {
-	orcaListIter li = end();
-	--li;
+	orcaListIter li;
+	if (dynamic_cast<orcaSbf*>(this)) {
+		int length = size();
+		li = begin();
+		li.set_idx(length-1);
+	}
+	else {
+		li = end();
+		--li;
+	}
+
 	return new orcaListIterator(li, begin(), end(), true, this);
 }
 

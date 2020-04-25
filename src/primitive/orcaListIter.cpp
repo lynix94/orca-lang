@@ -94,6 +94,11 @@ orcaListIter orcaListIter::operator--(int dummy)
 		break;
 
 	case LIST_SBF:
+		if (m_curr < 0) {
+			int length = static_cast<orcaSbf*>(m_lp)->size();
+			m_curr = length;
+		}
+
 		--m_curr;
 		if (static_cast<orcaSbf*>(m_lp)->eof(m_curr)) {
 			m_curr = -1;
@@ -118,6 +123,11 @@ orcaListIter& orcaListIter::operator--()
 		break;
 
 	case LIST_SBF:
+		if (m_curr < 0) {
+			int length = static_cast<orcaSbf*>(m_lp)->size();
+			m_curr = length;
+		}
+
 		--m_curr;
 		if (static_cast<orcaSbf*>(m_lp)->eof(m_curr)) {
 			m_curr = -1;
