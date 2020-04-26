@@ -2464,15 +2464,16 @@ fast_jmp:
 				p2 = m_stack->pop();
 				p1 = m_stack->top();
 
-				if (!isall<TYPE_INT>(p1, p2)) {
-					m_stack->pop();
-					throw orcaException(this, "orca.type", 
-						string("invalid parameter for make pair : ") + 
-						p1.dump_str() + ", " + p2.dump_str());
+				if (isall<TYPE_INT>(p1, p2)) {
+					p3.pair_set(p1.i(), p2.i());
+					m_stack->replace(p3);
 				}
-
-				p3.pair_set(p1.i(), p2.i());
-				m_stack->replace(p3);
+				else {
+					orcaTuple* tp = new orcaTuple();
+					tp->push_back(p1);
+					tp->push_back(p2);
+					m_stack->replace(tp);
+				}
 				break;
 
 			case OP_MAKE_REGEX: 
