@@ -26,7 +26,7 @@ You can type 'orca' to run interepeter.
 or you can run test files in /orca-lang/tests like below
 
 ```
-lynix@lynix-ThinkPad-X390:~/lab/orca$ docker run -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY -it orca-lang:latest bash
+lynix@lynix-ThinkPad-X390:~/lab/orca$ docker run -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY -it lynix94/orca-lang:latest bash
 root@de0b8acc27e8:/# orca
 $ print('hello, orca from docker');
 hello, orca from docker
