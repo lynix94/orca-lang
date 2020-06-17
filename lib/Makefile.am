@@ -6,7 +6,13 @@ orcalibdistributedir = $(prefix)/lib/orca/distribute.orca
 orcalibdistribute_DATA = distribute.orca/remotec.orca distribute.orca/remotec.kw distribute.orca/remoted.orca distribute.orca/remoted.kw distribute.orca/dist.orca distribute.orca/dist.kw distribute.orca/fs.orca distribute.orca/fs.kw distribute.orca/dfsd.orca distribute.orca/dfsd.kw
 
 orcalibnetdir = $(prefix)/lib/orca/net.orca
-orcalibnet_DATA = net.orca/http.orca/client.orca net.orca/http.orca/server.orca net.orca/url.orca net.orca/http.orca/client.kw net.orca/http.orca/server.kw net.orca/url.kw net.orca/krillc.orca/client.orca net.orca/krillc.orca/client.kw net.orca/krillc.orca/pool.orca net.orca/krillc.orca/pool.kw
+orcalibnet_DATA = net.orca/CODE.orca net.orca/url.orca net.orca/CODE.kw net.orca/url.kw
+
+orcalibnethttpdir = $(prefix)/lib/orca/net.orca/http.orca
+orcalibnethttp_DATA = net.orca/http.orca/client.orca net.orca/http.orca/server.orca net.orca/http.orca/client.kw net.orca/http.orca/server.kw
+
+orcalibnetkrilldir = $(prefix)/lib/orca/net.orca/krillc.orca
+orcalibnetkrill_DATA = net.orca/krillc.orca/client.orca net.orca/krillc.orca/client.kw net.orca/krillc.orca/pool.orca net.orca/krillc.orca/pool.kw
 
 orcaliblangdir = $(prefix)/lib/orca/lang.orca
 orcaliblang_DATA = lang.orca/lisp.orca lang.orca/lisp.kw lang.orca/sh.kw lang.orca/sh.orca
@@ -51,7 +57,7 @@ orcalibformdir = $(prefix)/lib/orca/html.orca/form.orca
 orcalibform_DATA = html.orca/form.orca/CODE.kw html.orca/form.orca/CODE.orca html.orca/form.orca/input.kw html.orca/form.orca/input.orca
 
 orcalibstringsdir = $(prefix)/lib/orca/strings.orca
-orcalibstrings_DATA = strings.orca/CODE.kw strings.orca/CODE.orca
+orcalibstrings_DATA = strings.orca/CODE.kw strings.orca/CODE.orca strings.orca/template.orca strings.orca/template.kw
 
 orcalibiodir = $(prefix)/lib/orca/io.orca
 orcalibio_DATA = io.orca/CODE.orca io.orca/CODE.kw io.orca/buffer.orca io.orca/buffer.kw
