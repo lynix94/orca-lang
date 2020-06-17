@@ -16,7 +16,7 @@ xhost +local:docker
 Run docker image like below (add below options to use gtk display)
 
 ```
-docker run -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY -it orca-lang:latest bash
+docker run -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY -it lynix94/orca-lang:latest bash
 ```
 
 
